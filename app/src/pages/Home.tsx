@@ -157,37 +157,42 @@ const iconMap: Record<string, React.ElementType> = { MapPin, Briefcase, Globe }
 function IntroSection() {
   const { t, lang } = useLang()
   const { isLoggedIn, user } = useAuth()
-  const [about, setAbout] = useState<AboutData>(() => loadAbout())
+  const [about, setAbout] = useState<AboutData>(() => loadAbout(lang))
   const [isEditing, setIsEditing] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [editTitle, setEditTitle] = useState(about.title)
-  const [editP1, setEditP1] = useState(about.p1)
-  const [editP2, setEditP2] = useState(about.p2)
-  const [editStats, setEditStats] = useState(about.stats)
+
+  /* Bilingual edit state */
+  const [editZh, setEditZh] = useState<AboutData>(() => loadAbout('zh'))
+  const [editEn, setEditEn] = useState<AboutData>(() => loadAbout('en'))
 
   const avatar = user?.avatar || '/avatar.jpg'
 
   const handleSave = () => {
-    const updated = { title: editTitle, p1: editP1, p2: editP2, stats: editStats }
-    saveAbout(updated)
-    setAbout(updated)
+    saveAbout('zh', editZh)
+    saveAbout('en', editEn)
+    setAbout(lang === 'zh' ? editZh : editEn)
     setIsEditing(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
 
   const handleCancel = () => {
-    setEditTitle(about.title)
-    setEditP1(about.p1)
-    setEditP2(about.p2)
-    setEditStats(about.stats)
+    const zh = loadAbout('zh')
+    const en = loadAbout('en')
+    setEditZh(zh)
+    setEditEn(en)
     setIsEditing(false)
   }
 
-  const updateStat = (i: number, label: string) => {
-    const next = [...editStats]
+  const updateZhStat = (i: number, label: string) => {
+    const next = [...editZh.stats]
     next[i] = { ...next[i], label }
-    setEditStats(next)
+    setEditZh({ ...editZh, stats: next })
+  }
+  const updateEnStat = (i: number, label: string) => {
+    const next = [...editEn.stats]
+    next[i] = { ...next[i], label }
+    setEditEn({ ...editEn, stats: next })
   }
 
   return (
@@ -238,7 +243,7 @@ function IntroSection() {
               <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col gap-3 mt-6 w-full max-w-[240px]">
-              {editStats.map((stat, i) => {
+              {(isEditing ? editZh.stats : about.stats).map((stat, i) => {
                 const IconComp = iconMap[stat.icon] || MapPin
                 return (
                   <motion.div
@@ -257,7 +262,7 @@ function IntroSection() {
                     {isEditing ? (
                       <input
                         value={stat.label}
-                        onChange={(e) => updateStat(i, e.target.value)}
+                        onChange={(e) => updateZhStat(i, e.target.value)}
                         className="w-full bg-transparent text-[0.8125rem] font-medium tracking-[0.04em] text-Slate focus:outline-none font-ui"
                       />
                     ) : (
@@ -284,32 +289,10 @@ function IntroSection() {
             className="md:col-span-8"
           >
             {!isEditing && (
-              <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
-                {t('home.aboutMe')}
-              </p>
-            )}
-            {isEditing ? (
               <>
-                <input
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full bg-transparent font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4"
-                />
-                <textarea
-                  value={editP1}
-                  onChange={(e) => setEditP1(e.target.value)}
-                  rows={3}
-                  className="w-full bg-transparent font-body text-[1.0625rem] leading-[1.75] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 resize-y"
-                />
-                <textarea
-                  value={editP2}
-                  onChange={(e) => setEditP2(e.target.value)}
-                  rows={2}
-                  className="w-full bg-transparent font-body text-[1.0625rem] leading-[1.75] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 resize-y"
-                />
-              </>
-            ) : (
-              <>
+                <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
+                  {t('home.aboutMe')}
+                </p>
                 <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
                   {about.title}
                 </h2>
@@ -326,6 +309,58 @@ function IntroSection() {
                   {t('home.learnMore')}
                 </Link>
               </>
+            )}
+
+            {isEditing && (
+              <div className="space-y-6">
+                {/* Chinese */}
+                <div className="bg-Linen rounded-xl border border-Sand p-5">
+                  <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-3">
+                    中文
+                  </p>
+                  <input
+                    value={editZh.title}
+                    onChange={(e) => setEditZh({ ...editZh, title: e.target.value })}
+                    className="w-full bg-transparent font-display text-[1.125rem] font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3"
+                  />
+                  <textarea
+                    value={editZh.p1}
+                    onChange={(e) => setEditZh({ ...editZh, p1: e.target.value })}
+                    rows={2}
+                    className="w-full bg-transparent font-body text-[0.9375rem] leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 resize-y"
+                  />
+                  <textarea
+                    value={editZh.p2}
+                    onChange={(e) => setEditZh({ ...editZh, p2: e.target.value })}
+                    rows={2}
+                    className="w-full bg-transparent font-body text-[0.9375rem] leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 resize-y"
+                  />
+                </div>
+
+                {/* English */}
+                <div className="bg-Linen rounded-xl border border-Sand p-5">
+                  <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-3">
+                    English
+                  </p>
+                  <input
+                    value={editEn.title}
+                    onChange={(e) => setEditEn({ ...editEn, title: e.target.value })}
+                    className="w-full bg-transparent font-display text-[1.125rem] font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3"
+                  />
+                  <textarea
+                    value={editEn.p1}
+                    onChange={(e) => setEditEn({ ...editEn, p1: e.target.value })}
+                    rows={2}
+                    className="w-full bg-transparent font-body text-[0.9375rem] leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 resize-y"
+                  />
+                  <textarea
+                    value={editEn.p2}
+                    onChange={(e) => setEditEn({ ...editEn, p2: e.target.value })}
+                    rows={2}
+                    className="w-full bg-transparent font-body text-[0.9375rem] leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 resize-y"
+                  />
+                </div>
+              </div>
             )}
           </motion.div>
         </div>
