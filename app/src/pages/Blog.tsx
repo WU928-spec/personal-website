@@ -192,7 +192,7 @@ export default function Blog() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(45,42,38,0.5) 0%, rgba(45,42,38,0.1) 50%, rgba(247,244,239,1) 100%)',
+              'linear-gradient(to bottom, rgba(45,42,38,0.75) 0%, rgba(45,42,38,0.55) 40%, rgba(45,42,38,0.25) 70%, rgba(247,244,239,1) 100%)',
           }}
         />
 
@@ -241,7 +241,7 @@ export default function Blog() {
               placeholder={t('blog.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-Parchment/15 backdrop-blur-md border border-Parchment/20 rounded-full py-3 pl-11 pr-5 text-Parchment placeholder:text-Parchment/50 focus:outline-none focus:border-Parchment/50 focus:bg-Parchment/20 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.2)] transition-all duration-300 font-body"
+              className="w-full bg-Parchment/25 backdrop-blur-md border border-Parchment/40 rounded-full py-3 pl-11 pr-5 text-Parchment placeholder:text-Parchment/70 focus:outline-none focus:border-Parchment/60 focus:bg-Parchment/35 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.25)] transition-all duration-300 font-body"
             />
           </motion.div>
         </div>
