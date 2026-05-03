@@ -151,6 +151,7 @@ export function preprocessWikilinks(
   content: string,
   existingSlugs: string[]
 ): string {
+  if (!content) return ''
   // [[Title|Display]]
   let processed = content.replace(
     /\[\[([^\]|]+)\|([^\]]+)\]\]/g,
@@ -186,6 +187,7 @@ export interface TocItem {
 }
 
 export function extractToc(content: string): TocItem[] {
+  if (!content) return []
   const headings: TocItem[] = []
   const lines = content.split('\n')
 

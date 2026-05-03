@@ -282,7 +282,22 @@ export default function BlogPost() {
     setIsEditing(false)
   }
 
-  if (!post) return null
+  if (!post) {
+    return (
+      <div className="min-h-[60dvh] bg-Parchment flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-Slate font-body text-lg">文章加载失败</p>
+          <p className="text-Slate/60 text-sm mt-2">请尝试清除浏览器缓存后刷新页面</p>
+          <button
+            onClick={() => navigate('/blog')}
+            className="mt-4 inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] transition-all duration-300"
+          >
+            返回博客列表
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-Parchment">
@@ -415,7 +430,7 @@ export default function BlogPost() {
                   />
                 ) : (
                   <MarkdownRenderer
-                    content={post.content}
+                    content={post.content || ''}
                     existingSlugs={allSlugs}
                   />
                 )}
