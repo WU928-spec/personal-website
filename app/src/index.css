@@ -83,3 +83,18 @@
     text-wrap: balance;
   }
 }
+
+/* Anchor links for headings */
+.anchor {
+  opacity: 0;
+  margin-left: 0.3em;
+  text-decoration: none;
+  color: var(--amber);
+  transition: opacity 0.2s ease;
+}
+
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor {
+  opacity: 1;
+}
