@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, ArrowRight, FileSearch } from 'lucide-react'
+import { Search, ArrowRight, FileSearch, Plus } from 'lucide-react'
 import {
   getCategories,
   getPostsByCategory,
@@ -9,6 +9,7 @@ import {
   type Post,
 } from '@/data/posts.ts'
 import { useLang } from '@/contexts/LangContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 const CATEGORIES = getCategories()
 
@@ -115,6 +116,8 @@ function EmptyState() {
    ─────────────────────────────────────────────── */
 export default function Blog() {
   const { t } = useLang()
+  const navigate = useNavigate()
+  const { isLoggedIn } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
@@ -285,8 +288,17 @@ export default function Blog() {
             })}
           </div>
 
-          {/* Right side: sort + count */}
+          {/* Right side: sort + count + new post */}
           <div className="flex items-center gap-4 shrink-0">
+            {isLoggedIn && (
+              <button
+                onClick={() => navigate('/blog/new')}
+                className="flex items-center gap-1.5 bg-Amber text-Parchment font-ui text-[0.8125rem] font-semibold px-4 py-[6px] rounded-lg hover:bg-[#B06A2F] transition-colors"
+              >
+                <Plus size={14} />
+                写文章
+              </button>
+            )}
             <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
               {filteredPosts.length} {t('blog.articles')}
             </span>

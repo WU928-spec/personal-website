@@ -444,6 +444,13 @@ let _posts: Post[] = mergeSavedPosts([
 
 export const posts = _posts;
 
+export function addPost(post: Post): void {
+  _posts.unshift(post);
+  const saved = loadSavedPosts();
+  saved[post.slug] = post;
+  localStorage.setItem('vibecoding_posts', JSON.stringify(saved));
+}
+
 export function savePost(slug: string, updates: Partial<Post>): void {
   const idx = _posts.findIndex((p) => p.slug === slug);
   if (idx === -1) return;
