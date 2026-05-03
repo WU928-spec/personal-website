@@ -182,6 +182,7 @@ function RelatedCard({ post, index }: { post: Post; index: number }) {
    ─────────────────────────────────────────────── */
 function PrevNextNav({ prev, next }: { prev: Post | null; next: Post | null }) {
   const navigate = useNavigate()
+  const { t } = useLang()
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
