@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Github, Search, Menu, X, LogIn, User, Globe } from 'lucide-react'
+import { Github, Search, Menu, X, LogIn, User, Globe, Sun, Moon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -11,6 +12,7 @@ export default function Navbar() {
   const location = useLocation()
   const { user, isLoggedIn } = useAuth()
   const { t, lang, toggleLang } = useLang()
+  const { theme, toggleTheme } = useTheme()
 
   const navLinks = [
     { path: '/', label: t('nav.home') },
@@ -94,6 +96,13 @@ export default function Navbar() {
             >
               <Globe size={14} />
               {lang === 'zh' ? 'EN' : '中'}
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center w-8 h-8 rounded-md border border-Sand text-Ink hover:text-Amber hover:border-Amber transition-colors duration-300"
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
             </button>
             {isLoggedIn ? (
               <Link

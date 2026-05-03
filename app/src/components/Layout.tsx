@@ -4,6 +4,7 @@ import Navbar from './Navbar.tsx'
 import Footer from './Footer.tsx'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LangProvider } from '@/contexts/LangContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import Lenis from 'lenis'
 
 interface LayoutProps {
@@ -32,14 +33,16 @@ export default function Layout({ children }: LayoutProps) {
   }, [])
 
   return (
-    <LangProvider>
-      <AuthProvider>
-        <div className="relative">
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </div>
-      </AuthProvider>
-    </LangProvider>
+    <ThemeProvider>
+      <LangProvider>
+        <AuthProvider>
+          <div className="relative">
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </div>
+        </AuthProvider>
+      </LangProvider>
+    </ThemeProvider>
   )
 }
