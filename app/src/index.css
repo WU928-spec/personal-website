@@ -35,31 +35,31 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --color-parchment: 247 244 239;
-    --color-ink: 30 28 26;
-    --color-amber: 196 120 58;
-    --color-sage: 107 142 107;
-    --color-slate: 74 85 104;
-    --color-graphite: 45 42 38;
-    --color-linen: 237 232 224;
-    --color-sand: 212 197 181;
-    --color-mist: 232 226 216;
-    --color-rose: 184 105 90;
-    --color-gold: 201 168 76;
+    --color-parchment: 247, 244, 239;
+    --color-ink: 30, 28, 26;
+    --color-amber: 196, 120, 58;
+    --color-sage: 107, 142, 107;
+    --color-slate: 74, 85, 104;
+    --color-graphite: 45, 42, 38;
+    --color-linen: 237, 232, 224;
+    --color-sand: 212, 197, 181;
+    --color-mist: 232, 226, 216;
+    --color-rose: 184, 105, 90;
+    --color-gold: 201, 168, 76;
   }
 
   .dark {
-    --color-parchment: 30 28 26;
-    --color-ink: 247 244 239;
-    --color-amber: 196 120 58;
-    --color-sage: 107 142 107;
-    --color-slate: 160 174 192;
-    --color-graphite: 247 244 239;
-    --color-linen: 45 42 38;
-    --color-sand: 74 85 104;
-    --color-mist: 45 42 38;
-    --color-rose: 184 105 90;
-    --color-gold: 201 168 76;
+    --color-parchment: 30, 28, 26;
+    --color-ink: 247, 244, 239;
+    --color-amber: 196, 120, 58;
+    --color-sage: 107, 142, 107;
+    --color-slate: 160, 174, 192;
+    --color-graphite: 247, 244, 239;
+    --color-linen: 45, 42, 38;
+    --color-sand: 74, 85, 104;
+    --color-mist: 45, 42, 38;
+    --color-rose: 184, 105, 90;
+    --color-gold: 201, 168, 76;
   }
 
   * {
@@ -81,14 +81,14 @@
     width: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--linen);
+    background: rgba(var(--color-linen), 1);
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--sand);
+    background: rgba(var(--color-sand), 1);
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--amber);
+    background: rgba(var(--color-amber), 1);
   }
 }
 
