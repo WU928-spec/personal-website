@@ -61,7 +61,7 @@ export default function Profile() {
           className="inline-flex items-center gap-2 text-Slate hover:text-Amber transition-colors mb-8 font-body"
         >
           <ArrowLeft size={16} />
-          返回
+          {t('profile.back')}
         </button>
 
         <motion.div

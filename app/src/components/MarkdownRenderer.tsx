@@ -244,7 +244,7 @@ function CopyButton({ code }: { code: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="absolute top-3 right-3 flex items-center gap-1 rounded px-2 py-1 text-xs font-mono text-Parchment/70 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white/20"
+      className="absolute top-3 right-3 flex items-center gap-1 rounded px-2 py-1 text-xs font-mono text-white/70 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white/20"
       aria-label="Copy code"
     >
       {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -321,12 +321,12 @@ function Callout({
   }
 
   const bgMap: Record<string, string> = {
-    note: 'rgba(107,142,107,0.08)',
-    tip: 'rgba(201,168,76,0.08)',
-    warning: 'rgba(184,101,74,0.08)',
-    danger: 'rgba(184,101,74,0.08)',
-    info: 'rgba(107,142,107,0.08)',
-    success: 'rgba(107,142,107,0.08)',
+    note: 'rgba(var(--color-sage), 0.12)',
+    tip: 'rgba(var(--color-gold), 0.12)',
+    warning: 'rgba(var(--color-rose), 0.12)',
+    danger: 'rgba(var(--color-rose), 0.12)',
+    info: 'rgba(var(--color-sage), 0.12)',
+    success: 'rgba(var(--color-sage), 0.12)',
   }
 
   const borderMap: Record<string, string> = {

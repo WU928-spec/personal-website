@@ -65,25 +65,20 @@ function HeroSection() {
         initial={{ scale: 1.05 }}
         animate={{ scale: 1 }}
         transition={{ duration: 8, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
-        className="absolute inset-0"
+        className="absolute inset-0 hero-bg-image"
         style={{
           backgroundImage: 'url(/hero-bg.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       />
-      {/* Overlay gradient */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(45,42,38,0.7) 0%, rgba(45,42,38,0.5) 40%, rgba(45,42,38,0.2) 70%, rgba(247,244,239,1) 100%)',
-        }}
-      />
+      {/* Overlay gradient - adaptive: light = transparent, dark = dark */}
+      <div className="absolute inset-0 hero-overlay" />
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
         {/* Headline with typing */}
-        <h1 className="font-display text-[clamp(2.75rem,6vw,5rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-Parchment">
+        <h1 className="font-display text-[clamp(2.75rem,6vw,5rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-Ink">
           {displayed}
           {showCursor && (
             <span className="text-Amber animate-blink ml-0.5">|</span>
@@ -95,7 +90,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={done ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="font-body text-[1.0625rem] leading-[1.75] text-[rgba(247,244,239,0.85)] mt-4"
+          className="font-body text-[1.0625rem] leading-[1.75] text-Ink/85 mt-4"
         >
           Developer &middot; Writer &middot; Digital Gardener
         </motion.p>
@@ -105,7 +100,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={done ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="font-body text-[0.9375rem] leading-[1.65] text-[rgba(247,244,239,0.7)] max-w-xl mx-auto mt-4"
+          className="font-body text-[0.9375rem] leading-[1.65] text-Ink/70 max-w-xl mx-auto mt-4"
         >
           I build things and write about what I learn. Welcome to my corner of the internet.
         </motion.p>
@@ -125,7 +120,7 @@ function HeroSection() {
           </Link>
           <Link
             to="/projects"
-            className="inline-flex items-center border-[1.5px] border-Parchment text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink hover:border-Ink hover:text-Parchment hover:-translate-y-px transition-all duration-300"
+            className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink/10 hover:-translate-y-px transition-all duration-300"
             style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
             {t('home.viewProjects')}
@@ -141,10 +136,10 @@ function HeroSection() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <div className="flex flex-col items-center gap-2 animate-scroll-pulse">
-          <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(247,244,239,0.5)] uppercase">
+          <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50 uppercase">
             {t('home.scroll')}
           </span>
-          <ChevronDown size={20} className="text-[rgba(247,244,239,0.5)]" />
+          <ChevronDown size={20} className="text-Ink/50" />
         </div>
       </motion.div>
     </section>
@@ -419,7 +414,7 @@ function BlogPreviewSection() {
                 delay: 0.1 * i,
                 ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
               }}
-              className="group bg-[rgba(237,232,224,0.7)] border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300"
+              className="group bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300"
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               {/* Thumbnail */}
@@ -443,11 +438,11 @@ function BlogPreviewSection() {
                   {post.excerpt}
                 </p>
                 <div className="flex items-center gap-2 mt-4">
-                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(30,28,26,0.5)]">
+                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50">
                     {post.date}
                   </span>
-                  <span className="text-[rgba(30,28,26,0.3)]">&middot;</span>
-                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(30,28,26,0.5)]">
+                  <span className="text-Ink/30">&middot;</span>
+                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50">
                     {post.readTime}
                   </span>
                 </div>
@@ -559,13 +554,13 @@ function GitHubSnapshotSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
         >
-          <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-[rgba(107,142,107,0.8)] mb-4">
+          <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage/80 mb-4">
             {t('home.openSource')}
           </p>
-          <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Parchment">
+          <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-white">
             {t('home.buildingTitle')}
           </h2>
-          <p className="font-body text-[0.9375rem] leading-[1.65] text-[rgba(247,244,239,0.6)] mt-2">
+          <p className="font-body text-[0.9375rem] leading-[1.65] text-white/60 mt-2">
             {t('home.buildingDesc')}
           </p>
         </motion.div>
@@ -578,7 +573,7 @@ function GitHubSnapshotSection() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mt-8"
         >
-          <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(247,244,239,0.5)] mb-3">
+          <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mb-3">
             {t('home.contributionActivity')}
           </p>
           <div className="flex gap-[3px] overflow-x-auto pb-2">
@@ -621,16 +616,16 @@ function GitHubSnapshotSection() {
                 delay: 0.1 * i,
                 ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
               }}
-              className="block bg-[rgba(45,42,38,0.9)] border border-[rgba(255,255,255,0.08)] rounded-xl p-6 hover:border-[rgba(255,255,255,0.15)] hover:shadow-deep hover:-translate-y-[2px] transition-all duration-300"
+              className="block bg-Graphite/90 border border-white/[0.08] rounded-xl p-6 hover:border-white/[0.15] hover:shadow-deep hover:-translate-y-[2px] transition-all duration-300"
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-mono text-[0.875rem] leading-[1.6] text-Amber">
                   {repo.name}
                 </h3>
-                <ExternalLink size={14} className="text-[rgba(247,244,239,0.4)]" />
+                <ExternalLink size={14} className="text-white/40" />
               </div>
-              <p className="font-body text-[0.9375rem] leading-[1.65] text-[rgba(247,244,239,0.7)] mt-2 line-clamp-2">
+              <p className="font-body text-[0.9375rem] leading-[1.65] text-white/70 mt-2 line-clamp-2">
                 {repo.description}
               </p>
               <div className="flex items-center gap-4 mt-4">
@@ -639,19 +634,19 @@ function GitHubSnapshotSection() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: repo.languageColor }}
                   />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-[rgba(247,244,239,0.6)]">
+                  <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/60">
                     {repo.language}
                   </span>
                 </span>
-                <span className="flex items-center gap-1 text-[rgba(247,244,239,0.6)]">
+                <span className="flex items-center gap-1 text-white/60">
                   <Star size={14} />
                   <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.stars}</span>
                 </span>
-                <span className="flex items-center gap-1 text-[rgba(247,244,239,0.6)]">
+                <span className="flex items-center gap-1 text-white/60">
                   <GitFork size={14} />
                   <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.forks}</span>
                 </span>
-                <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-[rgba(247,244,239,0.4)] ml-auto">
+                <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/40 ml-auto">
                   {repo.updated}
                 </span>
               </div>
@@ -675,11 +670,11 @@ function GitHubSnapshotSection() {
             <div
               key={stat.label}
               className={`flex flex-col items-center py-4 ${
-                i < arr.length - 1 ? 'md:border-r md:border-[rgba(247,244,239,0.1)]' : ''
+                i < arr.length - 1 ? 'md:border-r md:border-white/10' : ''
               }`}
             >
               <CountUpNumber value={stat.value} duration={1.5} />
-              <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(247,244,239,0.5)] mt-1">
+              <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mt-1">
                 {stat.label}
               </span>
             </div>
@@ -698,7 +693,7 @@ function GitHubSnapshotSection() {
             href="https://github.com/alex"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center border-[1.5px] border-[rgba(247,244,239,0.5)] text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Parchment hover:text-Ink hover:border-Parchment hover:-translate-y-px transition-all duration-300"
+            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
             style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
             {t('home.viewFullProfile')}

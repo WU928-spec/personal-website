@@ -43,7 +43,7 @@ function BlogCard({
       }`}
       onClick={() => navigate(`/blog/${post.slug}`)}
     >
-      <div className="bg-[rgba(237,232,224,0.7)] border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)]">
+      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)]">
         {/* Thumbnail */}
         <div className="relative overflow-hidden aspect-[16/10]">
           <img
@@ -185,16 +185,10 @@ export default function Blog() {
       {/* ── Hero ── */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center hero-bg-image"
           style={{ backgroundImage: 'url(/blog-hero.jpg)' }}
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(45,42,38,0.75) 0%, rgba(45,42,38,0.55) 40%, rgba(45,42,38,0.25) 70%, rgba(247,244,239,1) 100%)',
-          }}
-        />
+        <div className="absolute inset-0 hero-overlay" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
           <motion.h1
@@ -204,7 +198,7 @@ export default function Blog() {
               duration: 0.8,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Parchment"
+            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink"
           >
             {t('blog.garden')}
           </motion.h1>
@@ -216,7 +210,7 @@ export default function Blog() {
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="mt-4 text-[1.0625rem] leading-[1.75] text-Parchment/80 max-w-xl mx-auto font-body"
+            className="mt-4 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body"
           >
             {t('blog.gardenDesc')}
           </motion.p>
@@ -234,14 +228,14 @@ export default function Blog() {
           >
             <Search
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-Parchment/50"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-Ink/50"
             />
             <input
               type="text"
               placeholder={t('blog.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-Parchment/25 backdrop-blur-md border border-Parchment/40 rounded-full py-3 pl-11 pr-5 text-Parchment placeholder:text-Parchment/70 focus:outline-none focus:border-Parchment/60 focus:bg-Parchment/35 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.25)] transition-all duration-300 font-body"
+              className="w-full bg-Ink/10 backdrop-blur-md border border-Ink/20 rounded-full py-3 pl-11 pr-5 text-Ink placeholder:text-Ink/60 focus:outline-none focus:border-Ink/40 focus:bg-Ink/15 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.25)] transition-all duration-300 font-body"
             />
           </motion.div>
         </div>
@@ -296,7 +290,7 @@ export default function Blog() {
                 className="flex items-center gap-1.5 bg-Amber text-Parchment font-ui text-[0.8125rem] font-semibold px-4 py-[6px] rounded-lg hover:bg-[#B06A2F] transition-colors"
               >
                 <Plus size={14} />
-                写文章
+                {t('blog.newPost')}
               </button>
             )}
             <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">

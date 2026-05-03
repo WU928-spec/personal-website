@@ -110,15 +110,15 @@ export default function NewPost() {
   const handleSave = () => {
     setError('')
     if (!title.trim()) {
-      setError('请输入标题')
+      setError(t('newPost.errorTitle'))
       return
     }
     if (!slug.trim()) {
-      setError('请输入 URL 标识')
+      setError(t('newPost.errorSlug'))
       return
     }
     if (!content.trim()) {
-      setError('请输入正文内容')
+      setError(t('newPost.errorContent'))
       return
     }
 
@@ -176,20 +176,20 @@ export default function NewPost() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
         >
           <h1 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium text-Ink mb-2">
-            写文章
+            {t('newPost.title')}
           </h1>
-          <p className="text-Slate font-body mb-8">支持手动编辑或上传 .md 文件</p>
+          <p className="text-Slate font-body mb-8">{t('newPost.subtitle')}</p>
 
           {/* Upload area */}
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
             onClick={() => fileInputRef.current?.click()}
-            className="mb-8 p-8 border-2 border-dashed border-Sand rounded-xl bg-Linen hover:border-Amber hover:bg-[rgba(196,120,58,0.05)] transition-all duration-300 cursor-pointer text-center"
+            className="mb-8 p-8 border-2 border-dashed border-Sand rounded-xl bg-Linen hover:border-Amber hover:bg-Amber/5 transition-all duration-300 cursor-pointer text-center"
           >
             <FileUp size={32} className="text-Slate mx-auto mb-3" />
-            <p className="text-Ink font-body font-medium">拖拽 .md 文件到此处</p>
-            <p className="text-Slate text-sm mt-1">或点击选择文件</p>
+            <p className="text-Ink font-body font-medium">{t('newPost.dragDrop')}</p>
+            <p className="text-Slate text-sm mt-1">{t('newPost.orClick')}</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -208,7 +208,7 @@ export default function NewPost() {
               }`}
             >
               <Edit3 size={14} />
-              编辑
+              {t('newPost.edit')}
             </button>
             <button
               onClick={() => setPreview(true)}
@@ -217,33 +217,33 @@ export default function NewPost() {
               }`}
             >
               <Eye size={14} />
-              预览
+              {t('newPost.preview')}
             </button>
           </div>
 
           {preview ? (
             <div className="bg-Linen rounded-xl border border-Sand p-8 min-h-[400px]">
-              <h2 className="font-display text-2xl font-medium text-Ink mb-4">{title || '无标题'}</h2>
-              <MarkdownRenderer content={content || '*暂无内容*'} />
+              <h2 className="font-display text-2xl font-medium text-Ink mb-4">{title || t('newPost.noTitle')}</h2>
+              <MarkdownRenderer content={content || `*${t('newPost.noContent')}*`} />
             </div>
           ) : (
             <div className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-                    标题 *
+                    {t('newPost.titleLabel')} *
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="文章标题"
+                    placeholder={t('newPost.titlePlaceholder')}
                     className="w-full bg-Linen border border-Sand rounded-xl py-3 px-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
                   />
                 </div>
                 <div>
                   <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-                    URL 标识 (slug) *
+                    {t('newPost.slugLabel')} *
                   </label>
                   <input
                     type="text"
@@ -258,7 +258,7 @@ export default function NewPost() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-                    分类
+                    {t('newPost.categoryLabel')}
                   </label>
                   <input
                     type="text"
@@ -270,7 +270,7 @@ export default function NewPost() {
                 </div>
                 <div>
                   <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-                    标签（用逗号分隔）
+                    {t('newPost.tagsLabel')}
                   </label>
                   <input
                     type="text"
@@ -284,25 +284,25 @@ export default function NewPost() {
 
               <div>
                 <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-                  摘要
+                  {t('newPost.excerptLabel')}
                 </label>
                 <input
                   type="text"
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
-                  placeholder="简短描述这篇文章的内容..."
+                  placeholder={t('newPost.excerptPlaceholder')}
                   className="w-full bg-Linen border border-Sand rounded-xl py-3 px-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
                 />
               </div>
 
               <div>
                 <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-                  正文 (Markdown) *
+                  {t('newPost.contentLabel')} *
                 </label>
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="# 标题\n\n开始写作..."
+                  placeholder={t('newPost.contentPlaceholder')}
                   className="w-full min-h-[400px] bg-Linen border border-Sand rounded-xl p-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 resize-y font-body text-[0.9375rem] leading-[1.75]"
                 />
               </div>
@@ -319,7 +319,7 @@ export default function NewPost() {
               className="inline-flex items-center gap-2 bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3.5 rounded-xl hover:bg-[#B06A2F] hover:shadow-amber hover:-translate-y-px transition-all duration-300"
             >
               <Save size={16} />
-              {saved ? '已发布' : '发布文章'}
+              {saved ? t('newPost.published') : t('newPost.publish')}
             </button>
             <button
               onClick={() => navigate('/blog')}

@@ -36,7 +36,7 @@ export default function Footer() {
               <Link
                 key={`${link.path}-${link.label}`}
                 to={link.path}
-                className="font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] text-[rgba(247,244,239,0.6)] hover:text-Parchment transition-colors duration-300"
+                className="font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] text-white/60 hover:text-white transition-colors duration-300"
               >
                 {link.label}
               </Link>

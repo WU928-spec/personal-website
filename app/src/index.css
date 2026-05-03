@@ -49,17 +49,32 @@
   }
 
   .dark {
-    --color-parchment: 30, 28, 26;
-    --color-ink: 247, 244, 239;
-    --color-amber: 196, 120, 58;
-    --color-sage: 107, 142, 107;
-    --color-slate: 160, 174, 192;
-    --color-graphite: 247, 244, 239;
-    --color-linen: 45, 42, 38;
-    --color-sand: 74, 85, 104;
-    --color-mist: 45, 42, 38;
-    --color-rose: 184, 105, 90;
-    --color-gold: 201, 168, 76;
+    /* 深色模式：独立配色，非简单反转 */
+    --color-parchment: 30, 28, 26;       /* 页面背景：深石墨 */
+    --color-ink: 247, 244, 239;          /* 主要文字： parchment 白 */
+    --color-amber: 214, 145, 80;         /* 强调色：稍亮的琥珀 */
+    --color-sage: 130, 165, 130;         /* 强调色：稍亮的鼠尾草 */
+    --color-slate: 180, 175, 165;        /* 次要文字：暗米色 */
+    --color-graphite: 45, 42, 38;        /* 深色区块背景：固定不变 */
+    --color-linen: 58, 54, 48;           /* 卡片背景：深棕灰 */
+    --color-sand: 100, 94, 86;           /* 边框：深灰棕 */
+    --color-mist: 50, 46, 42;            /* 浅背景：深石墨 */
+    --color-rose: 205, 125, 110;         /* 强调色：稍亮的玫瑰 */
+    --color-gold: 220, 195, 110;         /* 强调色：稍亮的金 */
+  }
+
+  /* Hero 背景图在深色模式下变暗 */
+  .dark .hero-bg-image {
+    filter: brightness(0.25) saturate(0.7);
+    transition: filter 0.5s ease;
+  }
+
+  /* Hero 遮罩：light 模式几乎透明（底部短渐变过渡），dark 模式纯统一遮罩 */
+  .hero-overlay {
+    background: linear-gradient(to bottom, rgba(247,244,239,0) 0%, rgba(247,244,239,0) 70%, rgba(247,244,239,0.5) 100%);
+  }
+  .dark .hero-overlay {
+    background: rgba(30,28,26,0.45);
   }
 
   * {

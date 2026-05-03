@@ -152,7 +152,7 @@ function RelatedCard({ post, index }: { post: Post; index: number }) {
       className="group cursor-pointer"
       onClick={() => navigate(`/blog/${post.slug}`)}
     >
-      <div className="bg-[rgba(237,232,224,0.7)] border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-[0.35s]">
+      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-[0.35s]">
         <div className="relative overflow-hidden aspect-[16/10]">
           <img
             src={`/blog-thumb-${(index % 6) + 1}.jpg`}
@@ -288,13 +288,13 @@ export default function BlogPost() {
     return (
       <div className="min-h-[60dvh] bg-Parchment flex items-center justify-center">
         <div className="text-center">
-          <p className="text-Slate font-body text-lg">文章加载失败</p>
-          <p className="text-Slate/60 text-sm mt-2">请尝试清除浏览器缓存后刷新页面</p>
+          <p className="text-Slate font-body text-lg">{t('post.loadFailed')}</p>
+          <p className="text-Slate/60 text-sm mt-2">{t('post.loadFailedDesc')}</p>
           <button
             onClick={() => navigate('/blog')}
             className="mt-4 inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] transition-all duration-300"
           >
-            返回博客列表
+            {t('post.backToBlog')}
           </button>
         </div>
       </div>
@@ -307,20 +307,14 @@ export default function BlogPost() {
 
       {/* ── Post Hero ── */}
       <section
-        className="relative min-h-[40vh] max-h-[60vh] flex items-end overflow-hidden"
+        className="relative min-h-[40vh] max-h-[60vh] flex items-end overflow-hidden hero-bg-image"
         style={{
           backgroundImage: 'url(/blog-hero.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(45,42,38,0.5) 0%, rgba(45,42,38,0.1) 50%, rgba(247,244,239,1) 100%)',
-          }}
-        />
+        <div className="absolute inset-0 hero-overlay" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 pb-12 w-full">
           <motion.div
@@ -334,21 +328,21 @@ export default function BlogPost() {
           >
             <span
               className="px-3 py-1 rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Amber border border-Amber/30"
-              style={{ background: 'rgba(196,120,58,0.2)' }}
+              style={{ background: 'rgba(var(--color-amber), 0.2)' }}
             >
               {post.category}
             </span>
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Parchment/70">
+            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70">
               {post.date}
             </span>
-            <span className="text-Parchment/70">·</span>
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Parchment/70">
+            <span className="text-Ink/70">·</span>
+            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70">
               {post.readingTime}
             </span>
             {isLoggedIn && !isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Parchment/15 backdrop-blur-md border border-Parchment/20 text-Parchment text-[0.8125rem] font-medium hover:bg-Parchment/25 transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
               >
                 <Pencil size={14} />
                 {t('post.edit')}
@@ -357,18 +351,18 @@ export default function BlogPost() {
             {isLoggedIn && isEditing && (
               <div className="ml-auto flex items-center gap-2">
                 {saved && (
-                  <span className="text-[0.8125rem] text-Sage">已保存</span>
+                  <span className="text-[0.8125rem] text-Sage">{t('post.saved')}</span>
                 )}
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Ink text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
                 >
                   <Save size={14} />
                   {t('post.save')}
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Parchment/15 backdrop-blur-md border border-Parchment/20 text-Parchment text-[0.8125rem] font-medium hover:bg-Parchment/25 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
                 >
                   <X size={14} />
                   {t('post.cancel')}
@@ -382,7 +376,7 @@ export default function BlogPost() {
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="mt-3 w-full bg-transparent border-b border-Parchment/30 text-Parchment font-display text-[clamp(2rem,4vw,3.5rem)] font-medium placeholder:text-Parchment/40 focus:outline-none focus:border-Parchment/60 pb-2"
+              className="mt-3 w-full bg-transparent border-b border-Ink/30 text-Ink font-display text-[clamp(2rem,4vw,3.5rem)] font-medium placeholder:text-Ink/40 focus:outline-none focus:border-Ink/60 pb-2"
             />
           ) : (
             <motion.h1
@@ -393,7 +387,7 @@ export default function BlogPost() {
                 delay: 0.1,
                 ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
               }}
-              className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Parchment mt-3 max-w-3xl"
+              className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink mt-3 max-w-3xl"
             >
               {post.title}
             </motion.h1>
@@ -407,7 +401,7 @@ export default function BlogPost() {
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="mt-3 text-[1.0625rem] leading-[1.75] text-Parchment/80 max-w-2xl font-body"
+            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-2xl font-body"
           >
             {post.excerpt}
           </motion.p>

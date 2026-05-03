@@ -18,14 +18,14 @@ export default function Login() {
     e.preventDefault()
     setError('')
     if (!username.trim() || !password.trim()) {
-      setError('请输入用户名和密码')
+      setError(t('login.errorEmpty'))
       return
     }
     const success = login(username.trim(), password)
     if (success) {
       navigate('/')
     } else {
-      setError('用户名或密码错误')
+      setError(t('login.errorInvalid'))
     }
   }
 
@@ -80,7 +80,7 @@ export default function Login() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="输入密码"
+                placeholder={t('login.passwordPlaceholder')}
                 className="w-full bg-Linen border border-Sand rounded-xl py-3 pl-11 pr-12 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
               <button
