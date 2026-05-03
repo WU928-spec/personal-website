@@ -1,0 +1,53 @@
+import { Routes, Route } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
+import Layout from './components/Layout.tsx'
+import Home from './pages/Home.tsx'
+
+const Blog = lazy(() => import('./pages/Blog.tsx'))
+const BlogPost = lazy(() => import('./pages/BlogPost.tsx'))
+const Projects = lazy(() => import('./pages/Projects.tsx'))
+const About = lazy(() => import('./pages/About.tsx'))
+
+function App() {
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/blog"
+          element={
+            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
+              <Blog />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/blog/:slug"
+          element={
+            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
+              <BlogPost />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
+              <Projects />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
+              <About />
+            </Suspense>
+          }
+        />
+      </Routes>
+    </Layout>
+  )
+}
+
+export default App
