@@ -561,21 +561,6 @@ export default function MarkdownRenderer({
         rehypePlugins={[
           rehypeRaw,
           rehypeSlug,
-          [
-            rehypeAutolinkHeadings,
-            {
-              behavior: 'append',
-              properties: {
-                className: 'anchor hidden',
-                ariaHidden: 'true',
-                tabIndex: -1,
-              },
-              content: {
-                type: 'text',
-                value: '¶',
-              },
-            },
-          ],
         ]}
         components={buildComponents(existingSlugs)}
       >
