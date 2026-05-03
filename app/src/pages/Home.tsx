@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronDown, ExternalLink, MapPin, Briefcase, Globe, Star, GitFork } from 'lucide-react'
+import { ChevronDown, ExternalLink, MapPin, Briefcase, Globe, Star, GitFork, Pencil, Save, X } from 'lucide-react'
 import { useLang } from '@/contexts/LangContext'
+import { useAuth } from '@/contexts/AuthContext'
+import { loadAbout, saveAbout, type AboutData } from '@/data/about'
 
 /* ------------------------------------------------------------------ */
 /*  Hero Section                                                       */
@@ -150,17 +152,79 @@ function HeroSection() {
 /*  Introduction Card Section                                          */
 /* ------------------------------------------------------------------ */
 
-const introStats = [
-  { icon: MapPin, label: 'San Francisco, CA' },
-  { icon: Briefcase, label: 'Full-Stack Developer' },
-  { icon: Globe, label: 'EN, ES, DE' },
-]
+const iconMap: Record<string, React.ElementType> = { MapPin, Briefcase, Globe }
 
 function IntroSection() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const { isLoggedIn, user } = useAuth()
+  const [about, setAbout] = useState<AboutData>(() => loadAbout())
+  const [isEditing, setIsEditing] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [editTitle, setEditTitle] = useState(about.title)
+  const [editP1, setEditP1] = useState(about.p1)
+  const [editP2, setEditP2] = useState(about.p2)
+  const [editStats, setEditStats] = useState(about.stats)
+
+  const avatar = user?.avatar || '/avatar.jpg'
+
+  const handleSave = () => {
+    const updated = { title: editTitle, p1: editP1, p2: editP2, stats: editStats }
+    saveAbout(updated)
+    setAbout(updated)
+    setIsEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleCancel = () => {
+    setEditTitle(about.title)
+    setEditP1(about.p1)
+    setEditP2(about.p2)
+    setEditStats(about.stats)
+    setIsEditing(false)
+  }
+
+  const updateStat = (i: number, label: string) => {
+    const next = [...editStats]
+    next[i] = { ...next[i], label }
+    setEditStats(next)
+  }
+
   return (
-    <section className="bg-Parchment py-24 md:py-32">
+    <section className="bg-Parchment py-24 md:py-32 relative">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
+        {/* Edit button */}
+        {isLoggedIn && !isEditing && (
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+            >
+              <Pencil size={14} />
+              {t('post.edit')}
+            </button>
+          </div>
+        )}
+        {isLoggedIn && isEditing && (
+          <div className="flex justify-end mb-4 gap-2">
+            {saved && <span className="text-[0.8125rem] text-Sage self-center">{t('post.saved')}</span>}
+            <button
+              onClick={handleSave}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
+            >
+              <Save size={14} />
+              {t('post.save')}
+            </button>
+            <button
+              onClick={handleCancel}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Linen border border-Sand text-Slate text-[0.8125rem] font-medium hover:border-Amber hover:text-Amber transition-colors"
+            >
+              <X size={14} />
+              {t('post.cancel')}
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
           {/* Left column */}
           <motion.div
@@ -171,28 +235,39 @@ function IntroSection() {
             className="md:col-span-4 flex flex-col items-center"
           >
             <div className="w-[200px] h-[200px] rounded-full overflow-hidden border-[3px] border-Amber shadow-medium">
-              <img src="/avatar.jpg" alt="Profile" className="w-full h-full object-cover" />
+              <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col gap-3 mt-6 w-full max-w-[240px]">
-              {introStats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.5,
-                    delay: 0.1 * i,
-                    ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-                  }}
-                  className="flex items-center gap-2 bg-Linen border border-Sand rounded-lg px-3 py-2"
-                >
-                  <stat.icon size={14} className="text-Slate" />
-                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-                    {stat.label}
-                  </span>
-                </motion.div>
-              ))}
+              {editStats.map((stat, i) => {
+                const IconComp = iconMap[stat.icon] || MapPin
+                return (
+                  <motion.div
+                    key={stat.icon + i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.5,
+                      delay: 0.1 * i,
+                      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+                    }}
+                    className="flex items-center gap-2 bg-Linen border border-Sand rounded-lg px-3 py-2"
+                  >
+                    <IconComp size={14} className="text-Slate shrink-0" />
+                    {isEditing ? (
+                      <input
+                        value={stat.label}
+                        onChange={(e) => updateStat(i, e.target.value)}
+                        className="w-full bg-transparent text-[0.8125rem] font-medium tracking-[0.04em] text-Slate focus:outline-none font-ui"
+                      />
+                    ) : (
+                      <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+                        {stat.label}
+                      </span>
+                    )}
+                  </motion.div>
+                )
+              })}
             </div>
           </motion.div>
 
@@ -208,24 +283,50 @@ function IntroSection() {
             }}
             className="md:col-span-8"
           >
-            <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
-              {t('home.aboutMe')}
-            </p>
-            <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
-              {t('home.aboutTitle')}
-            </h2>
-            <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
-              {t('home.aboutP1')}
-            </p>
-            <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
-              {t('home.aboutP2')}
-            </p>
-            <Link
-              to="/about"
-              className="inline-block mt-6 font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300"
-            >
-              {t('home.learnMore')}
-            </Link>
+            {!isEditing && (
+              <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
+                {t('home.aboutMe')}
+              </p>
+            )}
+            {isEditing ? (
+              <>
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full bg-transparent font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4"
+                />
+                <textarea
+                  value={editP1}
+                  onChange={(e) => setEditP1(e.target.value)}
+                  rows={3}
+                  className="w-full bg-transparent font-body text-[1.0625rem] leading-[1.75] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 resize-y"
+                />
+                <textarea
+                  value={editP2}
+                  onChange={(e) => setEditP2(e.target.value)}
+                  rows={2}
+                  className="w-full bg-transparent font-body text-[1.0625rem] leading-[1.75] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 resize-y"
+                />
+              </>
+            ) : (
+              <>
+                <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
+                  {about.title}
+                </h2>
+                <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
+                  {about.p1}
+                </p>
+                <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
+                  {about.p2}
+                </p>
+                <Link
+                  to="/about"
+                  className="inline-block mt-6 font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300"
+                >
+                  {t('home.learnMore')}
+                </Link>
+              </>
+            )}
           </motion.div>
         </div>
       </div>
@@ -605,7 +706,7 @@ function GitHubSnapshotSection() {
           {pinnedRepos.map((repo, i) => (
             <motion.a
               key={repo.name}
-              href={`https://github.com/alex/${repo.name}`}
+              href={`https://github.com/WU928-spec/${repo.name}`}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
@@ -690,7 +791,7 @@ function GitHubSnapshotSection() {
           className="text-center mt-10"
         >
           <a
-            href="https://github.com/alex"
+            href="https://github.com/WU928-spec"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
