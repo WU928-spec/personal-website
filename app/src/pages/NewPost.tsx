@@ -31,7 +31,7 @@ export default function NewPost() {
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
-  const [category, setCategory] = useState('Thoughts')
+  const [category, setCategory] = useState(t('newPost.defaultCategory'))
   const [tags, setTags] = useState('')
   const [excerpt, setExcerpt] = useState('')
   const [content, setContent] = useState('')
@@ -133,8 +133,8 @@ export default function NewPost() {
       slug: finalSlug,
       title: title.trim(),
       date: now,
-      category: category.trim() || 'Uncategorized',
-      tags: tagList.length > 0 ? tagList : ['general'],
+      category: category.trim() || t('newPost.uncategorized'),
+      tags: tagList.length > 0 ? tagList : [t('newPost.defaultTag')],
       excerpt: excerpt.trim() || content.trim().substring(0, 120).replace(/[#*`]/g, '') + '...',
       readingTime: estimateReadingTime(content),
       content: content.trim(),
@@ -249,7 +249,7 @@ export default function NewPost() {
                     type="text"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
-                    placeholder="my-article-title"
+                    placeholder={t('newPost.slugPlaceholder')}
                     className="w-full bg-Linen border border-Sand rounded-xl py-3 px-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
                   />
                 </div>
@@ -264,7 +264,7 @@ export default function NewPost() {
                     type="text"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    placeholder="Thoughts"
+                    placeholder={t('newPost.categoryPlaceholder')}
                     className="w-full bg-Linen border border-Sand rounded-xl py-3 px-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
                   />
                 </div>
@@ -276,7 +276,7 @@ export default function NewPost() {
                     type="text"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
-                    placeholder="writing, react, tutorial"
+                    placeholder={t('newPost.tagsPlaceholder')}
                     className="w-full bg-Linen border border-Sand rounded-xl py-3 px-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
                   />
                 </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { List, X } from 'lucide-react'
+import { useLang } from '@/contexts/LangContext'
 import type { TocItem } from './MarkdownRenderer.tsx'
 
 interface TableOfContentsProps {
@@ -17,6 +18,7 @@ function scrollToHeading(id: string) {
 }
 
 export default function TableOfContents({ items }: TableOfContentsProps) {
+  const { t } = useLang()
   const [activeId, setActiveId] = useState<string>('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -127,7 +129,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
         <button
           onClick={() => setMobileOpen(true)}
           className="w-12 h-12 rounded-full bg-Ink text-Parchment flex items-center justify-center shadow-deep hover:scale-105 transition-transform duration-200"
-          aria-label="Open table of contents"
+          aria-label={t('toc.open')}
         >
           <List size={20} />
         </button>
@@ -159,7 +161,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
                 <button
                   onClick={() => setMobileOpen(false)}
                   className="text-Ink hover:text-Amber transition-colors"
-                  aria-label="Close table of contents"
+                  aria-label={t('toc.close')}
                 >
                   <X size={20} />
                 </button>

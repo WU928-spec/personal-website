@@ -276,7 +276,7 @@ export default function Blog() {
                       }}
                     />
                   )}
-                  <span className="relative z-10">{cat}</span>
+                  <span className="relative z-10">{cat === 'All' ? t('blog.allCategories') : cat}</span>
                 </button>
               )
             })}

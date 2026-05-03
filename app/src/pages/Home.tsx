@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronDown, ExternalLink, MapPin, Briefcase, Globe, Star, GitFork, Pencil, Save, X } from 'lucide-react'
+import { ChevronDown, ExternalLink, MapPin, Briefcase, Globe, Heart, Sparkles, Star, GitFork, Pencil, Save, X } from 'lucide-react'
 import { useLang } from '@/contexts/LangContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { loadAbout, saveAbout, type AboutData } from '@/data/about'
+import { loadHero, saveHero, type HeroData } from '@/data/site'
+import { loadSkills, saveSkills, type SkillCategory } from '@/data/site'
+import { loadBlogPreview, saveBlogPreview, type BlogPreviewPost } from '@/data/site'
+import { loadGitHub, saveGitHub, type GitHubData } from '@/data/site'
 
 /* ------------------------------------------------------------------ */
 /*  Hero Section                                                       */
@@ -56,9 +60,33 @@ function useTypingEffect(text: string, speed = 80, delay = 500) {
 }
 
 function HeroSection() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const { isLoggedIn, isEditMode } = useAuth()
   const headline = t('home.heroTitle')
   const { displayed, showCursor, done } = useTypingEffect(headline, 80, 600)
+
+  const [hero, setHero] = useState<HeroData>(() => loadHero(lang))
+  useEffect(() => { setHero(loadHero(lang)) }, [lang])
+  const [isEditing, setIsEditing] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [editZh, setEditZh] = useState<HeroData>(() => loadHero('zh'))
+  const [editEn, setEditEn] = useState<HeroData>(() => loadHero('en'))
+
+  const handleSave = () => {
+    saveHero({ zh: editZh, en: editEn })
+    setHero(lang === 'zh' ? editZh : editEn)
+    setIsEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleCancel = () => {
+    const zh = loadHero('zh')
+    const en = loadHero('en')
+    setEditZh(zh)
+    setEditEn(en)
+    setIsEditing(false)
+  }
 
   return (
     <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
@@ -87,63 +115,102 @@ function HeroSection() {
           )}
         </h1>
 
-        {/* Sub-line */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={done ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="font-body text-[1.0625rem] leading-[1.75] text-Ink/85 mt-4"
-        >
-          Developer &middot; Writer &middot; Digital Gardener
-        </motion.p>
+        {isEditing ? (
+          <div className="mt-6 space-y-4 text-left">
+            <div className="bg-Linen/80 backdrop-blur-md rounded-xl border border-Sand p-4">
+              <p className="font-ui text-[0.75rem] uppercase tracking-[0.1em] text-Sage mb-2">中文</p>
+              <input value={editZh.subtitle} onChange={(e) => setEditZh({ ...editZh, subtitle: e.target.value })} className="w-full bg-transparent font-body text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-2" />
+              <textarea value={editZh.tagline} onChange={(e) => setEditZh({ ...editZh, tagline: e.target.value })} rows={2} className="w-full bg-transparent font-body text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 resize-y" />
+            </div>
+            <div className="bg-Linen/80 backdrop-blur-md rounded-xl border border-Sand p-4">
+              <p className="font-ui text-[0.75rem] uppercase tracking-[0.1em] text-Sage mb-2">English</p>
+              <input value={editEn.subtitle} onChange={(e) => setEditEn({ ...editEn, subtitle: e.target.value })} className="w-full bg-transparent font-body text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-2" />
+              <textarea value={editEn.tagline} onChange={(e) => setEditEn({ ...editEn, tagline: e.target.value })} rows={2} className="w-full bg-transparent font-body text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 resize-y" />
+            </div>
+            <div className="flex justify-center gap-2">
+              {saved && <span className="text-[0.8125rem] text-Sage self-center">{t('post.saved')}</span>}
+              <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={14} />{t('post.save')}</button>
+              <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Linen border border-Sand text-Slate text-[0.8125rem] font-medium hover:border-Amber hover:text-Amber transition-colors"><X size={14} />{t('post.cancel')}</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Sub-line */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={done ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+              className="font-body text-[1.0625rem] leading-[1.75] text-Ink/85 mt-4"
+            >
+              {hero.subtitle}
+            </motion.p>
 
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={done ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="font-body text-[0.9375rem] leading-[1.65] text-Ink/70 max-w-xl mx-auto mt-4"
-        >
-          I build things and write about what I learn. Welcome to my corner of the internet.
-        </motion.p>
+            {/* Tagline */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={done ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+              className="font-body text-[0.9375rem] leading-[1.65] text-Ink/70 max-w-xl mx-auto mt-4"
+            >
+              {hero.tagline}
+            </motion.p>
+          </>
+        )}
 
         {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={done ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.9, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="flex items-center justify-center gap-4 mt-8"
-        >
-          <Link
-            to="/blog"
-            className="inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] hover:shadow-amber hover:-translate-y-px transition-all duration-300"
+        {!isEditing && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={done ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.9, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+            className="flex items-center justify-center gap-4 mt-8"
           >
-            {t('home.readBlog')}
-          </Link>
-          <Link
-            to="/projects"
-            className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink/10 hover:-translate-y-px transition-all duration-300"
-            style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
-          >
-            {t('home.viewProjects')}
-          </Link>
-        </motion.div>
+            <Link
+              to="/blog"
+              className="inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] hover:shadow-amber hover:-translate-y-px transition-all duration-300"
+            >
+              {t('home.readBlog')}
+            </Link>
+            <Link
+              to="/projects"
+              className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink/10 hover:-translate-y-px transition-all duration-300"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+            >
+              {t('home.viewProjects')}
+            </Link>
+          </motion.div>
+        )}
+
+        {/* Edit button */}
+        {isLoggedIn && isEditMode && !isEditing && (
+          <div className="mt-6">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+            >
+              <Pencil size={14} />
+              {t('post.edit')}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-      >
-        <div className="flex flex-col items-center gap-2 animate-scroll-pulse">
-          <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50 uppercase">
-            {t('home.scroll')}
-          </span>
-          <ChevronDown size={20} className="text-Ink/50" />
-        </div>
-      </motion.div>
+      {!isEditing && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        >
+          <div className="flex flex-col items-center gap-2 animate-scroll-pulse">
+            <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50 uppercase">
+              {t('home.scroll')}
+            </span>
+            <ChevronDown size={20} className="text-Ink/50" />
+          </div>
+        </motion.div>
+      )}
     </section>
   )
 }
@@ -152,12 +219,13 @@ function HeroSection() {
 /*  Introduction Card Section                                          */
 /* ------------------------------------------------------------------ */
 
-const iconMap: Record<string, React.ElementType> = { MapPin, Briefcase, Globe }
+const iconMap: Record<string, React.ElementType> = { MapPin, Briefcase, Globe, Heart, Sparkles }
 
 function IntroSection() {
   const { t, lang } = useLang()
-  const { isLoggedIn, user } = useAuth()
+  const { isLoggedIn, isEditMode, user } = useAuth()
   const [about, setAbout] = useState<AboutData>(() => loadAbout(lang))
+  useEffect(() => { setAbout(loadAbout(lang)) }, [lang])
   const [isEditing, setIsEditing] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -184,22 +252,23 @@ function IntroSection() {
     setIsEditing(false)
   }
 
-  const updateZhStat = (i: number, label: string) => {
-    const next = [...editZh.stats]
-    next[i] = { ...next[i], label }
-    setEditZh({ ...editZh, stats: next })
-  }
-  const updateEnStat = (i: number, label: string) => {
-    const next = [...editEn.stats]
-    next[i] = { ...next[i], label }
-    setEditEn({ ...editEn, stats: next })
+  const updateField = (langKey: 'zh' | 'en', i: number, key: 'name' | 'value', val: string) => {
+    if (langKey === 'zh') {
+      const next = [...editZh.fields]
+      next[i] = { ...next[i], [key]: val }
+      setEditZh({ ...editZh, fields: next })
+    } else {
+      const next = [...editEn.fields]
+      next[i] = { ...next[i], [key]: val }
+      setEditEn({ ...editEn, fields: next })
+    }
   }
 
   return (
     <section className="bg-Parchment py-24 md:py-32 relative">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         {/* Edit button */}
-        {isLoggedIn && !isEditing && (
+        {isLoggedIn && isEditMode && !isEditing && (
           <div className="flex justify-end mb-4">
             <button
               onClick={() => setIsEditing(true)}
@@ -210,7 +279,7 @@ function IntroSection() {
             </button>
           </div>
         )}
-        {isLoggedIn && isEditing && (
+        {isLoggedIn && isEditMode && isEditing && (
           <div className="flex justify-end mb-4 gap-2">
             {saved && <span className="text-[0.8125rem] text-Sage self-center">{t('post.saved')}</span>}
             <button
@@ -240,14 +309,14 @@ function IntroSection() {
             className="md:col-span-4 flex flex-col items-center"
           >
             <div className="w-[200px] h-[200px] rounded-full overflow-hidden border-[3px] border-Amber shadow-medium">
-              <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+              <img src={avatar} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
             </div>
-            <div className="flex flex-col gap-3 mt-6 w-full max-w-[240px]">
-              {(isEditing ? editZh.stats : about.stats).map((stat, i) => {
-                const IconComp = iconMap[stat.icon] || MapPin
+            <div className="flex flex-col gap-3 mt-6 w-full max-w-[280px]">
+              {(isEditing ? editZh.fields : about.fields).map((field, i) => {
+                const IconComp = iconMap[field.icon] || MapPin
                 return (
                   <motion.div
-                    key={stat.icon + i}
+                    key={field.icon + i}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -261,13 +330,13 @@ function IntroSection() {
                     <IconComp size={14} className="text-Slate shrink-0" />
                     {isEditing ? (
                       <input
-                        value={stat.label}
-                        onChange={(e) => updateZhStat(i, e.target.value)}
+                        value={field.value}
+                        onChange={(e) => updateField('zh', i, 'value', e.target.value)}
                         className="w-full bg-transparent text-[0.8125rem] font-medium tracking-[0.04em] text-Slate focus:outline-none font-ui"
                       />
                     ) : (
                       <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-                        {stat.label}
+                        {field.value}
                       </span>
                     )}
                   </motion.div>
@@ -318,10 +387,28 @@ function IntroSection() {
                   <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-3">
                     中文
                   </p>
+                  {editZh.fields.map((field, i) => {
+                    const IconComp = iconMap[field.icon] || MapPin
+                    return (
+                      <div key={`zh-f-${i}`} className="flex items-center gap-2 mb-2">
+                        <IconComp size={14} className="text-Slate shrink-0" />
+                        <input
+                          value={field.name}
+                          onChange={(e) => updateField('zh', i, 'name', e.target.value)}
+                          className="w-20 bg-transparent text-[0.8125rem] font-medium text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1 font-ui"
+                        />
+                        <input
+                          value={field.value}
+                          onChange={(e) => updateField('zh', i, 'value', e.target.value)}
+                          className="flex-1 bg-transparent text-[0.8125rem] font-medium text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 font-ui"
+                        />
+                      </div>
+                    )
+                  })}
                   <input
                     value={editZh.title}
                     onChange={(e) => setEditZh({ ...editZh, title: e.target.value })}
-                    className="w-full bg-transparent font-display text-[1.125rem] font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3"
+                    className="w-full bg-transparent font-display text-[1.125rem] font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 mt-2"
                   />
                   <textarea
                     value={editZh.p1}
@@ -342,10 +429,28 @@ function IntroSection() {
                   <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-3">
                     English
                   </p>
+                  {editEn.fields.map((field, i) => {
+                    const IconComp = iconMap[field.icon] || MapPin
+                    return (
+                      <div key={`en-f-${i}`} className="flex items-center gap-2 mb-2">
+                        <IconComp size={14} className="text-Slate shrink-0" />
+                        <input
+                          value={field.name}
+                          onChange={(e) => updateField('en', i, 'name', e.target.value)}
+                          className="w-20 bg-transparent text-[0.8125rem] font-medium text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1 font-ui"
+                        />
+                        <input
+                          value={field.value}
+                          onChange={(e) => updateField('en', i, 'value', e.target.value)}
+                          className="flex-1 bg-transparent text-[0.8125rem] font-medium text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 font-ui"
+                        />
+                      </div>
+                    )
+                  })}
                   <input
                     value={editEn.title}
                     onChange={(e) => setEditEn({ ...editEn, title: e.target.value })}
-                    className="w-full bg-transparent font-display text-[1.125rem] font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3"
+                    className="w-full bg-transparent font-display text-[1.125rem] font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 mt-2"
                   />
                   <textarea
                     value={editEn.p1}
@@ -373,54 +478,55 @@ function IntroSection() {
 /*  Skill Constellation Section                                        */
 /* ------------------------------------------------------------------ */
 
-const skillCategories = [
-  {
-    name: 'Languages',
-    color: 'bg-Amber',
-    skills: [
-      { name: 'TypeScript', size: 'lg' },
-      { name: 'Python', size: 'lg' },
-      { name: 'Go', size: 'md' },
-      { name: 'Rust', size: 'md' },
-    ],
-  },
-  {
-    name: 'Frontend',
-    color: 'bg-Sage',
-    skills: [
-      { name: 'React', size: 'lg' },
-      { name: 'Vue', size: 'md' },
-      { name: 'Tailwind', size: 'lg' },
-      { name: 'Next.js', size: 'md' },
-    ],
-  },
-  {
-    name: 'Backend',
-    color: 'bg-Slate',
-    skills: [
-      { name: 'Node.js', size: 'lg' },
-      { name: 'PostgreSQL', size: 'md' },
-      { name: 'Redis', size: 'md' },
-      { name: 'GraphQL', size: 'md' },
-    ],
-  },
-  {
-    name: 'Tools',
-    color: 'bg-Gold',
-    skills: [
-      { name: 'Docker', size: 'md' },
-      { name: 'Git', size: 'lg' },
-      { name: 'Linux', size: 'md' },
-      { name: 'Figma', size: 'md' },
-    ],
-  },
-]
-
 function SkillConstellationSection() {
   const { t } = useLang()
+  const { isLoggedIn, isEditMode } = useAuth()
+  const [categories, setCategories] = useState<SkillCategory[]>(() => loadSkills())
+  const [isEditing, setIsEditing] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  const handleSave = () => {
+    saveSkills(categories)
+    setIsEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleCancel = () => {
+    setCategories(loadSkills())
+    setIsEditing(false)
+  }
+
+  const updateSkill = (ci: number, si: number, name: string) => {
+    const next = [...categories]
+    next[ci] = { ...next[ci], skills: [...next[ci].skills] }
+    next[ci].skills[si] = { ...next[ci].skills[si], name }
+    setCategories(next)
+  }
+
   return (
-    <section className="bg-Linen py-20 md:py-28">
+    <section className="bg-Linen py-20 md:py-28 relative">
       <div className="max-w-5xl mx-auto px-6 md:px-12 text-center">
+        {/* Edit button */}
+        {isLoggedIn && isEditMode && !isEditing && (
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+            >
+              <Pencil size={14} />
+              {t('post.edit')}
+            </button>
+          </div>
+        )}
+        {isLoggedIn && isEditMode && isEditing && (
+          <div className="flex justify-end mb-4 gap-2">
+            {saved && <span className="text-[0.8125rem] text-Sage self-center">{t('post.saved')}</span>}
+            <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={14} />{t('post.save')}</button>
+            <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Linen border border-Sand text-Slate text-[0.8125rem] font-medium hover:border-Amber hover:text-Amber transition-colors"><X size={14} />{t('post.cancel')}</button>
+          </div>
+        )}
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -441,10 +547,10 @@ function SkillConstellationSection() {
 
         {/* Skill cloud */}
         <div className="mt-12 flex flex-wrap justify-center gap-3 md:gap-4">
-          {skillCategories.map((cat, ci) =>
+          {categories.map((cat, ci) =>
             cat.skills.map((skill, si) => (
               <motion.div
-                key={`${cat.name}-${skill.name}`}
+                key={`${cat.name}-${skill.name}-${ci}-${si}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: '-50px' }}
@@ -453,21 +559,29 @@ function SkillConstellationSection() {
                   delay: 0.06 * (ci * 4 + si),
                   ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number],
                 }}
-                whileHover={{
+                whileHover={isEditing ? undefined : {
                   y: -2,
                   boxShadow: '0 2px 8px rgba(196,120,58,0.1)',
                   borderColor: '#C4783A',
                 }}
-                className="inline-flex items-center gap-2 bg-Mist border border-Sand rounded-full px-4 py-1.5 cursor-default transition-colors duration-200 hover:bg-Linen"
+                className="inline-flex items-center gap-2 bg-Mist border border-Sand rounded-full px-4 py-1.5 transition-colors duration-200"
               >
                 <span className={`w-2 h-2 rounded-full ${cat.color}`} />
-                <span
-                  className={`font-ui font-medium tracking-[0.04em] text-Slate ${
-                    skill.size === 'lg' ? 'text-[0.9375rem]' : 'text-[0.8125rem]'
-                  }`}
-                >
-                  {skill.name}
-                </span>
+                {isEditing ? (
+                  <input
+                    value={skill.name}
+                    onChange={(e) => updateSkill(ci, si, e.target.value)}
+                    className="bg-transparent font-ui font-medium tracking-[0.04em] text-Slate focus:outline-none text-[0.8125rem] w-20"
+                  />
+                ) : (
+                  <span
+                    className={`font-ui font-medium tracking-[0.04em] text-Slate ${
+                      skill.size === 'lg' ? 'text-[0.9375rem]' : 'text-[0.8125rem]'
+                    }`}
+                  >
+                    {skill.name}
+                  </span>
+                )}
               </motion.div>
             ))
           )}
@@ -481,37 +595,48 @@ function SkillConstellationSection() {
 /*  Blog Preview Section                                               */
 /* ------------------------------------------------------------------ */
 
-const blogPosts = [
-  {
-    thumb: '/blog-thumb-1.jpg',
-    category: 'Development',
-    title: 'Building a Design System from Scratch',
-    excerpt: 'Lessons learned from creating a scalable component library that powers multiple products and teams.',
-    date: 'Jan 15, 2025',
-    readTime: '8 min read',
-  },
-  {
-    thumb: '/blog-thumb-2.jpg',
-    category: 'Thoughts',
-    title: 'The Art of Digital Gardening',
-    excerpt: 'Why I treat my website as a garden rather than a portfolio — and how that changes everything.',
-    date: 'Jan 8, 2025',
-    readTime: '5 min read',
-  },
-  {
-    thumb: '/blog-thumb-3.jpg',
-    category: 'Tutorial',
-    title: 'Type-Safe API Routes with Next.js',
-    excerpt: 'A practical guide to building fully type-safe API handlers without sacrificing developer experience.',
-    date: 'Dec 28, 2024',
-    readTime: '12 min read',
-  },
-]
-
 function BlogPreviewSection() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
+  const { isLoggedIn, isEditMode } = useAuth()
+  const [posts, setPosts] = useState<BlogPreviewPost[]>(() => loadBlogPreview(lang))
+  useEffect(() => { setPosts(loadBlogPreview(lang)) }, [lang])
+  const [isEditing, setIsEditing] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [editZh, setEditZh] = useState<BlogPreviewPost[]>(() => loadBlogPreview('zh'))
+  const [editEn, setEditEn] = useState<BlogPreviewPost[]>(() => loadBlogPreview('en'))
+
+  const handleSave = () => {
+    saveBlogPreview({ zh: editZh, en: editEn })
+    setPosts(lang === 'zh' ? editZh : editEn)
+    setIsEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleCancel = () => {
+    const zh = loadBlogPreview('zh')
+    const en = loadBlogPreview('en')
+    setEditZh(zh)
+    setEditEn(en)
+    setIsEditing(false)
+  }
+
+  const updatePost = (langKey: 'zh' | 'en', i: number, field: keyof BlogPreviewPost, value: string) => {
+    if (langKey === 'zh') {
+      const next = [...editZh]
+      next[i] = { ...next[i], [field]: value }
+      setEditZh(next)
+    } else {
+      const next = [...editEn]
+      next[i] = { ...next[i], [field]: value }
+      setEditEn(next)
+    }
+  }
+
+  const displayPosts = isEditing ? (lang === 'zh' ? editZh : editEn) : posts
+
   return (
-    <section className="bg-Parchment py-24 md:py-32">
+    <section className="bg-Parchment py-24 md:py-32 relative">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         {/* Header */}
         <motion.div
@@ -529,80 +654,137 @@ function BlogPreviewSection() {
               {t('home.freshFromNotebook')}
             </h2>
           </div>
-          <Link
-            to="/blog"
-            className="font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300 shrink-0"
-          >
-            {t('home.viewAll')}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/blog"
+              className="font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300 shrink-0"
+            >
+              {t('home.viewAll')}
+            </Link>
+            {isLoggedIn && isEditMode && !isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+              >
+                <Pencil size={14} />
+                {t('post.edit')}
+              </button>
+            )}
+            {isLoggedIn && isEditMode && isEditing && (
+              <div className="flex items-center gap-2">
+                {saved && <span className="text-[0.8125rem] text-Sage">{t('post.saved')}</span>}
+                <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={14} />{t('post.save')}</button>
+                <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Linen border border-Sand text-Slate text-[0.8125rem] font-medium hover:border-Amber hover:text-Amber transition-colors"><X size={14} />{t('post.cancel')}</button>
+              </div>
+            )}
+          </div>
         </motion.div>
+
+        {isEditing && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Chinese editor */}
+            <div className="bg-Linen rounded-xl border border-Sand p-5 space-y-4">
+              <p className="font-ui text-[0.8125rem] uppercase tracking-[0.1em] text-Sage">中文</p>
+              {editZh.map((post, i) => (
+                <div key={`zh-${i}`} className="space-y-2 border-b border-Sand pb-3 last:border-0">
+                  <input value={post.title} onChange={(e) => updatePost('zh', i, 'title', e.target.value)} placeholder="标题" className="w-full bg-transparent font-display text-sm font-medium text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                  <textarea value={post.excerpt} onChange={(e) => updatePost('zh', i, 'excerpt', e.target.value)} placeholder="摘要" rows={2} className="w-full bg-transparent font-body text-sm text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 resize-y" />
+                  <div className="flex gap-2">
+                    <input value={post.category} onChange={(e) => updatePost('zh', i, 'category', e.target.value)} placeholder="分类" className="flex-1 bg-transparent font-ui text-xs text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                    <input value={post.date} onChange={(e) => updatePost('zh', i, 'date', e.target.value)} placeholder="日期" className="flex-1 bg-transparent font-ui text-xs text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                    <input value={post.readTime} onChange={(e) => updatePost('zh', i, 'readTime', e.target.value)} placeholder="阅读时间" className="flex-1 bg-transparent font-ui text-xs text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* English editor */}
+            <div className="bg-Linen rounded-xl border border-Sand p-5 space-y-4">
+              <p className="font-ui text-[0.8125rem] uppercase tracking-[0.1em] text-Sage">English</p>
+              {editEn.map((post, i) => (
+                <div key={`en-${i}`} className="space-y-2 border-b border-Sand pb-3 last:border-0">
+                  <input value={post.title} onChange={(e) => updatePost('en', i, 'title', e.target.value)} placeholder="Title" className="w-full bg-transparent font-display text-sm font-medium text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                  <textarea value={post.excerpt} onChange={(e) => updatePost('en', i, 'excerpt', e.target.value)} placeholder="Excerpt" rows={2} className="w-full bg-transparent font-body text-sm text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 resize-y" />
+                  <div className="flex gap-2">
+                    <input value={post.category} onChange={(e) => updatePost('en', i, 'category', e.target.value)} placeholder="Category" className="flex-1 bg-transparent font-ui text-xs text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                    <input value={post.date} onChange={(e) => updatePost('en', i, 'date', e.target.value)} placeholder="Date" className="flex-1 bg-transparent font-ui text-xs text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                    <input value={post.readTime} onChange={(e) => updatePost('en', i, 'readTime', e.target.value)} placeholder="Read time" className="flex-1 bg-transparent font-ui text-xs text-Slate focus:outline-none border-b border-Sand focus:border-Amber pb-1" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {blogPosts.map((post, i) => (
-            <motion.article
-              key={post.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{
-                duration: 0.7,
-                delay: 0.1 * i,
-                ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-              }}
-              className="group bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300"
-              style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
-            >
-              {/* Thumbnail */}
-              <div className="aspect-[16/10] overflow-hidden">
-                <img
-                  src={post.thumb}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                  style={{ transitionTimingFunction: 'cubic-bezier(0.25, 0.1, 0.25, 1)' }}
-                />
-              </div>
-              {/* Content */}
-              <div className="p-6">
-                <span className="inline-flex items-center font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Sage bg-Mist rounded-full px-3 py-1 mb-3">
-                  {post.category}
-                </span>
-                <h3 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink group-hover:text-Amber transition-colors duration-500 line-clamp-2">
-                  {post.title}
-                </h3>
-                <p className="font-body text-[0.9375rem] leading-[1.65] text-Slate mt-2 line-clamp-3">
-                  {post.excerpt}
-                </p>
-                <div className="flex items-center gap-2 mt-4">
-                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50">
-                    {post.date}
-                  </span>
-                  <span className="text-Ink/30">&middot;</span>
-                  <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50">
-                    {post.readTime}
-                  </span>
+        {!isEditing && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {displayPosts.map((post, i) => (
+              <motion.article
+                key={post.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{
+                  duration: 0.7,
+                  delay: 0.1 * i,
+                  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+                }}
+                className="group bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+              >
+                {/* Thumbnail */}
+                <div className="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={post.thumb}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                    style={{ transitionTimingFunction: 'cubic-bezier(0.25, 0.1, 0.25, 1)' }}
+                  />
                 </div>
-              </div>
-            </motion.article>
-          ))}
-        </div>
+                {/* Content */}
+                <div className="p-6">
+                  <span className="inline-flex items-center font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Sage bg-Mist rounded-full px-3 py-1 mb-3">
+                    {post.category}
+                  </span>
+                  <h3 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink group-hover:text-Amber transition-colors duration-500 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="font-body text-[0.9375rem] leading-[1.65] text-Slate mt-2 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center gap-2 mt-4">
+                    <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50">
+                      {post.date}
+                    </span>
+                    <span className="text-Ink/30">&middot;</span>
+                    <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50">
+                      {post.readTime}
+                    </span>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        )}
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="text-center mt-10"
-        >
-          <Link
-            to="/blog"
-            className="inline-flex items-center border-[1.5px] border-Ink text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink hover:text-Parchment hover:-translate-y-px transition-all duration-300"
-            style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+        {!isEditing && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+            className="text-center mt-10"
           >
-            {t('home.exploreArticles')}
-          </Link>
-        </motion.div>
+            <Link
+              to="/blog"
+              className="inline-flex items-center border-[1.5px] border-Ink text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink hover:text-Parchment hover:-translate-y-px transition-all duration-300"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+            >
+              {t('home.exploreArticles')}
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   )
@@ -611,45 +793,6 @@ function BlogPreviewSection() {
 /* ------------------------------------------------------------------ */
 /*  GitHub Snapshot Section                                            */
 /* ------------------------------------------------------------------ */
-
-const pinnedRepos = [
-  {
-    name: 'digital-garden',
-    description: 'My personal website and digital garden built with React, Tailwind, and Vite.',
-    language: 'TypeScript',
-    languageColor: '#3178c6',
-    stars: 142,
-    forks: 18,
-    updated: '2 days ago',
-  },
-  {
-    name: 'obsidian-export',
-    description: 'A CLI tool to export Obsidian vaults to static HTML with wikilink support.',
-    language: 'Rust',
-    languageColor: '#dea584',
-    stars: 89,
-    forks: 12,
-    updated: '1 week ago',
-  },
-  {
-    name: 'type-safe-api',
-    description: 'End-to-end type safety for REST APIs without code generation.',
-    language: 'TypeScript',
-    languageColor: '#3178c6',
-    stars: 234,
-    forks: 31,
-    updated: '3 days ago',
-  },
-  {
-    name: 'go-cache',
-    description: 'High-performance in-memory cache for Go with TTL and LRU eviction.',
-    language: 'Go',
-    languageColor: '#00ADD8',
-    stars: 67,
-    forks: 8,
-    updated: '2 weeks ago',
-  },
-]
 
 // Generate mock contribution data
 function generateContributionGrid(): number[][] {
@@ -670,8 +813,13 @@ function generateContributionGrid(): number[][] {
 
 function GitHubSnapshotSection() {
   const { t } = useLang()
+  const { isLoggedIn, isEditMode } = useAuth()
   const contributions = useRef(generateContributionGrid())
-  const [stats] = useState({ repos: 48, stars: 1567, streak: 42 })
+  const [github, setGithub] = useState<GitHubData>(() => loadGitHub())
+  const [isEditing, setIsEditing] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [editRepos, setEditRepos] = useState(github.repos)
+  const [editStats, setEditStats] = useState(github.stats)
 
   const contributionColors = [
     'rgba(247,244,239,0.05)',
@@ -680,9 +828,51 @@ function GitHubSnapshotSection() {
     'rgba(196,120,58,1)',
   ]
 
+  const handleSave = () => {
+    const updated = { repos: editRepos, stats: editStats }
+    saveGitHub(updated)
+    setGithub(updated)
+    setIsEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleCancel = () => {
+    const data = loadGitHub()
+    setEditRepos(data.repos)
+    setEditStats(data.stats)
+    setIsEditing(false)
+  }
+
+  const updateRepo = (i: number, field: keyof GitHubRepo, value: string | number) => {
+    const next = [...editRepos]
+    next[i] = { ...next[i], [field]: value }
+    setEditRepos(next)
+  }
+
   return (
-    <section className="bg-Graphite py-24 md:py-32">
+    <section className="bg-Graphite py-24 md:py-32 relative">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
+        {/* Edit button */}
+        {isLoggedIn && isEditMode && !isEditing && (
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[0.8125rem] font-medium hover:bg-white/15 transition-colors"
+            >
+              <Pencil size={14} />
+              {t('post.edit')}
+            </button>
+          </div>
+        )}
+        {isLoggedIn && isEditMode && isEditing && (
+          <div className="flex justify-end mb-4 gap-2">
+            {saved && <span className="text-[0.8125rem] text-Sage self-center">{t('post.saved')}</span>}
+            <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={14} />{t('post.save')}</button>
+            <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Graphite border border-white/20 text-white/70 text-[0.8125rem] font-medium hover:border-white/40 hover:text-white transition-colors"><X size={14} />{t('post.cancel')}</button>
+          </div>
+        )}
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -702,43 +892,45 @@ function GitHubSnapshotSection() {
         </motion.div>
 
         {/* Contribution graph */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-8"
-        >
-          <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mb-3">
-            {t('home.contributionActivity')}
-          </p>
-          <div className="flex gap-[3px] overflow-x-auto pb-2">
-            {contributions.current.map((week, wi) => (
-              <div key={wi} className="flex flex-col gap-[3px]">
-                {week.map((level, di) => (
-                  <motion.div
-                    key={di}
-                    initial={{ opacity: 0, scale: 0 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.005 * (wi * 7 + di),
-                      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
-                    }}
-                    className="w-[10px] h-[10px] rounded-sm shrink-0"
-                    style={{ backgroundColor: contributionColors[level] }}
-                    title={`${level} contributions`}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        {!isEditing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="mt-8"
+          >
+            <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mb-3">
+              {t('home.contributionActivity')}
+            </p>
+            <div className="flex gap-[3px] overflow-x-auto pb-2">
+              {contributions.current.map((week, wi) => (
+                <div key={wi} className="flex flex-col gap-[3px]">
+                  {week.map((level, di) => (
+                    <motion.div
+                      key={di}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.3,
+                        delay: 0.005 * (wi * 7 + di),
+                        ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+                      }}
+                      className="w-[10px] h-[10px] rounded-sm shrink-0"
+                      style={{ backgroundColor: contributionColors[level] }}
+                      title={`${level} ${t('github.contributions')}`}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Pinned repos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-          {pinnedRepos.map((repo, i) => (
+          {(isEditing ? editRepos : github.repos).map((repo, i) => (
             <motion.a
               key={repo.name}
               href={`https://github.com/WU928-spec/${repo.name}`}
@@ -754,38 +946,57 @@ function GitHubSnapshotSection() {
               }}
               className="block bg-Graphite/90 border border-white/[0.08] rounded-xl p-6 hover:border-white/[0.15] hover:shadow-deep hover:-translate-y-[2px] transition-all duration-300"
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+              onClick={(e) => isEditing && e.preventDefault()}
             >
-              <div className="flex items-center justify-between">
-                <h3 className="font-mono text-[0.875rem] leading-[1.6] text-Amber">
-                  {repo.name}
-                </h3>
-                <ExternalLink size={14} className="text-white/40" />
-              </div>
-              <p className="font-body text-[0.9375rem] leading-[1.65] text-white/70 mt-2 line-clamp-2">
-                {repo.description}
-              </p>
-              <div className="flex items-center gap-4 mt-4">
-                <span className="flex items-center gap-1.5">
-                  <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: repo.languageColor }}
-                  />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/60">
-                    {repo.language}
-                  </span>
-                </span>
-                <span className="flex items-center gap-1 text-white/60">
-                  <Star size={14} />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.stars}</span>
-                </span>
-                <span className="flex items-center gap-1 text-white/60">
-                  <GitFork size={14} />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.forks}</span>
-                </span>
-                <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/40 ml-auto">
-                  {repo.updated}
-                </span>
-              </div>
+              {isEditing ? (
+                <div className="space-y-2">
+                  <input value={repo.name} onChange={(e) => updateRepo(i, 'name', e.target.value)} className="w-full bg-transparent font-mono text-[0.875rem] text-Amber focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+                  <textarea value={repo.description} onChange={(e) => updateRepo(i, 'description', e.target.value)} rows={2} className="w-full bg-transparent font-body text-[0.9375rem] text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1 resize-y" />
+                  <div className="flex gap-2">
+                    <input value={repo.language} onChange={(e) => updateRepo(i, 'language', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+                    <input value={repo.languageColor} onChange={(e) => updateRepo(i, 'languageColor', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+                    <input value={repo.updated} onChange={(e) => updateRepo(i, 'updated', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+                  </div>
+                  <div className="flex gap-2">
+                    <input type="number" value={repo.stars} onChange={(e) => updateRepo(i, 'stars', Number(e.target.value))} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+                    <input type="number" value={repo.forks} onChange={(e) => updateRepo(i, 'forks', Number(e.target.value))} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-mono text-[0.875rem] leading-[1.6] text-Amber">
+                      {repo.name}
+                    </h3>
+                    <ExternalLink size={14} className="text-white/40" />
+                  </div>
+                  <p className="font-body text-[0.9375rem] leading-[1.65] text-white/70 mt-2 line-clamp-2">
+                    {repo.description}
+                  </p>
+                  <div className="flex items-center gap-4 mt-4">
+                    <span className="flex items-center gap-1.5">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: repo.languageColor }}
+                      />
+                      <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/60">
+                        {repo.language}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-1 text-white/60">
+                      <Star size={14} />
+                      <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.stars}</span>
+                    </span>
+                    <span className="flex items-center gap-1 text-white/60">
+                      <GitFork size={14} />
+                      <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.forks}</span>
+                    </span>
+                    <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/40 ml-auto">
+                      {repo.updated}
+                    </span>
+                  </div>
+                </>
+              )}
             </motion.a>
           ))}
         </div>
@@ -799,9 +1010,9 @@ function GitHubSnapshotSection() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8"
         >
           {[
-            { label: 'Total Repositories', value: stats.repos },
-            { label: 'Total Stars', value: stats.stars },
-            { label: 'Longest Streak', value: stats.streak },
+            { label: t('github.totalRepositories'), value: isEditing ? editStats.repos : github.stats.repos, key: 'repos' as const },
+            { label: t('github.totalStars'), value: isEditing ? editStats.stars : github.stats.stars, key: 'stars' as const },
+            { label: t('github.longestStreak'), value: isEditing ? editStats.streak : github.stats.streak, key: 'streak' as const },
           ].map((stat, i, arr) => (
             <div
               key={stat.label}
@@ -809,7 +1020,16 @@ function GitHubSnapshotSection() {
                 i < arr.length - 1 ? 'md:border-r md:border-white/10' : ''
               }`}
             >
-              <CountUpNumber value={stat.value} duration={1.5} />
+              {isEditing ? (
+                <input
+                  type="number"
+                  value={stat.value}
+                  onChange={(e) => setEditStats({ ...editStats, [stat.key]: Number(e.target.value) })}
+                  className="bg-transparent font-display text-[clamp(2rem,4vw,3.5rem)] font-medium leading-[1.1] text-Amber text-center w-32 focus:outline-none border-b border-white/20 focus:border-Amber"
+                />
+              ) : (
+                <CountUpNumber value={stat.value} duration={1.5} />
+              )}
               <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mt-1">
                 {stat.label}
               </span>
@@ -818,23 +1038,25 @@ function GitHubSnapshotSection() {
         </motion.div>
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="text-center mt-10"
-        >
-          <a
-            href="https://github.com/WU928-spec"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
-            style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+        {!isEditing && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="text-center mt-10"
           >
-            {t('home.viewFullProfile')}
-          </a>
-        </motion.div>
+            <a
+              href="https://github.com/WU928-spec"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+            >
+              {t('home.viewFullProfile')}
+            </a>
+          </motion.div>
+        )}
       </div>
     </section>
   )

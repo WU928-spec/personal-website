@@ -10,10 +10,18 @@ const translations = {
       about: '关于',
       login: '登录',
       profile: '个人资料',
+      search: '搜索',
+      toggleMenu: '打开菜单',
+      closeMenu: '关闭菜单',
+      switchLanguage: '切换语言',
+    },
+    theme: {
+      switchToDark: '切换到深色模式',
+      switchToLight: '切换到浅色模式',
     },
     // Home
     home: {
-      heroTitle: 'Hi, I\'m Alex',
+      heroTitle: 'Hi, I\'m Jasper',
       heroSubtitle: '开发者 · 写作者 · 数字园丁',
       heroDesc: '我动手创造，并记录所学。欢迎来到我的互联网角落。',
       readBlog: '阅读博客',
@@ -37,6 +45,30 @@ const translations = {
       contributionActivity: '贡献记录',
       viewFullProfile: '查看完整资料 →',
     },
+    github: {
+      totalRepositories: '仓库总数',
+      totalStars: '总星标',
+      longestStreak: '最长连续贡献',
+      contributions: '次贡献',
+    },
+    toc: {
+      contents: '目录',
+      open: '打开目录',
+      close: '关闭目录',
+    },
+    editor: {
+      editFooter: '编辑页脚',
+      titlePlaceholder: '标题',
+      excerptPlaceholder: '摘要',
+      categoryPlaceholder: '分类',
+      datePlaceholder: '日期',
+      readTimePlaceholder: '阅读时间',
+      brandDesc: '品牌描述',
+      copyright: '版权信息',
+      tagline: '标语',
+      navLinks: '导航链接',
+      socialLinks: '社交链接',
+    },
     // Blog
     blog: {
       garden: '花园',
@@ -49,6 +81,7 @@ const translations = {
       noArticles: '未找到文章',
       noArticlesDesc: '换个关键词或分类试试',
       newPost: '写文章',
+      allCategories: '全部',
     },
     // Blog Post
     post: {
@@ -68,6 +101,11 @@ const translations = {
       loadFailed: '文章加载失败',
       loadFailedDesc: '请尝试清除浏览器缓存后刷新页面',
       backToBlog: '返回博客列表',
+      copyLink: '复制链接',
+      shareOnTwitter: '分享到 Twitter',
+      shareOnLinkedIn: '分享到 LinkedIn',
+      readingTimeFormat: '{n} 分钟阅读',
+      authorAlt: '作者',
     },
     // Login
     login: {
@@ -80,6 +118,7 @@ const translations = {
       errorEmpty: '请输入用户名和密码',
       errorInvalid: '用户名或密码错误',
       passwordPlaceholder: '输入密码',
+      usernamePlaceholder: '输入用户名',
     },
     // Profile
     profile: {
@@ -95,6 +134,7 @@ const translations = {
       pleaseLogin: '请先登录',
       goLogin: '前往登录',
       back: '返回',
+      avatarAlt: '头像',
     },
     // New Post
     newPost: {
@@ -109,7 +149,9 @@ const translations = {
       slugLabel: 'URL 标识 (slug)',
       slugPlaceholder: 'url-friendly-slug',
       categoryLabel: '分类',
+      categoryPlaceholder: '随笔',
       tagsLabel: '标签（用逗号分隔）',
+      tagsPlaceholder: '写作, React, 教程',
       excerptLabel: '摘要',
       excerptPlaceholder: '简短描述这篇文章的内容...',
       contentLabel: '正文 (Markdown)',
@@ -121,6 +163,9 @@ const translations = {
       errorTitle: '请输入标题',
       errorSlug: '请输入 URL 标识',
       errorContent: '请输入正文内容',
+      uncategorized: '未分类',
+      defaultCategory: '随笔',
+      defaultTag: '通用',
     },
     // Projects
     projects: {
@@ -146,10 +191,18 @@ const translations = {
       about: 'About',
       login: 'Login',
       profile: 'Profile',
+      search: 'Search',
+      toggleMenu: 'Toggle menu',
+      closeMenu: 'Close menu',
+      switchLanguage: 'Switch language',
+    },
+    theme: {
+      switchToDark: 'Switch to dark mode',
+      switchToLight: 'Switch to light mode',
     },
     // Home
     home: {
-      heroTitle: 'Hi, I\'m Alex',
+      heroTitle: 'Hi, I\'m Jasper',
       heroSubtitle: 'Developer · Writer · Digital Gardener',
       heroDesc: 'I build things and write about what I learn. Welcome to my corner of the internet.',
       readBlog: 'Read My Blog',
@@ -173,6 +226,30 @@ const translations = {
       contributionActivity: 'Contribution activity',
       viewFullProfile: 'View full profile →',
     },
+    github: {
+      totalRepositories: 'Total Repositories',
+      totalStars: 'Total Stars',
+      longestStreak: 'Longest Streak',
+      contributions: 'contributions',
+    },
+    toc: {
+      contents: 'Contents',
+      open: 'Open table of contents',
+      close: 'Close table of contents',
+    },
+    editor: {
+      editFooter: 'Edit Footer',
+      titlePlaceholder: 'Title',
+      excerptPlaceholder: 'Excerpt',
+      categoryPlaceholder: 'Category',
+      datePlaceholder: 'Date',
+      readTimePlaceholder: 'Read time',
+      brandDesc: 'Brand description',
+      copyright: 'Copyright',
+      tagline: 'Tagline',
+      navLinks: 'Navigation links',
+      socialLinks: 'Social links',
+    },
     // Blog
     blog: {
       garden: 'The Garden',
@@ -185,6 +262,7 @@ const translations = {
       noArticles: 'No articles found',
       noArticlesDesc: 'Try a different search or category',
       newPost: 'New Post',
+      allCategories: 'All',
     },
     // Blog Post
     post: {
@@ -204,6 +282,11 @@ const translations = {
       loadFailed: 'Failed to load article',
       loadFailedDesc: 'Try clearing your browser cache and refreshing',
       backToBlog: 'Back to Blog',
+      copyLink: 'Copy link',
+      shareOnTwitter: 'Share on Twitter',
+      shareOnLinkedIn: 'Share on LinkedIn',
+      readingTimeFormat: '{n} min read',
+      authorAlt: 'Author',
     },
     // Login
     login: {
@@ -216,6 +299,7 @@ const translations = {
       errorEmpty: 'Please enter username and password',
       errorInvalid: 'Invalid username or password',
       passwordPlaceholder: 'Enter password',
+      usernamePlaceholder: 'Enter username',
     },
     // Profile
     profile: {
@@ -231,6 +315,7 @@ const translations = {
       pleaseLogin: 'Please sign in first',
       goLogin: 'Sign In',
       back: 'Back',
+      avatarAlt: 'Avatar',
     },
     // New Post
     newPost: {
@@ -245,7 +330,9 @@ const translations = {
       slugLabel: 'URL Slug',
       slugPlaceholder: 'url-friendly-slug',
       categoryLabel: 'Category',
+      categoryPlaceholder: 'Thoughts',
       tagsLabel: 'Tags (comma separated)',
+      tagsPlaceholder: 'writing, react, tutorial',
       excerptLabel: 'Excerpt',
       excerptPlaceholder: 'Briefly describe what this article is about...',
       contentLabel: 'Content (Markdown)',
@@ -257,6 +344,9 @@ const translations = {
       errorTitle: 'Please enter a title',
       errorSlug: 'Please enter a URL slug',
       errorContent: 'Please enter content',
+      uncategorized: 'Uncategorized',
+      defaultCategory: 'Thoughts',
+      defaultTag: 'general',
     },
     // Projects
     projects: {

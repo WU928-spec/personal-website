@@ -8,6 +8,8 @@ export interface User {
 interface AuthContextType {
   user: User | null
   isLoggedIn: boolean
+  isEditMode: boolean
+  setEditMode: (v: boolean) => void
   login: (username: string, password: string) => boolean
   logout: () => void
   updateAvatar: (avatar: string) => void
@@ -20,6 +22,7 @@ const LOGIN_PASSWORD = 'vibecoding2025'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [isEditMode, setEditMode] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('vibecoding_user')
@@ -45,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null)
+    setEditMode(false)
     localStorage.removeItem('vibecoding_user')
   }
 
@@ -62,6 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isLoggedIn: !!user,
+        isEditMode,
+        setEditMode,
         login,
         logout,
         updateAvatar,

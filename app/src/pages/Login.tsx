@@ -63,7 +63,7 @@ export default function Login() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="WU928-spec"
+                placeholder={t('login.usernamePlaceholder')}
                 className="w-full bg-Linen border border-Sand rounded-xl py-3 pl-11 pr-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
             </div>

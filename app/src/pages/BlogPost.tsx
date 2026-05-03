@@ -70,8 +70,8 @@ function CopyLinkButton() {
     <button
       onClick={handleCopy}
       className="p-2 rounded-lg bg-Linen hover:bg-Mist transition-colors duration-200"
-      aria-label="Copy link"
-      title="Copy link"
+      aria-label={t('post.copyLink')}
+      title={t('post.copyLink')}
     >
       {copied ? <Check size={16} className="text-Sage" /> : <Copy size={16} className="text-Slate" />}
     </button>
@@ -88,7 +88,7 @@ function AuthorCard() {
       <div className="flex items-center gap-4">
         <img
           src="/avatar.jpg"
-          alt="Author"
+          alt={t('post.authorAlt')}
           className="w-16 h-16 rounded-full object-cover"
         />
         <div>
@@ -100,7 +100,7 @@ function AuthorCard() {
           </p>
           <div className="flex items-center gap-3 mt-3">
             <a
-              href="https://github.com"
+              href="https://github.com/WU928-spec"
               target="_blank"
               rel="noopener noreferrer"
               className="text-Slate hover:text-Amber transition-colors"
@@ -226,7 +226,7 @@ function PrevNextNav({ prev, next }: { prev: Post | null; next: Post | null }) {
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, isEditMode } = useAuth()
   const { t } = useLang()
 
   const [post, setPost] = useState<Post | undefined>(undefined)
@@ -339,7 +339,7 @@ export default function BlogPost() {
             <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70">
               {post.readingTime}
             </span>
-            {isLoggedIn && !isEditing && (
+            {isLoggedIn && isEditMode && !isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
                 className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
@@ -348,7 +348,7 @@ export default function BlogPost() {
                 {t('post.edit')}
               </button>
             )}
-            {isLoggedIn && isEditing && (
+            {isLoggedIn && isEditMode && isEditing && (
               <div className="ml-auto flex items-center gap-2">
                 {saved && (
                   <span className="text-[0.8125rem] text-Sage">{t('post.saved')}</span>
@@ -458,7 +458,7 @@ export default function BlogPost() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 rounded-lg bg-Linen hover:bg-Mist transition-colors duration-200"
-                      aria-label="Share on Twitter"
+                      aria-label={t('post.shareOnTwitter')}
                     >
                       <Twitter size={16} className="text-Slate" />
                     </a>
@@ -467,7 +467,7 @@ export default function BlogPost() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 rounded-lg bg-Linen hover:bg-Mist transition-colors duration-200"
-                      aria-label="Share on LinkedIn"
+                      aria-label={t('post.shareOnLinkedIn')}
                     >
                       <Linkedin size={16} className="text-Slate" />
                     </a>

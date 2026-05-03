@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Github, Search, Menu, X, LogIn, User, Globe, Sun, Moon } from 'lucide-react'
+import { Github, Search, Menu, X, LogIn, User, Globe, Sun, Moon, Pencil, Eye } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
@@ -10,7 +10,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
-  const { user, isLoggedIn } = useAuth()
+  const { user, isLoggedIn, isEditMode, setEditMode } = useAuth()
   const { t, lang, toggleLang } = useLang()
   const { theme, toggleTheme } = useTheme()
 
@@ -75,7 +75,7 @@ export default function Navbar() {
           {/* Right side icons */}
           <div className="hidden md:flex items-center gap-4">
             <a
-              href="https://github.com"
+              href="https://github.com/WU928-spec"
               target="_blank"
               rel="noopener noreferrer"
               className="text-Ink hover:text-Amber transition-colors duration-300"
@@ -85,14 +85,14 @@ export default function Navbar() {
             </a>
             <button
               className="text-Ink hover:text-Amber transition-colors duration-300"
-              aria-label="Search"
+              aria-label={t('nav.search')}
             >
               <Search size={20} />
             </button>
             <button
               onClick={toggleLang}
               className="flex items-center gap-1 text-[0.75rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 px-2 py-1 rounded-md border border-Sand hover:border-Amber"
-              title="Switch language"
+              title={t('nav.switchLanguage')}
             >
               <Globe size={14} />
               {lang === 'zh' ? 'EN' : '中'}
@@ -100,21 +100,35 @@ export default function Navbar() {
             <button
               onClick={toggleTheme}
               className="flex items-center justify-center w-8 h-8 rounded-md border border-Sand text-Ink hover:text-Amber hover:border-Amber transition-colors duration-300"
-              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+              title={theme === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')}
             >
               {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
             </button>
             {isLoggedIn ? (
-              <Link
-                to="/profile"
-                className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors duration-300"
-              >
-                <img
-                  src={user?.avatar}
-                  alt={user?.username}
-                  className="w-8 h-8 rounded-full object-cover border border-Sand"
-                />
-              </Link>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setEditMode(!isEditMode)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[0.75rem] font-medium border transition-colors ${
+                    isEditMode
+                      ? 'bg-Amber text-Parchment border-Amber hover:bg-[#b8863d]'
+                      : 'bg-Linen text-Ink border-Sand hover:border-Amber hover:text-Amber'
+                  }`}
+                  title={isEditMode ? '切换为浏览模式' : '切换为编辑模式'}
+                >
+                  {isEditMode ? <Eye size={13} /> : <Pencil size={13} />}
+                  {isEditMode ? '浏览模式' : '编辑模式'}
+                </button>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors duration-300"
+                >
+                  <img
+                    src={user?.avatar}
+                    alt={user?.username}
+                    className="w-8 h-8 rounded-full object-cover border border-Sand"
+                  />
+                </Link>
+              </div>
             ) : (
               <Link
                 to="/login"
@@ -130,7 +144,7 @@ export default function Navbar() {
           <button
             className="md:hidden text-Ink p-1"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
+            aria-label={t('nav.toggleMenu')}
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -150,7 +164,7 @@ export default function Navbar() {
             <button
               className="self-end text-Ink mb-8"
               onClick={() => setMobileOpen(false)}
-              aria-label="Close menu"
+              aria-label={t('nav.closeMenu')}
             >
               <X size={24} />
             </button>
@@ -170,7 +184,7 @@ export default function Navbar() {
             <div className="mt-auto flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/WU928-spec"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-Ink hover:text-Amber transition-colors"
@@ -178,7 +192,7 @@ export default function Navbar() {
                 >
                   <Github size={20} />
                 </a>
-                <button className="text-Ink hover:text-Amber transition-colors" aria-label="Search">
+                <button className="text-Ink hover:text-Amber transition-colors" aria-label={t('nav.search')}>
                   <Search size={20} />
                 </button>
               </div>
