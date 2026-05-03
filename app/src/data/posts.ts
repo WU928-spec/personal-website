@@ -365,8 +365,22 @@ const architectureOfSimplicityContent = [
 function loadSavedPosts(): Record<string, Partial<Post>> {
   try {
     const saved = localStorage.getItem('vibecoding_posts')
-    return saved ? JSON.parse(saved) : {}
+    if (!saved) return {}
+    const parsed = JSON.parse(saved) as Record<string, Partial<Post>>
+    // 自动清理损坏的数据（缺少 content 字段）
+    let hasCorrupt = false
+    for (const [slug, data] of Object.entries(parsed)) {
+      if (!data.content || typeof data.content !== 'string') {
+        delete parsed[slug]
+        hasCorrupt = true
+      }
+    }
+    if (hasCorrupt) {
+      localStorage.setItem('vibecoding_posts', JSON.stringify(parsed))
+    }
+    return parsed
   } catch {
+    localStorage.removeItem('vibecoding_posts')
     return {}
   }
 }
