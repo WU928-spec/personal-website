@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import Layout from './components/Layout.tsx'
 import Home from './pages/Home.tsx'
+import Login from './pages/Login.tsx'
+import Profile from './pages/Profile.tsx'
 
 const Blog = lazy(() => import('./pages/Blog.tsx'))
 const BlogPost = lazy(() => import('./pages/BlogPost.tsx'))
@@ -45,6 +47,8 @@ function App() {
             </Suspense>
           }
         />
+        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Layout>
   )

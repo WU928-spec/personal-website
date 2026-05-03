@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { useEffect, useRef } from 'react'
 import Navbar from './Navbar.tsx'
 import Footer from './Footer.tsx'
+import { AuthProvider } from '@/contexts/AuthContext'
+import { LangProvider } from '@/contexts/LangContext'
 import Lenis from 'lenis'
 
 interface LayoutProps {
@@ -30,10 +32,14 @@ export default function Layout({ children }: LayoutProps) {
   }, [])
 
   return (
-    <div className="relative">
-      <Navbar />
-      <main>{children}</main>
-      <Footer />
-    </div>
+    <LangProvider>
+      <AuthProvider>
+        <div className="relative">
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </div>
+      </AuthProvider>
+    </LangProvider>
   )
 }

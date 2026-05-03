@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Github, Search, Menu, X } from 'lucide-react'
+import { Github, Search, Menu, X, LogIn, User, Globe } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const navLinks = [
-  { path: '/', label: 'Home' },
-  { path: '/blog', label: 'Blog' },
-  { path: '/projects', label: 'Projects' },
-  { path: '/about', label: 'About' },
-]
+import { useAuth } from '@/contexts/AuthContext'
+import { useLang } from '@/contexts/LangContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
+  const { user, isLoggedIn } = useAuth()
+  const { t, lang, toggleLang } = useLang()
+
+  const navLinks = [
+    { path: '/', label: t('nav.home') },
+    { path: '/blog', label: t('nav.blog') },
+    { path: '/projects', label: t('nav.projects') },
+    { path: '/about', label: t('nav.about') },
+  ]
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,6 +87,34 @@ export default function Navbar() {
             >
               <Search size={20} />
             </button>
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-1 text-[0.75rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 px-2 py-1 rounded-md border border-Sand hover:border-Amber"
+              title="Switch language"
+            >
+              <Globe size={14} />
+              {lang === 'zh' ? 'EN' : '中'}
+            </button>
+            {isLoggedIn ? (
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors duration-300"
+              >
+                <img
+                  src={user?.avatar}
+                  alt={user?.username}
+                  className="w-8 h-8 rounded-full object-cover border border-Sand"
+                />
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-Ink hover:text-Amber transition-colors duration-300"
+              >
+                <LogIn size={16} />
+                {t('nav.login')}
+              </Link>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -126,19 +158,40 @@ export default function Navbar() {
                 </Link>
               ))}
             </div>
-            <div className="mt-auto flex items-center gap-4">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-Ink hover:text-Amber transition-colors"
-                aria-label="GitHub"
-              >
-                <Github size={20} />
-              </a>
-              <button className="text-Ink hover:text-Amber transition-colors" aria-label="Search">
-                <Search size={20} />
-              </button>
+            <div className="mt-auto flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-Ink hover:text-Amber transition-colors"
+                  aria-label="GitHub"
+                >
+                  <Github size={20} />
+                </a>
+                <button className="text-Ink hover:text-Amber transition-colors" aria-label="Search">
+                  <Search size={20} />
+                </button>
+              </div>
+              {isLoggedIn ? (
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <User size={18} />
+                  <span className="font-ui text-[0.875rem] font-medium">{t('nav.profile')}</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <LogIn size={18} />
+                  <span className="font-ui text-[0.875rem] font-medium">{t('nav.login')}</span>
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

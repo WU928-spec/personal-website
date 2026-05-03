@@ -362,7 +362,26 @@ const architectureOfSimplicityContent = [
   'Related: [[Slow Programming]], [[The Philosophy of Enough|the philosophy of enough]]',
 ].join('\n');
 
-export const posts: Post[] = [
+function loadSavedPosts(): Record<string, Partial<Post>> {
+  try {
+    const saved = localStorage.getItem('vibecoding_posts')
+    return saved ? JSON.parse(saved) : {}
+  } catch {
+    return {}
+  }
+}
+
+function mergeSavedPosts(basePosts: Post[]): Post[] {
+  const saved = loadSavedPosts()
+  return basePosts.map((post) => {
+    if (saved[post.slug]) {
+      return { ...post, ...saved[post.slug] }
+    }
+    return post
+  })
+}
+
+let _posts: Post[] = mergeSavedPosts([
   {
     slug: 'slow-programming',
     title: 'Slow Programming',
@@ -407,25 +426,36 @@ export const posts: Post[] = [
     readingTime: '9 min read',
     content: architectureOfSimplicityContent,
   },
-];
+]);
+
+export const posts = _posts;
+
+export function savePost(slug: string, updates: Partial<Post>): void {
+  const idx = _posts.findIndex((p) => p.slug === slug);
+  if (idx === -1) return;
+  _posts[idx] = { ..._posts[idx], ...updates };
+  const saved = loadSavedPosts();
+  saved[slug] = { ...saved[slug], ...updates };
+  localStorage.setItem('vibecoding_posts', JSON.stringify(saved));
+}
 
 export function getPostBySlug(slug: string): Post | undefined {
-  return posts.find((p) => p.slug === slug);
+  return _posts.find((p) => p.slug === slug);
 }
 
 export function getAllSlugs(): string[] {
-  return posts.map((p) => p.slug);
+  return _posts.map((p) => p.slug);
 }
 
 export function getAdjacentPosts(slug: string): {
   prev: Post | null;
   next: Post | null;
 } {
-  const idx = posts.findIndex((p) => p.slug === slug);
+  const idx = _posts.findIndex((p) => p.slug === slug);
   if (idx === -1) return { prev: null, next: null };
   return {
-    prev: idx < posts.length - 1 ? posts[idx + 1] : null,
-    next: idx > 0 ? posts[idx - 1] : null,
+    prev: idx < _posts.length - 1 ? _posts[idx + 1] : null,
+    next: idx > 0 ? _posts[idx - 1] : null,
   };
 }
 
@@ -433,7 +463,7 @@ export function getRelatedPosts(slug: string, limit = 3): Post[] {
   const current = getPostBySlug(slug);
   if (!current) return [];
 
-  const scored = posts
+  const scored = _posts
     .filter((p) => p.slug !== slug)
     .map((p) => {
       let score = 0;
@@ -452,13 +482,13 @@ export function getRelatedPosts(slug: string, limit = 3): Post[] {
 }
 
 export function getCategories(): string[] {
-  const cats = new Set(posts.map((p) => p.category));
+  const cats = new Set(_posts.map((p) => p.category));
   return ['All', ...Array.from(cats)];
 }
 
 export function searchPosts(query: string): Post[] {
   const q = query.toLowerCase();
-  return posts.filter(
+  return _posts.filter(
     (p) =>
       p.title.toLowerCase().includes(q) ||
       p.excerpt.toLowerCase().includes(q) ||
@@ -468,6 +498,6 @@ export function searchPosts(query: string): Post[] {
 }
 
 export function getPostsByCategory(category: string): Post[] {
-  if (category === 'All') return posts;
-  return posts.filter((p) => p.category === category);
+  if (category === 'All') return _posts;
+  return _posts.filter((p) => p.category === category);
 }

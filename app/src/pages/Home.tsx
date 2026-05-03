@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ChevronDown, ExternalLink, MapPin, Briefcase, Globe, Star, GitFork } from 'lucide-react'
+import { useLang } from '@/contexts/LangContext'
 
 /* ------------------------------------------------------------------ */
 /*  Hero Section                                                       */
@@ -53,7 +54,8 @@ function useTypingEffect(text: string, speed = 80, delay = 500) {
 }
 
 function HeroSection() {
-  const headline = "Hi, I'm Alex"
+  const { t } = useLang()
+  const headline = t('home.heroTitle')
   const { displayed, showCursor, done } = useTypingEffect(headline, 80, 600)
 
   return (
@@ -119,14 +121,14 @@ function HeroSection() {
             to="/blog"
             className="inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] hover:shadow-amber hover:-translate-y-px transition-all duration-300"
           >
-            Read My Blog
+            {t('home.readBlog')}
           </Link>
           <Link
             to="/projects"
             className="inline-flex items-center border-[1.5px] border-Parchment text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink hover:border-Ink hover:text-Parchment hover:-translate-y-px transition-all duration-300"
             style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
-            View Projects
+            {t('home.viewProjects')}
           </Link>
         </motion.div>
       </div>
@@ -140,7 +142,7 @@ function HeroSection() {
       >
         <div className="flex flex-col items-center gap-2 animate-scroll-pulse">
           <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(247,244,239,0.5)] uppercase">
-            Scroll
+            {t('home.scroll')}
           </span>
           <ChevronDown size={20} className="text-[rgba(247,244,239,0.5)]" />
         </div>
@@ -160,6 +162,7 @@ const introStats = [
 ]
 
 function IntroSection() {
+  const { t } = useLang()
   return (
     <section className="bg-Parchment py-24 md:py-32">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
@@ -211,22 +214,22 @@ function IntroSection() {
             className="md:col-span-8"
           >
             <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
-              About Me
+              {t('home.aboutMe')}
             </p>
             <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
-              A curious mind building in the open
+              {t('home.aboutTitle')}
             </h2>
             <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
-              I'm a developer who believes in learning by doing and thinking by writing. This site is my digital garden — a collection of notes, experiments, and projects that grow over time. Everything here is a work in progress, and that's exactly how I like it.
+              {t('home.aboutP1')}
             </p>
             <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
-              When I'm not coding, you'll find me exploring new ideas, reading widely, or chasing the perfect cup of coffee.
+              {t('home.aboutP2')}
             </p>
             <Link
               to="/about"
               className="inline-block mt-6 font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300"
             >
-              Learn more about me &rarr;
+              {t('home.learnMore')}
             </Link>
           </motion.div>
         </div>
@@ -283,6 +286,7 @@ const skillCategories = [
 ]
 
 function SkillConstellationSection() {
+  const { t } = useLang()
   return (
     <section className="bg-Linen py-20 md:py-28">
       <div className="max-w-5xl mx-auto px-6 md:px-12 text-center">
@@ -294,13 +298,13 @@ function SkillConstellationSection() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
         >
           <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
-            What I Do
+            {t('home.whatIDo')}
           </p>
           <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
-            Tools, skills & technologies
+            {t('home.skillsTitle')}
           </h2>
           <p className="font-body text-[0.9375rem] leading-[1.65] text-Slate mt-2">
-            The stack I reach for when building things
+            {t('home.skillsDesc')}
           </p>
         </motion.div>
 
@@ -374,6 +378,7 @@ const blogPosts = [
 ]
 
 function BlogPreviewSection() {
+  const { t } = useLang()
   return (
     <section className="bg-Parchment py-24 md:py-32">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
@@ -387,17 +392,17 @@ function BlogPreviewSection() {
         >
           <div>
             <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
-              Latest Writing
+              {t('home.latestWriting')}
             </p>
             <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
-              Fresh from my notebook
+              {t('home.freshFromNotebook')}
             </h2>
           </div>
           <Link
             to="/blog"
             className="font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300 shrink-0"
           >
-            View all &rarr;
+            {t('home.viewAll')}
           </Link>
         </motion.div>
 
@@ -464,7 +469,7 @@ function BlogPreviewSection() {
             className="inline-flex items-center border-[1.5px] border-Ink text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink hover:text-Parchment hover:-translate-y-px transition-all duration-300"
             style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
-            Explore all articles &rarr;
+            {t('home.exploreArticles')}
           </Link>
         </motion.div>
       </div>
@@ -533,6 +538,7 @@ function generateContributionGrid(): number[][] {
 }
 
 function GitHubSnapshotSection() {
+  const { t } = useLang()
   const contributions = useRef(generateContributionGrid())
   const [stats] = useState({ repos: 48, stars: 1567, streak: 42 })
 
@@ -554,13 +560,13 @@ function GitHubSnapshotSection() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
         >
           <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-[rgba(107,142,107,0.8)] mb-4">
-            Open Source
+            {t('home.openSource')}
           </p>
           <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Parchment">
-            What I'm building
+            {t('home.buildingTitle')}
           </h2>
           <p className="font-body text-[0.9375rem] leading-[1.65] text-[rgba(247,244,239,0.6)] mt-2">
-            Pinned projects and recent contributions
+            {t('home.buildingDesc')}
           </p>
         </motion.div>
 
@@ -573,7 +579,7 @@ function GitHubSnapshotSection() {
           className="mt-8"
         >
           <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-[rgba(247,244,239,0.5)] mb-3">
-            Contribution activity
+            {t('home.contributionActivity')}
           </p>
           <div className="flex gap-[3px] overflow-x-auto pb-2">
             {contributions.current.map((week, wi) => (
@@ -695,7 +701,7 @@ function GitHubSnapshotSection() {
             className="inline-flex items-center border-[1.5px] border-[rgba(247,244,239,0.5)] text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Parchment hover:text-Ink hover:border-Parchment hover:-translate-y-px transition-all duration-300"
             style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
-            View full profile &rarr;
+            {t('home.viewFullProfile')}
           </a>
         </motion.div>
       </div>

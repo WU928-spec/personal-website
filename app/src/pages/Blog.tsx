@@ -8,6 +8,7 @@ import {
   searchPosts,
   type Post,
 } from '@/data/posts.ts'
+import { useLang } from '@/contexts/LangContext'
 
 const CATEGORIES = getCategories()
 
@@ -91,6 +92,7 @@ function BlogCard({
    Empty State
    ─────────────────────────────────────────────── */
 function EmptyState() {
+  const { t } = useLang()
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -99,10 +101,10 @@ function EmptyState() {
     >
       <FileSearch size={48} className="text-Sand mb-4" />
       <h4 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink mb-2">
-        No articles found
+        {t('blog.noArticles')}
       </h4>
       <p className="text-[0.9375rem] leading-[1.65] text-Slate">
-        Try a different search or category
+        {t('blog.noArticlesDesc')}
       </p>
     </motion.div>
   )
@@ -112,6 +114,7 @@ function EmptyState() {
    Blog Listing Page
    ─────────────────────────────────────────────── */
 export default function Blog() {
+  const { t } = useLang()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('All')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
@@ -200,7 +203,7 @@ export default function Blog() {
             }}
             className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Parchment"
           >
-            The Garden
+            {t('blog.garden')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -212,8 +215,7 @@ export default function Blog() {
             }}
             className="mt-4 text-[1.0625rem] leading-[1.75] text-Parchment/80 max-w-xl mx-auto font-body"
           >
-            Notes, essays, and half-baked ideas. Everything here is a work in
-            progress.
+            {t('blog.gardenDesc')}
           </motion.p>
 
           {/* Search */}
@@ -233,7 +235,7 @@ export default function Blog() {
             />
             <input
               type="text"
-              placeholder="Search articles..."
+              placeholder={t('blog.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-Parchment/15 backdrop-blur-md border border-Parchment/20 rounded-full py-3 pl-11 pr-5 text-Parchment placeholder:text-Parchment/50 focus:outline-none focus:border-Parchment/50 focus:bg-Parchment/20 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.2)] transition-all duration-300 font-body"
@@ -286,8 +288,7 @@ export default function Blog() {
           {/* Right side: sort + count */}
           <div className="flex items-center gap-4 shrink-0">
             <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-              {filteredPosts.length} article
-              {filteredPosts.length !== 1 ? 's' : ''}
+              {filteredPosts.length} {t('blog.articles')}
             </span>
 
             {/* Sort dropdown */}
@@ -298,8 +299,8 @@ export default function Blog() {
               }
               className="hidden md:block bg-Linen border border-Sand rounded-lg px-3 py-[6px] text-[0.8125rem] font-medium text-Slate focus:outline-none focus:border-Amber cursor-pointer"
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
+              <option value="newest">{t('blog.newestFirst')}</option>
+              <option value="oldest">{t('blog.oldestFirst')}</option>
             </select>
           </div>
         </div>
@@ -335,7 +336,7 @@ export default function Blog() {
                 onClick={loadMore}
                 className="px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)]"
               >
-                Load More Articles
+                {t('blog.loadMore')}
               </button>
             </div>
           )}

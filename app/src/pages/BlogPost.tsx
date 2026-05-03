@@ -8,16 +8,22 @@ import {
   Linkedin,
   Copy,
   Check,
+  Pencil,
+  Save,
+  X,
 } from 'lucide-react'
 import {
   getPostBySlug,
   getAdjacentPosts,
   getRelatedPosts,
   getAllSlugs,
+  savePost,
   type Post,
 } from '@/data/posts.ts'
 import MarkdownRenderer, { extractToc } from '@/components/MarkdownRenderer.tsx'
 import TableOfContents from '@/components/TableOfContents.tsx'
+import { useAuth } from '@/contexts/AuthContext'
+import { useLang } from '@/contexts/LangContext'
 
 /* ───────────────────────────────────────────────
    Scroll Progress Bar
@@ -86,10 +92,10 @@ function AuthorCard() {
         />
         <div>
           <h5 className="font-ui text-[1rem] font-semibold leading-[1.4] text-Ink">
-            Digital Gardener
+            {t('post.authorName')}
           </h5>
           <p className="text-[0.9375rem] leading-[1.65] text-Slate mt-1">
-            Developer, writer, and perennial learner. Cultivating ideas in public since 2020.
+            {t('post.authorDesc')}
           </p>
           <div className="flex items-center gap-3 mt-3">
             <a
@@ -184,7 +190,7 @@ function PrevNextNav({ prev, next }: { prev: Post | null; next: Post | null }) {
           className="text-left group p-4 rounded-lg hover:bg-Linen transition-colors duration-200"
         >
           <span className="block text-[0.8125rem] font-medium tracking-[0.04em] text-Slate uppercase mb-1">
-            ← Previous
+            ← {t('post.previous')}
           </span>
           <span className="font-display text-[1rem] font-medium leading-[1.3] text-Ink group-hover:text-Amber transition-colors duration-200 line-clamp-2">
             {prev.title}
@@ -199,7 +205,7 @@ function PrevNextNav({ prev, next }: { prev: Post | null; next: Post | null }) {
           className="text-right group p-4 rounded-lg hover:bg-Linen transition-colors duration-200"
         >
           <span className="block text-[0.8125rem] font-medium tracking-[0.04em] text-Slate uppercase mb-1">
-            Next →
+            {t('post.next')} →
           </span>
           <span className="font-display text-[1rem] font-medium leading-[1.3] text-Ink group-hover:text-Amber transition-colors duration-200 line-clamp-2">
             {next.title}
@@ -218,12 +224,28 @@ function PrevNextNav({ prev, next }: { prev: Post | null; next: Post | null }) {
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const { isLoggedIn } = useAuth()
+  const { t } = useLang()
 
-  const post = useMemo(() => getPostBySlug(slug || ''), [slug])
+  const [post, setPost] = useState<Post | undefined>(undefined)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editContent, setEditContent] = useState('')
+  const [editTitle, setEditTitle] = useState('')
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    const p = getPostBySlug(slug || '')
+    setPost(p)
+    if (p) {
+      setEditContent(p.content)
+      setEditTitle(p.title)
+    }
+  }, [slug])
+
   const tocItems = useMemo(() => {
-    if (!post) return []
+    if (!post || isEditing) return []
     return extractToc(post.content)
-  }, [post])
+  }, [post, isEditing])
 
   const adjacent = useMemo(() => {
     if (!post) return { prev: null, next: null }
@@ -238,10 +260,27 @@ export default function BlogPost() {
   const allSlugs = useMemo(() => getAllSlugs(), [])
 
   useEffect(() => {
+    if (post === undefined) return
     if (!post) {
       navigate('/blog', { replace: true })
     }
   }, [post, navigate])
+
+  const handleSave = () => {
+    if (!post) return
+    savePost(post.slug, { title: editTitle, content: editContent })
+    setPost({ ...post, title: editTitle, content: editContent })
+    setIsEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleCancel = () => {
+    if (!post) return
+    setEditContent(post.content)
+    setEditTitle(post.title)
+    setIsEditing(false)
+  }
 
   if (!post) return null
 
@@ -274,7 +313,7 @@ export default function BlogPost() {
               duration: 0.7,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 flex-wrap"
           >
             <span
               className="px-3 py-1 rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Amber border border-Amber/30"
@@ -289,20 +328,59 @@ export default function BlogPost() {
             <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Parchment/70">
               {post.readingTime}
             </span>
+            {isLoggedIn && !isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Parchment/15 backdrop-blur-md border border-Parchment/20 text-Parchment text-[0.8125rem] font-medium hover:bg-Parchment/25 transition-colors"
+              >
+                <Pencil size={14} />
+                {t('post.edit')}
+              </button>
+            )}
+            {isLoggedIn && isEditing && (
+              <div className="ml-auto flex items-center gap-2">
+                {saved && (
+                  <span className="text-[0.8125rem] text-Sage">已保存</span>
+                )}
+                <button
+                  onClick={handleSave}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
+                >
+                  <Save size={14} />
+                  {t('post.save')}
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Parchment/15 backdrop-blur-md border border-Parchment/20 text-Parchment text-[0.8125rem] font-medium hover:bg-Parchment/25 transition-colors"
+                >
+                  <X size={14} />
+                  {t('post.cancel')}
+                </button>
+              </div>
+            )}
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.7,
-              delay: 0.1,
-              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-            }}
-            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Parchment mt-3 max-w-3xl"
-          >
-            {post.title}
-          </motion.h1>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="mt-3 w-full bg-transparent border-b border-Parchment/30 text-Parchment font-display text-[clamp(2rem,4vw,3.5rem)] font-medium placeholder:text-Parchment/40 focus:outline-none focus:border-Parchment/60 pb-2"
+            />
+          ) : (
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.7,
+                delay: 0.1,
+                ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+              }}
+              className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Parchment mt-3 max-w-3xl"
+            >
+              {post.title}
+            </motion.h1>
+          )}
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -329,17 +407,25 @@ export default function BlogPost() {
             {/* Article Body */}
             <div className="lg:col-span-9">
               <div className="max-w-3xl">
-                <MarkdownRenderer
-                  content={post.content}
-                  existingSlugs={allSlugs}
-                />
+                {isEditing ? (
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    className="w-full min-h-[600px] bg-Linen border border-Sand rounded-xl p-6 text-Ink font-body text-[1rem] leading-[1.75] focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 resize-y"
+                  />
+                ) : (
+                  <MarkdownRenderer
+                    content={post.content}
+                    existingSlugs={allSlugs}
+                  />
+                )}
 
                 {/* ── Article Footer ── */}
                 <div className="mt-12 pt-8 border-t border-Sand">
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 items-center">
                     <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mr-1">
-                      Tagged:
+                      {t('post.tagged')}
                     </span>
                     {post.tags.map((tag) => (
                       <span
@@ -354,7 +440,7 @@ export default function BlogPost() {
                   {/* Share Row */}
                   <div className="mt-6 flex items-center gap-3">
                     <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-                      Share:
+                      {t('post.share')}
                     </span>
                     <a
                       href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`}
@@ -400,10 +486,10 @@ export default function BlogPost() {
               }}
             >
               <h3 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium text-Ink">
-                Continue Reading
+                {t('post.continueReading')}
               </h3>
               <p className="mt-2 text-[0.9375rem] leading-[1.65] text-Slate">
-                More from the garden
+                {t('post.moreFromGarden')}
               </p>
             </motion.div>
 
@@ -431,7 +517,7 @@ export default function BlogPost() {
             className="inline-flex items-center gap-2 px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s]"
           >
             <ArrowLeft size={16} />
-            Back to all articles
+            {t('post.backToArticles')}
           </Link>
         </div>
       </section>
