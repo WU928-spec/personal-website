@@ -184,6 +184,7 @@ const translations = {
       openInBlog: '在博客中打开',
       backlinks: '反向链接',
       noBacklinks: '暂无文章链接到本文',
+      rootNotes: '根目录笔记',
     },
     // Projects
     projects: {
@@ -383,6 +384,7 @@ const translations = {
       openInBlog: 'Open in Blog',
       backlinks: 'Backlinks',
       noBacklinks: 'No articles link to this one yet',
+      rootNotes: 'Root Notes',
     },
     // Projects
     projects: {

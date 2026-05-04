@@ -38,7 +38,7 @@ function TreeItem({
   onSelect: (slug: string) => void
   selectedSlug?: string
 }) {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
 
   if (item.type === 'folder') {
     return (
@@ -82,11 +82,11 @@ function TreeItem({
     )
   }
 
-  // Derive slug from file name
+  // Derive slug from file name (support Chinese)
   const slug = item.name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
     .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_]/g, '')
     .substring(0, 60)
 
   const isSelected = selectedSlug === slug
@@ -104,6 +104,63 @@ function TreeItem({
       <FileText size={14} className={isSelected ? 'text-Amber' : 'text-Slate'} />
       <span className="text-[0.8125rem] font-medium truncate">{item.name}</span>
     </button>
+  )
+}
+
+/* ───────────────────────────────────────────────
+   Root Files Group (ungrouped notes at vault root)
+   ─────────────────────────────────────────────── */
+function RootFilesGroup({
+  files,
+  onSelect,
+  selectedSlug,
+}: {
+  files: VaultFile[]
+  onSelect: (slug: string) => void
+  selectedSlug?: string
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const { t } = useLang()
+
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-1.5 w-full text-left py-1.5 px-2 rounded-md hover:bg-Ink/5 transition-colors dark:hover:bg-white/5"
+        style={{ paddingLeft: '8px' }}
+      >
+        {expanded ? (
+          <ChevronDown size={14} className="text-Slate shrink-0" />
+        ) : (
+          <ChevronRight size={14} className="text-Slate shrink-0" />
+        )}
+        <Folder size={14} className="text-Sage shrink-0" />
+        <span className="text-[0.8125rem] font-medium text-Ink dark:text-white truncate">
+          {t('obsidian.rootNotes')}
+        </span>
+        <span className="text-[0.6875rem] text-Slate ml-1">({files.length})</span>
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {files.map((item) => (
+              <TreeItem
+                key={item.path}
+                item={item}
+                depth={1}
+                onSelect={onSelect}
+                selectedSlug={selectedSlug}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
@@ -313,14 +370,27 @@ export default function ObsidianBrowser() {
               {tree.length === 0 ? (
                 <p className="text-[0.8125rem] text-Slate px-2">{t('obsidian.emptyVault')}</p>
               ) : (
-                tree.map((item) => (
-                  <TreeItem
-                    key={item.path}
-                    item={item}
-                    onSelect={handleSelectNote}
-                    selectedSlug={selectedSlug}
-                  />
-                ))
+                <>
+                  {/* Folders first */}
+                  {tree
+                    .filter((item) => item.type === 'folder')
+                    .map((item) => (
+                      <TreeItem
+                        key={item.path}
+                        item={item}
+                        onSelect={handleSelectNote}
+                        selectedSlug={selectedSlug}
+                      />
+                    ))}
+                  {/* Root files grouped together */}
+                  {tree.some((item) => item.type === 'file') && (
+                    <RootFilesGroup
+                      files={tree.filter((item) => item.type === 'file')}
+                      onSelect={handleSelectNote}
+                      selectedSlug={selectedSlug}
+                    />
+                  )}
+                </>
               )}
             </div>
           </aside>
