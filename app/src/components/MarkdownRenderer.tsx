@@ -524,21 +524,65 @@ function buildComponents(_existingSlugs: string[]): Components {
       </div>
     ),
 
-    img: ({ src, alt }) => (
-      <figure className="my-6">
-        <img
-          src={src}
-          alt={alt || ''}
-          className="rounded-lg shadow-soft w-full"
-          loading="lazy"
-        />
-        {alt && (
-          <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-            {alt}
-          </figcaption>
-        )}
-      </figure>
-    ),
+    img: ({ src, alt }) => {
+      const ext = src?.split('.').pop()?.toLowerCase() || ''
+      const audioExts = ['mp3', 'wav', 'm4a', 'ogg', 'webm', 'aac', 'flac']
+      const videoExts = ['mp4', 'mov', 'webm', 'mkv']
+
+      if (audioExts.includes(ext)) {
+        return (
+          <figure className="my-6">
+            <audio
+              controls
+              className="w-full rounded-lg"
+              preload="metadata"
+            >
+              <source src={src} type={`audio/${ext === 'm4a' ? 'mp4' : ext}`} />
+            </audio>
+            {alt && (
+              <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+                {alt}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+
+      if (videoExts.includes(ext)) {
+        return (
+          <figure className="my-6">
+            <video
+              controls
+              className="w-full rounded-lg shadow-soft"
+              preload="metadata"
+            >
+              <source src={src} />
+            </video>
+            {alt && (
+              <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+                {alt}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+
+      return (
+        <figure className="my-6">
+          <img
+            src={src}
+            alt={alt || ''}
+            className="rounded-lg shadow-soft w-full"
+            loading="lazy"
+          />
+          {alt && (
+            <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+              {alt}
+            </figcaption>
+          )}
+        </figure>
+      )
+    },
   }
 }
 
