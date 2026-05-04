@@ -22,7 +22,7 @@ export default function Profile() {
   const { t, lang } = useLang()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [previewAvatar, setPreviewAvatar] = useState(user?.avatar || '/avatar.jpg')
+  const [previewAvatar, setPreviewAvatar] = useState(user?.avatar || localStorage.getItem('vibecoding_avatar') || '/avatar.jpg')
   const [saved, setSaved] = useState(false)
 
   /* About data */

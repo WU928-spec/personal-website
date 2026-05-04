@@ -233,7 +233,7 @@ function IntroSection() {
   const [editZh, setEditZh] = useState<AboutData>(() => loadAbout('zh'))
   const [editEn, setEditEn] = useState<AboutData>(() => loadAbout('en'))
 
-  const avatar = user?.avatar || '/avatar.jpg'
+  const avatar = user?.avatar || localStorage.getItem('vibecoding_avatar') || '/avatar.jpg'
 
   const handleSave = () => {
     saveAbout('zh', editZh)
