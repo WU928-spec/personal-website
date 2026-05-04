@@ -22,6 +22,7 @@ import {
 } from '@/data/posts.ts'
 import MarkdownRenderer, { extractToc } from '@/components/MarkdownRenderer.tsx'
 import TableOfContents from '@/components/TableOfContents.tsx'
+import Backlinks from '@/components/Backlinks.tsx'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
 
@@ -469,6 +470,9 @@ export default function BlogPost() {
                     </a>
                     <CopyLinkButton />
                   </div>
+
+                  {/* Backlinks */}
+                  {!isEditing && <Backlinks currentSlug={post.slug} />}
 
                   {/* Author Card */}
                   <AuthorCard />

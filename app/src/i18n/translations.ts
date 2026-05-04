@@ -7,6 +7,7 @@ const translations = {
       home: '首页',
       blog: '博客',
       projects: '项目',
+      obsidian: 'Obsidian',
       about: '关于',
       login: '登录',
       profile: '个人资料',
@@ -167,6 +168,23 @@ const translations = {
       defaultCategory: '随笔',
       defaultTag: '通用',
     },
+    // Obsidian
+    obsidian: {
+      title: 'Obsidian 笔记',
+      subtitle: '浏览本地 vault 中的笔记，探索知识之间的联系。',
+      serverOffline: '本地 Sync Server 未启动。请在 obsidian-server 目录运行 npm run dev。',
+      retry: '重试连接',
+      refresh: '刷新',
+      notes: '篇笔记',
+      vault: 'Vault 目录',
+      emptyVault: 'Vault 为空',
+      noNotes: '暂无笔记',
+      preview: '预览',
+      allNotes: '全部笔记',
+      openInBlog: '在博客中打开',
+      backlinks: '反向链接',
+      noBacklinks: '暂无文章链接到本文',
+    },
     // Projects
     projects: {
       title: '项目',
@@ -188,6 +206,7 @@ const translations = {
       home: 'Home',
       blog: 'Blog',
       projects: 'Projects',
+      obsidian: 'Obsidian',
       about: 'About',
       login: 'Login',
       profile: 'Profile',
@@ -347,6 +366,23 @@ const translations = {
       uncategorized: 'Uncategorized',
       defaultCategory: 'Thoughts',
       defaultTag: 'general',
+    },
+    // Obsidian
+    obsidian: {
+      title: 'Obsidian Notes',
+      subtitle: 'Browse notes from your local vault and explore connections between ideas.',
+      serverOffline: 'Local Sync Server is not running. Please run npm run dev in the obsidian-server directory.',
+      retry: 'Retry Connection',
+      refresh: 'Refresh',
+      notes: 'notes',
+      vault: 'Vault Directory',
+      emptyVault: 'Vault is empty',
+      noNotes: 'No notes yet',
+      preview: 'Preview',
+      allNotes: 'All Notes',
+      openInBlog: 'Open in Blog',
+      backlinks: 'Backlinks',
+      noBacklinks: 'No articles link to this one yet',
     },
     // Projects
     projects: {

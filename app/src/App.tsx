@@ -10,6 +10,7 @@ const Blog = lazy(() => import('./pages/Blog.tsx'))
 const BlogPost = lazy(() => import('./pages/BlogPost.tsx'))
 const Projects = lazy(() => import('./pages/Projects.tsx'))
 const About = lazy(() => import('./pages/About.tsx'))
+const ObsidianBrowser = lazy(() => import('./pages/ObsidianBrowser.tsx'))
 
 function App() {
   return (
@@ -45,6 +46,14 @@ function App() {
           element={
             <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
               <About />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/obsidian"
+          element={
+            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
+              <ObsidianBrowser />
             </Suspense>
           }
         />
