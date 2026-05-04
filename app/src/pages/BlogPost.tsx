@@ -57,6 +57,7 @@ function ScrollProgressBar() {
    Copy Link Button
    ─────────────────────────────────────────────── */
 function CopyLinkButton() {
+  const { t } = useLang()
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
