@@ -206,6 +206,166 @@ function NoteListCard({
 }
 
 /* ───────────────────────────────────────────────
+   Folder Browser (main area)
+   ─────────────────────────────────────────────── */
+function FolderBrowser({
+  tree,
+  notes,
+  onSelect,
+  selectedSlug,
+}: {
+  tree: VaultFile[]
+  notes: ObsidianNoteMeta[]
+  onSelect: (slug: string) => void
+  selectedSlug?: string
+}) {
+  const { t } = useLang()
+  const noteMap = useMemo(() => {
+    const map = new Map<string, ObsidianNoteMeta>()
+    for (const n of notes) map.set(n.slug, n)
+    return map
+  }, [notes])
+
+  if (tree.length === 0) {
+    return <EmptyState message={t('obsidian.noNotes')} />
+  }
+
+  return (
+    <div className="space-y-4">
+      {tree.map((item) => (
+        <FolderSection
+          key={item.path}
+          item={item}
+          noteMap={noteMap}
+          onSelect={onSelect}
+          selectedSlug={selectedSlug}
+        />
+      ))}
+    </div>
+  )
+}
+
+function FolderSection({
+  item,
+  noteMap,
+  onSelect,
+  selectedSlug,
+}: {
+  item: VaultFile
+  noteMap: Map<string, ObsidianNoteMeta>
+  onSelect: (slug: string) => void
+  selectedSlug?: string
+}) {
+  const [expanded, setExpanded] = useState(false)
+
+  // Collect all file descendants (recursively)
+  function collectFiles(node: VaultFile, files: VaultFile[]) {
+    if (node.type === 'file') {
+      files.push(node)
+    } else if (node.children) {
+      for (const child of node.children) collectFiles(child, files)
+    }
+  }
+
+  const allFiles: VaultFile[] = []
+  collectFiles(item, allFiles)
+  const fileCount = allFiles.length
+
+  if (item.type === 'file') {
+    // Root-level file handled by RootFilesGroup in sidebar; skip here
+    return null
+  }
+
+  return (
+    <div className="rounded-xl border border-Sand bg-Linen/50 dark:bg-white/5 dark:border-white/10 overflow-hidden">
+      {/* Folder Header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-3 w-full text-left px-5 py-4 hover:bg-Ink/[0.02] transition-colors dark:hover:bg-white/[0.03]"
+      >
+        {expanded ? (
+          <ChevronDown size={18} className="text-Slate shrink-0" />
+        ) : (
+          <ChevronRight size={18} className="text-Slate shrink-0" />
+        )}
+        <Folder size={18} className="text-Amber shrink-0" />
+        <span className="font-display text-[1.0625rem] font-semibold text-Ink dark:text-white truncate">
+          {item.name}
+        </span>
+        <span className="text-[0.75rem] text-Slate ml-auto shrink-0">
+          {fileCount} 篇
+        </span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-5 pb-4">
+              {/* Sub-folders */}
+              {item.children
+                ?.filter((child) => child.type === 'folder')
+                .map((child) => (
+                  <div key={child.path} className="mt-3 ml-4">
+                    <FolderSection
+                      item={child}
+                      noteMap={noteMap}
+                      onSelect={onSelect}
+                      selectedSlug={selectedSlug}
+                    />
+                  </div>
+                ))}
+
+              {/* Files in this folder */}
+              {item.children
+                ?.filter((child) => child.type === 'file')
+                .map((child) => {
+                  const slug = child.name
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_]/g, '')
+                    .substring(0, 60)
+                  const note = noteMap.get(slug)
+                  const isSelected = selectedSlug === slug
+                  return (
+                    <button
+                      key={child.path}
+                      onClick={() => onSelect(slug)}
+                      className={`flex items-center gap-2 w-full text-left py-2 px-3 rounded-lg transition-colors ${
+                        isSelected
+                          ? 'bg-Amber/10 text-Amber'
+                          : 'hover:bg-Ink/5 text-Ink dark:text-white dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <FileText
+                        size={14}
+                        className={isSelected ? 'text-Amber shrink-0' : 'text-Slate shrink-0'}
+                      />
+                      <span className="text-[0.875rem] font-medium truncate">
+                        {child.name}
+                      </span>
+                      {note && (
+                        <span className="text-[0.6875rem] text-Slate ml-auto shrink-0">
+                          {note.date.split('T')[0]}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* ───────────────────────────────────────────────
    Empty State
    ─────────────────────────────────────────────── */
 function EmptyState({ message }: { message: string }) {
@@ -466,39 +626,14 @@ export default function ObsidianBrowser() {
                 </div>
               </motion.div>
             ) : (
-              /* ── Note List ── */
+              /* ── Folder Browser ── */
               <>
-                {/* Category Filter */}
-                <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 no-scrollbar">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setActiveCategory(cat)}
-                      className={`px-3 py-1 rounded-full text-[0.8125rem] font-medium whitespace-nowrap transition-colors ${
-                        activeCategory === cat
-                          ? 'bg-Amber text-white'
-                          : 'bg-Linen text-Slate hover:text-Ink dark:bg-white/10 dark:text-white/70 dark:hover:text-white'
-                      }`}
-                    >
-                      {cat === 'All' ? t('blog.allCategories') : cat}
-                    </button>
-                  ))}
-                </div>
-
-                {filteredNotes.length === 0 ? (
-                  <EmptyState message={t('obsidian.noNotes')} />
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {filteredNotes.map((note) => (
-                      <NoteListCard
-                        key={note.slug}
-                        note={note}
-                        onClick={() => handleSelectNote(note.slug)}
-                      />
-                    ))}
-                  </div>
-                )}
-
+                <FolderBrowser
+                  tree={tree}
+                  notes={notes}
+                  onSelect={handleSelectNote}
+                  selectedSlug={selectedSlug}
+                />
                 {/* Knowledge Graph */}
                 {notes.length > 1 && <GraphView notes={notes} height={420} />}
               </>
