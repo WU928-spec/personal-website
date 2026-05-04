@@ -6,6 +6,7 @@ import {
   getCategories,
   getPostsByCategory,
   searchPosts,
+  syncObsidianPosts,
   type Post,
 } from '@/data/posts.ts'
 import { useLang } from '@/contexts/LangContext'
@@ -123,7 +124,13 @@ export default function Blog() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [visibleCount, setVisibleCount] = useState(6)
   const [isSticky, setIsSticky] = useState(false)
+  const [obsidianSynced, setObsidianSynced] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
+
+  // Sync Obsidian posts on mount
+  useEffect(() => {
+    syncObsidianPosts().then(() => setObsidianSynced(true))
+  }, [])
 
   // Filter + search
   const filteredPosts = useMemo(() => {
@@ -154,7 +161,7 @@ export default function Blog() {
     }
 
     return result
-  }, [searchQuery, activeCategory, sortOrder])
+  }, [searchQuery, activeCategory, sortOrder, obsidianSynced])
 
   const visiblePosts = filteredPosts.slice(0, visibleCount)
   const hasMore = visibleCount < filteredPosts.length
