@@ -61,6 +61,7 @@ function CopyLinkButton() {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
+    if (!navigator.clipboard) return
     navigator.clipboard.writeText(window.location.href).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -388,7 +389,7 @@ export default function BlogPost() {
                 delay: 0.1,
                 ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
               }}
-              className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink mt-3 max-w-3xl"
+              className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink dark:text-white mt-3 max-w-3xl"
             >
               {post.title}
             </motion.h1>
@@ -402,7 +403,7 @@ export default function BlogPost() {
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-2xl font-body"
+            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 dark:text-white/90 max-w-2xl font-body"
           >
             {post.excerpt}
           </motion.p>

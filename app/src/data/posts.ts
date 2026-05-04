@@ -367,11 +367,15 @@ function loadSavedPosts(): Record<string, Partial<Post>> {
     const saved = localStorage.getItem('vibecoding_posts')
     if (!saved) return {}
     const parsed = JSON.parse(saved) as Record<string, Partial<Post>>
-    // 自动清理损坏的数据（缺少 content 字段）
+    if (!parsed || typeof parsed !== 'object') return {}
+    // 自动清理损坏的数据（缺少 content 字段或 tags 不是数组）
     let hasCorrupt = false
     for (const [slug, data] of Object.entries(parsed)) {
       if (!data.content || typeof data.content !== 'string') {
         delete parsed[slug]
+        hasCorrupt = true
+      } else if (data.tags && !Array.isArray(data.tags)) {
+        data.tags = []
         hasCorrupt = true
       }
     }
@@ -489,7 +493,7 @@ export function getRelatedPosts(slug: string, limit = 3): Post[] {
     .map((p) => {
       let score = 0;
       if (p.category === current.category) score += 3;
-      const sharedTags = p.tags.filter((t) => current.tags.includes(t));
+      const sharedTags = (p.tags || []).filter((t) => (current.tags || []).includes(t));
       score += sharedTags.length * 2;
       const dateDiff = Math.abs(
         new Date(p.date).getTime() - new Date(current.date).getTime()
@@ -513,7 +517,7 @@ export function searchPosts(query: string): Post[] {
     (p) =>
       p.title.toLowerCase().includes(q) ||
       p.excerpt.toLowerCase().includes(q) ||
-      p.tags.some((t) => t.toLowerCase().includes(q)) ||
+      (p.tags || []).some((t) => t.toLowerCase().includes(q)) ||
       p.category.toLowerCase().includes(q)
   );
 }

@@ -24,7 +24,10 @@ export function loadHero(lang: Lang): HeroData {
   if (saved) {
     try {
       const parsed = JSON.parse(saved) as Record<Lang, HeroData>
-      return parsed[lang] || defaultHero[lang]
+      if (parsed && typeof parsed === 'object' && parsed[lang]) {
+        return parsed[lang]
+      }
+      localStorage.removeItem('vibecoding_hero')
     } catch {
       localStorage.removeItem('vibecoding_hero')
     }
@@ -97,7 +100,9 @@ export function loadSkills(): SkillCategory[] {
   const saved = localStorage.getItem('vibecoding_skills')
   if (saved) {
     try {
-      return JSON.parse(saved) as SkillCategory[]
+      const parsed = JSON.parse(saved) as SkillCategory[]
+      if (Array.isArray(parsed)) return parsed
+      localStorage.removeItem('vibecoding_skills')
     } catch {
       localStorage.removeItem('vibecoding_skills')
     }
@@ -181,7 +186,10 @@ export function loadBlogPreview(lang: Lang): BlogPreviewPost[] {
   if (saved) {
     try {
       const parsed = JSON.parse(saved) as Record<Lang, BlogPreviewPost[]>
-      return parsed[lang] || defaultBlogPreview[lang]
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed[lang])) {
+        return parsed[lang]
+      }
+      localStorage.removeItem('vibecoding_blogPreview')
     } catch {
       localStorage.removeItem('vibecoding_blogPreview')
     }
@@ -263,7 +271,11 @@ export function loadGitHub(): GitHubData {
   const saved = localStorage.getItem('vibecoding_github')
   if (saved) {
     try {
-      return JSON.parse(saved) as GitHubData
+      const parsed = JSON.parse(saved) as GitHubData
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.repos)) {
+        return parsed
+      }
+      localStorage.removeItem('vibecoding_github')
     } catch {
       localStorage.removeItem('vibecoding_github')
     }
@@ -341,7 +353,10 @@ export function loadFooter(lang: Lang): FooterData {
   if (saved) {
     try {
       const parsed = JSON.parse(saved) as Record<Lang, FooterData>
-      return parsed[lang] || defaultFooter[lang]
+      if (parsed && typeof parsed === 'object' && parsed[lang]) {
+        return parsed[lang]
+      }
+      localStorage.removeItem('vibecoding_footer')
     } catch {
       localStorage.removeItem('vibecoding_footer')
     }
