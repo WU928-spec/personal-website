@@ -114,3 +114,29 @@
 .anchor {
   display: none;
 }
+
+/* ── KaTeX Math ── */
+.katex {
+  font-size: 1.05em;
+}
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+.katex-display .katex {
+  font-size: 1.1em;
+}
+/* Dark mode KaTeX colors */
+.dark .katex {
+  color: #F7F4EF;
+}
+.dark .katex .msupsub {
+  color: #F7F4EF;
+}
+.dark .katex .mathnormal,
+.dark .katex .mathrm,
+.dark .katex .mathbf,
+.dark .katex .boldsymbol {
+  color: #F7F4EF;
+}

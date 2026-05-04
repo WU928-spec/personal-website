@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeRaw from 'rehype-raw'
+import rehypeKatex from 'rehype-katex'
 import { createHighlighter, type ThemeInput } from 'shiki'
 import matter from 'gray-matter'
 import { Link } from 'react-router-dom'
@@ -558,9 +560,10 @@ export default function MarkdownRenderer({
   return (
     <div className={`markdown-content ${className}`}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
           rehypeRaw,
+          rehypeKatex,
           rehypeSlug,
         ]}
         components={buildComponents(existingSlugs)}
