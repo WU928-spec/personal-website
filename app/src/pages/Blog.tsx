@@ -169,7 +169,7 @@ export default function Blog() {
     const handleScroll = () => {
       if (filterRef.current) {
         const rect = filterRef.current.getBoundingClientRect()
-        setIsSticky(rect.top <= 0)
+        setIsSticky(rect.top <= 64)
       }
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -183,12 +183,7 @@ export default function Blog() {
   return (
     <div className="bg-Parchment">
       {/* ── Hero ── */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center hero-bg-image"
-          style={{ backgroundImage: 'url(/blog-hero.jpg)' }}
-        />
-        <div className="absolute inset-0 hero-overlay" />
+      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
 
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
           <motion.h1
@@ -198,7 +193,7 @@ export default function Blog() {
               duration: 0.8,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink"
+            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink dark:text-white"
           >
             {t('blog.garden')}
           </motion.h1>
@@ -210,7 +205,7 @@ export default function Blog() {
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="mt-4 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body"
+            className="mt-4 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
           >
             {t('blog.gardenDesc')}
           </motion.p>
@@ -228,14 +223,14 @@ export default function Blog() {
           >
             <Search
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-Ink/50"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-Ink/50 dark:text-white"
             />
             <input
               type="text"
               placeholder={t('blog.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-Ink/10 backdrop-blur-md border border-Ink/20 rounded-full py-3 pl-11 pr-5 text-Ink placeholder:text-Ink/60 focus:outline-none focus:border-Ink/40 focus:bg-Ink/15 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.25)] transition-all duration-300 font-body"
+              className="w-full bg-Ink/10 backdrop-blur-md border border-Ink/20 rounded-full py-3 pl-11 pr-5 text-Ink placeholder:text-Ink/60 focus:outline-none focus:border-Ink/40 focus:bg-Ink/15 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.25)] transition-all duration-300 font-body dark:bg-white/15 dark:border-white/20 dark:text-white dark:placeholder:text-white/60 dark:focus:border-white/40 dark:focus:bg-white/20"
             />
           </motion.div>
         </div>
@@ -244,10 +239,10 @@ export default function Blog() {
       {/* ── Filter Bar ── */}
       <div
         ref={filterRef}
-        className={`sticky top-0 z-40 transition-all duration-300 ${
+        className={`sticky top-16 z-40 transition-all duration-300 ${
           isSticky
-            ? 'bg-Parchment/90 backdrop-blur-xl border-b border-Sand'
-            : 'bg-Parchment'
+            ? 'bg-Parchment/90 backdrop-blur-xl border-b border-Sand dark:bg-Graphite/90 dark:border-white/10'
+            : 'bg-Parchment dark:bg-Graphite'
         }`}
       >
         <div className="max-w-6xl mx-auto px-6 md:px-12 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -340,7 +335,7 @@ export default function Blog() {
             <div className="flex justify-center mt-12">
               <button
                 onClick={loadMore}
-                className="px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)]"
+                className="px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)] dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
               >
                 {t('blog.loadMore')}
               </button>

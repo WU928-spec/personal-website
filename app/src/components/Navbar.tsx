@@ -33,33 +33,33 @@ export default function Navbar() {
     setMobileOpen(false)
   }, [location.pathname])
 
+  const linkClass = (path: string) =>
+    `relative font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] transition-colors duration-300 group ${
+      location.pathname === path
+        ? 'text-Amber'
+        : 'text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber'
+    }`
+
+  const iconBtnClass =
+    'text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber'
+
   return (
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-Parchment/85 backdrop-blur-md border-b border-Sand'
-            : 'bg-transparent'
+            ? 'bg-Parchment/95 backdrop-blur-xl border-b border-Sand shadow-sm dark:bg-Graphite/95 dark:border-white/10'
+            : 'bg-Parchment/30 backdrop-blur-sm dark:bg-Graphite/90 dark:backdrop-blur-md'
         }`}
       >
         <div className="max-w-6xl mx-auto px-6 md:px-12 flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center shrink-0">
             <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`relative font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] transition-colors duration-300 group ${
-                  location.pathname === link.path
-                    ? 'text-Amber'
-                    : 'text-Ink hover:text-Amber'
-                }`}
-              >
+              <Link key={link.path} to={link.path} className={linkClass(link.path)}>
                 {link.label}
                 <span
                   className={`absolute left-0 -bottom-1 h-[2px] bg-Amber transition-transform duration-300 origin-center ${
@@ -72,26 +72,22 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right side icons */}
           <div className="hidden md:flex items-center gap-4">
             <a
               href="https://github.com/WU928-spec"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-Ink hover:text-Amber transition-colors duration-300"
+              className={iconBtnClass}
               aria-label="GitHub"
             >
               <Github size={20} />
             </a>
-            <button
-              className="text-Ink hover:text-Amber transition-colors duration-300"
-              aria-label={t('nav.search')}
-            >
+            <button className={iconBtnClass} aria-label={t('nav.search')}>
               <Search size={20} />
             </button>
             <button
               onClick={toggleLang}
-              className="flex items-center gap-1 text-[0.75rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 px-2 py-1 rounded-md border border-Sand hover:border-Amber"
+              className="flex items-center gap-1 text-[0.75rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 px-2 py-1 rounded-md border border-Sand hover:border-Amber dark:text-white dark:border-white/30 dark:hover:text-Amber dark:hover:border-Amber"
               title={t('nav.switchLanguage')}
             >
               <Globe size={14} />
@@ -99,7 +95,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={toggleTheme}
-              className="flex items-center justify-center w-8 h-8 rounded-md border border-Sand text-Ink hover:text-Amber hover:border-Amber transition-colors duration-300"
+              className="flex items-center justify-center w-8 h-8 rounded-md border border-Sand text-Ink hover:text-Amber hover:border-Amber transition-colors duration-300 dark:text-white dark:border-white/30 dark:hover:text-Amber dark:hover:border-Amber"
               title={theme === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')}
             >
               {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
@@ -110,8 +106,8 @@ export default function Navbar() {
                   onClick={() => setEditMode(!isEditMode)}
                   className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[0.75rem] font-medium border transition-colors ${
                     isEditMode
-                      ? 'bg-Amber text-Parchment border-Amber hover:bg-[#b8863d]'
-                      : 'bg-Linen text-Ink border-Sand hover:border-Amber hover:text-Amber'
+                      ? 'bg-Amber text-white border-Amber hover:bg-[#b8863d]'
+                      : 'bg-Linen text-Ink border-Sand hover:border-Amber hover:text-Amber dark:bg-white/15 dark:text-white dark:border-white/25 dark:hover:text-Amber dark:hover:border-Amber'
                   }`}
                   title={isEditMode ? '切换为浏览模式' : '切换为编辑模式'}
                 >
@@ -120,19 +116,19 @@ export default function Navbar() {
                 </button>
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors duration-300"
+                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber"
                 >
                   <img
                     src={user?.avatar}
                     alt={user?.username}
-                    className="w-8 h-8 rounded-full object-cover border border-Sand"
+                    className="w-8 h-8 rounded-full object-cover border border-Sand dark:border-white/25"
                   />
                 </Link>
               </div>
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-Ink hover:text-Amber transition-colors duration-300"
+                className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber"
               >
                 <LogIn size={16} />
                 {t('nav.login')}
@@ -140,9 +136,8 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
           <button
-            className="md:hidden text-Ink p-1"
+            className="md:hidden text-Ink p-1 dark:text-white"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={t('nav.toggleMenu')}
           >
@@ -151,7 +146,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile slide-in menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -159,10 +153,10 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
-            className="fixed top-0 right-0 bottom-0 w-72 bg-Parchment shadow-deep z-[60] flex flex-col p-8"
+            className="fixed top-0 right-0 bottom-0 w-72 bg-Parchment shadow-deep z-[60] flex flex-col p-8 dark:bg-Graphite"
           >
             <button
-              className="self-end text-Ink mb-8"
+              className="self-end text-Ink mb-8 dark:text-white"
               onClick={() => setMobileOpen(false)}
               aria-label={t('nav.closeMenu')}
             >
@@ -174,7 +168,9 @@ export default function Navbar() {
                   key={link.path}
                   to={link.path}
                   className={`font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] ${
-                    location.pathname === link.path ? 'text-Amber' : 'text-Ink'
+                    location.pathname === link.path
+                      ? 'text-Amber'
+                      : 'text-Ink dark:text-white'
                   }`}
                 >
                   {link.label}
@@ -187,19 +183,22 @@ export default function Navbar() {
                   href="https://github.com/WU928-spec"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-Ink hover:text-Amber transition-colors"
+                  className="text-Ink hover:text-Amber transition-colors dark:text-white dark:hover:text-Amber"
                   aria-label="GitHub"
                 >
                   <Github size={20} />
                 </a>
-                <button className="text-Ink hover:text-Amber transition-colors" aria-label={t('nav.search')}>
+                <button
+                  className="text-Ink hover:text-Amber transition-colors dark:text-white dark:hover:text-Amber"
+                  aria-label={t('nav.search')}
+                >
                   <Search size={20} />
                 </button>
               </div>
               {isLoggedIn ? (
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors"
+                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors dark:text-white dark:hover:text-Amber"
                   onClick={() => setMobileOpen(false)}
                 >
                   <User size={18} />
@@ -208,7 +207,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors"
+                  className="flex items-center gap-2 text-Ink hover:text-Amber transition-colors dark:text-white dark:hover:text-Amber"
                   onClick={() => setMobileOpen(false)}
                 >
                   <LogIn size={18} />

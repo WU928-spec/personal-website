@@ -309,14 +309,8 @@ export default function BlogPost() {
 
       {/* ── Post Hero ── */}
       <section
-        className="relative min-h-[40vh] max-h-[60vh] flex items-end overflow-hidden hero-bg-image"
-        style={{
-          backgroundImage: 'url(/blog-hero.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        className="relative min-h-[40vh] max-h-[60vh] flex items-end overflow-hidden bg-Parchment dark:bg-Graphite pt-16"
       >
-        <div className="absolute inset-0 hero-overlay" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 pb-12 w-full">
           <motion.div
@@ -334,17 +328,17 @@ export default function BlogPost() {
             >
               {post.category}
             </span>
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70">
+            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70 dark:text-white">
               {post.date}
             </span>
-            <span className="text-Ink/70">·</span>
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70">
+            <span className="text-Ink/70 dark:text-white">·</span>
+            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70 dark:text-white">
               {post.readingTime}
             </span>
             {isLoggedIn && isEditMode && !isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors dark:bg-white/15 dark:text-white dark:border-white/25"
               >
                 <Pencil size={14} />
                 {t('post.edit')}
@@ -364,7 +358,7 @@ export default function BlogPost() {
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors dark:bg-white/15 dark:text-white dark:border-white/25"
                 >
                   <X size={14} />
                   {t('post.cancel')}
@@ -403,7 +397,7 @@ export default function BlogPost() {
               delay: 0.2,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 dark:text-white/90 max-w-2xl font-body"
+            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 dark:text-white max-w-2xl font-body"
           >
             {post.excerpt}
           </motion.p>
@@ -527,7 +521,7 @@ export default function BlogPost() {
         <div className="max-w-6xl mx-auto px-6 md:px-12 flex justify-center">
           <Link
             to="/blog"
-            className="inline-flex items-center gap-2 px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s]"
+            className="inline-flex items-center gap-2 px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s] dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
           >
             <ArrowLeft size={16} />
             {t('post.backToArticles')}

@@ -89,26 +89,12 @@ function HeroSection() {
   }
 
   return (
-    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
-      {/* Background image with slow zoom */}
-      <motion.div
-        initial={{ scale: 1.05 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 8, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
-        className="absolute inset-0 hero-bg-image"
-        style={{
-          backgroundImage: 'url(/hero-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
-      {/* Overlay gradient - adaptive: light = transparent, dark = dark */}
-      <div className="absolute inset-0 hero-overlay" />
+    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
         {/* Headline with typing */}
-        <h1 className="font-display text-[clamp(2.75rem,6vw,5rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-Ink">
+        <h1 className="font-display text-[clamp(2.75rem,6vw,5rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-Ink dark:text-white">
           {displayed}
           {showCursor && (
             <span className="text-Amber animate-blink ml-0.5">|</span>
@@ -140,7 +126,7 @@ function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               animate={done ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="font-body text-[1.0625rem] leading-[1.75] text-Ink/85 mt-4"
+              className="font-body text-[1.0625rem] leading-[1.75] text-Ink/85 mt-4 dark:text-white"
             >
               {hero.subtitle}
             </motion.p>
@@ -150,7 +136,7 @@ function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               animate={done ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="font-body text-[0.9375rem] leading-[1.65] text-Ink/70 max-w-xl mx-auto mt-4"
+              className="font-body text-[0.9375rem] leading-[1.65] text-Ink/70 max-w-xl mx-auto mt-4 dark:text-white"
             >
               {hero.tagline}
             </motion.p>
@@ -173,7 +159,7 @@ function HeroSection() {
             </Link>
             <Link
               to="/projects"
-              className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink/10 hover:-translate-y-px transition-all duration-300"
+              className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink/10 hover:-translate-y-px transition-all duration-300 dark:border-white/40 dark:text-white dark:hover:bg-white/10"
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               {t('home.viewProjects')}
@@ -186,7 +172,7 @@ function HeroSection() {
           <div className="mt-6">
             <button
               onClick={() => setIsEditing(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors dark:bg-white/15 dark:text-white dark:border-white/25"
             >
               <Pencil size={14} />
               {t('post.edit')}
@@ -204,10 +190,10 @@ function HeroSection() {
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
         >
           <div className="flex flex-col items-center gap-2 animate-scroll-pulse">
-            <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50 uppercase">
+            <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/50 uppercase dark:text-white">
               {t('home.scroll')}
             </span>
-            <ChevronDown size={20} className="text-Ink/50" />
+            <ChevronDown size={20} className="text-Ink/50 dark:text-white" />
           </div>
         </motion.div>
       )}
@@ -365,10 +351,10 @@ function IntroSection() {
                 <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink">
                   {about.title}
                 </h2>
-                <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
+                <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4 dark:text-white">
                   {about.p1}
                 </p>
-                <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4">
+                <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4 dark:text-white">
                   {about.p2}
                 </p>
                 <Link
