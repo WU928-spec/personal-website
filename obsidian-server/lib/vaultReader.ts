@@ -31,9 +31,9 @@ export interface VaultFile {
    ─────────────────────────────────────────────── */
 function slugify(title: string): string {
   return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
     .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_]/g, '')
     .substring(0, 60)
 }
 

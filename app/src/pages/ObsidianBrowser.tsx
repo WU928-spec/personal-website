@@ -12,6 +12,7 @@ import {
   Eye,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
+import GraphView from '@/components/GraphView.tsx'
 import {
   fetchObsidianNotes,
   fetchObsidianNote,
@@ -427,6 +428,9 @@ export default function ObsidianBrowser() {
                     ))}
                   </div>
                 )}
+
+                {/* Knowledge Graph */}
+                {notes.length > 1 && <GraphView notes={notes} height={420} />}
               </>
             )}
           </main>

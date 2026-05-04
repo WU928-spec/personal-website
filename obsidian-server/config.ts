@@ -15,7 +15,7 @@ export interface ServerConfig {
 function getConfig(): ServerConfig {
   return {
     // Obsidian vault 本地路径
-    vaultPath: process.env.OBSIDIAN_VAULT_PATH || path.join(os.homedir(), 'Documents', 'obsidian-vault'),
+    vaultPath: process.env.OBSIDIAN_VAULT_PATH || '/Users/a123456/Library/Mobile Documents/com~apple~CloudDocs/Obsidian Vault',
     // 服务器端口
     port: parseInt(process.env.PORT || '2667', 10),
     // GitHub Personal Access Token (需 repo + workflow 权限)
