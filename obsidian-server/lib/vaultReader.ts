@@ -185,6 +185,34 @@ export async function buildFileTree(vaultPath: string): Promise<VaultFile[]> {
 }
 
 /* ───────────────────────────────────────────────
+   Process Obsidian embed syntax ![[filename.ext]]
+   ─────────────────────────────────────────────── */
+function processEmbeds(content: string, noteFilePath: string, vaultPath: string): string {
+  const noteDir = path.dirname(noteFilePath)
+
+  return content.replace(/!\[\[([^\]]+)\]\]/g, (_match, filename: string) => {
+    const ext = filename.split('.').pop()?.toLowerCase() || ''
+    const fileRelPath = path.posix.join(noteDir, filename)
+
+    const audioExts = ['mp3', 'wav', 'm4a', 'ogg', 'webm', 'aac', 'flac']
+    const videoExts = ['mp4', 'mov', 'webm', 'mkv']
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp']
+
+    if (audioExts.includes(ext)) {
+      return `<audio controls preload="metadata" style="width:100%;margin:1rem 0;"><source src="http://localhost:2667/api/file/${encodeURIComponent(fileRelPath)}" type="audio/${ext === 'm4a' ? 'mp4' : ext}"></audio>`
+    }
+    if (videoExts.includes(ext)) {
+      return `<video controls preload="metadata" style="width:100%;margin:1rem 0;"><source src="http://localhost:2667/api/file/${encodeURIComponent(fileRelPath)}"></video>`
+    }
+    if (imageExts.includes(ext)) {
+      return `<img src="http://localhost:2667/api/file/${encodeURIComponent(fileRelPath)}" alt="${filename}" style="max-width:100%;border-radius:8px;margin:1rem 0;" />`
+    }
+    // Fallback: treat as internal note embed (link to note)
+    return `[${filename}](/blog/${slugify(filename.replace('.md', ''))})`
+  })
+}
+
+/* ───────────────────────────────────────────────
    Read a single note by slug
    ─────────────────────────────────────────────── */
 export async function getNoteBySlug(
@@ -199,9 +227,10 @@ export async function getNoteBySlug(
   try {
     const raw = await fs.readFile(fullPath, 'utf-8')
     const parsed = matter(raw)
+    const processedContent = processEmbeds(parsed.content, meta.filePath, vaultPath)
     return {
       ...meta,
-      content: parsed.content,
+      content: processedContent,
       frontmatter: parsed.data,
     }
   } catch {

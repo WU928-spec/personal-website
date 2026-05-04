@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import fs from 'fs/promises'
+import path from 'path'
 import config from './config.ts'
 import {
   scanVault,
@@ -130,6 +132,58 @@ app.post('/api/deploy', async (req, res) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     res.status(500).json({ error: msg })
+  }
+})
+
+/* ───────────────────────────────────────────────
+   GET /api/file/:path — Serve vault files (audio, images, etc.)
+   ─────────────────────────────────────────────── */
+app.get('/api/file/*', async (req, res) => {
+  try {
+    const filePath = decodeURIComponent(req.path.replace('/api/file/', ''))
+    const fullPath = path.join(config.vaultPath, filePath)
+
+    // Security: ensure the resolved path is inside vault
+    const resolved = await fs.realpath(fullPath).catch(() => fullPath)
+    if (!resolved.startsWith(config.vaultPath)) {
+      res.status(403).json({ error: 'Access denied' })
+      return
+    }
+
+    const stat = await fs.stat(resolved)
+    if (!stat.isFile()) {
+      res.status(404).json({ error: 'Not a file' })
+      return
+    }
+
+    // Set content type based on extension
+    const ext = path.extname(resolved).toLowerCase()
+    const mimeTypes: Record<string, string> = {
+      '.mp3': 'audio/mpeg',
+      '.wav': 'audio/wav',
+      '.m4a': 'audio/mp4',
+      '.ogg': 'audio/ogg',
+      '.aac': 'audio/aac',
+      '.flac': 'audio/flac',
+      '.mp4': 'video/mp4',
+      '.mov': 'video/quicktime',
+      '.webm': 'video/webm',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.svg': 'image/svg+xml',
+      '.pdf': 'application/pdf',
+    }
+    const contentType = mimeTypes[ext] || 'application/octet-stream'
+    res.setHeader('Content-Type', contentType)
+
+    const data = await fs.readFile(resolved)
+    res.send(data)
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    res.status(404).json({ error: msg })
   }
 })
 
