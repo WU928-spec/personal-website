@@ -83,7 +83,8 @@ async function scanMarkdownFile(
       (parsed.data.title as string) ||
       fileName.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
-    const slug = (parsed.data.slug as string) || slugify(title)
+    // Use fileName (without .md) as slug for consistency with file tree
+    const slug = (parsed.data.slug as string) || slugify(fileName)
     const date = (parsed.data.date as string) || new Date().toISOString().split('T')[0]
     const category = (parsed.data.category as string) || 'Uncategorized'
     const tags = Array.isArray(parsed.data.tags)
@@ -190,7 +191,8 @@ export async function buildFileTree(vaultPath: string): Promise<VaultFile[]> {
 function processEmbeds(content: string, noteFilePath: string, vaultPath: string): string {
   const noteDir = path.dirname(noteFilePath)
 
-  return content.replace(/!\[\[([^\]]+)\]\]/g, (_match, filename: string) => {
+  // 1. Handle Obsidian embed syntax ![[filename.ext]]
+  let processed = content.replace(/!\[\[([^\]]+)\]\]/g, (_match, filename: string) => {
     const ext = filename.split('.').pop()?.toLowerCase() || ''
     const fileRelPath = path.posix.join(noteDir, filename)
 
@@ -210,6 +212,12 @@ function processEmbeds(content: string, noteFilePath: string, vaultPath: string)
     // Fallback: treat as internal note embed (link to note)
     return `[${filename}](/blog/${slugify(filename.replace('.md', ''))})`
   })
+
+  // 2. Collapse excessive blank lines (3+ newlines → 2 newlines)
+  // This prevents Obsidian notes with lots of empty lines from rendering as huge gaps
+  processed = processed.replace(/\n{3,}/g, '\n\n')
+
+  return processed
 }
 
 /* ───────────────────────────────────────────────
