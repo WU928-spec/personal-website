@@ -7,9 +7,8 @@ import {
   ChevronRight,
   ChevronDown,
   RefreshCw,
-  Upload,
-  FileSearch,
   Eye,
+  ChevronLeft,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 import {
@@ -164,219 +163,6 @@ function RootFilesGroup({
 }
 
 /* ───────────────────────────────────────────────
-   Note List Card
-   ─────────────────────────────────────────────── */
-function NoteListCard({
-  note,
-  onClick,
-}: {
-  note: ObsidianNoteMeta
-  onClick: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left p-4 rounded-xl border border-Sand bg-Linen/50 hover:bg-Linen hover:shadow-soft transition-all duration-200 group dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10"
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <span className="px-2 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-[0.04em] text-Sage bg-Sage/10">
-          {note.category}
-        </span>
-        <span className="text-[0.6875rem] text-Slate">{note.date}</span>
-      </div>
-      <h4 className="font-display text-[1rem] font-semibold text-Ink group-hover:text-Amber transition-colors dark:text-white">
-        {note.title}
-      </h4>
-      <p className="mt-1 text-[0.875rem] text-Slate line-clamp-2">{note.excerpt}</p>
-      {note.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {note.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-[0.6875rem] text-Slate bg-Mist/60 px-2 py-0.5 rounded-full"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-    </button>
-  )
-}
-
-/* ───────────────────────────────────────────────
-   Folder Browser (main area)
-   ─────────────────────────────────────────────── */
-function FolderBrowser({
-  tree,
-  notes,
-  onSelect,
-  selectedSlug,
-}: {
-  tree: VaultFile[]
-  notes: ObsidianNoteMeta[]
-  onSelect: (slug: string) => void
-  selectedSlug?: string
-}) {
-  const { t } = useLang()
-  const noteMap = useMemo(() => {
-    const map = new Map<string, ObsidianNoteMeta>()
-    for (const n of notes) map.set(n.slug, n)
-    return map
-  }, [notes])
-
-  if (tree.length === 0) {
-    return <EmptyState message={t('obsidian.noNotes')} />
-  }
-
-  return (
-    <div className="space-y-4">
-      {tree.map((item) => (
-        <FolderSection
-          key={item.path}
-          item={item}
-          noteMap={noteMap}
-          onSelect={onSelect}
-          selectedSlug={selectedSlug}
-        />
-      ))}
-    </div>
-  )
-}
-
-function FolderSection({
-  item,
-  noteMap,
-  onSelect,
-  selectedSlug,
-}: {
-  item: VaultFile
-  noteMap: Map<string, ObsidianNoteMeta>
-  onSelect: (slug: string) => void
-  selectedSlug?: string
-}) {
-  const [expanded, setExpanded] = useState(false)
-
-  // Collect all file descendants (recursively)
-  function collectFiles(node: VaultFile, files: VaultFile[]) {
-    if (node.type === 'file') {
-      files.push(node)
-    } else if (node.children) {
-      for (const child of node.children) collectFiles(child, files)
-    }
-  }
-
-  const allFiles: VaultFile[] = []
-  collectFiles(item, allFiles)
-  const fileCount = allFiles.length
-
-  if (item.type === 'file') {
-    // Root-level file handled by RootFilesGroup in sidebar; skip here
-    return null
-  }
-
-  return (
-    <div className="rounded-xl border border-Sand bg-Linen/50 dark:bg-white/5 dark:border-white/10 overflow-hidden">
-      {/* Folder Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-3 w-full text-left px-5 py-4 hover:bg-Ink/[0.02] transition-colors dark:hover:bg-white/[0.03]"
-      >
-        {expanded ? (
-          <ChevronDown size={18} className="text-Slate shrink-0" />
-        ) : (
-          <ChevronRight size={18} className="text-Slate shrink-0" />
-        )}
-        <Folder size={18} className="text-Amber shrink-0" />
-        <span className="font-display text-[1.0625rem] font-semibold text-Ink dark:text-white truncate">
-          {item.name}
-        </span>
-        <span className="text-[0.75rem] text-Slate ml-auto shrink-0">
-          {fileCount} 篇
-        </span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: 'auto' }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-5 pb-4">
-              {/* Sub-folders */}
-              {item.children
-                ?.filter((child) => child.type === 'folder')
-                .map((child) => (
-                  <div key={child.path} className="mt-3 ml-4">
-                    <FolderSection
-                      item={child}
-                      noteMap={noteMap}
-                      onSelect={onSelect}
-                      selectedSlug={selectedSlug}
-                    />
-                  </div>
-                ))}
-
-              {/* Files in this folder */}
-              {item.children
-                ?.filter((child) => child.type === 'file')
-                .map((child) => {
-                  const slug = child.name
-                    .trim()
-                    .replace(/\s+/g, '-')
-                    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_]/g, '')
-                    .substring(0, 60)
-                  const note = noteMap.get(slug)
-                  const isSelected = selectedSlug === slug
-                  return (
-                    <button
-                      key={child.path}
-                      onClick={() => onSelect(slug)}
-                      className={`flex items-center gap-2 w-full text-left py-2 px-3 rounded-lg transition-colors ${
-                        isSelected
-                          ? 'bg-Amber/10 text-Amber'
-                          : 'hover:bg-Ink/5 text-Ink dark:text-white dark:hover:bg-white/5'
-                      }`}
-                    >
-                      <FileText
-                        size={14}
-                        className={isSelected ? 'text-Amber shrink-0' : 'text-Slate shrink-0'}
-                      />
-                      <span className="text-[0.875rem] font-medium truncate">
-                        {child.name}
-                      </span>
-                      {note && (
-                        <span className="text-[0.6875rem] text-Slate ml-auto shrink-0">
-                          {note.date.split('T')[0]}
-                        </span>
-                      )}
-                    </button>
-                  )
-                })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-/* ───────────────────────────────────────────────
-   Empty State
-   ─────────────────────────────────────────────── */
-function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <FileSearch size={40} className="text-Sand mb-4" />
-      <p className="text-Slate font-body">{message}</p>
-    </div>
-  )
-}
-
-/* ───────────────────────────────────────────────
    Obsidian Browser Page
    ─────────────────────────────────────────────── */
 export default function ObsidianBrowser() {
@@ -389,7 +175,7 @@ export default function ObsidianBrowser() {
   const [selectedNote, setSelectedNote] = useState<ObsidianNote | null>(null)
   const [selectedSlug, setSelectedSlug] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const [viewMode, setViewMode] = useState<'list' | 'preview'>('list')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   // Check server and load data
   const loadData = useCallback(async () => {
@@ -417,7 +203,6 @@ export default function ObsidianBrowser() {
   const handleSelectNote = useCallback(
     async (slug: string) => {
       setSelectedSlug(slug)
-      setViewMode('preview')
       const note = await fetchObsidianNote(slug)
       setSelectedNote(note)
     },
@@ -426,18 +211,6 @@ export default function ObsidianBrowser() {
 
   // All slugs for MarkdownRenderer wikilink resolution
   const allSlugs = useMemo(() => notes.map((n) => n.slug), [notes])
-
-  // Categories for filter
-  const categories = useMemo(() => {
-    const cats = new Set(notes.map((n) => n.category))
-    return ['All', ...Array.from(cats)]
-  }, [notes])
-
-  const [activeCategory, setActiveCategory] = useState('All')
-  const filteredNotes =
-    activeCategory === 'All'
-      ? notes
-      : notes.filter((n) => n.category === activeCategory)
 
   if (serverOn === false) {
     return (
@@ -518,75 +291,76 @@ export default function ObsidianBrowser() {
       </section>
 
       {/* ── Main Content ── */}
-      <section className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar: File Tree */}
-          <aside className="lg:w-64 shrink-0">
-            <div className="sticky top-20 bg-Linen/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-4 max-h-[calc(100dvh-120px)] overflow-y-auto">
-              <h3 className="text-[0.8125rem] font-semibold uppercase tracking-[0.06em] text-Slate mb-3 px-2">
-                {t('obsidian.vault')}
-              </h3>
-              {tree.length === 0 ? (
-                <p className="text-[0.8125rem] text-Slate px-2">{t('obsidian.emptyVault')}</p>
-              ) : (
-                <>
-                  {/* Folders first */}
-                  {tree
-                    .filter((item) => item.type === 'folder')
-                    .map((item) => (
-                      <TreeItem
-                        key={item.path}
-                        item={item}
-                        onSelect={handleSelectNote}
-                        selectedSlug={selectedSlug}
-                      />
-                    ))}
-                  {/* Root files grouped together */}
-                  {tree.some((item) => item.type === 'file') && (
-                    <RootFilesGroup
-                      files={tree.filter((item) => item.type === 'file')}
-                      onSelect={handleSelectNote}
-                      selectedSlug={selectedSlug}
-                    />
-                  )}
-                </>
+      <section className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative">
+        <div className="flex gap-0">
+          {/* Sidebar */}
+          <div className="relative shrink-0">
+            {/* Expanded sidebar */}
+            <AnimatePresence>
+              {!sidebarCollapsed && (
+                <motion.aside
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 240, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
+                  className="overflow-hidden"
+                >
+                  <div className="w-[240px] bg-Linen/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-Sand dark:border-white/10">
+                      <h3 className="text-[0.75rem] font-semibold uppercase tracking-[0.06em] text-Slate dark:text-white/60">
+                        {t('obsidian.vault')}
+                      </h3>
+                      <button
+                        onClick={() => setSidebarCollapsed(true)}
+                        className="text-Slate hover:text-Ink dark:text-white/60 dark:hover:text-white transition-colors"
+                        aria-label="收起侧边栏"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                    </div>
+                    {/* Tree content */}
+                    <div className="p-3 max-h-[calc(100dvh-200px)] overflow-y-auto overscroll-contain">
+                      {tree.length === 0 ? (
+                        <p className="text-[0.8125rem] text-Slate px-2">{t('obsidian.emptyVault')}</p>
+                      ) : (
+                        <>
+                          {tree.filter(i => i.type === 'folder').map(item => (
+                            <TreeItem key={item.path} item={item} onSelect={handleSelectNote} selectedSlug={selectedSlug} />
+                          ))}
+                          {tree.some(i => i.type === 'file') && (
+                            <RootFilesGroup
+                              files={tree.filter(i => i.type === 'file')}
+                              onSelect={handleSelectNote}
+                              selectedSlug={selectedSlug}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </motion.aside>
               )}
-            </div>
-          </aside>
+            </AnimatePresence>
 
-          {/* Main Area */}
-          <main className="flex-1 min-w-0">
-            {/* View Toggle */}
-            {selectedNote && (
-              <div className="flex items-center gap-2 mb-6">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.8125rem] font-medium transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-Amber text-white'
-                      : 'bg-Linen text-Ink hover:bg-Ink/5 dark:bg-white/10 dark:text-white'
-                  }`}
-                >
-                  <FileText size={14} />
-                  {t('obsidian.allNotes')}
-                </button>
-                <button
-                  onClick={() => setViewMode('preview')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.8125rem] font-medium transition-colors ${
-                    viewMode === 'preview'
-                      ? 'bg-Amber text-white'
-                      : 'bg-Linen text-Ink hover:bg-Ink/5 dark:bg-white/10 dark:text-white'
-                  }`}
-                >
-                  <Eye size={14} />
-                  {t('obsidian.preview')}
-                </button>
-              </div>
+            {/* Collapsed toggle button */}
+            {sidebarCollapsed && (
+              <button
+                onClick={() => setSidebarCollapsed(false)}
+                className="flex items-center justify-center w-7 h-16 rounded-r-lg bg-Linen/90 backdrop-blur-sm border border-l-0 border-Sand dark:bg-white/10 dark:border-white/15 text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors duration-300 shadow-sm"
+                title="展开导航"
+                aria-label="展开侧边栏"
+              >
+                <ChevronRight size={14} />
+              </button>
             )}
+          </div>
 
-            {viewMode === 'preview' && selectedNote ? (
-              /* ── Note Preview ── */
+          {/* Main Area: Note Content */}
+          <main className="flex-1 min-w-0 lg:pl-8">
+            {selectedNote ? (
               <motion.div
+                key={selectedNote.slug}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-Linen/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-6 md:p-10"
@@ -625,16 +399,16 @@ export default function ObsidianBrowser() {
                 </div>
               </motion.div>
             ) : (
-              /* ── Folder Browser ── */
-              <>
-                <FolderBrowser
-                  tree={tree}
-                  notes={notes}
-                  onSelect={handleSelectNote}
-                  selectedSlug={selectedSlug}
-                />
-
-              </>
+              <div className="h-full min-h-[400px] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-Linen dark:bg-white/5 border border-Sand dark:border-white/10 flex items-center justify-center mx-auto mb-4">
+                    <FileText size={28} className="text-Sand dark:text-white/20" />
+                  </div>
+                  <p className="text-[0.9375rem] text-Slate dark:text-white/40">
+                    {t('obsidian.selectNote')}
+                  </p>
+                </div>
+              </div>
             )}
           </main>
         </div>
