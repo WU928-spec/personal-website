@@ -1,10 +1,12 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Layout from './components/Layout.tsx'
 import Home from './pages/Home.tsx'
 import Login from './pages/Login.tsx'
 import Profile from './pages/Profile.tsx'
 import NewPost from './pages/NewPost.tsx'
+import NotFound from './pages/NotFound.tsx'
 
 const Blog = lazy(() => import('./pages/Blog.tsx'))
 const BlogPost = lazy(() => import('./pages/BlogPost.tsx'))
@@ -12,55 +14,79 @@ const Projects = lazy(() => import('./pages/Projects.tsx'))
 const About = lazy(() => import('./pages/About.tsx'))
 const ObsidianBrowser = lazy(() => import('./pages/ObsidianBrowser.tsx'))
 
+function PageTransition({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.25, ease: 'easeInOut' }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+const fallback = (
+  <div className="min-h-[60dvh] flex items-center justify-center">
+    <div className="w-6 h-6 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+  </div>
+)
+
 function App() {
+  const location = useLocation()
+
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/blog"
-          element={
-            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
-              <Blog />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/blog/:slug"
-          element={
-            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
-              <BlogPost />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/projects"
-          element={
-            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
-              <Projects />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
-              <About />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/obsidian"
-          element={
-            <Suspense fallback={<div className="min-h-[60dvh] flex items-center justify-center text-Slate font-body">Loading...</div>}>
-              <ObsidianBrowser />
-            </Suspense>
-          }
-        />
-        <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/blog/new" element={<NewPost />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route
+            path="/blog"
+            element={
+              <Suspense fallback={fallback}>
+                <PageTransition><Blog /></PageTransition>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/blog/:slug"
+            element={
+              <Suspense fallback={fallback}>
+                <PageTransition><BlogPost /></PageTransition>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <Suspense fallback={fallback}>
+                <PageTransition><Projects /></PageTransition>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <Suspense fallback={fallback}>
+                <PageTransition><About /></PageTransition>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/obsidian"
+            element={
+              <Suspense fallback={fallback}>
+                <PageTransition><ObsidianBrowser /></PageTransition>
+              </Suspense>
+            }
+          />
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+          <Route path="/blog/new" element={<PageTransition><NewPost /></PageTransition>} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
     </Layout>
   )
 }

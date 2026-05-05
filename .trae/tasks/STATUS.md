@@ -8,4 +8,4 @@
 | 003 | BlogPost 页面集成 Backlinks | ✅ 完成 | Kimi Code |
 | 004 | GraphView D3 知识图谱组件 | ❌ 已取消 | — |
 | 005 | ObsidianBrowser vault 侧边栏折叠+滚动 | ✅ 完成 | Kimi Code |
-| — | 审查 task-005 | — | Trae |
+| 006 | 精美 404 页面 | ✅ 完成 | Kimi Code |
