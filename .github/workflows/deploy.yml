@@ -4,11 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      slugs:
-        description: 'Comma-separated list of slugs to deploy (optional)'
-        required: false
-        default: ''
 
 jobs:
   build:

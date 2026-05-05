@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { List, X } from 'lucide-react'
+import { List, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLang } from '@/contexts/LangContext'
 import type { TocItem } from './MarkdownRenderer.tsx'
 
@@ -21,9 +21,10 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
   const { t } = useLang()
   const [activeId, setActiveId] = useState<string>('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Scroll-spy with IntersectionObserver
   useEffect(() => {
     if (items.length === 0) return
 
@@ -56,7 +57,6 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
     }
   }, [items])
 
-  // Also update active on scroll (fallback when no headings intersecting)
   useEffect(() => {
     const handleScroll = () => {
       if (items.length === 0) return
@@ -95,34 +95,78 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:block lg:col-span-3">
-        <div className="sticky top-[100px] max-h-[calc(100dvh-120px)] overflow-y-auto pr-2">
-          <h5 className="font-ui text-[1rem] font-semibold leading-[1.4] tracking-[0.08em] text-Slate uppercase mb-4">
-            Contents
-          </h5>
-          <nav className="flex flex-col">
-            {items.map((item) => {
-              const isActive = activeId === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleClick(item.id)}
-                  className={`text-left text-[0.9375rem] leading-[1.65] py-[6px] transition-all duration-200 border-l-2 ${
-                    isActive
-                      ? 'text-Amber border-Amber pl-3'
-                      : 'text-Slate border-transparent hover:text-Ink pl-0'
-                  } ${item.level === 3 ? 'pl-4' : ''} ${
-                    isActive && item.level === 3 ? '!pl-7' : ''
-                  }`}
-                >
-                  {item.text}
-                </button>
-              )
-            })}
-          </nav>
+      {/* Desktop fixed sidebar — collapsed strip */}
+      {desktopCollapsed && (
+        <div className="hidden lg:block fixed right-0 top-1/2 -translate-y-1/2 z-40">
+          <button
+            onClick={() => setDesktopCollapsed(false)}
+            className="flex items-center justify-center w-8 h-20 rounded-l-lg bg-Parchment/95 backdrop-blur-sm border border-r-0 border-Sand dark:bg-Graphite/95 dark:border-white/10 text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors duration-300 shadow-sm"
+            title="展开目录"
+            aria-label="展开目录"
+          >
+            <ChevronLeft size={16} />
+          </button>
         </div>
-      </aside>
+      )}
+
+      {/* Desktop fixed sidebar — expanded */}
+      <AnimatePresence>
+        {!desktopCollapsed && (
+          <motion.aside
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
+            className="hidden lg:block fixed right-0 top-[80px] z-40"
+          >
+            <div className="flex">
+              {/* Collapse toggle strip */}
+              <button
+                onClick={() => setDesktopCollapsed(true)}
+                className="flex items-center justify-center w-7 bg-Parchment/95 backdrop-blur-sm border border-r-0 border-Sand dark:bg-Graphite/95 dark:border-white/10 text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors duration-300 rounded-l-lg shadow-sm shrink-0"
+                title="收起目录"
+                aria-label="收起目录"
+              >
+                <ChevronRight size={14} />
+              </button>
+
+              {/* TOC content */}
+              <div className="w-[220px] max-h-[calc(100dvh-140px)] bg-Parchment/95 backdrop-blur-sm border-y border-r border-Sand dark:bg-Graphite/95 dark:border-white/10 rounded-l-xl shadow-lg overflow-hidden flex flex-col">
+                <div className="px-5 pt-4 pb-2 shrink-0">
+                  <h5 className="font-ui text-[0.8125rem] font-semibold leading-[1.4] tracking-[0.06em] text-Slate dark:text-white/60 uppercase">
+                    {t('toc.title') || 'Contents'}
+                  </h5>
+                </div>
+                <div
+                  ref={scrollContainerRef}
+                  className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4"
+                >
+                  <nav className="flex flex-col">
+                    {items.map((item) => {
+                      const isActive = activeId === item.id
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => handleClick(item.id)}
+                          className={`text-left text-[0.875rem] leading-[1.6] py-[5px] transition-all duration-200 border-l-2 ${
+                            isActive
+                              ? 'text-Amber border-Amber pl-3'
+                              : 'text-Slate dark:text-white/60 border-transparent hover:text-Ink dark:hover:text-white pl-0'
+                          } ${item.level === 3 ? 'ml-2' : ''} ${
+                            isActive && item.level === 3 ? '!ml-2 !pl-3' : ''
+                          }`}
+                        >
+                          {item.text}
+                        </button>
+                      )
+                    })}
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       {/* Mobile floating button */}
       <div className="lg:hidden fixed bottom-6 right-6 z-50">
@@ -152,21 +196,21 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="fixed bottom-0 left-0 right-0 bg-Parchment rounded-t-2xl z-[70] lg:hidden max-h-[70dvh] flex flex-col"
+              className="fixed bottom-0 left-0 right-0 bg-Parchment dark:bg-Graphite rounded-t-2xl z-[70] lg:hidden max-h-[70dvh] flex flex-col"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-Sand">
-                <h5 className="font-ui text-[1rem] font-semibold leading-[1.4] tracking-[0.08em] text-Slate uppercase">
-                  Contents
+              <div className="flex items-center justify-between px-6 py-4 border-b border-Sand dark:border-white/10">
+                <h5 className="font-ui text-[1rem] font-semibold leading-[1.4] tracking-[0.08em] text-Slate dark:text-white/60 uppercase">
+                  {t('toc.title') || 'Contents'}
                 </h5>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="text-Ink hover:text-Amber transition-colors"
+                  className="text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors"
                   aria-label={t('toc.close')}
                 >
                   <X size={20} />
                 </button>
               </div>
-              <nav className="flex flex-col overflow-y-auto px-6 py-4">
+              <nav className="flex flex-col overflow-y-auto overscroll-contain px-6 py-4">
                 {items.map((item) => {
                   const isActive = activeId === item.id
                   return (
@@ -176,7 +220,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
                       className={`text-left text-[0.9375rem] leading-[1.65] py-[8px] transition-all duration-200 border-l-2 ${
                         isActive
                           ? 'text-Amber border-Amber pl-3'
-                          : 'text-Slate border-transparent hover:text-Ink pl-0'
+                          : 'text-Slate dark:text-white/60 border-transparent hover:text-Ink dark:hover:text-white pl-0'
                       } ${item.level === 3 ? 'pl-4' : ''} ${
                         isActive && item.level === 3 ? '!pl-7' : ''
                       }`}

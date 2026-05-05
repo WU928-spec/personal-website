@@ -83,6 +83,23 @@ export async function fetchInboundLinks(): Promise<InboundLinkIndex> {
 }
 
 /* ───────────────────────────────────────────────
+   PUT /api/notes/:slug — Save note back to vault
+   ─────────────────────────────────────────────── */
+export async function saveObsidianNote(slug: string, content: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/notes/${encodeURIComponent(slug)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+      signal: AbortSignal.timeout(10000),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+/* ───────────────────────────────────────────────
    POST /api/deploy
    ─────────────────────────────────────────────── */
 export async function deployNotes(slugs: string[]): Promise<{ status: string }> {

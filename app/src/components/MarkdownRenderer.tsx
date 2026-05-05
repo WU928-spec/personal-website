@@ -5,7 +5,6 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import remarkBreaks from 'remark-breaks'
 import rehypeSlug from 'rehype-slug'
-import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeRaw from 'rehype-raw'
 import rehypeKatex from 'rehype-katex'
 import { createHighlighter, type ThemeInput } from 'shiki'
@@ -292,12 +291,20 @@ function CodeBlock({
 
   return (
     <div className="relative group my-6 rounded-lg overflow-hidden">
+      {lang !== 'text' && (
+        <div className="absolute top-0 left-0 z-10 flex items-center gap-2 px-3 py-1.5 rounded-br-md bg-white/8 backdrop-blur-sm">
+          <span className="text-[0.6875rem] font-mono font-medium uppercase tracking-[0.06em] text-white/50">
+            {lang}
+          </span>
+        </div>
+      )}
       <div
         className="overflow-x-auto"
         style={{
           background: '#1E1C1A',
           borderRadius: '8px',
           padding: '20px 24px',
+          paddingTop: lang !== 'text' ? '36px' : '20px',
         }}
         dangerouslySetInnerHTML={{ __html: html }}
       />

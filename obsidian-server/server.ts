@@ -8,6 +8,7 @@ import {
   buildFileTree,
   getNoteBySlug,
   buildInboundLinkIndex,
+  saveNoteToVault,
   type NoteMeta,
 } from './lib/vaultReader.ts'
 import { GitHubClient } from './lib/githubClient.ts'
@@ -68,6 +69,34 @@ app.get('/api/notes/:slug', async (req, res) => {
         filePath: note.filePath,
       },
     })
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    res.status(500).json({ error: msg })
+  }
+})
+
+/* ───────────────────────────────────────────────
+   PUT /api/notes/:slug — Save note back to vault
+   ─────────────────────────────────────────────── */
+app.put('/api/notes/:slug', async (req, res) => {
+  try {
+    const { content } = req.body as { content?: string }
+    if (!content && content !== '') {
+      res.status(400).json({ error: 'content is required' })
+      return
+    }
+
+    const success = await saveNoteToVault(config.vaultPath, req.params.slug, content)
+    if (!success) {
+      res.status(404).json({ error: 'Note not found' })
+      return
+    }
+
+    // Invalidate cache
+    notesCache = []
+    cacheTime = 0
+
+    res.json({ status: 'saved', slug: req.params.slug })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     res.status(500).json({ error: msg })

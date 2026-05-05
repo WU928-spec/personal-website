@@ -235,7 +235,21 @@ export async function getNoteBySlug(
   try {
     const raw = await fs.readFile(fullPath, 'utf-8')
     const parsed = matter(raw)
-    const processedContent = processEmbeds(parsed.content, meta.filePath, vaultPath)
+    // Fallback: if gray-matter didn't strip frontmatter (no --- separator),
+    // strip it ourselves
+    let body = parsed.content
+    if (body.trimStart().startsWith('---') || parsed.data === parsed.data) {
+      // gray-matter handles standard YAML frontmatter. But if the file
+      // has only a single --- line, treat the whole file as content
+      const lines = raw.split('\n')
+      if (lines[0].trim() === '---') {
+        const endIdx = lines.slice(1).findIndex(l => l.trim() === '---')
+        if (endIdx !== -1) {
+          body = lines.slice(endIdx + 2).join('\n')
+        }
+      }
+    }
+    const processedContent = processEmbeds(body, meta.filePath, vaultPath)
     return {
       ...meta,
       content: processedContent,
@@ -265,4 +279,36 @@ export function buildInboundLinkIndex(notes: NoteMeta[]): Map<string, string[]> 
   }
 
   return index
+}
+
+/* ───────────────────────────────────────────────
+   Save (overwrite) a note back to the vault
+   ─────────────────────────────────────────────── */
+export async function saveNoteToVault(
+  vaultPath: string,
+  slug: string,
+  content: string
+): Promise<boolean> {
+  const notes = await scanVault(vaultPath)
+  const meta = notes.find((n) => n.slug === slug)
+  if (!meta) return false
+
+  const fullPath = path.join(vaultPath, meta.filePath)
+
+  // Read existing frontmatter, preserve it, only replace body
+  const raw = await fs.readFile(fullPath, 'utf-8')
+  const parsed = matter(raw)
+
+  // Reconstruct file: frontmatter + separator + new content
+  const fm = parsed.data
+  const fmYaml = Object.keys(fm).length > 0
+    ? `---\n${Object.entries(fm).map(([k, v]) => {
+        if (Array.isArray(v)) return `${k}: [${v.map(x => typeof x === 'string' ? `"${x}"` : x).join(', ')}]`
+        if (typeof v === 'string') return `${k}: "${v}"`
+        return `${k}: ${v}`
+      }).join('\n')}\n---\n`
+    : '---\n---\n'
+
+  await fs.writeFile(fullPath, fmYaml + content, 'utf-8')
+  return true
 }

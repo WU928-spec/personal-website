@@ -8,7 +8,8 @@ import { loadAbout, saveAbout, type AboutData } from '@/data/about'
 import { loadHero, saveHero, type HeroData } from '@/data/site'
 import { loadSkills, saveSkills, type SkillCategory } from '@/data/site'
 import { loadBlogPreview, saveBlogPreview, type BlogPreviewPost } from '@/data/site'
-import { loadGitHub, saveGitHub, type GitHubData } from '@/data/site'
+import { loadGitHub, saveGitHub, type GitHubData, type GitHubRepo } from '@/data/site'
+import PageSEO from '@/components/PageSEO'
 
 /* ------------------------------------------------------------------ */
 /*  Hero Section                                                       */
@@ -1097,6 +1098,10 @@ function CountUpNumber({ value, duration }: { value: number; duration: number })
 export default function Home() {
   return (
     <div>
+      <PageSEO
+        title="Vibecoding Garden"
+        description="A digital garden of code, thoughts, and slow programming. Explore blog posts, projects, and a Zettelkasten-inspired knowledge base."
+      />
       <HeroSection />
       <IntroSection />
       <SkillConstellationSection />

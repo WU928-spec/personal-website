@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, FileUp, Eye, Edit3, Save, Plus } from 'lucide-react'
+import { ArrowLeft, FileUp, Eye, Edit3, Save } from 'lucide-react'
 import { addPost } from '@/data/posts'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'

@@ -185,6 +185,7 @@ const translations = {
       backlinks: '反向链接',
       noBacklinks: '暂无文章链接到本文',
       rootNotes: '根目录笔记',
+      selectNote: '在左侧选择一篇笔记开始阅读',
     },
     // Projects
     projects: {
@@ -385,6 +386,7 @@ const translations = {
       backlinks: 'Backlinks',
       noBacklinks: 'No articles link to this one yet',
       rootNotes: 'Root Notes',
+      selectNote: 'Select a note from the sidebar to start reading',
     },
     // Projects
     projects: {

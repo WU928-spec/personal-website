@@ -62,17 +62,6 @@
     --color-gold: 232, 208, 122;
   }
 
-  .dark .hero-bg-image {
-    filter: brightness(0.22) saturate(0.5);
-    transition: filter 0.5s ease;
-  }
-
-  .hero-overlay {
-    background: linear-gradient(to bottom, rgba(247,244,239,0) 0%, rgba(247,244,239,0.3) 60%, rgba(247,244,239,0.8) 85%, rgba(247,244,239,1) 100%);
-  }
-  .dark .hero-overlay {
-    background: linear-gradient(to bottom, rgba(8,6,4,0) 0%, rgba(8,6,4,0.5) 50%, rgba(8,6,4,0.85) 80%, rgba(20,18,16,1) 100%);
-  }
 
   * {
     @apply border-border;

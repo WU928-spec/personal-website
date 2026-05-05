@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion'
 import { useLang } from '@/contexts/LangContext'
+import PageSEO from '@/components/PageSEO'
 
 export default function Projects() {
   const { t } = useLang()
   return (
     <div className="bg-Parchment">
+      <PageSEO
+        title="Projects"
+        description="Open source projects and work."
+        path="/projects"
+      />
       {/* ── Hero ── */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -23,6 +23,7 @@ import {
 import MarkdownRenderer, { extractToc } from '@/components/MarkdownRenderer.tsx'
 import TableOfContents from '@/components/TableOfContents.tsx'
 import Backlinks from '@/components/Backlinks.tsx'
+import PageSEO from '@/components/PageSEO'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
 
@@ -141,6 +142,14 @@ function AuthorCard() {
    ─────────────────────────────────────────────── */
 function RelatedCard({ post, index }: { post: Post; index: number }) {
   const navigate = useNavigate()
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const imgRef = useRef<HTMLImageElement>(null)
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setImageLoaded(true)
+    }
+  }, [])
 
   return (
     <motion.article
@@ -155,20 +164,31 @@ function RelatedCard({ post, index }: { post: Post; index: number }) {
       className="group cursor-pointer"
       onClick={() => navigate(`/blog/${post.slug}`)}
     >
-      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-[0.35s]">
-        <div className="relative overflow-hidden aspect-[16/10]">
+      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300">
+        <div className="relative overflow-hidden aspect-[16/10] bg-Linen dark:bg-white/5">
+          <div
+            className={`absolute inset-0 bg-Linen dark:bg-white/5 transition-opacity duration-500 ${
+              imageLoaded ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
+            <div className="w-full h-full bg-gradient-to-br from-Linen via-Sand/20 to-Linen dark:from-white/5 dark:via-white/10 dark:to-white/5 animate-pulse" />
+          </div>
           <img
+            ref={imgRef}
             src={`/blog-thumb-${(index % 6) + 1}.jpg`}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-[0.4s] group-hover:scale-[1.04]"
+            className={`w-full h-full object-cover transition-all duration-500 ease ${
+              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105 blur-sm'
+            } group-hover:scale-[1.04]`}
             loading="lazy"
+            onLoad={() => setImageLoaded(true)}
           />
         </div>
         <div className="p-5">
           <span className="inline-block px-3 py-1 rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Sage bg-Sage/10 mb-2">
             {post.category}
           </span>
-          <h4 className="font-display text-[1.125rem] font-semibold leading-[1.3] text-Ink line-clamp-2 group-hover:text-Amber transition-colors duration-[0.35s]">
+          <h4 className="font-display text-[1.125rem] font-semibold leading-[1.3] text-Ink line-clamp-2 group-hover:text-Amber transition-colors duration-300">
             {post.title}
           </h4>
           <p className="mt-2 text-[0.9375rem] leading-[1.65] text-Slate line-clamp-2">
@@ -306,6 +326,11 @@ export default function BlogPost() {
 
   return (
     <div className="bg-Parchment">
+      <PageSEO
+        title={post.title}
+        description={post.excerpt}
+        path={`/blog/${post.slug}`}
+      />
       <ScrollProgressBar />
 
       {/* ── Post Hero ── */}
@@ -408,13 +433,11 @@ export default function BlogPost() {
       {/* ── Article Content ── */}
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* TOC Sidebar */}
+            {/* TOC Sidebar — fixed position, outside grid */}
             <TableOfContents items={tocItems} />
 
             {/* Article Body */}
-            <div className="lg:col-span-9">
-              <div className="max-w-3xl">
+            <div className="max-w-3xl">
                 {isEditing ? (
                   <textarea
                     value={editContent}
@@ -478,9 +501,7 @@ export default function BlogPost() {
                   <AuthorCard />
                 </div>
               </div>
-            </div>
           </div>
-        </div>
       </section>
 
       {/* ── Related Posts ── */}
@@ -525,7 +546,7 @@ export default function BlogPost() {
         <div className="max-w-6xl mx-auto px-6 md:px-12 flex justify-center">
           <Link
             to="/blog"
-            className="inline-flex items-center gap-2 px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s] dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
+            className="inline-flex items-center gap-2 px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-300 dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
           >
             <ArrowLeft size={16} />
             {t('post.backToArticles')}

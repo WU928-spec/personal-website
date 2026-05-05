@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, ArrowRight, FileSearch, Plus } from 'lucide-react'
+import PageSEO from '@/components/PageSEO'
 import {
   getCategories,
   getPostsByCategory,
@@ -27,6 +28,14 @@ function BlogCard({
   featured?: boolean
 }) {
   const navigate = useNavigate()
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const imgRef = useRef<HTMLImageElement>(null)
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setImageLoaded(true)
+    }
+  }, [])
 
   return (
     <motion.article
@@ -44,15 +53,31 @@ function BlogCard({
       }`}
       onClick={() => navigate(`/blog/${post.slug}`)}
     >
-      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)]">
-        {/* Thumbnail */}
-        <div className="relative overflow-hidden aspect-[16/10]">
+      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300 ease-in-out">
+        <div className="relative overflow-hidden aspect-[16/10] bg-Linen dark:bg-white/5">
+          {/* Blur placeholder */}
+          <div
+            className={`absolute inset-0 bg-Linen dark:bg-white/5 transition-opacity duration-500 ${
+              imageLoaded ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
+            <div className="w-full h-full bg-gradient-to-br from-Linen via-Sand/20 to-Linen dark:from-white/5 dark:via-white/10 dark:to-white/5 animate-pulse" />
+          </div>
           <img
+            ref={imgRef}
             src={`/blog-thumb-${(index % 6) + 1}.jpg`}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-[0.4s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-[1.04]"
+            className={`w-full h-full object-cover transition-all duration-500 ease ${
+              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105 blur-sm'
+            } group-hover:scale-[1.04]`}
             loading="lazy"
+            onLoad={() => setImageLoaded(true)}
           />
+
+          {/* Overlay on featured cards */}
+          {featured && (
+            <div className="absolute inset-0 bg-gradient-to-t from-Ink/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          )}
         </div>
 
         {/* Content */}
@@ -63,7 +88,7 @@ function BlogCard({
           </span>
 
           {/* Title */}
-          <h4 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink line-clamp-2 group-hover:text-Amber transition-colors duration-[0.35s]">
+          <h4 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink line-clamp-2 group-hover:text-Amber transition-colors duration-300">
             {post.title}
           </h4>
 
@@ -189,6 +214,11 @@ export default function Blog() {
 
   return (
     <div className="bg-Parchment">
+      <PageSEO
+        title="Blog"
+        description="Thoughts on code, design, and slow programming. A digital garden of ideas connected through wikilinks."
+        path="/blog"
+      />
       {/* ── Hero ── */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
 
@@ -342,7 +372,7 @@ export default function Blog() {
             <div className="flex justify-center mt-12">
               <button
                 onClick={loadMore}
-                className="px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-[0.35s] ease-[cubic-bezier(0.4,0,0.2,1)] dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
+                className="px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-300 ease-in-out dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
               >
                 {t('blog.loadMore')}
               </button>

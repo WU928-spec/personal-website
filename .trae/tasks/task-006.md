@@ -1,12 +1,25 @@
+# Task 006: 创建精美的 404 页面
+
+## 修改文件
+- `app/src/pages/NotFound.tsx`（新建文件）
+- `app/src/App.tsx`（在 Routes 末尾添加 404 路由）
+
+## 禁止修改
+- 不要改任何其他文件
+- 不要改 index.css、tailwind.config.js
+
+## 实现要求
+
+### 1. 新建 `app/src/pages/NotFound.tsx`
+
+```tsx
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Home, ArrowLeft } from 'lucide-react'
-import PageSEO from '@/components/PageSEO'
 
 export default function NotFound() {
   return (
     <div className="min-h-[80dvh] bg-Parchment dark:bg-Graphite flex items-center justify-center">
-      <PageSEO title="404 — Page Not Found" />
       <div className="text-center px-6 max-w-lg">
         {/* 404 large number */}
         <motion.div
@@ -59,3 +72,29 @@ export default function NotFound() {
     </div>
   )
 }
+```
+
+### 2. 修改 `app/src/App.tsx`
+
+在 `{/* 在 App.tsx 的 Routes 中添加 404 路由 */}` 处，在所有已定义路由之后、`</Routes>` 之前添加：
+
+```tsx
+import NotFound from './pages/NotFound.tsx'
+
+// 在所有 Route 之后，</Routes> 之前：
+<Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+```
+
+完整添加位置参考：
+```tsx
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+          <Route path="/blog/new" element={<PageTransition><NewPost /></PageTransition>} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+```
+
+## 完成后
+1. 在 `app/.trae/results/task-006-done.md` 写一句总结
+2. 更新 `app/.trae/tasks/STATUS.md`：task-006 状态改为 ✅完成
+3. git commit 并 push

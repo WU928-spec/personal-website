@@ -22,7 +22,7 @@ function migrateFromLegacy(data: unknown): AboutData | null {
 
   // 新格式已有 fields
   if (Array.isArray(d.fields)) {
-    return d as AboutData
+    return d as unknown as AboutData
   }
 
   // 旧格式有 stats（没有 name/value 分离）
