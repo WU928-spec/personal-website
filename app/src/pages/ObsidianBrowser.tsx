@@ -7,7 +7,7 @@ import {
   ChevronRight,
   ChevronDown,
   RefreshCw,
-  Eye,
+
   ChevronLeft,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
@@ -464,15 +464,6 @@ export default function ObsidianBrowser() {
                       #{tag}
                     </span>
                   ))}
-                </div>
-                <div className="mt-6 flex items-center gap-3">
-                  <button
-                    onClick={() => navigate(`/blog/${selectedNote.slug}`)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-Amber text-Parchment rounded-lg text-[0.8125rem] font-semibold hover:bg-[#B06A2F] transition-colors"
-                  >
-                    <Eye size={14} />
-                    {t('obsidian.openInBlog')}
-                  </button>
                 </div>
               </motion.div>
             ) : (
