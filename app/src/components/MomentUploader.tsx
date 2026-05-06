@@ -73,8 +73,12 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
     const files = Array.from(e.target.files || [])
     const remaining = 9 - images.length
     files.slice(0, remaining).forEach((file) => {
-      const url = URL.createObjectURL(file)
-      setImages((prev) => [...prev, url])
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        const dataUrl = ev.target?.result as string
+        setImages((prev) => [...prev, dataUrl])
+      }
+      reader.readAsDataURL(file)
     })
     e.target.value = ''
   }

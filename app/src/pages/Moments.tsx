@@ -86,8 +86,6 @@ export default function Moments() {
                   <MomentCard
                     moment={moment}
                     index={i}
-                    currentUser={displayName}
-                    avatarUrl={avatarUrl}
                     showDelete={isLoggedIn}
                     onLike={toggleLike}
                     onComment={addComment}

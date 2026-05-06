@@ -14,8 +14,66 @@ import {
 import { GitHubClient } from './lib/githubClient.ts'
 
 const app = express()
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
 app.use(cors({ origin: config.corsOrigin }))
+
+/* ── File uploads ── */
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads')
+
+async function ensureUploadsDir() {
+  await fs.mkdir(UPLOADS_DIR, { recursive: true })
+}
+
+function isBase64Image(url: string): boolean {
+  return url.startsWith('data:image/')
+}
+
+async function saveBase64Image(dataUrl: string): Promise<string> {
+  const matches = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/)
+  if (!matches) return dataUrl
+  const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1]
+  const base64Data = matches[2]
+  const filename = `img-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const filepath = path.join(UPLOADS_DIR, filename)
+  await fs.writeFile(filepath, Buffer.from(base64Data, 'base64'))
+  return `/api/uploads/${filename}`
+}
+
+async function processImages(images: string[]): Promise<string[]> {
+  const results: string[] = []
+  for (const img of images) {
+    if (isBase64Image(img)) {
+      results.push(await saveBase64Image(img))
+    } else {
+      results.push(img)
+    }
+  }
+  return results
+}
+
+app.get('/api/uploads/:filename', async (req, res) => {
+  const filename = req.params.filename
+  if (filename.includes('..') || filename.includes('/')) {
+    res.status(400).json({ error: 'Invalid filename' })
+    return
+  }
+  const filepath = path.join(UPLOADS_DIR, filename)
+  try {
+    const data = await fs.readFile(filepath)
+    const ext = path.extname(filename).toLowerCase()
+    const mimeTypes: Record<string, string> = {
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+    }
+    res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream')
+    res.send(data)
+  } catch {
+    res.status(404).json({ error: 'File not found' })
+  }
+})
 
 // In-memory cache
 let notesCache: NoteMeta[] = []
@@ -222,6 +280,7 @@ app.get('/api/file/*', async (req, res) => {
 
 interface Comment {
   id: string
+  userId: string
   name: string
   text: string
   time: string
@@ -235,6 +294,7 @@ interface MomentAttachment {
 
 interface Moment {
   id: string
+  authorId: string
   content: string
   images: string[]
   attachments?: MomentAttachment[]
@@ -281,6 +341,8 @@ app.post('/api/moments', async (req, res) => {
     res.status(400).json({ error: 'Content or images required' })
     return
   }
+  // Process base64 images → save as files
+  body.images = await processImages(body.images)
   const list = await getMoments()
   list.unshift(body)
   momentsCache = list
@@ -291,18 +353,18 @@ app.post('/api/moments', async (req, res) => {
 // POST /api/moments/:id/like
 app.post('/api/moments/:id/like', async (req, res) => {
   const { id } = req.params
-  const { name } = req.body as { name: string }
+  const { userId } = req.body as { userId: string }
   const list = await getMoments()
   const idx = list.findIndex((m) => m.id === id)
   if (idx === -1) {
     res.status(404).json({ error: 'Not found' })
     return
   }
-  const has = list[idx].likes.includes(name)
+  const has = list[idx].likes.includes(userId)
   if (has) {
-    list[idx].likes = list[idx].likes.filter((n) => n !== name)
+    list[idx].likes = list[idx].likes.filter((uid) => uid !== userId)
   } else {
-    list[idx].likes.push(name)
+    list[idx].likes.push(userId)
   }
   momentsCache = list
   await saveMoments(list)
@@ -342,8 +404,11 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', vaultPath: config.vaultPath })
 })
 
-app.listen(config.port, () => {
-  console.log(`🚀 Obsidian Sync Server running on http://localhost:${config.port}`)
-  console.log(`📁 Vault path: ${config.vaultPath}`)
-  console.log(`🔗 CORS origin: ${config.corsOrigin}`)
+ensureUploadsDir().then(() => {
+  app.listen(config.port, () => {
+    console.log(`🚀 Obsidian Sync Server running on http://localhost:${config.port}`)
+    console.log(`📁 Vault path: ${config.vaultPath}`)
+    console.log(`🔗 CORS origin: ${config.corsOrigin}`)
+    console.log(`📂 Uploads dir: ${UPLOADS_DIR}`)
+  })
 })

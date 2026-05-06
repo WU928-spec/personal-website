@@ -5,38 +5,37 @@ import { useNavigate } from 'react-router-dom'
 import type { Moment, MomentAttachment } from '@/types/moment'
 import ImageGrid from './ImageGrid'
 import { formatRelativeTime } from '@/hooks/useMoments'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Props {
   moment: Moment
   index: number
-  currentUser?: string
-  avatarUrl?: string
   showDelete?: boolean
-  onLike: (id: string, name: string) => void
-  onComment: (id: string, name: string, text: string) => void
+  onLike: (id: string) => void
+  onComment: (id: string, text: string) => void
   onDelete: (id: string) => void
 }
 
 export default function MomentCard({
   moment,
   index,
-  currentUser = 'Jasper',
-  avatarUrl,
   showDelete = true,
   onLike,
   onComment,
   onDelete,
 }: Props) {
   const navigate = useNavigate()
+  const { userId, getUserDisplay } = useAuth()
   const [showCommentInput, setShowCommentInput] = useState(false)
   const [commentText, setCommentText] = useState('')
 
-  const isLiked = moment.likes.includes(currentUser)
+  const author = getUserDisplay(moment.authorId)
+  const isLiked = moment.likes.includes(userId)
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!commentText.trim()) return
-    onComment(moment.id, currentUser, commentText.trim())
+    onComment(moment.id, commentText.trim())
     setCommentText('')
     setShowCommentInput(false)
   }
@@ -54,6 +53,11 @@ export default function MomentCard({
     }
   }
 
+  const likeNames = moment.likes
+    .map((uid) => getUserDisplay(uid).username)
+    .filter(Boolean)
+    .join('、')
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -67,15 +71,15 @@ export default function MomentCard({
     >
       {/* Avatar */}
       <div className="shrink-0">
-        {avatarUrl ? (
+        {author.avatar ? (
           <img
-            src={avatarUrl}
-            alt={currentUser}
+            src={author.avatar}
+            alt={author.username}
             className="w-12 h-12 rounded-full object-cover"
           />
         ) : (
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-base font-bold">
-            {currentUser[0]}
+            {author.username[0] || '?'}
           </div>
         )}
       </div>
@@ -84,7 +88,7 @@ export default function MomentCard({
       <div className="flex-1 min-w-0">
         {/* Nickname */}
         <div className="font-semibold text-[0.9375rem] text-Amber">
-          {currentUser}
+          {author.username}
         </div>
 
         {/* Time */}
@@ -136,7 +140,7 @@ export default function MomentCard({
         <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onLike(moment.id, currentUser)}
+              onClick={() => onLike(moment.id)}
               className="flex items-center gap-1 text-sm transition-colors"
             >
               <Heart
@@ -184,7 +188,7 @@ export default function MomentCard({
               <div className="flex items-start gap-1.5 text-sm">
                 <Heart size={14} className="text-red-500 fill-red-500 mt-0.5 shrink-0" />
                 <span className="text-Amber">
-                  {moment.likes.join('、')}
+                  {likeNames}
                 </span>
               </div>
             )}
@@ -197,12 +201,15 @@ export default function MomentCard({
             {/* Comments */}
             {moment.comments.length > 0 && (
               <div className="space-y-1">
-                {moment.comments.map((c) => (
-                  <div key={c.id} className="text-sm">
-                    <span className="font-semibold text-Amber">{c.name}</span>
-                    <span className="text-gray-700 dark:text-gray-300">：{c.text}</span>
-                  </div>
-                ))}
+                {moment.comments.map((c) => {
+                  const commenter = getUserDisplay(c.userId)
+                  return (
+                    <div key={c.id} className="text-sm">
+                      <span className="font-semibold text-Amber">{commenter.username || c.name}</span>
+                      <span className="text-gray-700 dark:text-gray-300">：{c.text}</span>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>

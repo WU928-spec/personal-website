@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Moment, Comment } from '@/types/moment'
+import { useAuth } from '@/contexts/AuthContext'
 
 const STORAGE_KEY = 'moments_v1'
 const API_BASE = 'http://localhost:2667'
@@ -8,6 +9,7 @@ const API_BASE = 'http://localhost:2667'
 const MOCK_MOMENTS: Moment[] = [
   {
     id: 'mock-1',
+    authorId: 'alice',
     content:
       '今天去了西湖，风景真的很美。湖面波光粼粼，柳树依依。\n\n拍了几张照片，分享给你们～',
     images: [
@@ -17,16 +19,18 @@ const MOCK_MOMENTS: Moment[] = [
     ],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     location: '杭州·西湖',
-    likes: ['Alice', 'Bob', 'Carol'],
+    likes: ['alice', 'bob', 'carol'],
     comments: [
       {
         id: 'c1',
+        userId: 'alice',
         name: 'Alice',
         text: '好漂亮！下次一起去',
         time: new Date(Date.now() - 1000 * 60 * 55).toISOString(),
       },
       {
         id: 'c2',
+        userId: 'bob',
         name: 'Bob',
         text: '西湖的柳树确实很有意境',
         time: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
@@ -35,15 +39,17 @@ const MOCK_MOMENTS: Moment[] = [
   },
   {
     id: 'mock-2',
+    authorId: 'bob',
     content: '终于把项目重构完了，用了 React 19 + Tailwind，体验很棒。',
     images: [
       'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=600&fit=crop',
     ],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-    likes: ['Dave'],
+    likes: ['dave'],
     comments: [
       {
         id: 'c3',
+        userId: 'dave',
         name: 'Dave',
         text: 'congrats! 期待上线',
         time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
@@ -79,6 +85,7 @@ function sortDesc(list: Moment[]): Moment[] {
 
 /* ── Hook ── */
 export function useMoments() {
+  const { userId, user, getUserDisplay } = useAuth()
   const [moments, setMoments] = useState<Moment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -115,10 +122,11 @@ export function useMoments() {
 
   const addMoment = useCallback(
     async (
-      moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments'>
+      moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments' | 'authorId'>
     ) => {
       const newMoment: Moment = {
         ...moment,
+        authorId: userId,
         id: 'moment-' + Date.now().toString(36),
         createdAt: new Date().toISOString(),
         likes: [],
@@ -144,17 +152,17 @@ export function useMoments() {
       setMoments(sortDesc(next))
       saveLocal(next)
     },
-    [moments, fetchMoments]
+    [moments, fetchMoments, userId]
   )
 
   const toggleLike = useCallback(
-    async (id: string, name: string) => {
+    async (id: string) => {
       const list = moments.map((m) => {
         if (m.id !== id) return m
-        const has = m.likes.includes(name)
+        const has = m.likes.includes(userId)
         return {
           ...m,
-          likes: has ? m.likes.filter((n) => n !== name) : [...m.likes, name],
+          likes: has ? m.likes.filter((uid) => uid !== userId) : [...m.likes, userId],
         }
       })
       setMoments(list)
@@ -164,20 +172,22 @@ export function useMoments() {
         await fetch(`${API_BASE}/api/moments/${id}/like`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name }),
+          body: JSON.stringify({ userId }),
         })
       } catch {
         // ignore
       }
     },
-    [moments]
+    [moments, userId]
   )
 
   const addComment = useCallback(
-    async (id: string, name: string, text: string) => {
+    async (id: string, text: string) => {
+      const displayName = user?.username || getUserDisplay(userId).username
       const comment: Comment = {
         id: 'c-' + Date.now().toString(36),
-        name,
+        userId,
+        name: displayName,
         text,
         time: new Date().toISOString(),
       }
@@ -197,7 +207,7 @@ export function useMoments() {
         // ignore
       }
     },
-    [moments]
+    [moments, userId, user, getUserDisplay]
   )
 
   const deleteMoment = useCallback(

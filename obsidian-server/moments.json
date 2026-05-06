@@ -32,18 +32,5 @@
         "time": "2026-05-06T12:00:00.749Z"
       }
     ]
-  },
-  {
-    "content": "你好",
-    "images": [
-      "blob:http://localhost:3000/2d9761d8-709d-49ae-9221-04097addb651"
-    ],
-    "id": "moment-motvlyse",
-    "createdAt": "2026-05-06T09:49:58.238Z",
-    "likes": [
-      "Jasper",
-      "WU928-spec"
-    ],
-    "comments": []
   }
 ]
