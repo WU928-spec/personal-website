@@ -9,7 +9,7 @@ interface ObsidianNote {
 }
 
 interface Props {
-  onSubmit: (moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments'>) => Promise<void>
+  onSubmit: (moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments' | 'authorId'>) => Promise<void>
   userName?: string
   avatarUrl?: string
 }
