@@ -4,8 +4,12 @@ import PageSEO from '@/components/PageSEO'
 import MomentCard from '@/components/MomentCard'
 import MomentUploader from '@/components/MomentUploader'
 import { useMoments } from '@/hooks/useMoments'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Moments() {
+  const { user } = useAuth()
+  const avatarUrl = user?.avatar || '/avatar.jpg'
+  const displayName = user?.username || 'Jasper'
   const {
     moments,
     loading,
@@ -42,16 +46,18 @@ export default function Moments() {
                 Jasper
               </h1>
             </div>
-            <div className="w-20 h-20 rounded-[4px] bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-2xl font-bold border-4 border-white dark:border-[#111] shadow-lg shrink-0">
-              J
-            </div>
+            <img
+              src={avatarUrl}
+              alt={displayName}
+              className="w-20 h-20 rounded-[4px] object-cover border-4 border-white dark:border-[#111] shadow-lg shrink-0"
+            />
           </div>
         </div>
       </div>
 
       {/* ── Publisher ── */}
       <div className="max-w-2xl mx-auto mt-2">
-        <MomentUploader onSubmit={addMoment} />
+        <MomentUploader onSubmit={addMoment} avatarUrl={avatarUrl} userName={displayName} />
       </div>
 
       {/* ── Feed ── */}
