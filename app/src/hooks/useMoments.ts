@@ -59,10 +59,28 @@ const MOCK_MOMENTS: Moment[] = [
 ]
 
 /* ── Helpers ── */
+function migrateMoment(m: Moment): Moment {
+  // Migrate old data without authorId
+  if (!m.authorId) {
+    m = { ...m, authorId: 'WU928-spec' }
+  }
+  // Migrate old comments without userId
+  if (m.comments) {
+    m.comments = m.comments.map((c) => ({
+      ...c,
+      userId: c.userId || c.name || 'unknown',
+    }))
+  }
+  return m
+}
+
 function loadLocal(): Moment[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as Moment[]
+    if (raw) {
+      const list = JSON.parse(raw) as Moment[]
+      return list.map(migrateMoment)
+    }
   } catch {
     // ignore
   }

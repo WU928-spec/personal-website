@@ -29,7 +29,7 @@ export default function MomentCard({
   const [showCommentInput, setShowCommentInput] = useState(false)
   const [commentText, setCommentText] = useState('')
 
-  const author = getUserDisplay(moment.authorId)
+  const author = getUserDisplay(moment.authorId || 'unknown')
   const isLiked = moment.likes.includes(userId)
 
   const handleCommentSubmit = (e: React.FormEvent) => {

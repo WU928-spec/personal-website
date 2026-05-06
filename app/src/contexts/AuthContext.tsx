@@ -135,7 +135,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('vibecoding_user', JSON.stringify(updated))
   }
 
-  const getUserDisplay = (uid: string): UserInfo => {
+  const getUserDisplay = (uid: string | undefined): UserInfo => {
+    if (!uid) return { username: '未知用户', avatar: '' }
     return registry[uid] || { username: uid, avatar: '' }
   }
 
