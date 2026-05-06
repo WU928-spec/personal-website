@@ -27,7 +27,7 @@ export default function Moments() {
       <div className="relative">
         {/* Cover Image */}
         <div
-          className="h-[300px] w-full bg-cover bg-center"
+          className="h-[300px] w-full bg-cover bg-top"
           style={{
             backgroundImage:
               'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3)), url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop)',
