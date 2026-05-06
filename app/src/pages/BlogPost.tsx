@@ -1,323 +1,156 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
-  Github,
-  Twitter,
-  Linkedin,
-  Copy,
-  Check,
-  Pencil,
-  Save,
-  X,
+  FileText,
+  FileSpreadsheet,
+  File,
 } from 'lucide-react'
 import {
   getPostBySlug,
-  getAdjacentPosts,
-  getRelatedPosts,
   getAllSlugs,
-  savePost,
   type Post,
 } from '@/data/posts.ts'
-import MarkdownRenderer, { extractToc } from '@/components/MarkdownRenderer.tsx'
-import TableOfContents from '@/components/TableOfContents.tsx'
-import Backlinks from '@/components/Backlinks.tsx'
+import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 import PageSEO from '@/components/PageSEO'
 import { useAuth } from '@/contexts/AuthContext'
-import { useLang } from '@/contexts/LangContext'
 
 /* ───────────────────────────────────────────────
-   Scroll Progress Bar
+   Extract images from markdown content
    ─────────────────────────────────────────────── */
-function ScrollProgressBar() {
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight
-      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
-      setProgress(Math.min(100, Math.max(0, pct)))
+function useExtractImages(content: string) {
+  return useMemo(() => {
+    const regex = /!\[.*?\]\((.*?)\)/g
+    const result: string[] = []
+    let match
+    while ((match = regex.exec(content)) !== null) {
+      result.push(match[1])
     }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    return result
+  }, [content])
+}
+
+/* ───────────────────────────────────────────────
+   WeChat-style Image Grid (full size in detail)
+   ─────────────────────────────────────────────── */
+function ImageGrid({ images }: { images: string[] }) {
+  const count = Math.min(images.length, 9)
+  if (count === 0) return null
+
+  if (count === 1) {
+    return (
+      <div className="mt-2 max-w-[70%]">
+        <img src={images[0]} alt="" className="w-full rounded-[4px] object-cover" loading="lazy" />
+      </div>
+    )
+  }
+
+  if (count === 2) {
+    return (
+      <div className="mt-2 grid grid-cols-2 gap-1 max-w-[70%]">
+        {images.map((src, i) => (
+          <img key={i} src={src} alt="" className="w-full aspect-square rounded-[4px] object-cover" loading="lazy" />
+        ))}
+      </div>
+    )
+  }
+
+  if (count === 3) {
+    return (
+      <div className="mt-2 flex gap-1 max-w-[70%]">
+        <img src={images[0]} alt="" className="w-[66%] aspect-square rounded-[4px] object-cover" loading="lazy" />
+        <div className="flex flex-col gap-1 w-[34%]">
+          <img src={images[1]} alt="" className="w-full aspect-square rounded-[4px] object-cover" loading="lazy" />
+          <img src={images[2]} alt="" className="w-full aspect-square rounded-[4px] object-cover" loading="lazy" />
+        </div>
+      </div>
+    )
+  }
+
+  if (count === 4) {
+    return (
+      <div className="mt-2 grid grid-cols-2 gap-1 max-w-[60%]">
+        {images.slice(0, 4).map((src, i) => (
+          <img key={i} src={src} alt="" className="w-full aspect-square rounded-[4px] object-cover" loading="lazy" />
+        ))}
+      </div>
+    )
+  }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-transparent">
-      <div
-        className="h-full bg-Amber transition-[width] duration-150 ease-linear"
-        style={{ width: `${progress}%` }}
-      />
+    <div className="mt-2 grid grid-cols-3 gap-1 max-w-[70%]">
+      {images.slice(0, 9).map((src, i) => (
+        <img key={i} src={src} alt="" className="w-full aspect-square rounded-[4px] object-cover" loading="lazy" />
+      ))}
     </div>
   )
 }
 
 /* ───────────────────────────────────────────────
-   Copy Link Button
+   Attachment Item
    ─────────────────────────────────────────────── */
-function CopyLinkButton() {
-  const { t } = useLang()
-  const [copied, setCopied] = useState(false)
+function AttachmentItem({ attachment }: { attachment: { name: string; type: string; data: string } }) {
+  const ext = attachment.name.split('.').pop()?.toLowerCase() || ''
+  const isMd = ext === 'md' || ext === 'markdown'
 
-  const handleCopy = () => {
-    if (!navigator.clipboard) return
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+  const handleClick = () => {
+    if (isMd) {
+      const blob = new Blob([attachment.data], { type: 'text/markdown' })
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+      setTimeout(() => URL.revokeObjectURL(url), 60000)
+    } else {
+      const link = document.createElement('a')
+      link.href = attachment.data
+      link.download = attachment.name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
+
+  const Icon =
+    ext === 'csv'
+      ? FileSpreadsheet
+      : ext === 'md' || ext === 'markdown' || ext === 'txt' || ext === 'json'
+        ? FileText
+        : File
 
   return (
     <button
-      onClick={handleCopy}
-      className="p-2 rounded-lg bg-Linen hover:bg-Mist transition-colors duration-200"
-      aria-label={t('post.copyLink')}
-      title={t('post.copyLink')}
+      onClick={handleClick}
+      className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-lg border border-[#e5e5e5] dark:border-white/10 bg-[#f7f7f7] dark:bg-white/5 hover:bg-[#eee] dark:hover:bg-white/10 transition-colors"
     >
-      {copied ? <Check size={16} className="text-Sage" /> : <Copy size={16} className="text-Slate" />}
+      <Icon size={16} className="text-Slate shrink-0" />
+      <span className="text-[0.75rem] text-Ink dark:text-white truncate">{attachment.name}</span>
+      <span className="text-[0.625rem] text-Slate/60 uppercase ml-auto shrink-0">{ext}</span>
     </button>
   )
 }
 
 /* ───────────────────────────────────────────────
-   Author Card
-   ─────────────────────────────────────────────── */
-function AuthorCard() {
-  const { t } = useLang()
-  return (
-    <div className="mt-8 bg-Linen rounded-xl p-6 shadow-soft">
-      <div className="flex items-center gap-4">
-        <img
-          src="/avatar.jpg"
-          alt={t('post.authorAlt')}
-          className="w-16 h-16 rounded-full object-cover"
-        />
-        <div>
-          <h5 className="font-ui text-[1rem] font-semibold leading-[1.4] text-Ink">
-            {t('post.authorName')}
-          </h5>
-          <p className="text-[0.9375rem] leading-[1.65] text-Slate mt-1">
-            {t('post.authorDesc')}
-          </p>
-          <div className="flex items-center gap-3 mt-3">
-            <a
-              href="https://github.com/WU928-spec"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-Slate hover:text-Amber transition-colors"
-              aria-label="GitHub"
-            >
-              <Github size={16} />
-            </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-Slate hover:text-Amber transition-colors"
-              aria-label="Twitter"
-            >
-              <Twitter size={16} />
-            </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-Slate hover:text-Amber transition-colors"
-              aria-label="LinkedIn"
-            >
-              <Linkedin size={16} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ───────────────────────────────────────────────
-   Related Post Card (simpler than BlogCard)
-   ─────────────────────────────────────────────── */
-function RelatedCard({ post, index }: { post: Post; index: number }) {
-  const navigate = useNavigate()
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const imgRef = useRef<HTMLImageElement>(null)
-
-  useEffect(() => {
-    if (imgRef.current?.complete) {
-      setImageLoaded(true)
-    }
-  }, [])
-
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.1,
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-      }}
-      className="group cursor-pointer"
-      onClick={() => navigate(`/blog/${post.slug}`)}
-    >
-      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300">
-        <div className="relative overflow-hidden aspect-[16/10] bg-Linen dark:bg-white/5">
-          <div
-            className={`absolute inset-0 bg-Linen dark:bg-white/5 transition-opacity duration-500 ${
-              imageLoaded ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            <div className="w-full h-full bg-gradient-to-br from-Linen via-Sand/20 to-Linen dark:from-white/5 dark:via-white/10 dark:to-white/5 animate-pulse" />
-          </div>
-          <img
-            ref={imgRef}
-            src={`/blog-thumb-${(index % 6) + 1}.jpg`}
-            alt={post.title}
-            className={`w-full h-full object-cover transition-all duration-500 ease ${
-              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105 blur-sm'
-            } group-hover:scale-[1.04]`}
-            loading="lazy"
-            onLoad={() => setImageLoaded(true)}
-          />
-        </div>
-        <div className="p-5">
-          <span className="inline-block px-3 py-1 rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Sage bg-Sage/10 mb-2">
-            {post.category}
-          </span>
-          <h4 className="font-display text-[1.125rem] font-semibold leading-[1.3] text-Ink line-clamp-2 group-hover:text-Amber transition-colors duration-300">
-            {post.title}
-          </h4>
-          <p className="mt-2 text-[0.9375rem] leading-[1.65] text-Slate line-clamp-2">
-            {post.excerpt}
-          </p>
-        </div>
-      </div>
-    </motion.article>
-  )
-}
-
-/* ───────────────────────────────────────────────
-   Prev / Next Navigation
-   ─────────────────────────────────────────────── */
-function PrevNextNav({ prev, next }: { prev: Post | null; next: Post | null }) {
-  const navigate = useNavigate()
-  const { t } = useLang()
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {prev ? (
-        <button
-          onClick={() => navigate(`/blog/${prev.slug}`)}
-          className="text-left group p-4 rounded-lg hover:bg-Linen transition-colors duration-200"
-        >
-          <span className="block text-[0.8125rem] font-medium tracking-[0.04em] text-Slate uppercase mb-1">
-            ← {t('post.previous')}
-          </span>
-          <span className="font-display text-[1rem] font-medium leading-[1.3] text-Ink group-hover:text-Amber transition-colors duration-200 line-clamp-2">
-            {prev.title}
-          </span>
-        </button>
-      ) : (
-        <div />
-      )}
-      {next ? (
-        <button
-          onClick={() => navigate(`/blog/${next.slug}`)}
-          className="text-right group p-4 rounded-lg hover:bg-Linen transition-colors duration-200"
-        >
-          <span className="block text-[0.8125rem] font-medium tracking-[0.04em] text-Slate uppercase mb-1">
-            {t('post.next')} →
-          </span>
-          <span className="font-display text-[1rem] font-medium leading-[1.3] text-Ink group-hover:text-Amber transition-colors duration-200 line-clamp-2">
-            {next.title}
-          </span>
-        </button>
-      ) : (
-        <div />
-      )}
-    </div>
-  )
-}
-
-/* ───────────────────────────────────────────────
-   Blog Post Page
+   Moment Detail Page (朋友圈详情)
    ─────────────────────────────────────────────── */
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const { isLoggedIn, isEditMode } = useAuth()
-  const { t } = useLang()
+  const { isLoggedIn } = useAuth()
 
-  const [post, setPost] = useState<Post | undefined>(undefined)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editContent, setEditContent] = useState('')
-  const [editTitle, setEditTitle] = useState('')
-  const [saved, setSaved] = useState(false)
-
-  useEffect(() => {
-    const p = getPostBySlug(slug || '')
-    setPost(p)
-    if (p) {
-      setEditContent(p.content)
-      setEditTitle(p.title)
-    }
-  }, [slug])
-
-  const tocItems = useMemo(() => {
-    if (!post || isEditing) return []
-    return extractToc(post.content)
-  }, [post, isEditing])
-
-  const adjacent = useMemo(() => {
-    if (!post) return { prev: null, next: null }
-    return getAdjacentPosts(post.slug)
-  }, [post])
-
-  const related = useMemo(() => {
-    if (!post) return []
-    return getRelatedPosts(post.slug, 3)
-  }, [post])
-
+  const post = useMemo(() => getPostBySlug(slug || ''), [slug])
+  const images = useExtractImages(post?.content || '')
   const allSlugs = useMemo(() => getAllSlugs(), [])
-
-  useEffect(() => {
-    if (post === undefined) return
-    if (!post) {
-      navigate('/blog', { replace: true })
-    }
-  }, [post, navigate])
-
-  const handleSave = () => {
-    if (!post) return
-    savePost(post.slug, { title: editTitle, content: editContent })
-    setPost({ ...post, title: editTitle, content: editContent })
-    setIsEditing(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-  }
-
-  const handleCancel = () => {
-    if (!post) return
-    setEditContent(post.content)
-    setEditTitle(post.title)
-    setIsEditing(false)
-  }
 
   if (!post) {
     return (
-      <div className="min-h-[60dvh] bg-Parchment flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-[#111] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-Slate font-body text-lg">{t('post.loadFailed')}</p>
-          <p className="text-Slate/60 text-sm mt-2">{t('post.loadFailedDesc')}</p>
+          <p className="text-Slate dark:text-white/50">动态不存在</p>
           <button
             onClick={() => navigate('/blog')}
-            className="mt-4 inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] transition-all duration-300"
+            className="mt-4 text-[#576b95] dark:text-[#7d90a9] text-[0.875rem]"
           >
-            {t('post.backToBlog')}
+            返回朋友圈
           </button>
         </div>
       </div>
@@ -325,234 +158,103 @@ export default function BlogPost() {
   }
 
   return (
-    <div className="bg-Parchment">
+    <div className="min-h-screen bg-white dark:bg-[#111]">
       <PageSEO
         title={post.title}
         description={post.excerpt}
         path={`/blog/${post.slug}`}
       />
-      <ScrollProgressBar />
 
-      {/* ── Post Hero ── */}
-      <section
-        className="relative min-h-[40vh] max-h-[60vh] flex items-end overflow-hidden bg-Parchment dark:bg-Graphite pt-16"
-      >
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 pb-12 w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.7,
-              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-            }}
-            className="flex items-center gap-3 flex-wrap"
+      {/* ── Top Navigation ── */}
+      <div className="sticky top-0 z-50 bg-white/95 dark:bg-[#111]/95 backdrop-blur border-b border-[#e5e5e5] dark:border-white/5">
+        <div className="max-w-2xl mx-auto px-4 flex items-center h-12">
+          <button
+            onClick={() => navigate('/blog')}
+            className="flex items-center text-Ink dark:text-white"
           >
-            <span
-              className="px-3 py-1 rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Amber border border-Amber/30"
-              style={{ background: 'rgba(var(--color-amber), 0.2)' }}
-            >
-              {post.category}
-            </span>
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70 dark:text-white">
-              {post.date}
-            </span>
-            <span className="text-Ink/70 dark:text-white">·</span>
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Ink/70 dark:text-white">
-              {post.readingTime}
-            </span>
-            {isLoggedIn && isEditMode && !isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors dark:bg-white/15 dark:text-white dark:border-white/25"
-              >
-                <Pencil size={14} />
-                {t('post.edit')}
-              </button>
-            )}
-            {isLoggedIn && isEditMode && isEditing && (
-              <div className="ml-auto flex items-center gap-2">
-                {saved && (
-                  <span className="text-[0.8125rem] text-Sage">{t('post.saved')}</span>
-                )}
-                <button
-                  onClick={handleSave}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Ink text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
-                >
-                  <Save size={14} />
-                  {t('post.save')}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 backdrop-blur-md border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors dark:bg-white/15 dark:text-white dark:border-white/25"
-                >
-                  <X size={14} />
-                  {t('post.cancel')}
-                </button>
-              </div>
-            )}
-          </motion.div>
-
-          {isEditing ? (
-            <input
-              type="text"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              className="mt-3 w-full bg-transparent border-b border-Ink/30 text-Ink font-display text-[clamp(2rem,4vw,3.5rem)] font-medium placeholder:text-Ink/40 focus:outline-none focus:border-Ink/60 pb-2"
-            />
-          ) : (
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.7,
-                delay: 0.1,
-                ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-              }}
-              className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink dark:text-white mt-3 max-w-3xl"
-            >
-              {post.title}
-            </motion.h1>
-          )}
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.7,
-              delay: 0.2,
-              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-            }}
-            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 dark:text-white max-w-2xl font-body"
-          >
-            {post.excerpt}
-          </motion.p>
+            <ArrowLeft size={20} />
+          </button>
+          <span className="absolute left-1/2 -translate-x-1/2 text-[1rem] font-medium text-Ink dark:text-white">
+            朋友圈
+          </span>
         </div>
-      </section>
+      </div>
 
-      {/* ── Article Content ── */}
-      <section className="py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-            {/* TOC Sidebar — fixed position, outside grid */}
-            <TableOfContents items={tocItems} />
-
-            {/* Article Body */}
-            <div className="max-w-3xl">
-                {isEditing ? (
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full min-h-[600px] bg-Linen border border-Sand rounded-xl p-6 text-Ink font-body text-[1rem] leading-[1.75] focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 resize-y"
-                  />
-                ) : (
-                  <MarkdownRenderer
-                    content={post.content || ''}
-                    existingSlugs={allSlugs}
-                  />
-                )}
-
-                {/* ── Article Footer ── */}
-                <div className="mt-12 pt-8 border-t border-Sand">
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mr-1">
-                      {t('post.tagged')}
-                    </span>
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-[6px] rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Slate bg-Linen border border-Sand"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Share Row */}
-                  <div className="mt-6 flex items-center gap-3">
-                    <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-                      {t('post.share')}
-                    </span>
-                    <a
-                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-Linen hover:bg-Mist transition-colors duration-200"
-                      aria-label={t('post.shareOnTwitter')}
-                    >
-                      <Twitter size={16} className="text-Slate" />
-                    </a>
-                    <a
-                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-Linen hover:bg-Mist transition-colors duration-200"
-                      aria-label={t('post.shareOnLinkedIn')}
-                    >
-                      <Linkedin size={16} className="text-Slate" />
-                    </a>
-                    <CopyLinkButton />
-                  </div>
-
-                  {/* Backlinks */}
-                  {!isEditing && <Backlinks currentSlug={post.slug} />}
-
-                  {/* Author Card */}
-                  <AuthorCard />
-                </div>
-              </div>
-          </div>
-      </section>
-
-      {/* ── Related Posts ── */}
-      {related.length > 0 && (
-        <section className="py-16 md:py-24 bg-Linen">
-          <div className="max-w-6xl mx-auto px-6 md:px-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.7,
-                ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-              }}
-            >
-              <h3 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium text-Ink">
-                {t('post.continueReading')}
-              </h3>
-              <p className="mt-2 text-[0.9375rem] leading-[1.65] text-Slate">
-                {t('post.moreFromGarden')}
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-8">
-              {related.map((rp, i) => (
-                <RelatedCard key={rp.slug} post={rp} index={i} />
-              ))}
+      {/* ── Moment Content ── */}
+      <div className="max-w-2xl mx-auto px-4 py-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="flex gap-3"
+        >
+          {/* Avatar */}
+          <div className="shrink-0">
+            <div className="w-10 h-10 rounded-[4px] bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-sm font-bold">
+              J
             </div>
           </div>
-        </section>
-      )}
 
-      {/* ── Prev / Next Navigation ── */}
-      <section className="py-8 border-t border-Sand">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <PrevNextNav prev={adjacent.prev} next={adjacent.next} />
-        </div>
-      </section>
+          {/* Content */}
+          <div className="flex-1 min-w-0 pb-8">
+            {/* Nickname */}
+            <div className="font-semibold text-[0.9375rem] text-[#576b95] dark:text-[#7d90a9]">
+              Jasper
+            </div>
 
-      {/* ── Back to Blog ── */}
-      <section className="pb-12">
-        <div className="max-w-6xl mx-auto px-6 md:px-12 flex justify-center">
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-300 dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
-          >
-            <ArrowLeft size={16} />
-            {t('post.backToArticles')}
-          </Link>
-        </div>
-      </section>
+            {/* Full Text */}
+            <div className="mt-1 text-[0.9375rem] leading-[1.6] text-Ink dark:text-white/90">
+              <MarkdownRenderer
+                content={post.content || ''}
+                existingSlugs={allSlugs}
+              />
+            </div>
+
+            {/* Images */}
+            <ImageGrid images={images} />
+
+            {/* Attachments */}
+            {post.attachments && post.attachments.length > 0 && (
+              <div className="mt-3 flex flex-col gap-2">
+                {post.attachments.map((att, i) => (
+                  <AttachmentItem key={i} attachment={att} />
+                ))}
+              </div>
+            )}
+
+            {/* Tags */}
+            {post.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 rounded text-[0.75rem] text-[#576b95] dark:text-[#7d90a9] bg-[#f2f2f2] dark:bg-white/5"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Footer row */}
+            <div className="mt-3 flex items-center justify-between">
+              <div className="text-[0.75rem] text-Slate/60 dark:text-white/40">
+                {post.date}
+              </div>
+              {isLoggedIn && (
+                <button
+                  onClick={() => {
+                    // TODO: delete post
+                  }}
+                  className="text-[0.75rem] text-[#576b95] dark:text-[#7d90a9]"
+                >
+                  删除
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }

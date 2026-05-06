@@ -532,6 +532,17 @@ function buildComponents(_existingSlugs: string[]): Components {
     ),
 
     img: ({ src, alt }) => {
+      // data: URLs are always images, skip extension check
+      if (src?.startsWith('data:')) {
+        return (
+          <img
+            src={src}
+            alt={alt || ''}
+            className="rounded-lg shadow-soft w-full"
+            loading="lazy"
+          />
+        )
+      }
       const ext = src?.split('.').pop()?.toLowerCase() || ''
       const audioExts = ['mp3', 'wav', 'm4a', 'ogg', 'webm', 'aac', 'flac']
       const videoExts = ['mp4', 'mov', 'webm', 'mkv']

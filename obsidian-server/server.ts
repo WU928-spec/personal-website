@@ -217,6 +217,125 @@ app.get('/api/file/*', async (req, res) => {
 })
 
 /* ───────────────────────────────────────────────
+   Moments API (动态墙)
+   ─────────────────────────────────────────────── */
+
+interface Comment {
+  id: string
+  name: string
+  text: string
+  time: string
+}
+
+interface MomentAttachment {
+  name: string
+  type: string
+  data: string
+}
+
+interface Moment {
+  id: string
+  content: string
+  images: string[]
+  attachments?: MomentAttachment[]
+  createdAt: string
+  location?: string
+  likes: string[]
+  comments: Comment[]
+}
+
+const MOMENTS_FILE = path.join(process.cwd(), 'moments.json')
+
+async function loadMoments(): Promise<Moment[]> {
+  try {
+    const raw = await fs.readFile(MOMENTS_FILE, 'utf-8')
+    return JSON.parse(raw) as Moment[]
+  } catch {
+    return []
+  }
+}
+
+async function saveMoments(list: Moment[]) {
+  await fs.writeFile(MOMENTS_FILE, JSON.stringify(list, null, 2))
+}
+
+let momentsCache: Moment[] | null = null
+
+async function getMoments(): Promise<Moment[]> {
+  if (!momentsCache) {
+    momentsCache = await loadMoments()
+  }
+  return momentsCache
+}
+
+// GET /api/moments
+app.get('/api/moments', async (_req, res) => {
+  const list = await getMoments()
+  res.json(list)
+})
+
+// POST /api/moments
+app.post('/api/moments', async (req, res) => {
+  const body = req.body as Moment
+  if (!body.content && (!body.images || body.images.length === 0)) {
+    res.status(400).json({ error: 'Content or images required' })
+    return
+  }
+  const list = await getMoments()
+  list.unshift(body)
+  momentsCache = list
+  await saveMoments(list)
+  res.json(body)
+})
+
+// POST /api/moments/:id/like
+app.post('/api/moments/:id/like', async (req, res) => {
+  const { id } = req.params
+  const { name } = req.body as { name: string }
+  const list = await getMoments()
+  const idx = list.findIndex((m) => m.id === id)
+  if (idx === -1) {
+    res.status(404).json({ error: 'Not found' })
+    return
+  }
+  const has = list[idx].likes.includes(name)
+  if (has) {
+    list[idx].likes = list[idx].likes.filter((n) => n !== name)
+  } else {
+    list[idx].likes.push(name)
+  }
+  momentsCache = list
+  await saveMoments(list)
+  res.json(list[idx])
+})
+
+// POST /api/moments/:id/comment
+app.post('/api/moments/:id/comment', async (req, res) => {
+  const { id } = req.params
+  const comment = req.body as Comment
+  const list = await getMoments()
+  const idx = list.findIndex((m) => m.id === id)
+  if (idx === -1) {
+    res.status(404).json({ error: 'Not found' })
+    return
+  }
+  list[idx].comments.push(comment)
+  momentsCache = list
+  await saveMoments(list)
+  res.json(list[idx])
+})
+
+// DELETE /api/moments/:id
+app.delete('/api/moments/:id', async (req, res) => {
+  const { id } = req.params
+  const list = await getMoments()
+  const filtered = list.filter((m) => m.id !== id)
+  momentsCache = filtered
+  await saveMoments(filtered)
+  res.json({ success: true })
+})
+
+/* ───────────────────────────────────────────────
    Health check
    ─────────────────────────────────────────────── */
 app.get('/api/health', (_req, res) => {

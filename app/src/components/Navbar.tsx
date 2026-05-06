@@ -16,7 +16,7 @@ export default function Navbar() {
 
   const navLinks = [
     { path: '/', label: t('nav.home') },
-    { path: '/blog', label: t('nav.blog') },
+    { path: '/moments', label: t('nav.moments') },
     { path: '/obsidian', label: t('nav.obsidian') },
     { path: '/projects', label: t('nav.projects') },
     { path: '/about', label: t('nav.about') },

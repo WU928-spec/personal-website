@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Folder,
@@ -9,9 +9,6 @@ import {
   RefreshCw,
   Eye,
   ChevronLeft,
-  Pencil,
-  Save,
-  X,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 import {
@@ -19,7 +16,6 @@ import {
   fetchObsidianNote,
   fetchVaultTree,
   isObsidianServerAvailable,
-  saveObsidianNote,
 } from '@/services/obsidianClient'
 import type { ObsidianNoteMeta, ObsidianNote, VaultFile } from '@/types'
 import { useLang } from '@/contexts/LangContext'
@@ -171,6 +167,7 @@ function RootFilesGroup({
 export default function ObsidianBrowser() {
   const { t } = useLang()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const [serverOn, setServerOn] = useState<boolean | null>(null)
   const [tree, setTree] = useState<VaultFile[]>([])
@@ -179,9 +176,6 @@ export default function ObsidianBrowser() {
   const [selectedSlug, setSelectedSlug] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editContent, setEditContent] = useState('')
-  const [saved, setSaved] = useState(false)
   const treeScrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -207,6 +201,26 @@ export default function ObsidianBrowser() {
     loadData()
   }, [loadData])
 
+  // Load selected note (declared BEFORE effects that reference it)
+  const handleSelectNote = useCallback(
+    async (slug: string) => {
+      setSelectedSlug(slug)
+      const note = await fetchObsidianNote(slug)
+      setSelectedNote(note)
+    },
+    []
+  )
+
+  // Auto-open note from query param ?note=slug
+  useEffect(() => {
+    const noteSlug = searchParams.get('note')
+    if (noteSlug && serverOn === true && notes.length > 0) {
+      handleSelectNote(noteSlug)
+      // Clean query param without reloading
+      navigate('/obsidian', { replace: true })
+    }
+  }, [searchParams, serverOn, notes.length, handleSelectNote, navigate])
+
   // Prevent outer page scroll when trackpad scrolling inside tree
   useEffect(() => {
     const el = treeScrollRef.current
@@ -219,16 +233,6 @@ export default function ObsidianBrowser() {
     el.addEventListener('wheel', handleWheel, { passive: false })
     return () => el.removeEventListener('wheel', handleWheel)
   }, [sidebarCollapsed])
-
-  // Load selected note
-  const handleSelectNote = useCallback(
-    async (slug: string) => {
-      setSelectedSlug(slug)
-      const note = await fetchObsidianNote(slug)
-      setSelectedNote(note)
-    },
-    []
-  )
 
   // Intercept obsidian:// wikilink clicks
   useEffect(() => {
@@ -247,35 +251,6 @@ export default function ObsidianBrowser() {
     el.addEventListener('click', handler)
     return () => el.removeEventListener('click', handler)
   }, [handleSelectNote, selectedNote])
-
-  // Enter edit mode
-  const handleStartEdit = useCallback(() => {
-    if (selectedNote) {
-      setEditContent(selectedNote.content)
-      setIsEditing(true)
-      setSaved(false)
-    }
-  }, [selectedNote])
-
-  // Cancel edit
-  const handleCancelEdit = useCallback(() => {
-    setIsEditing(false)
-    setEditContent('')
-  }, [])
-
-  // Save edited note back to vault
-  const handleSaveEdit = useCallback(async () => {
-    if (!selectedNote) return
-    const ok = await saveObsidianNote(selectedNote.slug, editContent)
-    if (ok) {
-      setSaved(true)
-      setIsEditing(false)
-      // Refresh the note
-      const updated = await fetchObsidianNote(selectedNote.slug)
-      if (updated) setSelectedNote(updated)
-      setTimeout(() => setSaved(false), 2000)
-    }
-  }, [selectedNote, editContent])
 
   // Pre-process wikilinks to navigate within obsidian
   const processObsidianWikilinks = useCallback((content: string): string => {
@@ -386,41 +361,6 @@ export default function ObsidianBrowser() {
       </section>
 
       {/* ── Main Content ── */}
-      {isEditing ? (
-        /* Full-width editing mode */
-        <section className="max-w-5xl mx-auto px-6 md:px-12 pb-24 pt-8">
-          <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="px-2 py-0.5 rounded-full text-[0.6875rem] font-medium text-Amber border border-Amber/30 bg-Amber/5">
-              {selectedNote?.category}
-            </span>
-            <span className="text-[0.6875rem] text-Slate">{selectedNote?.date}</span>
-            <span className="text-[0.6875rem] text-Slate dark:text-white/50 ml-auto">
-              Editing — {selectedNote?.title}
-            </span>
-            <button
-              onClick={handleSaveEdit}
-              className="flex items-center gap-1 px-4 py-2 rounded-md bg-Sage text-Ink text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
-            >
-              <Save size={14} />
-              Save to Vault
-            </button>
-            <button
-              onClick={handleCancelEdit}
-              className="flex items-center gap-1 px-4 py-2 rounded-md border border-Sand dark:border-white/20 text-Slate dark:text-white/60 text-[0.8125rem] font-medium hover:text-Ink dark:hover:text-white transition-colors"
-            >
-              <X size={14} />
-              Cancel
-            </button>
-          </div>
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            className="w-full min-h-[calc(100dvh-200px)] bg-Linen dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-6 text-Ink dark:text-white font-body text-[1rem] leading-[1.75] focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 resize-y"
-            autoFocus
-          />
-        </section>
-      ) : (
-      /* Normal browsing mode */
       <section className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative">
         <div className="flex gap-0">
           {/* Sidebar */}
@@ -505,9 +445,6 @@ export default function ObsidianBrowser() {
                     {selectedNote.category}
                   </span>
                   <span className="text-[0.6875rem] text-Slate">{selectedNote.date}</span>
-                  {saved && (
-                    <span className="text-[0.6875rem] text-Sage ml-auto">Saved ✓</span>
-                  )}
                 </div>
 
                 <h2 className="font-display text-[1.75rem] md:text-[2.25rem] font-medium text-Ink dark:text-white mb-6">
@@ -529,13 +466,6 @@ export default function ObsidianBrowser() {
                   ))}
                 </div>
                 <div className="mt-6 flex items-center gap-3">
-                  <button
-                    onClick={handleStartEdit}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 border border-Sand dark:border-white/20 rounded-lg text-[0.8125rem] font-medium text-Slate dark:text-white/60 hover:text-Ink dark:hover:text-white hover:border-Ink dark:hover:border-white/50 transition-colors"
-                  >
-                    <Pencil size={14} />
-                    Edit Markdown
-                  </button>
                   <button
                     onClick={() => navigate(`/blog/${selectedNote.slug}`)}
                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-Amber text-Parchment rounded-lg text-[0.8125rem] font-semibold hover:bg-[#B06A2F] transition-colors"
@@ -560,7 +490,6 @@ export default function ObsidianBrowser() {
           </main>
         </div>
       </section>
-      )}
     </div>
   )
 }

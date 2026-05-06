@@ -75,7 +75,7 @@ export default function Layout({ children }: LayoutProps) {
         <AuthProvider>
           <div className="relative">
             <Navbar />
-            <main>{children}</main>
+            <main className="pt-16">{children}</main>
             <Footer />
             <BackToTop />
           </div>

@@ -1,3 +1,9 @@
+export interface Attachment {
+  name: string;
+  type: string;
+  data: string;
+}
+
 export interface Post {
   slug: string;
   title: string;
@@ -7,6 +13,7 @@ export interface Post {
   excerpt: string;
   readingTime: string;
   content: string;
+  attachments?: Attachment[];
 }
 
 const slowProgrammingContent = [
@@ -391,12 +398,20 @@ function loadSavedPosts(): Record<string, Partial<Post>> {
 
 function mergeSavedPosts(basePosts: Post[]): Post[] {
   const saved = loadSavedPosts()
-  return basePosts.map((post) => {
+  const merged = basePosts.map((post) => {
     if (saved[post.slug]) {
       return { ...post, ...saved[post.slug] }
     }
     return post
   })
+  // Also include posts that only exist in localStorage (new moments)
+  const baseSlugs = new Set(merged.map((p) => p.slug))
+  for (const [slug, data] of Object.entries(saved)) {
+    if (!baseSlugs.has(slug) && data.content) {
+      merged.unshift(data as Post)
+    }
+  }
+  return merged
 }
 
 let _posts: Post[] = mergeSavedPosts([
@@ -447,81 +462,20 @@ let _posts: Post[] = mergeSavedPosts([
 ]);
 
 /* ───────────────────────────────────────────────
-   Obsidian sync integration
+   Saved posts overlay (manual additions via localStorage)
    ─────────────────────────────────────────────── */
-let obsidianPosts: Post[] = [];
-
-function calculateReadingTime(content: string): string {
-  const words = content.split(/\s+/).length;
-  const minutes = Math.max(1, Math.ceil(words / 200));
-  return `${minutes} min read`;
-}
-
-export async function syncObsidianPosts(): Promise<number> {
-  try {
-    const res = await fetch('http://localhost:2667/api/notes', {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!res.ok) return 0;
-
-    const data = await res.json();
-    const notes = data.notes as Array<{
-      slug: string;
-      title: string;
-      date: string;
-      category: string;
-      tags: string[];
-      excerpt: string;
-      content?: string;
-    }>;
-
-    // Fetch full content for each note
-    const fullNotes = await Promise.all(
-      notes.map(async (n) => {
-        try {
-          const detailRes = await fetch(
-            `http://localhost:2667/api/notes/${encodeURIComponent(n.slug)}`,
-            { signal: AbortSignal.timeout(3000) }
-          );
-          if (!detailRes.ok) return null;
-          const detail = await detailRes.json();
-          return {
-            slug: n.slug,
-            title: n.title,
-            date: n.date.split('T')[0] || n.date,
-            category: n.category,
-            tags: n.tags,
-            excerpt: n.excerpt,
-            readingTime: calculateReadingTime(detail.content || ''),
-            content: detail.content || '',
-          } as Post;
-        } catch {
-          return null;
-        }
-      })
-    );
-
-    obsidianPosts = fullNotes.filter((n): n is Post => n !== null);
-    return obsidianPosts.length;
-  } catch {
-    return 0;
-  }
-}
-
-function getMergedPosts(): Post[] {
-  // Merge static posts with obsidian posts, preferring static for duplicates
-  const staticSlugs = new Set(_posts.map((p) => p.slug));
-  const uniqueObsidian = obsidianPosts.filter((p) => !staticSlugs.has(p.slug));
-  return [..._posts, ...uniqueObsidian];
-}
-
-export const posts = _posts;
 
 export function addPost(post: Post): void {
   _posts.unshift(post);
   const saved = loadSavedPosts();
   saved[post.slug] = post;
-  localStorage.setItem('vibecoding_posts', JSON.stringify(saved));
+  try {
+    localStorage.setItem('vibecoding_posts', JSON.stringify(saved));
+  } catch (e) {
+    console.error('Failed to save post to localStorage:', e);
+    alert('保存失败：存储空间不足。请删除一些旧碎片或减少图片/附件数量。');
+    throw e;
+  }
 }
 
 export function savePost(slug: string, updates: Partial<Post>): void {
@@ -530,22 +484,28 @@ export function savePost(slug: string, updates: Partial<Post>): void {
   _posts[idx] = { ..._posts[idx], ...updates };
   const saved = loadSavedPosts();
   saved[slug] = { ...saved[slug], ...updates };
-  localStorage.setItem('vibecoding_posts', JSON.stringify(saved));
+  try {
+    localStorage.setItem('vibecoding_posts', JSON.stringify(saved));
+  } catch (e) {
+    console.error('Failed to save post to localStorage:', e);
+    alert('保存失败：存储空间不足。');
+    throw e;
+  }
 }
 
 export function getPostBySlug(slug: string): Post | undefined {
-  return getMergedPosts().find((p) => p.slug === slug);
+  return _posts.find((p) => p.slug === slug);
 }
 
 export function getAllSlugs(): string[] {
-  return getMergedPosts().map((p) => p.slug);
+  return _posts.map((p) => p.slug);
 }
 
 export function getAdjacentPosts(slug: string): {
   prev: Post | null;
   next: Post | null;
 } {
-  const all = getMergedPosts();
+  const all = _posts;
   const idx = all.findIndex((p) => p.slug === slug);
   if (idx === -1) return { prev: null, next: null };
   return {
@@ -558,7 +518,7 @@ export function getRelatedPosts(slug: string, limit = 3): Post[] {
   const current = getPostBySlug(slug);
   if (!current) return [];
 
-  const scored = getMergedPosts()
+  const scored = _posts
     .filter((p) => p.slug !== slug)
     .map((p) => {
       let score = 0;
@@ -577,13 +537,13 @@ export function getRelatedPosts(slug: string, limit = 3): Post[] {
 }
 
 export function getCategories(): string[] {
-  const cats = new Set(getMergedPosts().map((p) => p.category));
+  const cats = new Set(_posts.map((p) => p.category));
   return ['All', ...Array.from(cats)];
 }
 
 export function searchPosts(query: string): Post[] {
   const q = query.toLowerCase();
-  return getMergedPosts().filter(
+  return _posts.filter(
     (p) =>
       p.title.toLowerCase().includes(q) ||
       p.excerpt.toLowerCase().includes(q) ||
@@ -593,6 +553,6 @@ export function searchPosts(query: string): Post[] {
 }
 
 export function getPostsByCategory(category: string): Post[] {
-  if (category === 'All') return getMergedPosts();
-  return getMergedPosts().filter((p) => p.category === category);
+  if (category === 'All') return _posts;
+  return _posts.filter((p) => p.category === category);
 }

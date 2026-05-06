@@ -5,9 +5,9 @@ const translations = {
     // Navbar
     nav: {
       home: '首页',
-      blog: '博客',
+      moments: '记忆碎片',
       projects: '项目',
-      obsidian: 'Obsidian',
+      obsidian: '笔记',
       about: '关于',
       login: '登录',
       profile: '个人资料',
@@ -170,7 +170,7 @@ const translations = {
     },
     // Obsidian
     obsidian: {
-      title: 'Obsidian 笔记',
+      title: '笔记',
       subtitle: '浏览本地 vault 中的笔记，探索知识之间的联系。',
       serverOffline: '本地 Sync Server 未启动。请在 obsidian-server 目录运行 npm run dev。',
       retry: '重试连接',
@@ -206,9 +206,9 @@ const translations = {
     // Navbar
     nav: {
       home: 'Home',
-      blog: 'Blog',
+      moments: 'Moments',
       projects: 'Projects',
-      obsidian: 'Obsidian',
+      obsidian: 'Notes',
       about: 'About',
       login: 'Login',
       profile: 'Profile',
@@ -371,7 +371,7 @@ const translations = {
     },
     // Obsidian
     obsidian: {
-      title: 'Obsidian Notes',
+      title: 'Notes',
       subtitle: 'Browse notes from your local vault and explore connections between ideas.',
       serverOffline: 'Local Sync Server is not running. Please run npm run dev in the obsidian-server directory.',
       retry: 'Retry Connection',

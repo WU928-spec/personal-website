@@ -8,11 +8,10 @@ import Profile from './pages/Profile.tsx'
 import NewPost from './pages/NewPost.tsx'
 import NotFound from './pages/NotFound.tsx'
 
-const Blog = lazy(() => import('./pages/Blog.tsx'))
-const BlogPost = lazy(() => import('./pages/BlogPost.tsx'))
 const Projects = lazy(() => import('./pages/Projects.tsx'))
 const About = lazy(() => import('./pages/About.tsx'))
 const ObsidianBrowser = lazy(() => import('./pages/ObsidianBrowser.tsx'))
+const Moments = lazy(() => import('./pages/Moments.tsx'))
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   return (
@@ -45,7 +44,7 @@ function App() {
             path="/blog"
             element={
               <Suspense fallback={fallback}>
-                <PageTransition><Blog /></PageTransition>
+                <PageTransition><Moments /></PageTransition>
               </Suspense>
             }
           />
@@ -53,7 +52,7 @@ function App() {
             path="/blog/:slug"
             element={
               <Suspense fallback={fallback}>
-                <PageTransition><BlogPost /></PageTransition>
+                <PageTransition><Moments /></PageTransition>
               </Suspense>
             }
           />
@@ -83,7 +82,15 @@ function App() {
           />
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-          <Route path="/blog/new" element={<PageTransition><NewPost /></PageTransition>} />
+          <Route path="/blog/new" element={<PageTransition><Moments /></PageTransition>} />
+          <Route
+            path="/moments"
+            element={
+              <Suspense fallback={fallback}>
+                <PageTransition><Moments /></PageTransition>
+              </Suspense>
+            }
+          />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>

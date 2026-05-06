@@ -1,114 +1,185 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, ArrowRight, FileSearch, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
-import {
-  getCategories,
-  getPostsByCategory,
-  searchPosts,
-  syncObsidianPosts,
-  type Post,
-} from '@/data/posts.ts'
-import { useLang } from '@/contexts/LangContext'
+import { getPostsByCategory, type Post } from '@/data/posts.ts'
 import { useAuth } from '@/contexts/AuthContext'
 
-const CATEGORIES = getCategories()
+/* ───────────────────────────────────────────────
+   Extract images from markdown content
+   ─────────────────────────────────────────────── */
+function useExtractImages(content: string) {
+  return useMemo(() => {
+    const regex = /!\[.*?\]\((.*?)\)/g
+    const result: string[] = []
+    let match
+    while ((match = regex.exec(content)) !== null) {
+      result.push(match[1])
+    }
+    return result
+  }, [content])
+}
 
 /* ───────────────────────────────────────────────
-   Blog Card
+   WeChat-style Image Grid
    ─────────────────────────────────────────────── */
-function BlogCard({
-  post,
-  index,
-  featured = false,
-}: {
-  post: Post
-  index: number
-  featured?: boolean
-}) {
-  const navigate = useNavigate()
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const imgRef = useRef<HTMLImageElement>(null)
+function ImageGrid({ images }: { images: string[] }) {
+  const count = Math.min(images.length, 9)
 
-  useEffect(() => {
-    if (imgRef.current?.complete) {
-      setImageLoaded(true)
-    }
-  }, [])
+  if (count === 0) return null
+
+  if (count === 1) {
+    return (
+      <div className="mt-2 max-w-[70%]">
+        <img
+          src={images[0]}
+          alt=""
+          className="w-full rounded-[4px] object-cover"
+          loading="lazy"
+        />
+      </div>
+    )
+  }
+
+  if (count === 2) {
+    return (
+      <div className="mt-2 grid grid-cols-2 gap-1 max-w-[70%]">
+        {images.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt=""
+            className="w-full aspect-square rounded-[4px] object-cover"
+            loading="lazy"
+          />
+        ))}
+      </div>
+    )
+  }
+
+  if (count === 3) {
+    return (
+      <div className="mt-2 flex gap-1 max-w-[70%]">
+        <img
+          src={images[0]}
+          alt=""
+          className="w-[66%] aspect-square rounded-[4px] object-cover"
+          loading="lazy"
+        />
+        <div className="flex flex-col gap-1 w-[34%]">
+          <img
+            src={images[1]}
+            alt=""
+            className="w-full aspect-square rounded-[4px] object-cover"
+            loading="lazy"
+          />
+          <img
+            src={images[2]}
+            alt=""
+            className="w-full aspect-square rounded-[4px] object-cover"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (count === 4) {
+    return (
+      <div className="mt-2 grid grid-cols-2 gap-1 max-w-[60%]">
+        {images.slice(0, 4).map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt=""
+            className="w-full aspect-square rounded-[4px] object-cover"
+            loading="lazy"
+          />
+        ))}
+      </div>
+    )
+  }
+
+  // 5-9 images: 3x3 grid
+  return (
+    <div className="mt-2 grid grid-cols-3 gap-1 max-w-[70%]">
+      {images.slice(0, 9).map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt=""
+          className="w-full aspect-square rounded-[4px] object-cover"
+          loading="lazy"
+        />
+      ))}
+    </div>
+  )
+}
+
+/* ───────────────────────────────────────────────
+   Moment Card (朋友圈动态)
+   ─────────────────────────────────────────────── */
+function MomentCard({ post, index }: { post: Post; index: number }) {
+  const navigate = useNavigate()
+  const images = useExtractImages(post.content)
 
   return (
     <motion.article
-      layout
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
       transition={{
-        duration: 0.6,
-        delay: index * 0.08,
+        duration: 0.4,
+        delay: index * 0.05,
         ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
       }}
-      className={`group cursor-pointer ${
-        featured ? 'md:col-span-2' : ''
-      }`}
+      className="flex gap-3 px-4 py-4 bg-white dark:bg-[#111]"
       onClick={() => navigate(`/blog/${post.slug}`)}
     >
-      <div className="bg-Linen/70 border border-Sand rounded-xl overflow-hidden shadow-soft hover:shadow-medium hover:-translate-y-[3px] transition-all duration-300 ease-in-out">
-        <div className="relative overflow-hidden aspect-[16/10] bg-Linen dark:bg-white/5">
-          {/* Blur placeholder */}
-          <div
-            className={`absolute inset-0 bg-Linen dark:bg-white/5 transition-opacity duration-500 ${
-              imageLoaded ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            <div className="w-full h-full bg-gradient-to-br from-Linen via-Sand/20 to-Linen dark:from-white/5 dark:via-white/10 dark:to-white/5 animate-pulse" />
-          </div>
-          <img
-            ref={imgRef}
-            src={`/blog-thumb-${(index % 6) + 1}.jpg`}
-            alt={post.title}
-            className={`w-full h-full object-cover transition-all duration-500 ease ${
-              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105 blur-sm'
-            } group-hover:scale-[1.04]`}
-            loading="lazy"
-            onLoad={() => setImageLoaded(true)}
-          />
+      {/* Avatar */}
+      <div className="shrink-0">
+        <div className="w-10 h-10 rounded-[4px] bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-sm font-bold">
+          J
+        </div>
+      </div>
 
-          {/* Overlay on featured cards */}
-          {featured && (
-            <div className="absolute inset-0 bg-gradient-to-t from-Ink/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          )}
+      {/* Content */}
+      <div className="flex-1 min-w-0 cursor-pointer">
+        {/* Nickname */}
+        <div className="font-semibold text-[0.9375rem] text-[#576b95] dark:text-[#7d90a9]">
+          Jasper
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {/* Category badge */}
-          <span className="inline-block px-3 py-1 rounded-full text-[0.8125rem] font-medium tracking-[0.04em] text-Sage bg-Sage/10 mb-3">
-            {post.category}
-          </span>
+        {/* Text */}
+        <p className="mt-1 text-[0.9375rem] leading-[1.6] text-Ink dark:text-white/90 whitespace-pre-wrap">
+          {post.excerpt}
+        </p>
 
-          {/* Title */}
-          <h4 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink line-clamp-2 group-hover:text-Amber transition-colors duration-300">
-            {post.title}
-          </h4>
+        {/* Images */}
+        <ImageGrid images={images} />
 
-          {/* Excerpt */}
-          <p className="mt-2 text-[0.9375rem] leading-[1.65] text-Slate line-clamp-3">
-            {post.excerpt}
-          </p>
-
-          {/* Footer */}
-          <div className="flex justify-between items-center mt-4 pt-4 border-t border-Sand">
-            <div className="flex items-center gap-2 text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-              <span>{post.date}</span>
-              <span>·</span>
-              <span>{post.readingTime}</span>
-            </div>
-            <ArrowRight
-              size={18}
-              className="text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-1 group-hover:translate-x-0"
-            />
+        {/* Attachments hint */}
+        {post.attachments && post.attachments.length > 0 && (
+          <div className="mt-2 text-[0.75rem] text-[#576b95] dark:text-[#7d90a9] flex items-center gap-1">
+            <span>📎</span>
+            <span>{post.attachments.length}个附件</span>
           </div>
+        )}
+
+        {/* Footer row */}
+        <div className="mt-2 flex items-center justify-between">
+          <div className="text-[0.75rem] text-Slate/60 dark:text-white/40">
+            {post.date}
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              // TODO: show action sheet (delete / copy link)
+            }}
+            className="text-[0.75rem] text-Slate/40 dark:text-white/30 hover:text-Slate dark:hover:text-white/60 px-2 py-1"
+          >
+            ⋯
+          </button>
         </div>
       </div>
     </motion.article>
@@ -119,267 +190,111 @@ function BlogCard({
    Empty State
    ─────────────────────────────────────────────── */
 function EmptyState() {
-  const { t } = useLang()
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="col-span-full flex flex-col items-center py-24"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="flex flex-col items-center py-20 text-center px-6"
     >
-      <FileSearch size={48} className="text-Sand mb-4" />
-      <h4 className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink mb-2">
-        {t('blog.noArticles')}
-      </h4>
-      <p className="text-[0.9375rem] leading-[1.65] text-Slate">
-        {t('blog.noArticlesDesc')}
+      <div className="w-16 h-16 rounded-full bg-Linen dark:bg-white/5 flex items-center justify-center mb-4">
+        <span className="text-2xl">📷</span>
+      </div>
+      <p className="text-[0.9375rem] text-Slate dark:text-white/50">
+        还没有动态
+      </p>
+      <p className="text-[0.8125rem] text-Slate/60 dark:text-white/30 mt-1">
+        点击右下角按钮发布第一条
       </p>
     </motion.div>
   )
 }
 
 /* ───────────────────────────────────────────────
-   Blog Listing Page
+   Moments Feed Page (朋友圈)
    ─────────────────────────────────────────────── */
 export default function Blog() {
-  const { t } = useLang()
   const navigate = useNavigate()
   const { isLoggedIn } = useAuth()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState('All')
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
-  const [visibleCount, setVisibleCount] = useState(6)
-  const [isSticky, setIsSticky] = useState(false)
-  const [obsidianSynced, setObsidianSynced] = useState(false)
-  const filterRef = useRef<HTMLDivElement>(null)
+  const [visibleCount, setVisibleCount] = useState(8)
 
-  // Sync Obsidian posts on mount
-  useEffect(() => {
-    syncObsidianPosts().then(() => setObsidianSynced(true))
+  const allMoments = useMemo(() => {
+    return [...getPostsByCategory('All')].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
   }, [])
 
-  // Filter + search
-  const filteredPosts = useMemo(() => {
-    let result =
-      searchQuery.trim() && activeCategory === 'All'
-        ? searchPosts(searchQuery)
-        : getPostsByCategory(activeCategory)
-
-    if (searchQuery.trim() && activeCategory !== 'All') {
-      result = result.filter(
-        (p) =>
-          p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.tags.some((t) =>
-            t.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-      )
-    }
-
-    if (sortOrder === 'newest') {
-      result = [...result].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      )
-    } else {
-      result = [...result].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      )
-    }
-
-    return result
-  }, [searchQuery, activeCategory, sortOrder, obsidianSynced])
-
-  const visiblePosts = filteredPosts.slice(0, visibleCount)
-  const hasMore = visibleCount < filteredPosts.length
-
-  // Reset visible count when filter changes
-  useEffect(() => {
-    setVisibleCount(6)
-  }, [searchQuery, activeCategory, sortOrder])
-
-  // Sticky filter bar detection
-  useEffect(() => {
-    const handleScroll = () => {
-      if (filterRef.current) {
-        const rect = filterRef.current.getBoundingClientRect()
-        setIsSticky(rect.top <= 64)
-      }
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const loadMore = () => {
-    setVisibleCount((prev) => prev + 3)
-  }
+  const visibleMoments = allMoments.slice(0, visibleCount)
+  const hasMore = visibleCount < allMoments.length
 
   return (
-    <div className="bg-Parchment">
+    <div className="min-h-screen bg-[#ededed] dark:bg-[#111]">
       <PageSEO
-        title="Blog"
-        description="Thoughts on code, design, and slow programming. A digital garden of ideas connected through wikilinks."
+        title="朋友圈"
+        description="记录生活中的每一个瞬间"
         path="/blog"
       />
-      {/* ── Hero ── */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-            }}
-            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink dark:text-white"
-          >
-            {t('blog.garden')}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.3,
-              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-            }}
-            className="mt-4 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
-          >
-            {t('blog.gardenDesc')}
-          </motion.p>
+      {/* ── Cover + Profile Header ── */}
+      <div className="relative">
+        {/* Cover Image */}
+        <div className="h-[280px] w-full bg-gradient-to-b from-[#2c3e50] to-[#4a6741] dark:from-[#1a1a2e] dark:to-[#16213e]" />
 
-          {/* Search */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.5,
-              ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-            }}
-            className="mt-8 max-w-md mx-auto relative"
-          >
-            <Search
-              size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-Ink/50 dark:text-white"
-            />
-            <input
-              type="text"
-              placeholder={t('blog.searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-Ink/10 backdrop-blur-md border border-Ink/20 rounded-full py-3 pl-11 pr-5 text-Ink placeholder:text-Ink/60 focus:outline-none focus:border-Ink/40 focus:bg-Ink/15 focus:shadow-[0_0_0_3px_rgba(196,120,58,0.25)] transition-all duration-300 font-body dark:bg-white/15 dark:border-white/20 dark:text-white dark:placeholder:text-white/60 dark:focus:border-white/40 dark:focus:bg-white/20"
-            />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Filter Bar ── */}
-      <div
-        ref={filterRef}
-        className={`sticky top-16 z-40 transition-all duration-300 ${
-          isSticky
-            ? 'bg-Parchment/90 backdrop-blur-xl border-b border-Sand dark:bg-Graphite/90 dark:border-white/10'
-            : 'bg-Parchment dark:bg-Graphite'
-        }`}
-      >
-        <div className="max-w-6xl mx-auto px-6 md:px-12 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          {/* Category Tags */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
-            {CATEGORIES.map((cat) => {
-              const isActive = activeCategory === cat
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`relative px-[14px] py-[6px] rounded-full text-[0.8125rem] font-medium tracking-[0.04em] whitespace-nowrap cursor-pointer transition-all duration-200 ${
-                    isActive
-                      ? 'text-Parchment'
-                      : 'text-Slate bg-Linen border border-Sand hover:border-Amber hover:text-Ink'
-                  }`}
-                >
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeCategory"
-                      className="absolute inset-0 bg-Amber rounded-full"
-                      transition={{
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  <span className="relative z-10">{cat === 'All' ? t('blog.allCategories') : cat}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Right side: sort + count + new post */}
-          <div className="flex items-center gap-4 shrink-0">
-            {isLoggedIn && (
-              <button
-                onClick={() => navigate('/blog/new')}
-                className="flex items-center gap-1.5 bg-Amber text-Parchment font-ui text-[0.8125rem] font-semibold px-4 py-[6px] rounded-lg hover:bg-[#B06A2F] transition-colors"
-              >
-                <Plus size={14} />
-                {t('blog.newPost')}
-              </button>
-            )}
-            <span className="text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
-              {filteredPosts.length} {t('blog.articles')}
-            </span>
-
-            {/* Sort dropdown */}
-            <select
-              value={sortOrder}
-              onChange={(e) =>
-                setSortOrder(e.target.value as 'newest' | 'oldest')
-              }
-              className="hidden md:block bg-Linen border border-Sand rounded-lg px-3 py-[6px] text-[0.8125rem] font-medium text-Slate focus:outline-none focus:border-Amber cursor-pointer"
-            >
-              <option value="newest">{t('blog.newestFirst')}</option>
-              <option value="oldest">{t('blog.oldestFirst')}</option>
-            </select>
+        {/* Profile Info (overlapping cover bottom) */}
+        <div className="max-w-2xl mx-auto px-4 relative">
+          <div className="flex items-end justify-end gap-3 -mt-10 pb-4">
+            <div className="text-right pb-2">
+              <h1 className="text-white text-[1.125rem] font-medium drop-shadow-md">
+                Jasper
+              </h1>
+            </div>
+            <div className="w-20 h-20 rounded-[4px] bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-2xl font-bold border-4 border-white dark:border-[#111] shadow-lg shrink-0">
+              J
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Blog Grid ── */}
-      <section className="py-12 md:py-16 pb-24">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-          >
-            <AnimatePresence mode="popLayout">
-              {visiblePosts.length > 0 ? (
-                visiblePosts.map((post, i) => (
-                  <BlogCard
-                    key={post.slug}
-                    post={post}
-                    index={i}
-                    featured={i === 0 && activeCategory === 'All' && !searchQuery}
-                  />
-                ))
-              ) : (
-                <EmptyState key="empty" />
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Load More */}
-          {hasMore && (
-            <div className="flex justify-center mt-12">
-              <button
-                onClick={loadMore}
-                className="px-7 py-3 border-[1.5px] border-Ink rounded-md font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] text-Ink bg-transparent hover:bg-Ink hover:text-Parchment hover:-translate-y-[1px] transition-all duration-300 ease-in-out dark:border-white/50 dark:text-white dark:hover:bg-white dark:hover:text-Graphite"
-              >
-                {t('blog.loadMore')}
-              </button>
+      {/* ── Moments Feed ── */}
+      <div className="max-w-2xl mx-auto mt-2">
+        <AnimatePresence mode="popLayout">
+          {visibleMoments.length > 0 ? (
+            <div className="flex flex-col">
+              {visibleMoments.map((post, i) => (
+                <div key={post.slug}>
+                  <MomentCard post={post} index={i} />
+                  {i < visibleMoments.length - 1 && (
+                    <div className="h-[1px] bg-[#e5e5e5] dark:bg-white/5 mx-4" />
+                  )}
+                </div>
+              ))}
             </div>
+          ) : (
+            <EmptyState key="empty" />
           )}
-        </div>
-      </section>
+        </AnimatePresence>
+
+        {/* Load More */}
+        {hasMore && (
+          <div className="flex justify-center py-6">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 8)}
+              className="text-[0.8125rem] text-Slate/60 dark:text-white/40 hover:text-Slate dark:hover:text-white/60 transition-colors"
+            >
+              加载更多
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── FAB (发碎片) ── */}
+      {isLoggedIn && (
+        <button
+          onClick={() => navigate('/blog/new')}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-[#07c160] text-white shadow-lg flex items-center justify-center hover:bg-[#06ad56] active:scale-95 transition-all z-50"
+        >
+          <Plus size={24} strokeWidth={2.5} />
+        </button>
+      )}
     </div>
   )
 }

@@ -86,7 +86,9 @@ async function scanMarkdownFile(
     // Use fileName (without .md) as slug for consistency with file tree
     const slug = (parsed.data.slug as string) || slugify(fileName)
     const date = (parsed.data.date as string) || new Date().toISOString().split('T')[0]
-    const category = (parsed.data.category as string) || 'Uncategorized'
+    // Derive category from parent folder name (like Obsidian without explicit frontmatter)
+    const parentDir = path.basename(path.dirname(relativePath))
+    const category = parentDir && parentDir !== '.' ? parentDir : 'Uncategorized'
     const tags = Array.isArray(parsed.data.tags)
       ? parsed.data.tags.map((t) => String(t))
       : []
