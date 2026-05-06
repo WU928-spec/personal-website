@@ -835,7 +835,7 @@ function formatRelativeDate(dateStr: string): string {
 function GitHubSnapshotSection() {
   const { t } = useLang()
   const { isLoggedIn, isEditMode } = useAuth()
-  const contributions = useRef(generateContributionGrid())
+  const [contributions, setContributions] = useState<number[][]>(() => generateContributionGrid())
   const [github, setGithub] = useState<GitHubData>(() => loadGitHub())
   const [isEditing, setIsEditing] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -867,6 +867,31 @@ function GitHubSnapshotSection() {
       })
       .catch(() => {
         // fallback to local data
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  /* Fetch real contribution graph */
+  useEffect(() => {
+    let cancelled = false
+    fetch('https://github-contributions-api.deno.dev/WU928-spec.json')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data || !Array.isArray(data.contributions) || cancelled) return
+        const levelMap: Record<string, number> = {
+          NONE: 0,
+          FIRST_QUARTILE: 1,
+          SECOND_QUARTILE: 2,
+          THIRD_QUARTILE: 3,
+          FOURTH_QUARTILE: 3,
+        }
+        const grid: number[][] = data.contributions.map((week: { contributionLevel: string }[]) =>
+          week.map((day) => levelMap[day.contributionLevel] ?? 0)
+        )
+        setContributions(grid)
+      })
+      .catch(() => {
+        // fallback to mock data
       })
     return () => { cancelled = true }
   }, [])
@@ -954,7 +979,7 @@ function GitHubSnapshotSection() {
               {t('home.contributionActivity')}
             </p>
             <div className="flex gap-[3px] overflow-x-auto pb-2">
-              {contributions.current.map((week, wi) => (
+              {contributions.map((week, wi) => (
                 <div key={wi} className="flex flex-col gap-[3px]">
                   {week.map((level, di) => (
                     <motion.div
