@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { Moment, MomentAttachment } from '@/types/moment'
+import type { Moment, Comment } from '@/types/moment'
 
 const STORAGE_KEY = 'moments_v1'
 const API_BASE = 'http://localhost:2667'

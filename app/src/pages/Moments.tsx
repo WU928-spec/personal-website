@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { Camera } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
 import MomentCard from '@/components/MomentCard'

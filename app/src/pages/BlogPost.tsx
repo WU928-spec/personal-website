@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -10,7 +10,6 @@ import {
 import {
   getPostBySlug,
   getAllSlugs,
-  type Post,
 } from '@/data/posts.ts'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 import PageSEO from '@/components/PageSEO'

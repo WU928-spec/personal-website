@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Image, X, MapPin, Send, Paperclip, BookOpen } from 'lucide-react'
 import type { Moment, MomentAttachment } from '@/types/moment'

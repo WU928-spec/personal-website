@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, MessageCircle, MapPin, Trash2, Paperclip, BookOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import type { Moment } from '@/types/moment'
+import type { Moment, MomentAttachment } from '@/types/moment'
 import ImageGrid from './ImageGrid'
 import { formatRelativeTime } from '@/hooks/useMoments'
 
@@ -37,7 +37,7 @@ export default function MomentCard({
     setShowCommentInput(false)
   }
 
-  const handleAttachmentClick = (att: Moment['attachments'][number]) => {
+  const handleAttachmentClick = (att: MomentAttachment) => {
     if (att.type === 'md-link') {
       navigate(`/obsidian?note=${encodeURIComponent(att.data)}`)
     } else {

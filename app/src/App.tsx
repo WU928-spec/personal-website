@@ -5,7 +5,6 @@ import Layout from './components/Layout.tsx'
 import Home from './pages/Home.tsx'
 import Login from './pages/Login.tsx'
 import Profile from './pages/Profile.tsx'
-import NewPost from './pages/NewPost.tsx'
 import NotFound from './pages/NotFound.tsx'
 
 const Projects = lazy(() => import('./pages/Projects.tsx'))
