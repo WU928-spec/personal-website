@@ -11,7 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const { login } = useAuth()
+  const { login, user } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -116,7 +116,7 @@ export default function Login() {
         {/* Hint */}
         <div className="mt-8 p-4 bg-Linen rounded-xl border border-Sand">
           <p className="text-[0.8125rem] font-medium text-Slate mb-1">{t('login.testAccount')}</p>
-          <p className="text-[0.8125rem] text-Slate/70 font-mono">{t('login.username')}：WU928-spec</p>
+          <p className="text-[0.8125rem] text-Slate/70 font-mono">{t('login.username')}：{user?.username || 'WU928-spec'}</p>
           <p className="text-[0.8125rem] text-Slate/70 font-mono">{t('login.password')}：vibecoding2025</p>
         </div>
       </motion.div>
