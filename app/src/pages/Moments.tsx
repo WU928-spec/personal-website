@@ -43,7 +43,7 @@ export default function Moments() {
           <div className="flex items-end justify-end gap-3 -mt-10 pb-4">
             <div className="text-right pb-2">
               <h1 className="text-white text-[1.125rem] font-medium drop-shadow-md">
-                Jasper
+                {displayName}
               </h1>
             </div>
             <img

@@ -24,7 +24,14 @@
     "likes": [
       "WU928-spec"
     ],
-    "comments": []
+    "comments": [
+      {
+        "id": "c-mou0978t",
+        "name": "有点冷",
+        "text": "有点冷",
+        "time": "2026-05-06T12:00:00.749Z"
+      }
+    ]
   },
   {
     "content": "你好",
