@@ -8,7 +8,7 @@ import { loadAbout, saveAbout, type AboutData } from '@/data/about'
 import { loadHero, saveHero, type HeroData } from '@/data/site'
 import { loadSkills, saveSkills, type SkillCategory } from '@/data/site'
 import { loadBlogPreview, saveBlogPreview, type BlogPreviewPost } from '@/data/site'
-import { loadGitHub, saveGitHub, type GitHubData, type GitHubRepo } from '@/data/site'
+import { loadGitHub, saveGitHub, type GitHubData, type GitHubRepo, type GitHubStats } from '@/data/site'
 import PageSEO from '@/components/PageSEO'
 
 /* ------------------------------------------------------------------ */
@@ -798,6 +798,40 @@ function generateContributionGrid(): number[][] {
   return grid
 }
 
+/* GitHub language color map */
+const LANG_COLORS: Record<string, string> = {
+  TypeScript: '#3178c6',
+  JavaScript: '#f1e05a',
+  Python: '#3572A5',
+  Go: '#00ADD8',
+  Rust: '#dea584',
+  Java: '#b07219',
+  'C++': '#f34b7d',
+  C: '#555555',
+  HTML: '#e34c26',
+  CSS: '#563d7c',
+  Shell: '#89e051',
+  Vue: '#41b883',
+  React: '#61dafb',
+  Swift: '#ffac45',
+  Kotlin: '#A97BFF',
+  Ruby: '#701516',
+  PHP: '#4F5D95',
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  if (days < 7) return `${days} days ago`
+  if (days < 30) return `${Math.floor(days / 7)} weeks ago`
+  if (days < 365) return `${Math.floor(days / 30)} months ago`
+  return `${Math.floor(days / 365)} years ago`
+}
+
 function GitHubSnapshotSection() {
   const { t } = useLang()
   const { isLoggedIn, isEditMode } = useAuth()
@@ -807,6 +841,35 @@ function GitHubSnapshotSection() {
   const [saved, setSaved] = useState(false)
   const [editRepos, setEditRepos] = useState(github.repos)
   const [editStats, setEditStats] = useState(github.stats)
+
+  /* Fetch real GitHub data */
+  useEffect(() => {
+    let cancelled = false
+    fetch('https://api.github.com/users/WU928-spec/repos?sort=updated&per_page=4')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data || !Array.isArray(data) || cancelled) return
+        const repos: GitHubRepo[] = data.map((r: Record<string, unknown>) => ({
+          name: String(r.name || ''),
+          description: String(r.description || ''),
+          language: String(r.language || 'Other'),
+          languageColor: LANG_COLORS[String(r.language || '')] || '#8b949e',
+          stars: Number(r.stargazers_count || 0),
+          forks: Number(r.forks_count || 0),
+          updated: formatRelativeDate(String(r.updated_at || '')),
+        }))
+        const totalStars = repos.reduce((s, r) => s + r.stars, 0)
+        const stats: GitHubStats = { repos: data.length, stars: totalStars, streak: 0 }
+        const updated = { repos, stats }
+        setGithub(updated)
+        setEditRepos(repos)
+        setEditStats(stats)
+      })
+      .catch(() => {
+        // fallback to local data
+      })
+    return () => { cancelled = true }
+  }, [])
 
   const contributionColors = [
     'rgba(247,244,239,0.05)',
