@@ -11,6 +11,7 @@ interface Props {
   index: number
   currentUser?: string
   avatarUrl?: string
+  showDelete?: boolean
   onLike: (id: string, name: string) => void
   onComment: (id: string, name: string, text: string) => void
   onDelete: (id: string) => void
@@ -21,6 +22,7 @@ export default function MomentCard({
   index,
   currentUser = 'Jasper',
   avatarUrl,
+  showDelete = true,
   onLike,
   onComment,
   onDelete,
@@ -159,17 +161,19 @@ export default function MomentCard({
           </div>
 
           {/* Delete */}
-          <button
-            onClick={() => {
-              if (confirm('确定删除这条动态吗？')) {
-                onDelete(moment.id)
-              }
-            }}
-            className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors"
-            title="删除"
-          >
-            <Trash2 size={16} />
-          </button>
+          {showDelete && (
+            <button
+              onClick={() => {
+                if (confirm('确定删除这条动态吗？')) {
+                  onDelete(moment.id)
+                }
+              }}
+              className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors"
+              title="删除"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
         </div>
 
         {/* Likes & Comments area */}

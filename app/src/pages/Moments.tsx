@@ -7,7 +7,7 @@ import { useMoments } from '@/hooks/useMoments'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function Moments() {
-  const { user } = useAuth()
+  const { user, isLoggedIn } = useAuth()
   const avatarUrl = user?.avatar || '/avatar.jpg'
   const displayName = user?.username || 'Jasper'
   const {
@@ -55,10 +55,12 @@ export default function Moments() {
         </div>
       </div>
 
-      {/* ── Publisher ── */}
-      <div className="max-w-2xl mx-auto mt-2">
-        <MomentUploader onSubmit={addMoment} avatarUrl={avatarUrl} userName={displayName} />
-      </div>
+      {/* ── Publisher (logged-in only) ── */}
+      {isLoggedIn && (
+        <div className="max-w-2xl mx-auto mt-2">
+          <MomentUploader onSubmit={addMoment} avatarUrl={avatarUrl} userName={displayName} />
+        </div>
+      )}
 
       {/* ── Feed ── */}
       <div className="max-w-2xl mx-auto mt-2">
@@ -86,6 +88,7 @@ export default function Moments() {
                     index={i}
                     currentUser={displayName}
                     avatarUrl={avatarUrl}
+                    showDelete={isLoggedIn}
                     onLike={toggleLike}
                     onComment={addComment}
                     onDelete={deleteMoment}
