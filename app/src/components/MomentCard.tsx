@@ -10,6 +10,7 @@ interface Props {
   moment: Moment
   index: number
   currentUser?: string
+  avatarUrl?: string
   onLike: (id: string, name: string) => void
   onComment: (id: string, name: string, text: string) => void
   onDelete: (id: string) => void
@@ -19,6 +20,7 @@ export default function MomentCard({
   moment,
   index,
   currentUser = 'Jasper',
+  avatarUrl,
   onLike,
   onComment,
   onDelete,
@@ -63,16 +65,24 @@ export default function MomentCard({
     >
       {/* Avatar */}
       <div className="shrink-0">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-base font-bold">
-          J
-        </div>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={currentUser}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-base font-bold">
+            {currentUser[0]}
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         {/* Nickname */}
         <div className="font-semibold text-[0.9375rem] text-Amber">
-          Jasper
+          {currentUser}
         </div>
 
         {/* Time */}
