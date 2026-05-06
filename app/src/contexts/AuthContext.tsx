@@ -86,14 +86,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(localStorage.getItem('vibecoding_logged_in') === 'true')
   }, [])
 
-  const login = (username: string, password: string): boolean => {
-    if (username === DEFAULT_USER.username && password === LOGIN_PASSWORD) {
+  const login = (input: string, password: string): boolean => {
+    // Accept either the default username or the current nickname
+    const savedRaw = localStorage.getItem('vibecoding_user')
+    let currentNickname = DEFAULT_USER.username
+    if (savedRaw) {
+      try { currentNickname = JSON.parse(savedRaw).username || DEFAULT_USER.username } catch {}
+    }
+    const isValidUser = input === DEFAULT_USER.username || input === currentNickname
+    if (isValidUser && password === LOGIN_PASSWORD) {
       const savedAvatar = localStorage.getItem('vibecoding_avatar') || DEFAULT_USER.avatar
-      const newUser: User = { userId: username, username, avatar: savedAvatar }
+      const newUser: User = { userId: DEFAULT_USER.userId, username: currentNickname, avatar: savedAvatar }
       setUser(newUser)
       setIsLoggedIn(true)
       setRegistry((prev) => {
-        const next = { ...prev, [username]: { username, avatar: savedAvatar } }
+        const next = { ...prev, [DEFAULT_USER.userId]: { username: currentNickname, avatar: savedAvatar } }
         saveRegistry(next)
         return next
       })
