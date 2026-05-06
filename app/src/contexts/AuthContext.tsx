@@ -13,6 +13,7 @@ interface AuthContextType {
   login: (username: string, password: string) => boolean
   logout: () => void
   updateAvatar: (avatar: string) => void
+  updateUsername: (username: string) => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -61,6 +62,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const updateUsername = (username: string) => {
+    if (user) {
+      const updated = { ...user, username }
+      setUser(updated)
+      localStorage.setItem('vibecoding_user', JSON.stringify(updated))
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -71,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         updateAvatar,
+        updateUsername,
       }}
     >
       {children}

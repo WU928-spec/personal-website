@@ -4,7 +4,9 @@
     "images": [],
     "id": "moment-motznx4k",
     "createdAt": "2026-05-06T11:43:27.860Z",
-    "likes": [],
+    "likes": [
+      "WU928-spec"
+    ],
     "comments": []
   },
   {
@@ -19,7 +21,9 @@
     ],
     "id": "moment-motwj4eg",
     "createdAt": "2026-05-06T10:15:45.160Z",
-    "likes": [],
+    "likes": [
+      "WU928-spec"
+    ],
     "comments": []
   },
   {
@@ -30,7 +34,8 @@
     "id": "moment-motvlyse",
     "createdAt": "2026-05-06T09:49:58.238Z",
     "likes": [
-      "Jasper"
+      "Jasper",
+      "WU928-spec"
     ],
     "comments": []
   }

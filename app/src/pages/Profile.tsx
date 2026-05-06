@@ -18,12 +18,29 @@ const iconMap: Record<string, React.ElementType> = {
 }
 
 export default function Profile() {
-  const { user, logout, updateAvatar } = useAuth()
+  const { user, logout, updateAvatar, updateUsername } = useAuth()
   const { t, lang } = useLang()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [previewAvatar, setPreviewAvatar] = useState(user?.avatar || localStorage.getItem('vibecoding_avatar') || '/avatar.jpg')
   const [saved, setSaved] = useState(false)
+
+  /* Username edit */
+  const [isEditingUsername, setIsEditingUsername] = useState(false)
+  const [editUsername, setEditUsername] = useState(user?.username || '')
+  const [savedUsername, setSavedUsername] = useState(false)
+
+  const handleSaveUsername = () => {
+    updateUsername(editUsername.trim() || user?.username || '')
+    setIsEditingUsername(false)
+    setSavedUsername(true)
+    setTimeout(() => setSavedUsername(false), 2000)
+  }
+
+  const handleCancelUsername = () => {
+    setEditUsername(user?.username || '')
+    setIsEditingUsername(false)
+  }
 
   /* About data */
   const [about, setAbout] = useState<AboutData>(() => loadAbout(lang))
@@ -308,17 +325,42 @@ export default function Profile() {
 
           {/* Account Info */}
           <div className="bg-Linen rounded-xl border border-Sand p-8 mb-6">
-            <h2 className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-6">
-              {t('profile.accountInfo')}
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage">
+                {t('profile.accountInfo')}
+              </h2>
+              {!isEditingUsername ? (
+                <button
+                  onClick={() => setIsEditingUsername(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Ink/10 border border-Ink/20 text-Ink text-[0.8125rem] font-medium hover:bg-Ink/15 transition-colors"
+                >
+                  <Pencil size={14} />
+                  {t('post.edit')}
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {savedUsername && <span className="text-[0.8125rem] text-Sage">{t('post.saved')}</span>}
+                  <button onClick={handleSaveUsername} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={14} />{t('post.save')}</button>
+                  <button onClick={handleCancelUsername} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Linen border border-Sand text-Slate text-[0.8125rem] font-medium hover:border-Amber hover:text-Amber transition-colors"><X size={14} />{t('post.cancel')}</button>
+                </div>
+              )}
+            </div>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-Mist flex items-center justify-center">
                   <User size={18} className="text-Slate" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-[0.8125rem] text-Slate font-medium">{t('profile.username')}</p>
-                  <p className="text-Ink font-body">{user.username}</p>
+                  {isEditingUsername ? (
+                    <input
+                      value={editUsername}
+                      onChange={(e) => setEditUsername(e.target.value)}
+                      className="w-full bg-transparent font-body text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-0.5"
+                    />
+                  ) : (
+                    <p className="text-Ink font-body">{user.username}</p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-4">

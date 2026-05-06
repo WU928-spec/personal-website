@@ -112,7 +112,7 @@ const translations = {
     login: {
       welcomeBack: '欢迎回来',
       loginDesc: '登录后可编辑头像和文章内容',
-      username: '用户名',
+      username: '昵称',
       password: '密码',
       submit: '登录',
       testAccount: '测试账号',
@@ -313,7 +313,7 @@ const translations = {
     login: {
       welcomeBack: 'Welcome Back',
       loginDesc: 'Sign in to edit your avatar and blog posts',
-      username: 'Username',
+      username: 'Nickname',
       password: 'Password',
       submit: 'Sign In',
       testAccount: 'Test Account',
