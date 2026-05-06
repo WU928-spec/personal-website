@@ -348,6 +348,15 @@ export default function Profile() {
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-Mist flex items-center justify-center">
+                  <Mail size={18} className="text-Slate" />
+                </div>
+                <div>
+                  <p className="text-[0.8125rem] text-Slate font-medium">{t('profile.email')}</p>
+                  <p className="text-Ink font-body">{user.userId}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-Mist flex items-center justify-center">
                   <User size={18} className="text-Slate" />
                 </div>
                 <div className="flex-1">
@@ -361,15 +370,6 @@ export default function Profile() {
                   ) : (
                     <p className="text-Ink font-body">{user.username}</p>
                   )}
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-Mist flex items-center justify-center">
-                  <Mail size={18} className="text-Slate" />
-                </div>
-                <div>
-                  <p className="text-[0.8125rem] text-Slate font-medium">{t('profile.email')}</p>
-                  <p className="text-Ink font-body">15258743752@163.com</p>
                 </div>
               </div>
             </div>

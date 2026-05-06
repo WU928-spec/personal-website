@@ -60,9 +60,17 @@ const MOCK_MOMENTS: Moment[] = [
 
 /* ── Helpers ── */
 function migrateMoment(m: Moment): Moment {
-  // Migrate old data without authorId
+  // Migrate old data without authorId (old default was 'WU928-spec', now email)
   if (!m.authorId) {
-    m = { ...m, authorId: 'WU928-spec' }
+    m = { ...m, authorId: '15258743752@163.com' }
+  }
+  // Migrate old authorId from previous username to email
+  if (m.authorId === 'WU928-spec') {
+    m = { ...m, authorId: '15258743752@163.com' }
+  }
+  // Migrate old likes from previous username to email
+  if (m.likes) {
+    m.likes = m.likes.map((uid) => (uid === 'WU928-spec' ? '15258743752@163.com' : uid))
   }
   // Migrate old comments without userId
   if (m.comments) {

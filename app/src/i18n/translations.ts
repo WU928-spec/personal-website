@@ -112,14 +112,14 @@ const translations = {
     login: {
       welcomeBack: '欢迎回来',
       loginDesc: '登录后可编辑头像和文章内容',
-      username: '昵称',
+      email: '邮箱',
       password: '密码',
       submit: '登录',
       testAccount: '测试账号',
-      errorEmpty: '请输入用户名和密码',
-      errorInvalid: '用户名或密码错误',
+      errorEmpty: '请输入邮箱和密码',
+      errorInvalid: '邮箱或密码错误',
       passwordPlaceholder: '输入密码',
-      usernamePlaceholder: '输入用户名',
+      emailPlaceholder: '输入邮箱',
     },
     // Profile
     profile: {
@@ -313,14 +313,14 @@ const translations = {
     login: {
       welcomeBack: 'Welcome Back',
       loginDesc: 'Sign in to edit your avatar and blog posts',
-      username: 'Nickname',
+      email: 'Email',
       password: 'Password',
       submit: 'Sign In',
       testAccount: 'Test Account',
-      errorEmpty: 'Please enter username and password',
-      errorInvalid: 'Invalid username or password',
+      errorEmpty: 'Please enter email and password',
+      errorInvalid: 'Invalid email or password',
       passwordPlaceholder: 'Enter password',
-      usernamePlaceholder: 'Enter username',
+      emailPlaceholder: 'Enter email',
     },
     // Profile
     profile: {

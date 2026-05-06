@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 
 export interface User {
-  userId: string
-  username: string
+  userId: string   // 邮箱，唯一且不可变
+  username: string // 昵称，可修改，仅用于显示
   avatar: string
 }
 
@@ -17,16 +17,21 @@ interface AuthContextType {
   isLoggedIn: boolean
   isEditMode: boolean
   setEditMode: (v: boolean) => void
-  login: (username: string, password: string) => boolean
+  login: (email: string, password: string) => boolean
   logout: () => void
   updateAvatar: (avatar: string) => void
   updateUsername: (username: string) => void
-  getUserDisplay: (userId: string) => UserInfo
+  getUserDisplay: (userId: string | undefined) => UserInfo
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
-const DEFAULT_USER: User = { userId: 'WU928-spec', username: 'WU928-spec', avatar: '/avatar.jpg' }
+// 邮箱作为唯一身份标识，不可修改
+const DEFAULT_USER: User = {
+  userId: '15258743752@163.com',
+  username: 'WU928-spec',
+  avatar: '/avatar.jpg',
+}
 const LOGIN_PASSWORD = 'vibecoding2025'
 
 const REGISTRY_KEY = 'vibecoding_user_registry'
@@ -61,7 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isEditMode, setEditMode] = useState(false)
   const [registry, setRegistry] = useState<Record<string, UserInfo>>(loadRegistry)
 
-  // Current effective userId
   const userId = user?.userId || getOrCreateVisitorId()
 
   useEffect(() => {
@@ -69,9 +73,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (saved) {
       try {
         let parsed = JSON.parse(saved) as User
+        // Migrate old data: previous userId was 'WU928-spec', now it's email
+        if (parsed.userId === 'WU928-spec') {
+          parsed = { ...parsed, userId: DEFAULT_USER.userId }
+        }
         // Migrate old data without userId
         if (!parsed.userId) {
-          parsed = { ...parsed, userId: parsed.username || getOrCreateVisitorId() }
+          parsed = { ...parsed, userId: DEFAULT_USER.userId }
         }
         setUser(parsed)
         setRegistry((prev) => {
@@ -86,21 +94,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(localStorage.getItem('vibecoding_logged_in') === 'true')
   }, [])
 
-  const login = (input: string, password: string): boolean => {
-    // Accept either the default username or the current nickname
-    const savedRaw = localStorage.getItem('vibecoding_user')
-    let currentNickname = DEFAULT_USER.username
-    if (savedRaw) {
-      try { currentNickname = JSON.parse(savedRaw).username || DEFAULT_USER.username } catch {}
-    }
-    const isValidUser = input === DEFAULT_USER.username || input === currentNickname
-    if (isValidUser && password === LOGIN_PASSWORD) {
+  const login = (email: string, password: string): boolean => {
+    if (email === DEFAULT_USER.userId && password === LOGIN_PASSWORD) {
       const savedAvatar = localStorage.getItem('vibecoding_avatar') || DEFAULT_USER.avatar
-      const newUser: User = { userId: DEFAULT_USER.userId, username: currentNickname, avatar: savedAvatar }
+      // Preserve existing nickname if user has one
+      const savedRaw = localStorage.getItem('vibecoding_user')
+      let currentUsername = DEFAULT_USER.username
+      if (savedRaw) {
+        try { currentUsername = JSON.parse(savedRaw).username || DEFAULT_USER.username } catch {}
+      }
+      const newUser: User = { userId: DEFAULT_USER.userId, username: currentUsername, avatar: savedAvatar }
       setUser(newUser)
       setIsLoggedIn(true)
       setRegistry((prev) => {
-        const next = { ...prev, [DEFAULT_USER.userId]: { username: currentNickname, avatar: savedAvatar } }
+        const next = { ...prev, [DEFAULT_USER.userId]: { username: currentUsername, avatar: savedAvatar } }
         saveRegistry(next)
         return next
       })

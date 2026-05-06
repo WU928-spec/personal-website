@@ -1,27 +1,27 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { LogIn, Eye, EyeOff, User, Lock } from 'lucide-react'
+import { LogIn, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
 
 export default function Login() {
   const { t } = useLang()
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const { login, user } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       setError(t('login.errorEmpty'))
       return
     }
-    const success = login(username.trim(), password)
+    const success = login(email.trim(), password)
     if (success) {
       navigate('/')
     } else {
@@ -52,18 +52,18 @@ export default function Login() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Username */}
+          {/* Email */}
           <div>
             <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
-              {t('login.username')}
+              {t('login.email')}
             </label>
             <div className="relative">
-              <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-Slate/50" />
+              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-Slate/50" />
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder={t('login.usernamePlaceholder')}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('login.emailPlaceholder')}
                 className="w-full bg-Linen border border-Sand rounded-xl py-3 pl-11 pr-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
             </div>
@@ -116,7 +116,7 @@ export default function Login() {
         {/* Hint */}
         <div className="mt-8 p-4 bg-Linen rounded-xl border border-Sand">
           <p className="text-[0.8125rem] font-medium text-Slate mb-1">{t('login.testAccount')}</p>
-          <p className="text-[0.8125rem] text-Slate/70 font-mono">{t('login.username')}：{user?.username || 'WU928-spec'}</p>
+          <p className="text-[0.8125rem] text-Slate/70 font-mono">{t('login.email')}：15258743752@163.com</p>
           <p className="text-[0.8125rem] text-Slate/70 font-mono">{t('login.password')}：vibecoding2025</p>
         </div>
       </motion.div>
