@@ -152,10 +152,10 @@ function HeroSection() {
             className="flex items-center justify-center gap-4 mt-8"
           >
             <Link
-              to="/blog"
+              to="/moments"
               className="inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] hover:shadow-amber hover:-translate-y-px transition-all duration-300"
             >
-              {t('home.readBlog')}
+              记忆碎片
             </Link>
             <Link
               to="/projects"
