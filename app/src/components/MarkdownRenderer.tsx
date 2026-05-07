@@ -470,6 +470,16 @@ function buildComponents(_existingSlugs: string[]): Components {
           </Link>
         )
       }
+      if (href?.startsWith('obsidian://') || href?.startsWith('obsidian-unresolved://')) {
+        return (
+          <a
+            href={href}
+            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200"
+          >
+            {children}
+          </a>
+        )
+      }
       return (
         <a
           href={href}

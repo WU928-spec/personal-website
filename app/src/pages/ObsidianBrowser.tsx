@@ -239,12 +239,12 @@ export default function ObsidianBrowser() {
     const el = contentRef.current
     if (!el) return
     const handler = (e: MouseEvent) => {
-      const target = (e.target as HTMLElement).closest('a[href^="obsidian:"]')
+      const target = (e.target as HTMLElement).closest('a[href^="obsidian:"], a[href^="obsidian-unresolved:"]')
       if (target) {
         e.preventDefault()
         e.stopPropagation()
         const href = target.getAttribute('href') || ''
-        const slug = decodeURIComponent(href.replace(/^obsidian:\/\//, '').replace(/^unresolved-/, ''))
+        const slug = decodeURIComponent(href.replace(/^obsidian:\/\//, '').replace(/^obsidian-unresolved:\/\//, ''))
         if (slug) handleSelectNote(slug)
       }
     }
