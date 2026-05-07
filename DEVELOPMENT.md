@@ -20,6 +20,52 @@
 
 ## 最近解决的问题
 
+### 2026-05-07: 修复 Callout `[!NOTE]` 前缀显示问题
+
+**问题描述**:
+- Callout 卡片标题中显示 `[!NOTE] 定理`，应该只显示 "定理"
+- `[!NOTE]` 前缀应该被移除
+
+**根本原因**:
+1. `react-markdown` 将 blockquote 解析为包含多个子元素的结构
+2. `[!NOTE] 定理` 文本位于第二个子元素（`child[1]`）的第一个文本节点中
+3. 该子元素还包含其他内容（换行符、数学公式等）
+4. 之前的代码只提取了文本，创建了新的 `<p>` 标签，导致数学公式无法正常渲染
+
+**解决方案** (`app/src/components/MarkdownRenderer.tsx:391-461`):
+1. 遍历 blockquote 的所有子元素，找到包含 `[!NOTE]` 的元素
+2. 克隆该元素，过滤掉第一个包含 `[!NOTE]` 的文本节点
+3. 保留其他所有子元素（`<br>`、`<span>` 数学公式等）
+4. 将修改后的元素放入 Callout 组件
+
+**关键代码**:
+```typescript
+// 克隆元素并移除 [!NOTE] 文本节点
+const filteredGrandChildren = grandChildren.filter((gc, idx) => {
+  if (idx === 0 && typeof gc === 'string' && gc.match(/^\[!\w+\]/)) {
+    return false
+  }
+  return true
+})
+
+modifiedChild = {
+  ...calloutChild,
+  props: {
+    ...childProps,
+    children: filteredGrandChildren
+  }
+}
+```
+
+**测试结果**:
+- ✅ 标题正确显示为 "定理"（不包含 `[!NOTE]`）
+- ✅ 数学公式正常渲染
+- ✅ 没有 React key 重复警告
+
+**相关 Commit**: 待提交
+
+---
+
 ### 2026-05-07: Obsidian 笔记内链接跳转功能
 
 **问题描述**:
@@ -94,14 +140,14 @@
 
 ## 已知问题
 
-- `[!NOTE]` Callout 标题中仍显示 `[!NOTE]` 前缀，需继续修复
+（无）
 
 ## 待办事项
 
 - [x] 添加笔记搜索功能
+- [x] 修复 Callout `[!NOTE]` 前缀显示问题
 - [ ] 优化移动端体验
 - [ ] 添加笔记标签过滤
-- [ ] 修复 Callout `[!NOTE]` 前缀显示问题
 
 ## 开发环境配置
 

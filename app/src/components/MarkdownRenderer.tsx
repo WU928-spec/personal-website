@@ -390,18 +390,67 @@ const CALLOUT_TYPES = ['note', 'warning', 'tip', 'info', 'danger', 'success']
 
 function Blockquote({ children }: { children: React.ReactNode }) {
   const childArray = Array.isArray(children) ? children : [children]
-  const firstText = extractText(childArray[0])
-  const match = firstText.match(/^\[!(\w+)\]\s*(.*)/)
 
-  if (match && CALLOUT_TYPES.includes(match[1].toLowerCase())) {
-    const [, type, title] = match
-    const calloutTitle =
-      title.trim() || type.charAt(0).toUpperCase() + type.slice(1)
-    const contentChildren = childArray.slice(1)
+  // Try to find the child that contains [!NOTE]
+  let calloutChildIndex = -1
+  let calloutType = ''
+  let calloutTitle = ''
+
+  for (let i = 0; i < childArray.length; i++) {
+    const text = extractText(childArray[i])
+    const match = text.match(/^\[!(\w+)\]\s*([^\n]*)/)
+
+    if (match && CALLOUT_TYPES.includes(match[1].toLowerCase())) {
+      calloutChildIndex = i
+      calloutType = match[1]
+      calloutTitle = match[2].trim() || match[1].charAt(0).toUpperCase() + match[1].slice(1)
+      break
+    }
+  }
+
+  if (calloutChildIndex >= 0) {
+    // Found a callout, now we need to remove the [!TYPE] text from the first child
+    const calloutChild = childArray[calloutChildIndex]
+
+    // Clone the child and remove the [!NOTE] text from its children
+    let modifiedChild = calloutChild
+    if (
+      calloutChild &&
+      typeof calloutChild === 'object' &&
+      'props' in calloutChild &&
+      calloutChild.props &&
+      'children' in calloutChild.props
+    ) {
+      const childProps = calloutChild.props as { children?: React.ReactNode }
+      const grandChildren = Array.isArray(childProps.children)
+        ? childProps.children
+        : [childProps.children]
+
+      // Remove the first text node that contains [!NOTE]
+      const filteredGrandChildren = grandChildren.filter((gc, idx) => {
+        if (idx === 0 && typeof gc === 'string' && gc.match(/^\[!\w+\]/)) {
+          return false
+        }
+        return true
+      })
+
+      // Clone the element with filtered children
+      modifiedChild = {
+        ...calloutChild,
+        props: {
+          ...childProps,
+          children: filteredGrandChildren
+        }
+      }
+    }
+
+    // Get remaining children after the callout child
+    const remainingChildren = childArray.slice(calloutChildIndex + 1)
 
     return (
-      <Callout type={type} title={calloutTitle}>
-        {contentChildren.length > 0 ? contentChildren : null}
+      <Callout type={calloutType} title={calloutTitle}>
+        {modifiedChild}
+        {remainingChildren.length > 0 ? remainingChildren : null}
       </Callout>
     )
   }
