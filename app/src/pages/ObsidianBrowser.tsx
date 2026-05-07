@@ -234,40 +234,26 @@ export default function ObsidianBrowser() {
     return () => el.removeEventListener('wheel', handleWheel)
   }, [sidebarCollapsed])
 
-  // Intercept obsidian:// wikilink clicks
+  // Intercept wikilink clicks inside rendered note content
   useEffect(() => {
     const el = contentRef.current
     if (!el) return
-    const handler = (e: MouseEvent) => {
-      const target = (e.target as HTMLElement).closest('a[href^="obsidian:"], a[href^="obsidian-unresolved:"]')
-      if (target) {
+
+    const clickHandler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (target.classList.contains('obsidian-wikilink')) {
         e.preventDefault()
         e.stopPropagation()
-        const href = target.getAttribute('href') || ''
-        const slug = decodeURIComponent(href.replace(/^obsidian:\/\//, '').replace(/^obsidian-unresolved:\/\//, ''))
-        if (slug) handleSelectNote(slug)
+        const text = target.textContent || ''
+        if (text) {
+          handleSelectNote(text)
+        }
       }
     }
-    el.addEventListener('click', handler)
-    return () => el.removeEventListener('click', handler)
-  }, [handleSelectNote, selectedNote])
 
-  // Pre-process wikilinks to navigate within obsidian
-  const processObsidianWikilinks = useCallback((content: string): string => {
-    const slugMap = new Map(notes.map(n => [n.slug, n.title] as const))
-    return content.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_match, title: string, display: string) => {
-      const s = title.trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9\u4e00-\u9fa5\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .substring(0, 60)
-      const d = (display || title).trim()
-      if (slugMap.has(s)) {
-        return `[${d}](obsidian://${encodeURIComponent(s)})`
-      }
-      return `[${d}](obsidian-unresolved://${encodeURIComponent(s)})`
-    })
-  }, [notes])
+    el.addEventListener('click', clickHandler)
+    return () => el.removeEventListener('click', clickHandler)
+  }, [handleSelectNote, selectedNote])
 
   // All slugs for MarkdownRenderer wikilink resolution
   const allSlugs = useMemo(() => notes.map((n) => n.slug), [notes])
@@ -452,8 +438,9 @@ export default function ObsidianBrowser() {
                 </h2>
 
                 <MarkdownRenderer
-                  content={processObsidianWikilinks(selectedNote.content)}
+                  content={selectedNote.content}
                   existingSlugs={allSlugs}
+                  onWikilinkClick={handleSelectNote}
                 />
                 <div className="mt-8 pt-6 border-t border-Sand flex flex-wrap gap-2">
                   {selectedNote.tags.map((tag) => (

@@ -129,3 +129,32 @@
 .dark .katex .boldsymbol {
   color: #F7F4EF;
 }
+
+/* ── Obsidian Wikilink styles ── */
+.obsidian-wikilink {
+  color: #B58A5F;
+  border-bottom: 1px solid rgba(181, 138, 95, 0.3);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.obsidian-wikilink:hover {
+  border-bottom-color: #B58A5F;
+  background-color: rgba(181, 138, 95, 0.05);
+}
+.dark .obsidian-wikilink {
+  color: #D4A76A;
+  border-bottom-color: rgba(212, 167, 106, 0.3);
+}
+.dark .obsidian-wikilink:hover {
+  border-bottom-color: #D4A76A;
+  background-color: rgba(212, 167, 106, 0.05);
+}
+.obsidian-wikilink-unresolved {
+  color: rgba(181, 138, 95, 0.5);
+  border-bottom: 1px dashed rgba(181, 138, 95, 0.5);
+  cursor: help;
+}
+.dark .obsidian-wikilink-unresolved {
+  color: rgba(212, 167, 106, 0.5);
+  border-bottom-color: rgba(212, 167, 106, 0.5);
+}

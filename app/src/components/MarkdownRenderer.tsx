@@ -143,39 +143,53 @@ export function parseFrontmatter(content: string): {
    ─────────────────────────────────────────────── */
 function slugifyWikilink(title: string): string {
   return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
     .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9一-龥\-_]/g, '')
     .substring(0, 60)
+}
+
+function escapeHtmlAttr(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
 }
 
 export function preprocessWikilinks(
   content: string,
-  existingSlugs: string[]
+  existingSlugs: string[],
+  onWikilinkClick?: (slug: string) => void
 ): string {
   if (!content) return ''
+
+  const resolve = (title: string, display: string): string => {
+    const slug = slugifyWikilink(title.trim())
+    const safeDisplay = display.trim()
+
+    if (existingSlugs.includes(slug)) {
+      if (onWikilinkClick) {
+        // Use a special marker that we'll handle in the link component
+        return `[${safeDisplay}](obsidian-internal://${slug})`
+      }
+      return `[${safeDisplay}](/obsidian?note=${slug})`
+    }
+    return `<span class="obsidian-wikilink-unresolved" title="Note not yet published">${safeDisplay}</span>`
+  }
+
   // [[Title|Display]]
   let processed = content.replace(
     /\[\[([^\]|]+)\|([^\]]+)\]\]/g,
-    (_match, title: string, display: string) => {
-      const slug = slugifyWikilink(title.trim())
-      if (existingSlugs.includes(slug)) {
-        return `[${display}](/blog/${slug})`
-      }
-      return `[${display}](unresolved://${slug})`
-    }
+    (_match, title: string, display: string) => resolve(title, display.trim())
   )
   // [[Title]]
   processed = processed.replace(
     /\[\[([^\]|]+)\]\]/g,
-    (_match, title: string) => {
-      const slug = slugifyWikilink(title.trim())
-      if (existingSlugs.includes(slug)) {
-        return `[${title}](/blog/${slug})`
-      }
-      return `[${title}](unresolved://${slug})`
-    }
+    (_match, title: string) => resolve(title, title.trim())
   )
+
   return processed
 }
 
@@ -395,7 +409,10 @@ function Blockquote({ children }: { children: React.ReactNode }) {
   )
 }
 
-function buildComponents(_existingSlugs: string[]): Components {
+function buildComponents(
+  existingSlugs: string[],
+  onWikilinkClick?: (slug: string) => void
+): Components {
   return {
     h2: ({ children, id }) => (
       <h2
@@ -450,17 +467,97 @@ function buildComponents(_existingSlugs: string[]): Components {
     ),
 
     a: ({ href, children }) => {
-      if (href?.startsWith('unresolved://')) {
+      // Handle obsidian internal links
+      if (href?.startsWith('obsidian-internal://')) {
+        const slug = href.replace('obsidian-internal://', '')
         return (
           <span
-            className="text-Amber/50 border-b border-dashed border-Amber/50 cursor-help"
-            title="Note not yet published"
+            onClick={(e) => {
+              e.preventDefault()
+              if (onWikilinkClick) {
+                onWikilinkClick(slug)
+              }
+            }}
+            className="obsidian-wikilink"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                if (onWikilinkClick) {
+                  onWikilinkClick(slug)
+                }
+              }
+            }}
           >
             {children}
           </span>
         )
       }
-      if (href?.startsWith('/blog/')) {
+
+      // Handle .md file links (Obsidian standard markdown links)
+      if (href?.endsWith('.md')) {
+        const slug = href.replace('.md', '')
+        if (onWikilinkClick) {
+          return (
+            <span
+              onClick={(e) => {
+                e.preventDefault()
+                onWikilinkClick(slug)
+              }}
+              className="obsidian-wikilink"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onWikilinkClick(slug)
+                }
+              }}
+            >
+              {children}
+            </span>
+          )
+        }
+        return (
+          <Link
+            to={`/obsidian?note=${slug}`}
+            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200"
+          >
+            {children}
+          </Link>
+        )
+      }
+
+      // Handle internal note links without .md extension (e.g., [Slutsky定理](Slutsky定理))
+      // Check if it's a relative link (no protocol) and matches an existing note
+      if (href && !href.includes('://') && !href.startsWith('/') && !href.startsWith('#')) {
+        // Decode URL-encoded href (e.g., Slutsky%E5%AE%9A%E7%90%86 -> Slutsky定理)
+        const decodedHref = decodeURIComponent(href)
+        if (onWikilinkClick && existingSlugs.includes(decodedHref)) {
+          return (
+            <span
+              onClick={(e) => {
+                e.preventDefault()
+                onWikilinkClick(decodedHref)
+              }}
+              className="obsidian-wikilink"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onWikilinkClick(decodedHref)
+                }
+              }}
+            >
+              {children}
+            </span>
+          )
+        }
+      }
+
+      if (href?.startsWith('/blog/') || href?.startsWith('/obsidian')) {
         return (
           <Link
             to={href}
@@ -468,16 +565,6 @@ function buildComponents(_existingSlugs: string[]): Components {
           >
             {children}
           </Link>
-        )
-      }
-      if (href?.startsWith('obsidian://') || href?.startsWith('obsidian-unresolved://')) {
-        return (
-          <a
-            href={href}
-            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200"
-          >
-            {children}
-          </a>
         )
       }
       return (
@@ -621,14 +708,16 @@ export interface MarkdownRendererProps {
   content: string
   existingSlugs?: string[]
   className?: string
+  onWikilinkClick?: (slug: string) => void
 }
 
 export default function MarkdownRenderer({
   content,
   existingSlugs = [],
   className = '',
+  onWikilinkClick,
 }: MarkdownRendererProps) {
-  const processedContent = preprocessWikilinks(content, existingSlugs)
+  const processedContent = preprocessWikilinks(content, existingSlugs, onWikilinkClick)
 
   return (
     <div className={`markdown-content ${className}`}>
@@ -639,7 +728,7 @@ export default function MarkdownRenderer({
           rehypeKatex,
           rehypeSlug,
         ]}
-        components={buildComponents(existingSlugs)}
+        components={buildComponents(existingSlugs, onWikilinkClick)}
       >
         {processedContent}
       </ReactMarkdown>
