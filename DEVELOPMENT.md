@@ -71,15 +71,37 @@
 
 **相关 Commit**: `8a564c5` - feat: 支持 Obsidian 笔记内链接点击跳转
 
+### 2026-05-07: Kimi Code 完成的功能
+
+**1. 笔记搜索框** (`app/src/pages/ObsidianBrowser.tsx`)
+- 在侧边栏 Vault 目录下方添加实时搜索框
+- 支持按标题、分类、标签、摘要过滤笔记
+- 搜索结果列表点击直接打开笔记
+
+**2. 侧边栏滚动固定** (`app/src/pages/ObsidianBrowser.tsx`)
+- 添加 `sticky top-24 self-start`，长笔记滚动时侧边栏固定在左侧
+- 处理了 `AnimatePresence` + `overflow-hidden` 对 `sticky` 定位的干扰（把 `motion.aside` 改为 `motion.div`，`overflow-hidden` 移到内部 wrapper）
+- **教训**: 设置 `sticky`/`fixed` 时必须预留顶部导航栏高度，避免被遮住
+
+**3. `$$$$` 数学公式修复** (`app/src/components/MarkdownRenderer.tsx`)
+- 预处理：`content.replace(/\$\$\$\$/g, '$$\n\n$$')`，把 Obsidian 的 `$$$$` 拆分为两个独立行间公式
+- KaTeX 宽容模式：`[rehypeKatex, { throwOnError: false, strict: false }]`，防止无效 LaTeX 崩页面
+- 非数学内容检测：若 `$$...$$` 内没有 `\` 命令（如 `$$证明$$`），去掉 `$$` 当普通文本
+
+**4. Callout `[!NOTE]` 部分修复** (`app/src/components/MarkdownRenderer.tsx`)
+- `Blockquote` 正则从 `/^\[(\w+)\]/` 改为 `/^\[!(\w+)\]/`，匹配 Obsidian 的 `[!NOTE]` 语法
+- **仍有问题**: Callout 卡片样式已生效，但标题中仍带 `[!NOTE]` 前缀未去除 → **交给 Claude 继续处理**
+
 ## 已知问题
 
-暂无
+- `[!NOTE]` Callout 标题中仍显示 `[!NOTE]` 前缀，需继续修复
 
 ## 待办事项
 
-- [ ] 添加笔记搜索功能
+- [x] 添加笔记搜索功能
 - [ ] 优化移动端体验
 - [ ] 添加笔记标签过滤
+- [ ] 修复 Callout `[!NOTE]` 前缀显示问题
 
 ## 开发环境配置
 

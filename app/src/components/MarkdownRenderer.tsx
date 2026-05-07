@@ -149,21 +149,25 @@ function slugifyWikilink(title: string): string {
     .substring(0, 60)
 }
 
-function escapeHtmlAttr(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-}
-
 export function preprocessWikilinks(
   content: string,
   existingSlugs: string[],
   onWikilinkClick?: (slug: string) => void
 ): string {
   if (!content) return ''
+
+  // Normalize Obsidian-style $$$$ display math to two separate $$ blocks
+  let processed = content.replace(/\$\$\$\$/g, '$$\n\n$$')
+
+  // Strip $$...$$ wrappers that don't contain LaTeX commands (Obsidian-like behavior)
+  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (match, inner: string) => {
+    // If the content contains a backslash command, keep it as math
+    if (/\\[a-zA-Z]+/.test(inner)) {
+      return match
+    }
+    // Otherwise treat as plain text (remove the $$ delimiters)
+    return inner.trim()
+  })
 
   const resolve = (title: string, display: string): string => {
     const slug = slugifyWikilink(title.trim())
@@ -180,7 +184,7 @@ export function preprocessWikilinks(
   }
 
   // [[Title|Display]]
-  let processed = content.replace(
+  processed = processed.replace(
     /\[\[([^\]|]+)\|([^\]]+)\]\]/g,
     (_match, title: string, display: string) => resolve(title, display.trim())
   )
@@ -387,7 +391,7 @@ const CALLOUT_TYPES = ['note', 'warning', 'tip', 'info', 'danger', 'success']
 function Blockquote({ children }: { children: React.ReactNode }) {
   const childArray = Array.isArray(children) ? children : [children]
   const firstText = extractText(childArray[0])
-  const match = firstText.match(/^\[(\w+)\]\s*(.*)/)
+  const match = firstText.match(/^\[!(\w+)\]\s*(.*)/)
 
   if (match && CALLOUT_TYPES.includes(match[1].toLowerCase())) {
     const [, type, title] = match
@@ -725,7 +729,7 @@ export default function MarkdownRenderer({
         remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
         rehypePlugins={[
           rehypeRaw,
-          rehypeKatex,
+          [rehypeKatex, { throwOnError: false, strict: false }],
           rehypeSlug,
         ]}
         components={buildComponents(existingSlugs, onWikilinkClick)}

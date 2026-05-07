@@ -7,8 +7,9 @@ import {
   ChevronRight,
   ChevronDown,
   RefreshCw,
-
   ChevronLeft,
+  Search,
+  X,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 import {
@@ -176,6 +177,7 @@ export default function ObsidianBrowser() {
   const [selectedSlug, setSelectedSlug] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const treeScrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -257,6 +259,18 @@ export default function ObsidianBrowser() {
 
   // All slugs for MarkdownRenderer wikilink resolution
   const allSlugs = useMemo(() => notes.map((n) => n.slug), [notes])
+
+  // Filter notes by search query
+  const filteredNotes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return []
+    return notes.filter((n) =>
+      n.title.toLowerCase().includes(q) ||
+      n.category.toLowerCase().includes(q) ||
+      n.tags.some((t) => t.toLowerCase().includes(q)) ||
+      n.excerpt.toLowerCase().includes(q)
+    )
+  }, [searchQuery, notes])
 
   if (serverOn === false) {
     return (
@@ -348,20 +362,21 @@ export default function ObsidianBrowser() {
 
       {/* ── Main Content ── */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative">
-        <div className="flex gap-0">
+        <div className="flex gap-0 items-start">
           {/* Sidebar */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 sticky top-24 self-start">
             {/* Expanded sidebar */}
             <AnimatePresence>
               {!sidebarCollapsed && (
-                <motion.aside
+                <motion.div
                   initial={{ width: 0, opacity: 0 }}
                   animate={{ width: 240, opacity: 1 }}
                   exit={{ width: 0, opacity: 0 }}
                   transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
                   className="overflow-hidden"
                 >
-                  <div className="w-[240px] bg-Linen/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl overflow-hidden">
+                  <div className="w-[240px]">
+                    <div className="bg-Linen/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl overflow-hidden">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-Sand dark:border-white/10">
                       <h3 className="text-[0.75rem] font-semibold uppercase tracking-[0.06em] text-Slate dark:text-white/60">
@@ -375,12 +390,54 @@ export default function ObsidianBrowser() {
                         <ChevronLeft size={16} />
                       </button>
                     </div>
-                    {/* Tree content */}
+                    {/* Search */}
+                    <div className="px-3 py-2 border-b border-Sand dark:border-white/10">
+                      <div className="relative">
+                        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-Slate" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder={t('obsidian.search')}
+                          className="w-full pl-8 pr-7 py-1.5 text-[0.8125rem] bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+                        />
+                        {searchQuery && (
+                          <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-Slate hover:text-Ink dark:hover:text-white"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {/* Tree content / Search results */}
                     <div
                       ref={treeScrollRef}
-                      className="p-3 max-h-[calc(100dvh-200px)] overflow-y-auto overscroll-contain"
+                      className="p-3 max-h-[calc(100dvh-240px)] overflow-y-auto overscroll-contain"
                     >
-                      {tree.length === 0 ? (
+                      {searchQuery.trim() ? (
+                        filteredNotes.length === 0 ? (
+                          <p className="text-[0.8125rem] text-Slate px-2 py-4 text-center">{t('obsidian.noResults')}</p>
+                        ) : (
+                          <div className="space-y-1">
+                            {filteredNotes.map((note) => (
+                              <button
+                                key={note.slug}
+                                onClick={() => handleSelectNote(note.slug)}
+                                className={`w-full text-left px-2 py-1.5 rounded-md text-[0.8125rem] transition-colors ${
+                                  selectedSlug === note.slug
+                                    ? 'bg-Amber/10 text-Amber'
+                                    : 'text-Ink dark:text-white hover:bg-Ink/5 dark:hover:bg-white/5'
+                                }`}
+                              >
+                                <div className="font-medium truncate">{note.title}</div>
+                                <div className="text-[0.6875rem] text-Slate truncate mt-0.5">{note.excerpt.slice(0, 60)}...</div>
+                              </button>
+                            ))}
+                          </div>
+                        )
+                      ) : tree.length === 0 ? (
                         <p className="text-[0.8125rem] text-Slate px-2">{t('obsidian.emptyVault')}</p>
                       ) : (
                         <>
@@ -398,7 +455,8 @@ export default function ObsidianBrowser() {
                       )}
                     </div>
                   </div>
-                </motion.aside>
+                </div>
+                </motion.div>
               )}
             </AnimatePresence>
 
