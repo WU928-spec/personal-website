@@ -116,7 +116,21 @@ npm run dev  # http://localhost:2667
 - **查阅历史**: 遇到问题时先查看此文档的解决方案
 - **记录决策**: 重要的技术决策和权衡应记录在此
 
+### 2026-05-07: Kimi Code 尝试修复 Wikilink 跳转（未果，Claude 最终解决）
+
+**尝试过程** (Kimi Code):
+1. **方案一**: `obsidian://` 自定义协议 + `contentRef` 事件委托拦截 → 浏览器将其视为外部协议，`e.preventDefault()` 无法完全阻止
+2. **方案二**: HashRouter `<Link to="/obsidian?note=slug">` → `react-markdown` 自定义组件内的 `<Link>` 无法可靠拦截点击，仍被浏览器当作外部链接打开
+3. **方案三**: `rehype-raw` + HTML `<span data-obsidian-slug>` + 事件委托 → 思路方向正确，但未发现根本原因是 `slugifyWikilink` 删除中文字符 + 笔记中使用的是标准 Markdown 链接 `[标题](文件名.md)` 而非仅 `[[wikilink]]`
+
+**教训**:
+- ❌ 不要仅凭代码逻辑猜测，**必须使用浏览器开发者工具** (F12 → Elements/Console/Network) 查看实际渲染的 DOM、href 值和事件行为
+- ❌ 不要假设链接格式只有一种，Obsidian 笔记中可能混用 `[[标题]]`、`[标题](文件名.md)`、`[标题](文件名)` 三种格式
+- ✅ Claude 使用开发者工具发现实际渲染的 `<a href>` 值与预期不符，从而定位到 slug 生成函数和链接格式问题
+
+**最终方案**: 见上文 `8a564c5` (Claude Code 实现)
+
 ---
 
 *最后更新: 2026-05-07*  
-*更新者: Claude Sonnet 4.6*
+*更新者: Claude Sonnet 4.6 / Kimi Code*
