@@ -23,11 +23,11 @@ export default function ImageGrid({ images }: ImageGridProps) {
       i === null || i >= count - 1 ? i : i + 1
     )
 
-  /* ── Grid layout ── */
+  /* ── Single image: keep original aspect ratio, narrower width ── */
   if (count === 1) {
     return (
       <>
-        <div className="mt-2 max-w-md w-[70%]">
+        <div className="mt-2 w-[60%] max-w-[280px]">
           <img
             src={images[0]}
             alt=""
@@ -47,10 +47,11 @@ export default function ImageGrid({ images }: ImageGridProps) {
     )
   }
 
+  /* ── 2 images: 2-column grid, wider container ── */
   if (count === 2) {
     return (
       <>
-        <div className="mt-2 grid grid-cols-2 gap-1 max-w-md w-[60%]">
+        <div className="mt-2 w-[80%] max-w-[420px] grid grid-cols-2 gap-1">
           {images.slice(0, 2).map((src, i) => (
             <img
               key={i}
@@ -73,9 +74,10 @@ export default function ImageGrid({ images }: ImageGridProps) {
     )
   }
 
+  /* ── 3–9 images: 3×3 grid (九宫图), wider container for better viewing ── */
   return (
     <>
-      <div className="mt-2 grid grid-cols-3 gap-1 max-w-xs">
+      <div className="mt-2 w-[80%] max-w-[420px] grid grid-cols-3 gap-1">
         {images.slice(0, 9).map((src, i) => (
           <img
             key={i}
@@ -99,7 +101,7 @@ export default function ImageGrid({ images }: ImageGridProps) {
 }
 
 /* ───────────────────────────────────────────────
-   Full-screen Image Preview (layoutId)
+   Full-screen Image Preview
    ─────────────────────────────────────────────── */
 function PreviewOverlay({
   images,
@@ -116,6 +118,13 @@ function PreviewOverlay({
 }) {
   const isOpen = index !== null
 
+  /* Keyboard support */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') onClose()
+    else if (e.key === 'ArrowLeft') onPrev()
+    else if (e.key === 'ArrowRight') onNext()
+  }
+
   return (
     <AnimatePresence>
       {isOpen && index !== null && (
@@ -126,6 +135,9 @@ function PreviewOverlay({
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
           onClick={onClose}
+          onKeyDown={handleKeyDown}
+          tabIndex={-1}
+          autoFocus
         >
           {/* Close button */}
           <button
@@ -164,10 +176,9 @@ function PreviewOverlay({
           {/* Image */}
           <motion.img
             key={index}
-            layoutId={`moment-img-${images[index]}`}
             src={images[index]}
             alt=""
-            className="max-w-full max-h-[85vh] object-contain rounded-lg"
+            className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
 

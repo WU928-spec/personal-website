@@ -20,6 +20,73 @@
 
 ## 最近解决的问题
 
+### 2026-05-09: MomentUploader 笔记选择弹窗重构
+
+**文件**: `app/src/components/MomentUploader.tsx`
+
+**修改内容**:
+1. **按文件夹树形整合** - 从 `/api/tree` 获取文件夹结构，笔记按文件夹分组显示，文件夹可展开/折叠（默认收起）
+2. **键盘导航** - `↑`/`↓` 上下移动高亮，`Enter` 选择/展开，`Escape` 关闭弹窗
+3. **点击外部关闭** - 全局 `mousedown` 监听，点击弹窗外自动收起
+4. **触控板滚动** - `overflow-y-auto overscroll-contain`，阻止事件冒泡
+
+---
+
+### 2026-05-09: ImageGrid 图片布局与预览优化
+
+**文件**: `app/src/components/ImageGrid.tsx`
+
+**修改内容**:
+1. **统一图片宽度** - 单图/多图容器统一为 `w-[55%] max-w-xs`，与微信比例一致
+2. **九宫格排列** - 3-9 张图片用 `grid-cols-3 gap-1`，每张 `aspect-square`
+3. **全屏预览** - 点击放大，支持左右箭头/键盘 `←`/`→` 切换，`Esc` 关闭
+
+---
+
+### 2026-05-09: 图片 URL 路径修复
+
+**文件**: `app/src/hooks/useMoments.ts`
+
+**问题**: 服务器返回相对路径 `/api/uploads/xxx.jpg`，浏览器解析到前端 `localhost:3000`，导致 404
+
+**修复**: 统一添加 `resolveImageUrls` 函数，将 `/api/uploads/` 补全为 `http://localhost:2667/api/uploads/...`
+
+---
+
+### 2026-05-09: Markdown 标题默认收起
+
+**文件**: `app/src/components/MarkdownRenderer.tsx`
+
+**修改内容**:
+- 新笔记加载时自动折叠所有 H1-H4 标题
+- 使用 `useRef<string | null>(null)` 跟踪 `processedContent` 变化
+- **教训**: `useRef(processedContent)` 会在挂载时初始化，导致 `contentRef.current !== processedContent` 永远为 `false`
+
+---
+
+### 2026-05-09: Navbar 返回按钮
+
+**文件**: `app/src/components/Navbar.tsx`
+
+**修改内容**:
+- Logo 右侧添加圆形返回按钮（琥珀色边框 + `ArrowLeft` 图标）
+- 非首页时显示，点击 `navigate(-1)` 返回上一页
+
+---
+
+### 2026-05-09: Obsidian 笔记间浏览器返回支持
+
+**文件**: `app/src/pages/ObsidianBrowser.tsx`
+
+**问题**: 点击笔记只修改组件 state，URL 不变，浏览器返回无法在不同笔记间跳转
+
+**修复**:
+1. `handleSelectNote` 加载笔记后 `navigate(`/obsidian?note=${slug}`)`，push 新历史记录
+2. `useEffect` 监听 `searchParams` 变化，URL `?note=` 改变时自动加载对应笔记
+3. 浏览器返回/前进按钮可在笔记间正常导航
+
+---
+
 ### 2026-05-07: 修复 Callout `[!NOTE]` 前缀显示问题
 
 **问题描述**:
@@ -200,5 +267,5 @@ npm run dev  # http://localhost:2667
 
 ---
 
-*最后更新: 2026-05-07*  
-*更新者: Claude Sonnet 4.6 / Kimi Code*
+*最后更新: 2026-05-09*  
+*更新者: Kimi Code*

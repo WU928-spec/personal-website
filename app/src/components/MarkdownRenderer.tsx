@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -10,7 +10,20 @@ import rehypeKatex from 'rehype-katex'
 import { createHighlighter, type ThemeInput } from 'shiki'
 import matter from 'gray-matter'
 import { Link } from 'react-router-dom'
-import { Copy, Check, Lightbulb, AlertTriangle, Info } from 'lucide-react'
+import { Copy, Check, Lightbulb, AlertTriangle, Info, ChevronRight } from 'lucide-react'
+
+/* ───────────────────────────────────────────────
+   Heading Collapse Context
+   ─────────────────────────────────────────────── */
+interface HeadingCollapseContextType {
+  collapsedHeadings: Set<string>
+  toggleHeading: (id: string) => void
+}
+
+const HeadingCollapseContext = createContext<HeadingCollapseContextType>({
+  collapsedHeadings: new Set(),
+  toggleHeading: () => {},
+})
 
 /* ───────────────────────────────────────────────
    Shiki warm theme (amber / sage / gold / rose)
@@ -183,14 +196,37 @@ export function preprocessWikilinks(
     return `<span class="obsidian-wikilink-unresolved" title="Note not yet published">${safeDisplay}</span>`
   }
 
+  // [[#Heading]] - internal anchor links (must be processed before other wikilinks)
+  processed = processed.replace(
+    /\[\[#([^\]|]+)\|([^\]]+)\]\]/g,
+    (_match, heading: string, display: string) => {
+      const headingId = heading.trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+      return `[${display.trim()}](#${headingId})`
+    }
+  )
+  processed = processed.replace(
+    /\[\[#([^\]|]+)\]\]/g,
+    (_match, heading: string) => {
+      const headingText = heading.trim()
+      const headingId = headingText
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+      return `[${headingText}](#${headingId})`
+    }
+  )
+
   // [[Title|Display]]
   processed = processed.replace(
-    /\[\[([^\]|]+)\|([^\]]+)\]\]/g,
+    /\[\[([^\]|#]+)\|([^\]]+)\]\]/g,
     (_match, title: string, display: string) => resolve(title, display.trim())
   )
   // [[Title]]
   processed = processed.replace(
-    /\[\[([^\]|]+)\]\]/g,
+    /\[\[([^\]|#]+)\]\]/g,
     (_match, title: string) => resolve(title, title.trim())
   )
 
@@ -467,51 +503,110 @@ function buildComponents(
   onWikilinkClick?: (slug: string) => void
 ): Components {
   return {
-    h2: ({ children, id }) => (
-      <h2
-        id={id}
-        className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink mt-[2.5em] mb-[0.8em] scroll-mt-[80px] group"
-      >
-        {children}
-        <a
-          href={`#${id}`}
-          className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
-          aria-hidden="true"
+    h1: ({ children, id }) => {
+      const { collapsedHeadings, toggleHeading } = useContext(HeadingCollapseContext)
+      const isCollapsed = id ? collapsedHeadings.has(id) : false
+
+      return (
+        <h1
+          id={id}
+          className="font-display text-[clamp(2rem,3vw,2.75rem)] font-bold leading-[1.1] text-Ink mt-[2em] mb-[1em] scroll-mt-[80px] group flex items-center gap-2 cursor-pointer"
+          onClick={() => id && toggleHeading(id)}
         >
-          ¶
-        </a>
-      </h2>
-    ),
-    h3: ({ children, id }) => (
-      <h3
-        id={id}
-        className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink mt-[2em] mb-[0.6em] scroll-mt-[80px] group"
-      >
-        {children}
-        <a
-          href={`#${id}`}
-          className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
-          aria-hidden="true"
+          <ChevronRight
+            size={22}
+            className={`shrink-0 text-Amber transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+          />
+          <span className="flex-1">{children}</span>
+          <a
+            href={`#${id}`}
+            className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
+            aria-hidden="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            ¶
+          </a>
+        </h1>
+      )
+    },
+    h2: ({ children, id }) => {
+      const { collapsedHeadings, toggleHeading } = useContext(HeadingCollapseContext)
+      const isCollapsed = id ? collapsedHeadings.has(id) : false
+
+      return (
+        <h2
+          id={id}
+          className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink mt-[2.5em] mb-[0.8em] scroll-mt-[80px] group flex items-center gap-2 cursor-pointer"
+          onClick={() => id && toggleHeading(id)}
         >
-          ¶
-        </a>
-      </h3>
-    ),
-    h4: ({ children, id }) => (
-      <h4
-        id={id}
-        className="font-body text-[1rem] font-semibold leading-[1.4] tracking-[0.01em] text-Ink mt-[1.5em] mb-[0.5em] scroll-mt-[80px] group"
-      >
-        {children}
-        <a
-          href={`#${id}`}
-          className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
-          aria-hidden="true"
+          <ChevronRight
+            size={20}
+            className={`shrink-0 text-Amber transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+          />
+          <span className="flex-1">{children}</span>
+          <a
+            href={`#${id}`}
+            className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
+            aria-hidden="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            ¶
+          </a>
+        </h2>
+      )
+    },
+    h3: ({ children, id }) => {
+      const { collapsedHeadings, toggleHeading } = useContext(HeadingCollapseContext)
+      const isCollapsed = id ? collapsedHeadings.has(id) : false
+
+      return (
+        <h3
+          id={id}
+          className="font-display text-[1.25rem] font-semibold leading-[1.3] text-Ink mt-[2em] mb-[0.6em] scroll-mt-[80px] group flex items-center gap-2 cursor-pointer"
+          onClick={() => id && toggleHeading(id)}
         >
-          ¶
-        </a>
-      </h4>
-    ),
+          <ChevronRight
+            size={18}
+            className={`shrink-0 text-Amber transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+          />
+          <span className="flex-1">{children}</span>
+          <a
+            href={`#${id}`}
+            className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
+            aria-hidden="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            ¶
+          </a>
+        </h3>
+      )
+    },
+    h4: ({ children, id }) => {
+      const { collapsedHeadings, toggleHeading } = useContext(HeadingCollapseContext)
+      const isCollapsed = id ? collapsedHeadings.has(id) : false
+
+      return (
+        <h4
+          id={id}
+          className="font-body text-[1rem] font-semibold leading-[1.4] tracking-[0.01em] text-Ink mt-[1.5em] mb-[0.5em] scroll-mt-[80px] group flex items-center gap-2 cursor-pointer"
+          onClick={() => id && toggleHeading(id)}
+        >
+          <ChevronRight
+            size={16}
+            className={`shrink-0 text-Amber transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+          />
+          <span className="flex-1">{children}</span>
+          <a
+            href={`#${id}`}
+            className="anchor ml-2 text-Amber opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-underline"
+            aria-hidden="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            ¶
+          </a>
+        </h4>
+      )
+    },
 
     p: ({ children }) => (
       <p className="text-[1.0625rem] leading-[1.75] text-Ink mb-[1.25em]">
@@ -520,6 +615,28 @@ function buildComponents(
     ),
 
     a: ({ href, children }) => {
+      // Handle anchor links (internal heading links)
+      if (href?.startsWith('#')) {
+        return (
+          <a
+            href={href}
+            onClick={(e) => {
+              e.preventDefault()
+              const id = href.slice(1)
+              const element = document.getElementById(id)
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                // Update URL hash without jumping
+                window.history.pushState(null, '', href)
+              }
+            }}
+            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200 cursor-pointer"
+          >
+            {children}
+          </a>
+        )
+      }
+
       // Handle obsidian internal links
       if (href?.startsWith('obsidian-internal://')) {
         const slug = href.replace('obsidian-internal://', '')
@@ -770,21 +887,90 @@ export default function MarkdownRenderer({
   className = '',
   onWikilinkClick,
 }: MarkdownRendererProps) {
+  const [collapsedHeadings, setCollapsedHeadings] = useState<Set<string>>(new Set())
   const processedContent = preprocessWikilinks(content, existingSlugs, onWikilinkClick)
+  const contentRef = useRef<string | null>(null)
+
+  const toggleHeading = useCallback((id: string) => {
+    setCollapsedHeadings((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }, [])
+
+  // Auto-collapse all headings on new content, then apply collapse effect
+  useEffect(() => {
+    const container = document.querySelector('.markdown-content')
+    if (!container) return
+
+    const headings = container.querySelectorAll('h1[id], h2[id], h3[id], h4[id]')
+
+    // When content changes, auto-collapse all headings by default
+    if (contentRef.current !== processedContent) {
+      contentRef.current = processedContent
+      const allIds = new Set<string>()
+      headings.forEach((h) => {
+        const id = h.getAttribute('id')
+        if (id) allIds.add(id)
+      })
+      if (allIds.size > 0) {
+        setCollapsedHeadings(allIds)
+      }
+      return
+    }
+
+    headings.forEach((heading) => {
+      const id = heading.getAttribute('id')
+      if (!id) return
+
+      const isCollapsed = collapsedHeadings.has(id)
+      const headingLevel = parseInt(heading.tagName.substring(1))
+
+      // Find all siblings until next heading of same or higher level
+      let sibling = heading.nextElementSibling
+      while (sibling) {
+        const siblingTag = sibling.tagName.toLowerCase()
+
+        // Stop if we hit a heading of same or higher level
+        if (siblingTag.match(/^h[1-6]$/)) {
+          const siblingLevel = parseInt(siblingTag.substring(1))
+          if (siblingLevel <= headingLevel) {
+            break
+          }
+        }
+
+        // Toggle visibility
+        if (isCollapsed) {
+          (sibling as HTMLElement).style.display = 'none'
+        } else {
+          (sibling as HTMLElement).style.display = ''
+        }
+
+        sibling = sibling.nextElementSibling
+      }
+    })
+  }, [collapsedHeadings, processedContent])
 
   return (
-    <div className={`markdown-content ${className}`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
-        rehypePlugins={[
-          rehypeRaw,
-          [rehypeKatex, { throwOnError: false, strict: false }],
-          rehypeSlug,
-        ]}
-        components={buildComponents(existingSlugs, onWikilinkClick)}
-      >
-        {processedContent}
-      </ReactMarkdown>
-    </div>
+    <HeadingCollapseContext.Provider value={{ collapsedHeadings, toggleHeading }}>
+      <div className={`markdown-content ${className}`}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
+          rehypePlugins={[
+            rehypeRaw,
+            [rehypeKatex, { throwOnError: false, strict: false }],
+            rehypeSlug,
+          ]}
+          components={buildComponents(existingSlugs, onWikilinkClick)}
+        >
+          {processedContent}
+        </ReactMarkdown>
+      </div>
+    </HeadingCollapseContext.Provider>
   )
 }

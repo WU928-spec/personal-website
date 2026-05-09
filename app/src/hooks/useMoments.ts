@@ -82,12 +82,24 @@ function migrateMoment(m: Moment): Moment {
   return m
 }
 
+function resolveImageUrls(images: string[]): string[] {
+  return images.map((img) => {
+    if (img.startsWith('/api/uploads/')) {
+      return `${API_BASE}${img}`
+    }
+    return img
+  })
+}
+
 function loadLocal(): Moment[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const list = JSON.parse(raw) as Moment[]
-      return list.map(migrateMoment)
+      return list.map(migrateMoment).map((m) => ({
+        ...m,
+        images: resolveImageUrls(m.images),
+      }))
     }
   } catch {
     // ignore
@@ -123,8 +135,12 @@ export function useMoments() {
       const res = await fetch(`${API_BASE}/api/moments`)
       if (res.ok) {
         const data = (await res.json()) as Moment[]
-        setMoments(sortDesc(data))
-        saveLocal(data)
+        const resolved = data.map((m) => ({
+          ...m,
+          images: resolveImageUrls(m.images),
+        }))
+        setMoments(sortDesc(resolved))
+        saveLocal(resolved)
         setLoading(false)
         return
       }

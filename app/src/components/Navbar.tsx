@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Github, Search, Menu, X, LogIn, User, Globe, Sun, Moon, Pencil, Eye } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Github, Search, Menu, X, LogIn, User, Globe, Sun, Moon, Pencil, Eye, ArrowLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/LangContext'
@@ -10,6 +10,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const { user, isLoggedIn, isEditMode, setEditMode } = useAuth()
   const { t, lang, toggleLang } = useLang()
   const { theme, toggleTheme } = useTheme()
@@ -57,6 +58,15 @@ export default function Navbar() {
           <Link to="/" className="flex items-center shrink-0">
             <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
           </Link>
+          {location.pathname !== '/' && (
+            <button
+              onClick={() => navigate(-1)}
+              className="ml-3 flex items-center justify-center w-8 h-8 rounded-full border border-Amber/50 text-Amber hover:bg-Amber/10 transition-colors duration-300"
+              title="返回"
+            >
+              <ArrowLeft size={16} />
+            </button>
+          )}
 
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (

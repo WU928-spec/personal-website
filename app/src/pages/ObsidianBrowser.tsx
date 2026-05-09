@@ -203,25 +203,35 @@ export default function ObsidianBrowser() {
     loadData()
   }, [loadData])
 
-  // Load selected note (declared BEFORE effects that reference it)
+  // Load selected note and push URL for browser back support
   const handleSelectNote = useCallback(
     async (slug: string) => {
       setSelectedSlug(slug)
       const note = await fetchObsidianNote(slug)
       setSelectedNote(note)
+      // Push URL so browser back/forward works between notes
+      navigate(`/obsidian?note=${encodeURIComponent(slug)}`)
     },
-    []
+    [navigate]
   )
 
-  // Auto-open note from query param ?note=slug
+  // Open note from URL query param when it changes (back/forward support)
   useEffect(() => {
     const noteSlug = searchParams.get('note')
-    if (noteSlug && serverOn === true && notes.length > 0) {
-      handleSelectNote(noteSlug)
-      // Clean query param without reloading
-      navigate('/obsidian', { replace: true })
+    if (noteSlug && serverOn === true) {
+      // Only fetch if it's different from current
+      if (noteSlug !== selectedSlug) {
+        setSelectedSlug(noteSlug)
+        fetchObsidianNote(noteSlug).then((note) => {
+          setSelectedNote(note)
+        })
+      }
+    } else if (!noteSlug && selectedNote) {
+      // URL has no note param → clear selection
+      setSelectedSlug('')
+      setSelectedNote(null)
     }
-  }, [searchParams, serverOn, notes.length, handleSelectNote, navigate])
+  }, [searchParams, serverOn, selectedSlug, selectedNote])
 
   // Prevent outer page scroll when trackpad scrolling inside tree
   useEffect(() => {

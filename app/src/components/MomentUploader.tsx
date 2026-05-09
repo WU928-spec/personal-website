@@ -1,17 +1,167 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Image, X, MapPin, Send, Paperclip, BookOpen } from 'lucide-react'
+import {
+  Image,
+  X,
+  MapPin,
+  Send,
+  Paperclip,
+  BookOpen,
+  Folder,
+  ChevronRight,
+  ChevronDown,
+  FileText,
+} from 'lucide-react'
 import type { Moment, MomentAttachment } from '@/types/moment'
 
-interface ObsidianNote {
-  slug: string
-  title: string
+interface VaultFile {
+  name: string
+  path: string
+  type: 'file' | 'folder'
+  children?: VaultFile[]
 }
 
 interface Props {
   onSubmit: (moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments' | 'authorId'>) => Promise<void>
   userName?: string
   avatarUrl?: string
+}
+
+/* ── slugify (must match server-side logic) ── */
+function slugify(title: string): string {
+  return title
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_]/g, '')
+    .substring(0, 60)
+}
+
+/* ── Recursive tree node renderer ── */
+function TreeNode({
+  item,
+  depth = 0,
+  expanded,
+  onToggle,
+  onSelect,
+  highlightedPath,
+}: {
+  item: VaultFile
+  depth?: number
+  expanded: Set<string>
+  onToggle: (path: string) => void
+  onSelect: (item: VaultFile) => void
+  highlightedPath: string
+}) {
+  const isExpanded = expanded.has(item.path)
+  const isHighlighted = highlightedPath === item.path
+
+  if (item.type === 'folder') {
+    return (
+      <div>
+        <button
+          data-nav-item
+          data-path={item.path}
+          onClick={() => onToggle(item.path)}
+          className={`flex items-center gap-1.5 w-full text-left py-2 px-3 rounded-md transition-colors ${
+            isHighlighted
+              ? 'bg-gray-100 dark:bg-white/10'
+              : 'hover:bg-gray-50 dark:hover:bg-white/5'
+          }`}
+          style={{ paddingLeft: `${depth * 14 + 12}px` }}
+        >
+          {isExpanded ? (
+            <ChevronDown size={14} className="text-gray-400 shrink-0" />
+          ) : (
+            <ChevronRight size={14} className="text-gray-400 shrink-0" />
+          )}
+          <Folder size={14} className="text-amber-500 shrink-0" />
+          <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+            {item.name}
+          </span>
+        </button>
+        <AnimatePresence initial={false}>
+          {isExpanded && item.children && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="overflow-hidden"
+            >
+              {item.children.map((child) => (
+                <TreeNode
+                  key={child.path}
+                  item={child}
+                  depth={depth + 1}
+                  expanded={expanded}
+                  onToggle={onToggle}
+                  onSelect={onSelect}
+                  highlightedPath={highlightedPath}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    )
+  }
+
+  // File node
+  return (
+    <button
+      data-nav-item
+      data-path={item.path}
+      onClick={() => onSelect(item)}
+      className={`flex items-center gap-2 w-full text-left py-2 px-3 rounded-md transition-colors ${
+        isHighlighted
+          ? 'bg-Amber/10 text-Amber'
+          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+      }`}
+      style={{ paddingLeft: `${depth * 14 + 30}px` }}
+    >
+      <FileText
+        size={14}
+        className={isHighlighted ? 'text-Amber shrink-0' : 'text-gray-400 shrink-0'}
+      />
+      <span className="text-sm truncate">{item.name}</span>
+    </button>
+  )
+}
+
+/* ── Root files group (files not inside any folder) ── */
+function RootFilesGroup({
+  files,
+  onSelect,
+  highlightedPath,
+}: {
+  files: VaultFile[]
+  onSelect: (item: VaultFile) => void
+  highlightedPath: string
+}) {
+  return (
+    <div>
+      {files.map((item) => (
+        <button
+          key={item.path}
+          data-nav-item
+          data-path={item.path}
+          onClick={() => onSelect(item)}
+          className={`flex items-center gap-2 w-full text-left py-2 px-3 rounded-md transition-colors ${
+            highlightedPath === item.path
+              ? 'bg-Amber/10 text-Amber'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+          }`}
+          style={{ paddingLeft: '30px' }}
+        >
+          <FileText
+            size={14}
+            className={highlightedPath === item.path ? 'text-Amber shrink-0' : 'text-gray-400 shrink-0'}
+          />
+          <span className="text-sm truncate">{item.name}</span>
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUrl }: Props) {
@@ -21,12 +171,15 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
   const [location, setLocation] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showNotePicker, setShowNotePicker] = useState(false)
-  const [notes, setNotes] = useState<ObsidianNote[]>([])
-  const [notesLoading, setNotesLoading] = useState(false)
+  const [tree, setTree] = useState<VaultFile[]>([])
+  const [treeLoading, setTreeLoading] = useState(false)
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
+  const [highlightedPath, setHighlightedPath] = useState('')
   const [locating, setLocating] = useState(false)
 
   const fileRef = useRef<HTMLInputElement>(null)
   const attachmentRef = useRef<HTMLInputElement>(null)
+  const pickerRef = useRef<HTMLDivElement>(null)
 
   const canSubmit = content.trim().length > 0 || images.length > 0 || attachments.length > 0
 
@@ -108,33 +261,139 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
     setAttachments((prev) => prev.filter((_, i) => i !== idx))
   }
 
-  /* ── Note picker ── */
-  const loadNotes = async () => {
-    setNotesLoading(true)
+  /* ── Note picker: load vault tree ── */
+  const loadTree = async () => {
+    setTreeLoading(true)
     try {
-      const res = await fetch('http://localhost:2667/api/notes')
+      const res = await fetch('http://localhost:2667/api/tree', {
+        signal: AbortSignal.timeout(5000),
+      })
       if (res.ok) {
-        const json = (await res.json()) as { notes: { slug: string; title: string }[] }
-        setNotes(json.notes.map((n) => ({ slug: n.slug, title: n.title })))
+        const json = (await res.json()) as { tree: VaultFile[] }
+        setTree(json.tree)
+        // Folders collapsed by default
+        setExpandedFolders(new Set())
       }
     } catch {
       // backend unavailable
     }
-    setNotesLoading(false)
+    setTreeLoading(false)
   }
 
   const openNotePicker = () => {
     setShowNotePicker(true)
-    if (notes.length === 0) loadNotes()
+    if (tree.length === 0) loadTree()
   }
 
-  const selectNote = (note: ObsidianNote) => {
-    setAttachments((prev) => [
-      ...prev,
-      { name: note.title + '.md', type: 'md-link', data: note.slug },
-    ])
-    setShowNotePicker(false)
-  }
+  const toggleFolder = useCallback((path: string) => {
+    setExpandedFolders((prev) => {
+      const next = new Set(prev)
+      if (next.has(path)) next.delete(path)
+      else next.add(path)
+      return next
+    })
+  }, [])
+
+  const selectNoteFromTree = useCallback(
+    (item: VaultFile) => {
+      const noteSlug = slugify(item.name)
+      setAttachments((prev) => [
+        ...prev,
+        { name: item.name + '.md', type: 'md-link', data: noteSlug },
+      ])
+      setShowNotePicker(false)
+    },
+    []
+  )
+
+  /* ── Keyboard navigation ── */
+  const getNavItems = useCallback(() => {
+    const el = pickerRef.current
+    if (!el) return []
+    return Array.from(el.querySelectorAll<HTMLElement>('[data-nav-item]'))
+  }, [])
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const items = getNavItems()
+      if (items.length === 0) return
+
+      const currentIndex = items.findIndex((el) => el.dataset.path === highlightedPath)
+      let nextIndex = currentIndex
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        const path = items[currentIndex]?.dataset.path
+        if (!path) return
+        // Find the item in tree
+        const findItem = (nodes: VaultFile[]): VaultFile | null => {
+          for (const n of nodes) {
+            if (n.path === path) return n
+            if (n.children) {
+              const found = findItem(n.children)
+              if (found) return found
+            }
+          }
+          return null
+        }
+        const item = findItem(tree)
+        if (item) {
+          if (item.type === 'folder') toggleFolder(item.path)
+          else selectNoteFromTree(item)
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setShowNotePicker(false)
+      }
+
+      if (nextIndex !== currentIndex && items[nextIndex]) {
+        const path = items[nextIndex].dataset.path || ''
+        setHighlightedPath(path)
+        items[nextIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
+    },
+    [getNavItems, highlightedPath, tree, toggleFolder, selectNoteFromTree]
+  )
+
+  /* Auto-focus first item when picker opens and data loads */
+  useEffect(() => {
+    if (showNotePicker && !treeLoading && tree.length > 0) {
+      const timer = setTimeout(() => {
+        const items = pickerRef.current?.querySelectorAll<HTMLElement>('[data-nav-item]')
+        if (items && items.length > 0) {
+          const firstPath = items[0].dataset.path || ''
+          setHighlightedPath(firstPath)
+          pickerRef.current?.focus()
+        }
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [showNotePicker, treeLoading, tree.length])
+
+  /* Reset state when picker closes */
+  useEffect(() => {
+    if (!showNotePicker) {
+      setHighlightedPath('')
+    }
+  }, [showNotePicker])
+
+  /* Click outside to close picker */
+  useEffect(() => {
+    if (!showNotePicker) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setShowNotePicker(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showNotePicker])
 
   /* ── Submit ── */
   const handleSubmit = async () => {
@@ -152,6 +411,13 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
     setLocation('')
     setSubmitting(false)
   }
+
+  /* ── Collect root folders & root files ── */
+  const { folderNodes, rootFileNodes } = useMemo(() => {
+    const folders = tree.filter((i) => i.type === 'folder')
+    const files = tree.filter((i) => i.type === 'file')
+    return { folderNodes: folders, rootFileNodes: files }
+  }, [tree])
 
   return (
     <div className="bg-white dark:bg-[#111] border-b border-gray-200 dark:border-white/10 px-4 py-4 relative">
@@ -322,39 +588,63 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
       <AnimatePresence>
         {showNotePicker && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-x-0 top-full z-50 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl mx-4 mt-2 max-h-64 overflow-y-auto"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-x-0 top-full z-50 mx-4 mt-2"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">选择笔记</span>
-              <button
-                onClick={() => setShowNotePicker(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            <div
+              ref={pickerRef}
+              tabIndex={-1}
+              onKeyDown={handleKeyDown}
+              className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden outline-none"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">选择笔记</span>
+                <button
+                  onClick={() => setShowNotePicker(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Tree content */}
+              <div
+                className="max-h-72 overflow-y-auto overscroll-contain py-1"
+                onWheel={(e) => e.stopPropagation()}
               >
-                <X size={16} />
-              </button>
+                {treeLoading ? (
+                  <div className="flex justify-center py-6">
+                    <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : tree.length === 0 ? (
+                  <div className="py-6 text-center text-sm text-gray-400">暂无笔记</div>
+                ) : (
+                  <>
+                    {folderNodes.map((item) => (
+                      <TreeNode
+                        key={item.path}
+                        item={item}
+                        expanded={expandedFolders}
+                        onToggle={toggleFolder}
+                        onSelect={selectNoteFromTree}
+                        highlightedPath={highlightedPath}
+                      />
+                    ))}
+                    {rootFileNodes.length > 0 && (
+                      <RootFilesGroup
+                        files={rootFileNodes}
+                        onSelect={selectNoteFromTree}
+                        highlightedPath={highlightedPath}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-            {notesLoading ? (
-              <div className="flex justify-center py-6">
-                <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : notes.length === 0 ? (
-              <div className="py-6 text-center text-sm text-gray-400">暂无笔记</div>
-            ) : (
-              <div className="py-1">
-                {notes.map((note) => (
-                  <button
-                    key={note.slug}
-                    onClick={() => selectNote(note)}
-                    className="w-full text-left px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                  >
-                    {note.title}
-                  </button>
-                ))}
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
