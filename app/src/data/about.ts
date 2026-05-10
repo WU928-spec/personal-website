@@ -1,4 +1,5 @@
 import type { Lang } from '@/i18n/translations'
+import { createLangStorageKey } from '@/utils/storage'
 
 export interface ProfileField {
   icon: string
@@ -11,41 +12,6 @@ export interface AboutData {
   title: string
   p1: string
   p2: string
-}
-
-const STORAGE_KEY = 'vibecoding_about'
-
-/* 旧的 stats 格式迁移 */
-function migrateFromLegacy(data: unknown): AboutData | null {
-  if (!data || typeof data !== 'object') return null
-  const d = data as Record<string, unknown>
-
-  // 新格式已有 fields
-  if (Array.isArray(d.fields)) {
-    return d as unknown as AboutData
-  }
-
-  // 旧格式有 stats（没有 name/value 分离）
-  if (Array.isArray(d.stats)) {
-    const oldStats = d.stats as Array<{ icon: string; label: string }>
-    const fieldNames: Record<string, string> = {
-      MapPin: '位置',
-      Briefcase: '职业',
-      Globe: '语言',
-    }
-    return {
-      fields: oldStats.map((s) => ({
-        icon: s.icon,
-        name: fieldNames[s.icon] || '信息',
-        value: s.label,
-      })),
-      title: (d.title as string) || '',
-      p1: (d.p1 as string) || '',
-      p2: (d.p2 as string) || '',
-    }
-  }
-
-  return null
 }
 
 const defaultAbout: Record<Lang, AboutData> = {
@@ -71,22 +37,12 @@ const defaultAbout: Record<Lang, AboutData> = {
   },
 }
 
+const aboutStorage = createLangStorageKey('vibecoding_about', defaultAbout)
+
 export function loadAbout(lang: Lang): AboutData {
-  const key = `${STORAGE_KEY}_${lang}`
-  const saved = localStorage.getItem(key)
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved)
-      const migrated = migrateFromLegacy(parsed)
-      if (migrated) return migrated
-      localStorage.removeItem(key)
-    } catch {
-      localStorage.removeItem(key)
-    }
-  }
-  return defaultAbout[lang]
+  return aboutStorage.load(lang)
 }
 
 export function saveAbout(lang: Lang, data: AboutData) {
-  localStorage.setItem(`${STORAGE_KEY}_${lang}`, JSON.stringify(data))
+  aboutStorage.save(lang, data)
 }

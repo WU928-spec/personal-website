@@ -5,7 +5,7 @@ import { Link2, ArrowRight } from 'lucide-react'
 import { fetchObsidianNotes } from '@/services/obsidianClient'
 import type { ObsidianNoteMeta } from '@/types'
 import { findBacklinks } from '@/services/linkParser'
-import { useLang } from '@/contexts/LangContext'
+import { useLang } from '@/contexts/PreferencesContext'
 
 interface BacklinksProps {
   currentSlug: string

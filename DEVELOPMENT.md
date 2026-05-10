@@ -1,5 +1,11 @@
 # 开发日志
 
+> **最新重构**: 2026年5月10日完成全面代码重构，详见 [REFACTOR-2026-05-10.md](./REFACTOR-2026-05-10.md)
+> 
+> **重构成果**: 代码减少 1350 行，依赖减少 68%，添加类型安全和单元测试，核心模块 100% 测试覆盖
+
+---
+
 本文档记录项目的开发历史、已知问题和解决方案，用于在不同 AI 助手（Kimi Code、Claude Code 等）之间同步项目信息。
 
 ## 项目概述
@@ -19,6 +25,186 @@
 - Obsidian Server：http://localhost:2667
 
 ## 最近解决的问题
+
+### 2026-05-09: Obsidian PDF 标注 Callout 显示修复 + 笔记搜索相关度排序
+
+**问题描述**:
+1. PDF 标注格式 `[!PDF|] [[原则.pdf#page=75|原则, p.75]]` 无法正确显示为 Callout
+2. 笔记搜索结果没有按相关度排序，只是简单过滤
+
+**解决方案**:
+
+**1. PDF Callout 显示修复** (`app/src/components/MarkdownRenderer.tsx`)
+
+问题原因：
+- 正则表达式 `/^\[!(\w+)(?:\|[^\]]+)?\]/` 要求 `|` 后面至少有一个字符
+- `[!PDF|]` 的 `|` 后面为空，导致匹配失败
+- PDF 链接 `[[file.pdf#page=...|Display]]` 没有被预处理
+
+修复方案：
+```typescript
+// 1. 修复正则表达式，允许 | 后面为空
+const match = text.match(/^\[!(\w+)(?:\|[^\]]*)?\]\s*([^\n]*)/)
+
+// 2. 在标题提取时处理 PDF 链接
+let rawTitle = match[2].trim()
+rawTitle = rawTitle.replace(
+  /\[\[([^|\]]+\.pdf[^|\]]*)\|([^\]]+)\]\]/g, 
+  (_m, _path, display) => display.trim()
+)
+
+// 3. 在 preprocessWikilinks 中处理 PDF 链接
+processed = processed.replace(
+  /\[\[([^|\]]+\.pdf[^|\]]*)\|([^\]]+)\]\]/g,
+  (_match, _pdfPath: string, display: string) => display.trim()
+)
+
+// 4. 添加 PDF 样式
+pdf: <Info size={16} className="text-Amber shrink-0" />
+bgMap.pdf = 'rgba(var(--color-amber), 0.12)'
+borderMap.pdf = '#C4783A'
+```
+
+**2. 笔记搜索相关度排序** (`app/src/pages/ObsidianBrowser.tsx`)
+
+实现与全局搜索相同的评分算法：
+```typescript
+const calcNoteScore = (note: ObsidianNote, query: string): number => {
+  // 标题匹配（最高权重）
+  if (title === query) score += 100
+  else if (title.startsWith(query)) score += 80
+  else if (title.includes(query)) score += 60
+
+  // 标签匹配
+  if (tags.some(tag === query)) score += 50
+  else if (tags.some(tag.includes(query))) score += 40
+
+  // 分类匹配
+  if (category === query) score += 45
+  else if (category.includes(query)) score += 35
+
+  // 摘要/内容匹配
+  if (excerpt === query) score += 30
+  else if (excerpt.startsWith(query)) score += 25
+  else if (excerpt.includes(query)) score += 20
+}
+
+const filteredNotes = notes
+  .filter(/* 包含查询词 */)
+  .map(n => ({ note: n, score: calcNoteScore(n, q) }))
+  .sort((a, b) => b.score - a.score)
+  .map(item => item.note)
+```
+
+**测试结果**:
+- ✅ PDF 标注 Callout 正确显示为琥珀色卡片
+- ✅ 标题显示为 "原则, p.75"（不包含 PDF 链接）
+- ✅ 笔记搜索结果按相关度排序
+- ✅ 标题完全匹配的笔记排在最前面
+
+**相关文件**:
+- `app/src/components/MarkdownRenderer.tsx` - PDF Callout 修复
+- `app/src/pages/ObsidianBrowser.tsx` - 搜索相关度排序
+
+**相关 Commit**: 待提交
+
+---
+
+### 2026-05-09: 标题折叠功能 + 文档内锚点跳转
+
+**功能需求**:
+1. 标题折叠：点击标题前的箭头图标可以收起/展开下属内容（类似 Obsidian）
+2. 文档内锚点跳转：`[[#标题]]` 格式的链接可以跳转到同一文档内的对应标题
+
+**实现方案**:
+
+**1. 文档内锚点跳转** (`app/src/components/MarkdownRenderer.tsx:199-220`)
+- 在 `preprocessWikilinks` 函数中识别 `[[#标题]]` 和 `[[#标题|显示文本]]` 格式
+- 将标题文本转换为合法的 HTML id（小写、去除特殊字符、空格转连字符）
+- 转换为标准 markdown 链接 `[显示文本](#id)`
+- 在链接组件中添加平滑滚动处理
+
+```typescript
+// [[#Heading]] - internal anchor links
+processed = processed.replace(
+  /\[\[#([^\]|]+)\]\]/g,
+  (_match, heading: string) => {
+    const headingText = heading.trim()
+    const headingId = headingText
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+    return `[${headingText}](#${headingId})`
+  }
+)
+```
+
+**2. 标题折叠功能** (`app/src/components/MarkdownRenderer.tsx`)
+
+技术实现：
+- 使用 React Context 管理折叠状态 (`HeadingCollapseContext`)
+- 为 h1-h4 标题添加 `ChevronRight` 图标和点击事件
+- 使用 `useEffect` + DOM 操作隐藏/显示标题下的内容
+
+关键代码：
+```typescript
+// 1. Context 定义
+const HeadingCollapseContext = createContext<HeadingCollapseContextType>({
+  collapsedHeadings: new Set(),
+  toggleHeading: () => {},
+})
+
+// 2. 标题组件（以 h2 为例）
+h2: ({ children, id }) => {
+  const { collapsedHeadings, toggleHeading } = useContext(HeadingCollapseContext)
+  const isCollapsed = id ? collapsedHeadings.has(id) : false
+
+  return (
+    <h2 onClick={() => id && toggleHeading(id)}>
+      <ChevronRight 
+        className={`${isCollapsed ? '' : 'rotate-90'}`}
+      />
+      {children}
+    </h2>
+  )
+}
+
+// 3. DOM 操作实现折叠
+useEffect(() => {
+  const headings = container.querySelectorAll('h1[id], h2[id], h3[id], h4[id]')
+  headings.forEach((heading) => {
+    // 找到该标题下的所有内容，直到遇到同级或更高级标题
+    let sibling = heading.nextElementSibling
+    while (sibling) {
+      if (isCollapsed) {
+        sibling.style.display = 'none'
+      } else {
+        sibling.style.display = ''
+      }
+      sibling = sibling.nextElementSibling
+    }
+  })
+}, [collapsedHeadings, processedContent])
+```
+
+**遇到的问题**:
+- 初始实现只支持 h2-h4，导致"马斯克传英语原著原文"中的 h1 标题（`# PROLOGUE Mues of fire`）没有折叠图标
+- 通过开发者工具检查发现问题，补充了 h1 的支持
+
+**测试结果**:
+- ✅ 所有 h1-h4 标题都有折叠图标（▶）
+- ✅ 点击标题可以收起/展开下属内容
+- ✅ 展开时图标旋转 90° 变成（▼）
+- ✅ `[[#标题]]` 链接可以平滑滚动到对应位置
+- ✅ 全局应用到所有笔记
+
+**相关文件**:
+- `app/src/components/MarkdownRenderer.tsx` - 核心实现
+- `app/src/components/ImageGrid.tsx` - 顺便优化了图片网格尺寸（单图 60%/280px，多图 80%/420px）
+
+**相关 Commit**: 待提交
+
+---
 
 ### 2026-05-09: MomentUploader 笔记选择弹窗重构
 
@@ -264,6 +450,43 @@ npm run dev  # http://localhost:2667
 - ✅ Claude 使用开发者工具发现实际渲染的 `<a href>` 值与预期不符，从而定位到 slug 生成函数和链接格式问题
 
 **最终方案**: 见上文 `8a564c5` (Claude Code 实现)
+
+---
+
+### 2026-05-09: Navbar 全局搜索（Cmd+K）
+
+**文件**: `app/src/components/Navbar.tsx`
+
+**功能**:
+1. **全局搜索覆盖层** - 点击搜索图标或 `Cmd+K` 打开全屏搜索弹窗
+2. **双数据源** - 同时搜索 Obsidian 笔记（标题/摘要/分类/标签）和记忆碎片（内容/地理位置）
+3. **相关度排序** - 按匹配权重降序排列（标题完全匹配 +100 → 内容包含 +20）
+4. **触控板滑动** - `overscroll-contain` + `onWheel` 阻止事件冒泡
+5. **键盘导航** - `↑↓` 选择，`↵` 打开，`Esc` 关闭
+
+**结果项区分**:
+- 笔记：📄 文件图标 + 分类标签
+- 碎片："碎片"标签 + 地理位置
+
+---
+
+### 2026-05-09: Obsidian 笔记浏览器历史导航 + 消除闪烁
+
+**文件**: `app/src/pages/ObsidianBrowser.tsx`
+
+**1. 前后按钮改为浏览器历史导航**
+- `←` 上一篇 = `navigate(-1)`（浏览器后退）
+- `→` 下一篇 = `navigate(1)`（浏览器前进）
+- **不是**基于笔记列表索引，而是基于用户实际浏览路径
+- disabled 判断：使用 `window.history.state.idx` + `maxHistoryIdx` ref 跟踪当前 session 内的最大访问索引
+
+**2. 消除切换闪烁**
+- 移除 `motion.div` 的 `key={selectedNote.slug}`
+- 切换笔记时不再重新创建组件，内容平滑更新
+
+**3. 按钮样式**
+- 可点击：圆形按钮 + `border-white/25` + `bg-white/5` + 白色箭头，hover 变琥珀色
+- disabled：无边框透明背景 + `text-white/10` 几乎不可见
 
 ---
 

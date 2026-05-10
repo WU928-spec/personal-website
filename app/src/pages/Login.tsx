@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { LogIn, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useLang } from '@/contexts/LangContext'
+import { useLang } from '@/contexts/PreferencesContext'
 
 export default function Login() {
   const { t } = useLang()

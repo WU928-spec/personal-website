@@ -1,28 +1,20 @@
-import { type ReactNode, useState, useEffect, useRef, useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
 import Navbar from './Navbar.tsx'
 import Footer from './Footer.tsx'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { LangProvider } from '@/contexts/LangContext'
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import Lenis from 'lenis'
+import { PreferencesProvider } from '@/contexts/PreferencesContext'
 import { ArrowUp } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useScrollPosition } from '@/hooks'
 
 interface LayoutProps {
   children: ReactNode
 }
 
 function BackToTop() {
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setVisible(window.scrollY > 400)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const { y } = useScrollPosition()
+  const visible = y > 400
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -48,40 +40,18 @@ function BackToTop() {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const lenisRef = useRef<Lenis | null>(null)
-
-  useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.08,
-    })
-    lenisRef.current = lenis
-
-    function raf(time: number) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-    requestAnimationFrame(raf)
-
-    return () => {
-      lenis.destroy()
-      lenisRef.current = null
-    }
-  }, [])
-
   return (
     <HelmetProvider>
-    <ThemeProvider>
-      <LangProvider>
-        <AuthProvider>
-          <div className="relative">
-            <Navbar />
-            <main className="pt-16">{children}</main>
-            <Footer />
-            <BackToTop />
-          </div>
-        </AuthProvider>
-      </LangProvider>
-    </ThemeProvider>
+    <PreferencesProvider>
+      <AuthProvider>
+        <div className="relative">
+          <Navbar />
+          <main className="pt-16">{children}</main>
+          <Footer />
+          <BackToTop />
+        </div>
+      </AuthProvider>
+    </PreferencesProvider>
     </HelmetProvider>
   )
 }

@@ -3,12 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Github, Search, Menu, X, LogIn, User, Globe, Sun, Moon, Pencil, Eye, ArrowLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
-import { useLang } from '@/contexts/LangContext'
-import { useTheme } from '@/contexts/ThemeContext'
+import { useLang, useTheme } from '@/contexts/PreferencesContext'
+import GlobalSearch from './GlobalSearch'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { user, isLoggedIn, isEditMode, setEditMode } = useAuth()
@@ -24,9 +25,7 @@ export default function Navbar() {
   ]
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -35,6 +34,17 @@ export default function Navbar() {
     setMobileOpen(false)
   }, [location.pathname])
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setSearchOpen((v) => !v)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   const linkClass = (path: string) =>
     `relative font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] transition-colors duration-300 group ${
       location.pathname === path
@@ -42,8 +52,7 @@ export default function Navbar() {
         : 'text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber'
     }`
 
-  const iconBtnClass =
-    'text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber'
+  const iconBtnClass = 'text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber'
 
   return (
     <>
@@ -74,9 +83,7 @@ export default function Navbar() {
                 {link.label}
                 <span
                   className={`absolute left-0 -bottom-1 h-[2px] bg-Amber transition-transform duration-300 origin-center ${
-                    location.pathname === link.path
-                      ? 'w-full scale-x-100'
-                      : 'w-full scale-x-0 group-hover:scale-x-100'
+                    location.pathname === link.path ? 'w-full scale-x-100' : 'w-full scale-x-0 group-hover:scale-x-100'
                   }`}
                 />
               </Link>
@@ -93,7 +100,12 @@ export default function Navbar() {
             >
               <Github size={20} />
             </a>
-            <button className={iconBtnClass} aria-label={t('nav.search')}>
+            <button
+              onClick={() => setSearchOpen(true)}
+              className={`${iconBtnClass} relative`}
+              aria-label={t('nav.search')}
+              title="搜索 (Cmd+K)"
+            >
               <Search size={20} />
             </button>
             <button
@@ -157,13 +169,15 @@ export default function Navbar() {
         </div>
       </nav>
 
+      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className="fixed top-0 right-0 bottom-0 w-72 bg-Parchment shadow-deep z-[60] flex flex-col p-8 dark:bg-Graphite"
           >
             <button
@@ -179,9 +193,7 @@ export default function Navbar() {
                   key={link.path}
                   to={link.path}
                   className={`font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] ${
-                    location.pathname === link.path
-                      ? 'text-Amber'
-                      : 'text-Ink dark:text-white'
+                    location.pathname === link.path ? 'text-Amber' : 'text-Ink dark:text-white'
                   }`}
                 >
                   {link.label}
@@ -200,6 +212,10 @@ export default function Navbar() {
                   <Github size={20} />
                 </a>
                 <button
+                  onClick={() => {
+                    setMobileOpen(false)
+                    setSearchOpen(true)
+                  }}
                   className="text-Ink hover:text-Amber transition-colors dark:text-white dark:hover:text-Amber"
                   aria-label={t('nav.search')}
                 >

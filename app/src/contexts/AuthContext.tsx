@@ -34,124 +34,148 @@ const DEFAULT_USER: User = {
 }
 const LOGIN_PASSWORD = 'vibecoding2025'
 
-const REGISTRY_KEY = 'vibecoding_user_registry'
-const VISITOR_KEY = 'vibecoding_visitor_id'
+const AUTH_KEY = 'vibecoding_auth'
 
-function loadRegistry(): Record<string, UserInfo> {
+interface AuthStorage {
+  currentUser: User | null
+  visitorId: string
+  registry: Record<string, UserInfo>
+}
+
+function loadAuth(): AuthStorage {
   try {
-    const raw = localStorage.getItem(REGISTRY_KEY)
-    if (raw) return JSON.parse(raw) as Record<string, UserInfo>
+    const raw = localStorage.getItem(AUTH_KEY)
+    if (raw) {
+      const data = JSON.parse(raw) as AuthStorage
+      // 迁移旧数据
+      if (data.currentUser?.userId === 'WU928-spec') {
+        data.currentUser.userId = DEFAULT_USER.userId
+      }
+      return data
+    }
   } catch {
-    // ignore
+    // 尝试迁移旧格式数据
+    try {
+      const oldUser = localStorage.getItem('vibecoding_user')
+      const oldRegistry = localStorage.getItem('vibecoding_user_registry')
+      const oldVisitor = localStorage.getItem('vibecoding_visitor_id')
+
+      if (oldUser || oldRegistry || oldVisitor) {
+        const migrated: AuthStorage = {
+          currentUser: oldUser ? JSON.parse(oldUser) : null,
+          visitorId: oldVisitor || 'visitor_' + Math.random().toString(36).slice(2, 10),
+          registry: oldRegistry ? JSON.parse(oldRegistry) : {}
+        }
+
+        // 清理旧数据
+        localStorage.removeItem('vibecoding_user')
+        localStorage.removeItem('vibecoding_logged_in')
+        localStorage.removeItem('vibecoding_avatar')
+        localStorage.removeItem('vibecoding_user_registry')
+        localStorage.removeItem('vibecoding_visitor_id')
+
+        saveAuth(migrated)
+        return migrated
+      }
+    } catch {}
   }
-  return {}
+
+  return {
+    currentUser: null,
+    visitorId: 'visitor_' + Math.random().toString(36).slice(2, 10),
+    registry: {}
+  }
 }
 
-function saveRegistry(registry: Record<string, UserInfo>) {
-  localStorage.setItem(REGISTRY_KEY, JSON.stringify(registry))
-}
-
-function getOrCreateVisitorId(): string {
-  let id = localStorage.getItem(VISITOR_KEY)
-  if (!id) {
-    id = 'visitor_' + Math.random().toString(36).slice(2, 10)
-    localStorage.setItem(VISITOR_KEY, id)
-  }
-  return id
+function saveAuth(data: AuthStorage) {
+  localStorage.setItem(AUTH_KEY, JSON.stringify(data))
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [authData, setAuthData] = useState<AuthStorage>(loadAuth)
   const [isEditMode, setEditMode] = useState(false)
-  const [registry, setRegistry] = useState<Record<string, UserInfo>>(loadRegistry)
 
-  const userId = user?.userId || getOrCreateVisitorId()
+  const user = authData.currentUser
+  const isLoggedIn = user !== null
+  const userId = user?.userId || authData.visitorId
 
-  useEffect(() => {
-    const saved = localStorage.getItem('vibecoding_user')
-    if (saved) {
-      try {
-        let parsed = JSON.parse(saved) as User
-        // Migrate old data: previous userId was 'WU928-spec', now it's email
-        if (parsed.userId === 'WU928-spec') {
-          parsed = { ...parsed, userId: DEFAULT_USER.userId }
-        }
-        // Migrate old data without userId
-        if (!parsed.userId) {
-          parsed = { ...parsed, userId: DEFAULT_USER.userId }
-        }
-        setUser(parsed)
-        setRegistry((prev) => {
-          const next = { ...prev, [parsed.userId]: { username: parsed.username, avatar: parsed.avatar } }
-          saveRegistry(next)
-          return next
-        })
-      } catch {
-        localStorage.removeItem('vibecoding_user')
-      }
-    }
-    setIsLoggedIn(localStorage.getItem('vibecoding_logged_in') === 'true')
-  }, [])
+  const updateAuth = (updater: (prev: AuthStorage) => AuthStorage) => {
+    setAuthData(prev => {
+      const next = updater(prev)
+      saveAuth(next)
+      return next
+    })
+  }
 
   const login = (email: string, password: string): boolean => {
     if (email === DEFAULT_USER.userId && password === LOGIN_PASSWORD) {
-      const savedAvatar = localStorage.getItem('vibecoding_avatar') || DEFAULT_USER.avatar
-      // Preserve existing nickname if user has one
-      const savedRaw = localStorage.getItem('vibecoding_user')
-      let currentUsername = DEFAULT_USER.username
-      if (savedRaw) {
-        try { currentUsername = JSON.parse(savedRaw).username || DEFAULT_USER.username } catch {}
-      }
-      const newUser: User = { userId: DEFAULT_USER.userId, username: currentUsername, avatar: savedAvatar }
-      setUser(newUser)
-      setIsLoggedIn(true)
-      setRegistry((prev) => {
-        const next = { ...prev, [DEFAULT_USER.userId]: { username: currentUsername, avatar: savedAvatar } }
-        saveRegistry(next)
-        return next
+      updateAuth(prev => {
+        const existingUser = prev.registry[DEFAULT_USER.userId]
+        const newUser: User = {
+          userId: DEFAULT_USER.userId,
+          username: existingUser?.username || DEFAULT_USER.username,
+          avatar: existingUser?.avatar || DEFAULT_USER.avatar
+        }
+        return {
+          ...prev,
+          currentUser: newUser,
+          registry: {
+            ...prev.registry,
+            [newUser.userId]: { username: newUser.username, avatar: newUser.avatar }
+          }
+        }
       })
-      localStorage.setItem('vibecoding_user', JSON.stringify(newUser))
-      localStorage.setItem('vibecoding_logged_in', 'true')
       return true
     }
     return false
   }
 
   const logout = () => {
-    setIsLoggedIn(false)
+    updateAuth(prev => ({ ...prev, currentUser: null }))
     setEditMode(false)
-    localStorage.removeItem('vibecoding_logged_in')
   }
 
   const updateAvatar = (avatar: string) => {
-    const currentUser = user || { userId: getOrCreateVisitorId(), username: '访客', avatar: '/avatar.jpg' }
-    const updated = { ...currentUser, avatar }
-    setUser(updated)
-    setRegistry((prev) => {
-      const next = { ...prev, [updated.userId]: { username: updated.username, avatar } }
-      saveRegistry(next)
-      return next
+    updateAuth(prev => {
+      const currentUser = prev.currentUser || {
+        userId: prev.visitorId,
+        username: '访客',
+        avatar: '/avatar.jpg'
+      }
+      const updated = { ...currentUser, avatar }
+      return {
+        ...prev,
+        currentUser: updated,
+        registry: {
+          ...prev.registry,
+          [updated.userId]: { username: updated.username, avatar }
+        }
+      }
     })
-    localStorage.setItem('vibecoding_user', JSON.stringify(updated))
-    localStorage.setItem('vibecoding_avatar', avatar)
   }
 
   const updateUsername = (username: string) => {
-    const currentUser = user || { userId: getOrCreateVisitorId(), username: '访客', avatar: '/avatar.jpg' }
-    const updated = { ...currentUser, username }
-    setUser(updated)
-    setRegistry((prev) => {
-      const next = { ...prev, [updated.userId]: { username, avatar: updated.avatar } }
-      saveRegistry(next)
-      return next
+    updateAuth(prev => {
+      const currentUser = prev.currentUser || {
+        userId: prev.visitorId,
+        username: '访客',
+        avatar: '/avatar.jpg'
+      }
+      const updated = { ...currentUser, username }
+      return {
+        ...prev,
+        currentUser: updated,
+        registry: {
+          ...prev.registry,
+          [updated.userId]: { username, avatar: updated.avatar }
+        }
+      }
     })
-    localStorage.setItem('vibecoding_user', JSON.stringify(updated))
   }
 
   const getUserDisplay = (uid: string | undefined): UserInfo => {
     if (!uid) return { username: '未知用户', avatar: '' }
-    return registry[uid] || { username: uid, avatar: '' }
+    return authData.registry[uid] || { username: uid, avatar: '' }
   }
 
   return (

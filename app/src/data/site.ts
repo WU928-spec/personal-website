@@ -1,4 +1,5 @@
 import type { Lang } from '@/i18n/translations'
+import { createLangStorageKey, createStorageKey } from '@/utils/storage'
 
 /* ───────────────────────────────────────────────
    Hero
@@ -19,24 +20,14 @@ const defaultHero: Record<Lang, HeroData> = {
   },
 }
 
+const heroStorage = createLangStorageKey('vibecoding_hero', defaultHero)
+
 export function loadHero(lang: Lang): HeroData {
-  const saved = localStorage.getItem('vibecoding_hero')
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as Record<Lang, HeroData>
-      if (parsed && typeof parsed === 'object' && parsed[lang]) {
-        return parsed[lang]
-      }
-      localStorage.removeItem('vibecoding_hero')
-    } catch {
-      localStorage.removeItem('vibecoding_hero')
-    }
-  }
-  return defaultHero[lang]
+  return heroStorage.load(lang)
 }
 
 export function saveHero(data: Record<Lang, HeroData>) {
-  localStorage.setItem('vibecoding_hero', JSON.stringify(data))
+  heroStorage.saveAll(data)
 }
 
 /* ───────────────────────────────────────────────
@@ -96,22 +87,14 @@ const defaultSkills: SkillCategory[] = [
   },
 ]
 
+const skillsStorage = createStorageKey('vibecoding_skills', defaultSkills)
+
 export function loadSkills(): SkillCategory[] {
-  const saved = localStorage.getItem('vibecoding_skills')
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as SkillCategory[]
-      if (Array.isArray(parsed)) return parsed
-      localStorage.removeItem('vibecoding_skills')
-    } catch {
-      localStorage.removeItem('vibecoding_skills')
-    }
-  }
-  return defaultSkills
+  return skillsStorage.load()
 }
 
 export function saveSkills(data: SkillCategory[]) {
-  localStorage.setItem('vibecoding_skills', JSON.stringify(data))
+  skillsStorage.save(data)
 }
 
 /* ───────────────────────────────────────────────
@@ -181,24 +164,14 @@ const defaultBlogPreview: Record<Lang, BlogPreviewPost[]> = {
   ],
 }
 
+const blogPreviewStorage = createLangStorageKey('vibecoding_blogPreview', defaultBlogPreview)
+
 export function loadBlogPreview(lang: Lang): BlogPreviewPost[] {
-  const saved = localStorage.getItem('vibecoding_blogPreview')
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as Record<Lang, BlogPreviewPost[]>
-      if (parsed && typeof parsed === 'object' && Array.isArray(parsed[lang])) {
-        return parsed[lang]
-      }
-      localStorage.removeItem('vibecoding_blogPreview')
-    } catch {
-      localStorage.removeItem('vibecoding_blogPreview')
-    }
-  }
-  return defaultBlogPreview[lang]
+  return blogPreviewStorage.load(lang)
 }
 
 export function saveBlogPreview(data: Record<Lang, BlogPreviewPost[]>) {
-  localStorage.setItem('vibecoding_blogPreview', JSON.stringify(data))
+  blogPreviewStorage.saveAll(data)
 }
 
 /* ───────────────────────────────────────────────
@@ -267,24 +240,14 @@ const defaultGitHub: GitHubData = {
   stats: { repos: 48, stars: 1567, streak: 42 },
 }
 
+const githubStorage = createStorageKey('vibecoding_github', defaultGitHub)
+
 export function loadGitHub(): GitHubData {
-  const saved = localStorage.getItem('vibecoding_github')
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as GitHubData
-      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.repos)) {
-        return parsed
-      }
-      localStorage.removeItem('vibecoding_github')
-    } catch {
-      localStorage.removeItem('vibecoding_github')
-    }
-  }
-  return defaultGitHub
+  return githubStorage.load()
 }
 
 export function saveGitHub(data: GitHubData) {
-  localStorage.setItem('vibecoding_github', JSON.stringify(data))
+  githubStorage.save(data)
 }
 
 /* ───────────────────────────────────────────────
@@ -348,22 +311,12 @@ const defaultFooter: Record<Lang, FooterData> = {
   },
 }
 
+const footerStorage = createLangStorageKey('vibecoding_footer', defaultFooter)
+
 export function loadFooter(lang: Lang): FooterData {
-  const saved = localStorage.getItem('vibecoding_footer')
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as Record<Lang, FooterData>
-      if (parsed && typeof parsed === 'object' && parsed[lang]) {
-        return parsed[lang]
-      }
-      localStorage.removeItem('vibecoding_footer')
-    } catch {
-      localStorage.removeItem('vibecoding_footer')
-    }
-  }
-  return defaultFooter[lang]
+  return footerStorage.load(lang)
 }
 
 export function saveFooter(data: Record<Lang, FooterData>) {
-  localStorage.setItem('vibecoding_footer', JSON.stringify(data))
+  footerStorage.saveAll(data)
 }

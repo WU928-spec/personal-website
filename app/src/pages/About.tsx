@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useLang } from '@/contexts/LangContext'
+import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 
 export default function About() {

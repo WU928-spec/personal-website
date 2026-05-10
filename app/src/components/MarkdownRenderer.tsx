@@ -219,6 +219,15 @@ export function preprocessWikilinks(
     }
   )
 
+  // [[file.pdf#page=...&selection=...|Display]] - PDF annotations (convert to plain text)
+  processed = processed.replace(
+    /\[\[([^|\]]+\.pdf[^|\]]*)\|([^\]]+)\]\]/g,
+    (_match, _pdfPath: string, display: string) => {
+      // Just return the display text without link, since PDF viewing is not supported yet
+      return display.trim()
+    }
+  )
+
   // [[Title|Display]]
   processed = processed.replace(
     /\[\[([^\]|#]+)\|([^\]]+)\]\]/g,
@@ -383,6 +392,7 @@ function Callout({
     danger: <AlertTriangle size={16} className="text-Rose shrink-0" />,
     info: <Info size={16} className="text-Sage shrink-0" />,
     success: <Info size={16} className="text-Sage shrink-0" />,
+    pdf: <Info size={16} className="text-Amber shrink-0" />,
   }
 
   const bgMap: Record<string, string> = {
@@ -392,6 +402,7 @@ function Callout({
     danger: 'rgba(var(--color-rose), 0.12)',
     info: 'rgba(var(--color-sage), 0.12)',
     success: 'rgba(var(--color-sage), 0.12)',
+    pdf: 'rgba(var(--color-amber), 0.12)',
   }
 
   const borderMap: Record<string, string> = {
@@ -401,6 +412,7 @@ function Callout({
     danger: '#B8695A',
     info: '#6B8E6B',
     success: '#6B8E6B',
+    pdf: '#C4783A',
   }
 
   const lowerType = type.toLowerCase()
@@ -422,24 +434,28 @@ function Callout({
   )
 }
 
-const CALLOUT_TYPES = ['note', 'warning', 'tip', 'info', 'danger', 'success']
-
 function Blockquote({ children }: { children: React.ReactNode }) {
   const childArray = Array.isArray(children) ? children : [children]
 
-  // Try to find the child that contains [!NOTE]
+  // Try to find the child that contains [!NOTE] or any callout type
   let calloutChildIndex = -1
   let calloutType = ''
   let calloutTitle = ''
 
   for (let i = 0; i < childArray.length; i++) {
     const text = extractText(childArray[i])
-    const match = text.match(/^\[!(\w+)\]\s*([^\n]*)/)
+    // Match any [!TYPE] or [!TYPE|modifier] format (modifier can be empty)
+    const match = text.match(/^\[!(\w+)(?:\|[^\]]*)?\]\s*([^\n]*)/)
 
-    if (match && CALLOUT_TYPES.includes(match[1].toLowerCase())) {
+    if (match) {
       calloutChildIndex = i
       calloutType = match[1]
-      calloutTitle = match[2].trim() || match[1].charAt(0).toUpperCase() + match[1].slice(1)
+      let rawTitle = match[2].trim()
+
+      // Process PDF links in title: [[file.pdf#page=...|Display]] -> Display
+      rawTitle = rawTitle.replace(/\[\[([^|\]]+\.pdf[^|\]]*)\|([^\]]+)\]\]/g, (_m, _path, display) => display.trim())
+
+      calloutTitle = rawTitle || match[1].charAt(0).toUpperCase() + match[1].slice(1)
       break
     }
   }
@@ -462,9 +478,9 @@ function Blockquote({ children }: { children: React.ReactNode }) {
         ? childProps.children
         : [childProps.children]
 
-      // Remove the first text node that contains [!NOTE]
+      // Remove the first text node that contains [!TYPE] or [!TYPE|modifier]
       const filteredGrandChildren = grandChildren.filter((gc, idx) => {
-        if (idx === 0 && typeof gc === 'string' && gc.match(/^\[!\w+\]/)) {
+        if (idx === 0 && typeof gc === 'string' && gc.match(/^\[!\w+(?:\|[^\]]*)?\]/)) {
           return false
         }
         return true

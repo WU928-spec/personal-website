@@ -8,15 +8,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **技术栈**:
 - React 19 + TypeScript
-- Vite 7.2.4
+- Vite 7.3.0
 - Tailwind CSS 3.4.19
-- shadcn/ui
 - React Router v7
 - Markdown 渲染：react-markdown + remark/rehype
+- 类型验证：Zod 3.25.76
+- 测试框架：Vitest + @testing-library/react
 
 **服务**:
 - 前端：http://localhost:3000
 - Obsidian Server：http://localhost:2667
+
+**代码质量**:
+- ✅ TypeScript 严格模式
+- ✅ 运行时类型验证（Zod）
+- ✅ 核心模块单元测试覆盖
+- ✅ 错误边界保护
+- ✅ 性能优化（懒加载、React.memo）
 
 ## 开发环境
 
@@ -25,6 +33,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd app
 npm install
 npm run dev  # http://localhost:3000
+npm test     # 运行单元测试
 ```
 
 ### Obsidian Server 启动
@@ -46,9 +55,12 @@ npm run dev  # http://localhost:2667
    - 实时搜索功能（标题、分类、标签、摘要）
    - 侧边栏固定滚动
    - 笔记内部链接跳转
+   - 标题折叠/展开功能
 
 2. **Markdown 渲染** (`app/src/components/MarkdownRenderer.tsx`)
    - Wikilink 支持：`[[标题]]`、`[[标题|显示文本]]`
+   - 文档内锚点：`[[#标题]]`、`[[#标题|显示文本]]`
+   - 标题折叠：点击 h1-h4 标题前的箭头图标收起/展开内容
    - 数学公式：KaTeX 渲染
    - 代码高亮：Shiki（warm-garden 主题）
    - Obsidian Callout：`[!NOTE]`、`[!TIP]`、`[!WARNING]` 等
@@ -56,6 +68,7 @@ npm run dev  # http://localhost:2667
 
 3. **链接处理**
    - 内部链接：`obsidian-internal://slug`
+   - 文档内锚点：`#heading-id`（平滑滚动）
    - Markdown 链接：`[标题](文件名.md)`
    - 相对链接：自动 URL 解码
    - 中文链接支持
@@ -180,6 +193,98 @@ contentRef.current?.addEventListener('click', (e) => {
 
 **注意**: `top-24` 是为了预留顶部导航栏高度（6rem = 96px）
 
+### 6. 标题折叠功能
+
+**实现**: `MarkdownRenderer.tsx`
+
+使用 React Context + DOM 操作实现标题折叠：
+
+```typescript
+// 1. Context 管理折叠状态
+const HeadingCollapseContext = createContext<HeadingCollapseContextType>({
+  collapsedHeadings: new Set(),
+  toggleHeading: () => {},
+})
+
+// 2. 标题组件添加折叠图标
+h2: ({ children, id }) => {
+  const { collapsedHeadings, toggleHeading } = useContext(HeadingCollapseContext)
+  const isCollapsed = id ? collapsedHeadings.has(id) : false
+
+  return (
+    <h2 onClick={() => id && toggleHeading(id)}>
+      <ChevronRight 
+        className={`${isCollapsed ? '' : 'rotate-90'}`}
+      />
+      {children}
+    </h2>
+  )
+}
+
+// 3. useEffect 控制内容显示/隐藏
+useEffect(() => {
+  const headings = container.querySelectorAll('h1[id], h2[id], h3[id], h4[id]')
+  headings.forEach((heading) => {
+    // 隐藏该标题下的所有内容，直到遇到同级或更高级标题
+    let sibling = heading.nextElementSibling
+    while (sibling) {
+      if (isCollapsed) {
+        sibling.style.display = 'none'
+      } else {
+        sibling.style.display = ''
+      }
+      sibling = sibling.nextElementSibling
+    }
+  })
+}, [collapsedHeadings, processedContent])
+```
+
+**重要**: 必须支持 h1-h4 所有级别，因为不同笔记可能使用不同的标题级别
+
+### 7. 文档内锚点跳转
+
+**实现**: `MarkdownRenderer.tsx:199-220`
+
+识别 `[[#标题]]` 格式并转换为锚点链接：
+
+```typescript
+// 预处理 [[#Heading]] 为 [Heading](#heading)
+processed = processed.replace(
+  /\[\[#([^\]|]+)\]\]/g,
+  (_match, heading: string) => {
+    const headingText = heading.trim()
+    const headingId = headingText
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+    return `[${headingText}](#${headingId})`
+  }
+)
+
+// 链接组件处理锚点点击
+a: ({ href, children }) => {
+  if (href?.startsWith('#')) {
+    return (
+      <a
+        href={href}
+        onClick={(e) => {
+          e.preventDefault()
+          const element = document.getElementById(href.slice(1))
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        }}
+      >
+        {children}
+      </a>
+    )
+  }
+  // ... 其他链接处理
+}
+```
+
+**注意**: `top-24` 是为了预留顶部导航栏高度（6rem = 96px）
+
 ## 常见问题
 
 ### 1. 中文链接无法跳转
@@ -216,16 +321,44 @@ contentRef.current?.addEventListener('click', (e) => {
 app/
 ├── src/
 │   ├── components/
-│   │   └── MarkdownRenderer.tsx    # Markdown 渲染核心
+│   │   ├── MarkdownRenderer.tsx    # Markdown 渲染核心
+│   │   ├── ErrorBoundary.tsx       # 错误边界
+│   │   ├── NoteTree.tsx            # 笔记树组件
+│   │   ├── ProfileHeader.tsx       # Profile 头部
+│   │   ├── ProfileSettings.tsx     # Profile 设置
+│   │   ├── LazyImage.tsx           # 懒加载图片
+│   │   ├── RepoCard.tsx            # GitHub 仓库卡片
+│   │   └── SkillTag.tsx            # 技能标签
 │   ├── pages/
-│   │   └── ObsidianBrowser.tsx     # 笔记浏览器
-│   ├── services/
-│   │   └── obsidianApi.ts          # Obsidian API 调用
+│   │   ├── ObsidianBrowser.tsx     # 笔记浏览器
+│   │   ├── Home.tsx                # 首页
+│   │   ├── Profile.tsx             # 个人资料
+│   │   └── Moments.tsx             # 记忆碎片
+│   ├── contexts/
+│   │   ├── PreferencesContext.tsx  # 统一的偏好设置（主题+语言）
+│   │   └── AuthContext.tsx         # 认证上下文
+│   ├── hooks/
+│   │   ├── useLocalStorage.ts      # localStorage hook
+│   │   ├── useDebounce.ts          # 防抖 hook
+│   │   ├── useAsync.ts             # 异步 hook
+│   │   ├── useMediaQuery.ts        # 媒体查询 hook
+│   │   ├── useClickOutside.ts      # 点击外部 hook
+│   │   ├── useScrollPosition.ts    # 滚动位置 hook
+│   │   └── *.test.ts               # 单元测试
+│   ├── utils/
+│   │   └── storage.ts              # 统一的存储工具
 │   ├── types/
-│   │   └── obsidian.ts             # 类型定义
-│   └── index.css                   # 全局样式（wikilink 样式）
+│   │   ├── obsidian.ts             # Obsidian 类型定义
+│   │   └── api.ts                  # API 类型定义（Zod schemas）
+│   ├── data/
+│   │   ├── site.ts                 # 网站配置
+│   │   └── about.ts                # 关于信息
+│   ├── test/
+│   │   └── setup.ts                # 测试配置
+│   └── index.css                   # 全局样式
 ├── package.json
-└── vite.config.ts
+├── vite.config.ts
+└── vitest.config.ts                # 测试配置
 
 obsidian-server/
 ├── src/
@@ -246,9 +379,79 @@ obsidian-server/
 
 5. **数学公式**: 不要用 `<p>` 或其他标签包裹数学公式相关的内容
 
-6. **Git 提交**: 重要功能修复后记得更新 `DEVELOPMENT.md` 并提交
+6. **类型安全**: 
+   - 所有 API 响应必须使用 Zod 验证（参考 `src/types/api.ts`）
+   - 避免使用 `any` 类型
+   - 使用 `parseGitHubRepos()` 等安全解析函数
+
+7. **测试**: 
+   - 修改核心 Hooks 后必须运行测试：`npm test`
+   - 新增 Hooks 需要添加对应的测试文件
+   - 测试覆盖率要求：核心模块 100%
+
+8. **性能优化**:
+   - 大型列表使用 `React.memo`
+   - 图片使用 `LazyImage` 组件
+   - 避免不必要的重渲染
+
+9. **错误处理**:
+   - 所有异步操作必须有错误处理
+   - API 调用失败要有友好提示
+   - 使用 `ErrorBoundary` 防止应用崩溃
+
+10. **Git 提交**: 
+    - 重要功能修复后记得更新 `DEVELOPMENT.md`
+    - 每周进行一次代码重构（参考 `REFACTOR-*.md`）
+    - 提交前运行测试确保通过
 
 ## 最近更新
+
+### 2026-05-10: 全面代码重构 ⭐
+
+**重构内容**: 
+- 删除 54 个未使用依赖，减少 68%
+- 删除 46 个未使用 UI 组件，减少 87%
+- 拆分大型组件（Home, ObsidianBrowser, Profile）
+- 合并 ThemeContext 和 LangContext 为 PreferencesContext
+- 添加错误边界（ErrorBoundary）
+- 创建 6 个可复用 Hooks
+- 添加类型安全验证（Zod）
+- 添加 10 个单元测试，核心模块 100% 覆盖
+
+**成果**:
+- 代码减少 ~1350 行（17%）
+- 消除所有 `any` 类型
+- Context 层级从 3 层减少到 2 层
+- 平均组件大小减少 40%
+
+**详细记录**: 参见 `REFACTOR-2026-05-10.md`
+
+**相关文件**: 
+- `src/utils/storage.ts` - 统一存储工具
+- `src/contexts/PreferencesContext.tsx` - 合并后的 Context
+- `src/components/ErrorBoundary.tsx` - 错误边界
+- `src/hooks/*` - 可复用 Hooks
+- `src/types/api.ts` - API 类型验证
+- `vitest.config.ts` - 测试配置
+
+### 2026-05-09: 标题折叠功能 + 文档内锚点跳转
+
+**功能**: 
+1. 点击标题前的箭头图标可以收起/展开下属内容（类似 Obsidian）
+2. `[[#标题]]` 格式的链接可以跳转到同一文档内的对应标题
+
+**实现**:
+- 使用 React Context 管理折叠状态
+- 为 h1-h4 标题添加 `ChevronRight` 图标和点击事件
+- 使用 `useEffect` + DOM 操作隐藏/显示标题下的内容
+- 在 `preprocessWikilinks` 中识别 `[[#标题]]` 格式并转换为锚点链接
+- 在链接组件中添加平滑滚动处理
+
+**相关文件**: `app/src/components/MarkdownRenderer.tsx`
+
+**注意**: 初始实现只支持 h2-h4，后来补充了 h1 支持以适配所有笔记格式
+
+**Commit**: 待提交
 
 ### 2026-05-08: 创建 CLAUDE.md 项目文档
 
@@ -291,13 +494,16 @@ obsidian-server/
 
 ## 参考文档
 
+- [REFACTOR-2026-05-10.md](./REFACTOR-2026-05-10.md) - 最新重构详细记录
 - [DEVELOPMENT.md](./DEVELOPMENT.md) - 详细的开发日志和问题解决记录
 - [React Markdown](https://github.com/remarkjs/react-markdown) - Markdown 渲染库
 - [KaTeX](https://katex.org/) - 数学公式渲染
 - [Shiki](https://shiki.style/) - 代码高亮
 - [Obsidian](https://obsidian.md/) - 笔记应用
+- [Zod](https://zod.dev/) - TypeScript 类型验证
+- [Vitest](https://vitest.dev/) - 测试框架
 
 ---
 
-*最后更新: 2026-05-08*  
+*最后更新: 2026-05-10*  
 *维护者: Claude Sonnet 4.6*

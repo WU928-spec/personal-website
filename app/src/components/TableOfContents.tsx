@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { List, X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useLang } from '@/contexts/LangContext'
+import { useLang } from '@/contexts/PreferencesContext'
 import type { TocItem } from './MarkdownRenderer.tsx'
 
 interface TableOfContentsProps {

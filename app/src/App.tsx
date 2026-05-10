@@ -6,6 +6,7 @@ import Home from './pages/Home.tsx'
 import Login from './pages/Login.tsx'
 import Profile from './pages/Profile.tsx'
 import NotFound from './pages/NotFound.tsx'
+import ErrorBoundary from './components/ErrorBoundary.tsx'
 
 const Projects = lazy(() => import('./pages/Projects.tsx'))
 const About = lazy(() => import('./pages/About.tsx'))
@@ -35,6 +36,7 @@ function App() {
   const location = useLocation()
 
   return (
+    <ErrorBoundary>
     <Layout>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
@@ -94,6 +96,7 @@ function App() {
         </Routes>
       </AnimatePresence>
     </Layout>
+    </ErrorBoundary>
   )
 }
 

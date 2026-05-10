@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Github, Twitter, Linkedin, Mail, Pencil, Save, X } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useLang } from '@/contexts/LangContext'
+import { useLang } from '@/contexts/PreferencesContext'
 import { type FooterData, loadFooter, saveFooter } from '@/data/site'
 
 const iconMap: Record<string, React.ElementType> = {
