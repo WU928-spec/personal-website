@@ -122,10 +122,17 @@ function sortDesc(list: Moment[]): Moment[] {
 async function fetchFromSupabase(): Promise<Moment[]> {
   if (!isSupabaseReady()) throw new Error('Supabase not configured')
 
-  const { data, error } = await supabase!
+  // 5s timeout — don't block UI if Supabase is unreachable
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Supabase timeout')), 5000)
+  )
+
+  const query = supabase!
     .from('moments')
     .select('*')
     .order('created_at', { ascending: false })
+
+  const { data, error } = await Promise.race([query, timeout])
 
   if (error) throw error
   if (!data) return []
