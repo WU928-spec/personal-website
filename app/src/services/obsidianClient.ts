@@ -46,7 +46,12 @@ export async function fetchObsidianNote(slug: string): Promise<ObsidianNote | nu
   if (!meta) return null
 
   try {
-    const res = await fetch(`/notes/${encodeURIComponent(meta.filePath)}`)
+    // Encode each path segment separately, preserve '/' as directory separator
+    const encodedPath = meta.filePath
+      .split('/')
+      .map((s) => encodeURIComponent(s))
+      .join('/')
+    const res = await fetch(`/notes/${encodedPath}`)
     if (!res.ok) return null
     const raw = await res.text()
 
