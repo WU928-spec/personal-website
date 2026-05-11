@@ -1,28 +1,10 @@
 import type { DayEntry, TodoItem } from '@/types/calendar'
+import { supabase, isSupabaseReady } from '@/lib/supabase'
 
 export const ENTRIES_KEY = 'calendar_entries'
 
-/* ─── Entry CRUD ─── */
-
-export function loadEntry(dateStr: string): DayEntry | null {
-  try {
-    const raw = localStorage.getItem(ENTRIES_KEY)
-    if (!raw) return null
-    const all: Record<string, DayEntry> = JSON.parse(raw)
-    const entry = all[dateStr]
-    if (entry) {
-      entry.todos = entry.todos.map((t) => ({
-        ...t,
-        timeRecords: t.timeRecords || [],
-      }))
-    }
-    return entry || null
-  } catch {
-    return null
-  }
-}
-
-export function loadAllEntries(): Record<string, DayEntry> {
+/* ─── Local helpers ─── */
+function loadLocalAll(): Record<string, DayEntry> {
   try {
     const raw = localStorage.getItem(ENTRIES_KEY)
     if (!raw) return {}
@@ -32,24 +14,100 @@ export function loadAllEntries(): Record<string, DayEntry> {
   }
 }
 
-export function saveEntry(entry: DayEntry) {
+function saveLocalAll(all: Record<string, DayEntry>) {
   try {
-    const raw = localStorage.getItem(ENTRIES_KEY)
-    const all: Record<string, DayEntry> = raw ? JSON.parse(raw) : {}
-    all[entry.date] = entry
     localStorage.setItem(ENTRIES_KEY, JSON.stringify(all))
-  } catch (error) {
-    console.error('Failed to save calendar entry:', error)
+  } catch {
+    // ignore
   }
 }
 
+function normalizeEntry(entry: DayEntry): DayEntry {
+  return {
+    ...entry,
+    todos: (entry.todos || []).map((t) => ({
+      ...t,
+      timeRecords: t.timeRecords || [],
+    })),
+  }
+}
+
+/* ─── Supabase helpers ─── */
+async function fetchAllEntriesFromSupabase(): Promise<Record<string, DayEntry>> {
+  if (!isSupabaseReady()) return {}
+  const { data, error } = await supabase!.from('calendar_entries').select('*')
+  if (error || !data) return {}
+  const map: Record<string, DayEntry> = {}
+  for (const row of data as Record<string, unknown>[]) {
+    const date = String(row.date)
+    map[date] = normalizeEntry({
+      date,
+      todos: Array.isArray(row.todos) ? row.todos : [],
+      diary: String(row.diary || ''),
+    })
+  }
+  return map
+}
+
+async function upsertEntryToSupabase(entry: DayEntry) {
+  if (!isSupabaseReady()) return
+  await supabase!.from('calendar_entries').upsert({
+    date: entry.date,
+    todos: entry.todos,
+    diary: entry.diary,
+  })
+}
+
+/* ─── Entry CRUD ─── */
+
+export function loadEntry(dateStr: string): DayEntry | null {
+  const all = loadLocalAll()
+  const entry = all[dateStr]
+  return entry ? normalizeEntry(entry) : null
+}
+
+export function loadAllEntries(): Record<string, DayEntry> {
+  const all = loadLocalAll()
+  return Object.fromEntries(
+    Object.entries(all).map(([k, v]) => [k, normalizeEntry(v)])
+  )
+}
+
+export function saveEntry(entry: DayEntry) {
+  const all = loadLocalAll()
+  all[entry.date] = entry
+  saveLocalAll(all)
+  // Async sync to Supabase — never block UI
+  upsertEntryToSupabase(entry).catch((e) =>
+    console.warn('Calendar Supabase sync failed:', e)
+  )
+}
+
 export function loadTodayEntry(): DayEntry | null {
-  const todayStr = formatDateStr(new Date())
-  return loadEntry(todayStr)
+  return loadEntry(formatDateStr(new Date()))
 }
 
 export function saveTodayEntry(entry: DayEntry) {
   saveEntry(entry)
+}
+
+/**
+ * Background sync: load from Supabase and update localStorage.
+ * Call this on app mount or page focus.
+ */
+export async function syncCalendarEntries(): Promise<boolean> {
+  if (!isSupabaseReady()) return false
+  try {
+    const remote = await fetchAllEntriesFromSupabase()
+    const local = loadLocalAll()
+    // Merge: remote wins for same date
+    const merged = { ...local, ...remote }
+    saveLocalAll(merged)
+    return true
+  } catch (e) {
+    console.warn('Calendar sync failed:', e)
+    return false
+  }
 }
 
 /* ─── Time helpers ─── */

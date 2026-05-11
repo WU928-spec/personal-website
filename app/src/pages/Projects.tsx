@@ -11,6 +11,7 @@ import {
   activateProject,
   getSubProjects,
   generateId,
+  syncProjects,
 } from '@/utils/projectStorage'
 import { getProjectStats } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
@@ -43,12 +44,16 @@ export default function Projects() {
 
   useEffect(() => {
     refresh()
+    /* Background sync with Supabase */
+    syncProjects().then(() => refresh())
     const handleSaved = () => refresh()
     window.addEventListener('calendar-entry-saved', handleSaved)
-    window.addEventListener('focus', handleSaved)
+    window.addEventListener('focus', () => {
+      refresh()
+      syncProjects().then(() => refresh())
+    })
     return () => {
       window.removeEventListener('calendar-entry-saved', handleSaved)
-      window.removeEventListener('focus', handleSaved)
     }
   }, [refresh])
 

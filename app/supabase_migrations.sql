@@ -1,9 +1,9 @@
 -- ============================================================
--- Supabase 记忆碎片（Moments）表结构
--- 在 Supabase SQL Editor → New query 中执行以下语句
+-- Supabase 全量数据上云 — 记忆碎片 + 日历 + 项目 + 站点设置
+-- 在 Supabase SQL Editor → New query 中执行
 -- ============================================================
 
--- 1. 创建 moments 表
+-- ── 1. 记忆碎片（已完成）──
 CREATE TABLE IF NOT EXISTS moments (
   id          TEXT PRIMARY KEY,
   author_id   TEXT NOT NULL,
@@ -16,21 +16,58 @@ CREATE TABLE IF NOT EXISTS moments (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. 启用行级安全（RLS）
 ALTER TABLE moments ENABLE ROW LEVEL SECURITY;
 
--- 3. 公开访问策略（由前端登录状态控制权限）
-CREATE POLICY "Allow public select" ON moments
-  FOR SELECT USING (true);
+CREATE POLICY "Allow public select" ON moments FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON moments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON moments FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON moments FOR DELETE USING (true);
 
-CREATE POLICY "Allow public insert" ON moments
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Allow public update" ON moments
-  FOR UPDATE USING (true);
-
-CREATE POLICY "Allow public delete" ON moments
-  FOR DELETE USING (true);
-
--- 4. 创建索引加速查询
 CREATE INDEX IF NOT EXISTS idx_moments_created_at ON moments(created_at DESC);
+
+-- ── 2. 日历条目 ──
+CREATE TABLE IF NOT EXISTS calendar_entries (
+  date    TEXT PRIMARY KEY,
+  todos   JSONB DEFAULT '[]'::JSONB,
+  diary   TEXT DEFAULT ''
+);
+
+ALTER TABLE calendar_entries ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public select" ON calendar_entries FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON calendar_entries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON calendar_entries FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON calendar_entries FOR DELETE USING (true);
+
+-- ── 3. 项目列表 ──
+CREATE TABLE IF NOT EXISTS projects (
+  id          TEXT PRIMARY KEY,
+  name        TEXT NOT NULL,
+  description TEXT,
+  color       TEXT,
+  target_hours NUMERIC DEFAULT 0,
+  status      TEXT DEFAULT 'active',
+  parent_id   TEXT,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public select" ON projects FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON projects FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON projects FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON projects FOR DELETE USING (true);
+
+-- ── 4. 站点设置（Hero / Skills / Footer / About 等）──
+CREATE TABLE IF NOT EXISTS site_settings (
+  key        TEXT PRIMARY KEY,
+  value      JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public select" ON site_settings FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON site_settings FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON site_settings FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON site_settings FOR DELETE USING (true);

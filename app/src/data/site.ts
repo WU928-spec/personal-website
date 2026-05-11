@@ -1,5 +1,29 @@
 import type { Lang } from '@/i18n/translations'
 import { createLangStorageKey, createStorageKey } from '@/utils/storage'
+import { supabase, isSupabaseReady } from '@/lib/supabase'
+
+/* ───────────────────────────────────────────────
+   Helpers
+   ─────────────────────────────────────────────── */
+async function fetchSetting<T>(key: string): Promise<T | null> {
+  if (!isSupabaseReady()) return null
+  const { data, error } = await supabase!
+    .from('site_settings')
+    .select('value')
+    .eq('key', key)
+    .maybeSingle()
+  if (error || !data) return null
+  return (data as Record<string, unknown>).value as T
+}
+
+async function saveSetting<T>(key: string, value: T) {
+  if (!isSupabaseReady()) return
+  await supabase!.from('site_settings').upsert({
+    key,
+    value: value as unknown as Record<string, unknown>,
+    updated_at: new Date().toISOString(),
+  })
+}
 
 /* ───────────────────────────────────────────────
    Hero
@@ -28,6 +52,7 @@ export function loadHero(lang: Lang): HeroData {
 
 export function saveHero(data: Record<Lang, HeroData>) {
   heroStorage.saveAll(data)
+  saveSetting('hero', data).catch((e) => console.warn('Hero Supabase sync failed:', e))
 }
 
 /* ───────────────────────────────────────────────
@@ -95,6 +120,7 @@ export function loadSkills(): SkillCategory[] {
 
 export function saveSkills(data: SkillCategory[]) {
   skillsStorage.save(data)
+  saveSetting('skills', data).catch((e) => console.warn('Skills Supabase sync failed:', e))
 }
 
 /* ───────────────────────────────────────────────
@@ -172,6 +198,9 @@ export function loadBlogPreview(lang: Lang): BlogPreviewPost[] {
 
 export function saveBlogPreview(data: Record<Lang, BlogPreviewPost[]>) {
   blogPreviewStorage.saveAll(data)
+  saveSetting('blogPreview', data).catch((e) =>
+    console.warn('BlogPreview Supabase sync failed:', e)
+  )
 }
 
 /* ───────────────────────────────────────────────
@@ -248,6 +277,7 @@ export function loadGitHub(): GitHubData {
 
 export function saveGitHub(data: GitHubData) {
   githubStorage.save(data)
+  saveSetting('github', data).catch((e) => console.warn('GitHub Supabase sync failed:', e))
 }
 
 /* ───────────────────────────────────────────────
@@ -319,4 +349,31 @@ export function loadFooter(lang: Lang): FooterData {
 
 export function saveFooter(data: Record<Lang, FooterData>) {
   footerStorage.saveAll(data)
+  saveSetting('footer', data).catch((e) => console.warn('Footer Supabase sync failed:', e))
+}
+
+/* ───────────────────────────────────────────────
+   Background sync for all site settings
+   ─────────────────────────────────────────────── */
+export async function syncSiteSettings(): Promise<boolean> {
+  if (!isSupabaseReady()) return false
+  try {
+    const keys = ['hero', 'skills', 'blogPreview', 'github', 'footer']
+    for (const key of keys) {
+      const remote = await fetchSetting<unknown>(key)
+      if (remote) {
+        localStorage.setItem(`vibecoding_${key}`, JSON.stringify(remote))
+        if (key === 'hero' || key === 'blogPreview' || key === 'footer') {
+          // These are lang-keyed; store under both langs for simplicity
+          const typed = remote as Record<string, unknown>
+          if (typed.zh) localStorage.setItem(`vibecoding_${key}_zh`, JSON.stringify(typed.zh))
+          if (typed.en) localStorage.setItem(`vibecoding_${key}_en`, JSON.stringify(typed.en))
+        }
+      }
+    }
+    return true
+  } catch (e) {
+    console.warn('Site settings sync failed:', e)
+    return false
+  }
 }

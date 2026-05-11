@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CalendarHeader from '@/components/calendar/CalendarHeader'
 import CalendarGrid from '@/components/calendar/CalendarGrid'
@@ -6,18 +6,11 @@ import DayDetailPanel from '@/components/calendar/DayDetailPanel'
 import TodayStatsPanel from '@/components/calendar/TodayStatsPanel'
 import TodayTaskList from '@/components/calendar/TodayTaskList'
 import PageSEO from '@/components/PageSEO'
-
-const STORAGE_KEY = 'calendar_entries'
+import { loadAllEntries, syncCalendarEntries } from '@/utils/calendarStorage'
 
 function loadAllEntryDates(): Set<string> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return new Set()
-    const all: Record<string, unknown> = JSON.parse(raw)
-    return new Set(Object.keys(all))
-  } catch {
-    return new Set()
-  }
+  const all = loadAllEntries()
+  return new Set(Object.keys(all))
 }
 
 export default function Calendar() {
@@ -65,6 +58,11 @@ export default function Calendar() {
 
   const handleEntryChange = useCallback(() => {
     setEntries(loadAllEntryDates())
+  }, [])
+
+  /* Background sync with Supabase */
+  useEffect(() => {
+    syncCalendarEntries().then(() => setEntries(loadAllEntryDates()))
   }, [])
 
   return (
