@@ -15,6 +15,16 @@
 
 ## 最近已完成的工作
 
+### 5. 日历与项目系统代码重构（2026-05-11）
+- **拆分 `Projects.tsx`**：从 1058 行拆分为 8 个独立组件（`ProjectCard`、`ProjectDetail`、`ProjectBarChart` 等），页面组件降至 244 行
+- **拆分 `projectStorage.ts`**：按单一职责拆为 `projectStorage.ts`（CRUD）、`projectAggregation.ts`（统计聚合）、`projectSeed.ts`（Demo 数据）
+- **提取共享 Hooks**：`useLiveTick`（6 组件复用）、`useProjectStats`（自动刷新项目统计）
+- **新建 `calendarStorage.ts`**：统一日历条目的读写与常用 helper（`formatDateStr`、`formatDuration`、`getTotalDuration` 等）
+- **清理重复类型定义**：所有日历相关类型统一从 `@/types/calendar` 导入
+- **修复所有非测试类 TypeScript 错误**：`npm run build` 零报错
+- **子项目默认查看全部历史**：展开子项目卡片时直接展示完整柱状图与任务列表
+- **删除废弃文件**：`TodayTaskPanel.tsx`
+
 ### 0. 项目追踪柱状图 Tooltip 优化（2026-05-11）
 - 优化柱状图 hover 显示效果
 - 修复柱子形状问题（圆角过大）
@@ -110,22 +120,23 @@
 ### 问题 4：TypeScript 严格模式差异
 `npm run dev`（Vite + esbuild）不阻塞 TypeScript 错误，但 `npm run build`（`tsc -b`）启用了 `noUnusedLocals` 等严格检查，导致构建失败。项目中存在大量未使用的变量/导入。
 
-**状态**：Projects 相关文件已清理，但其他文件（`DayDetailPanel.tsx`、`TodayStatsPanel.tsx`、`test/setup.ts` 等）仍有遗留错误。
+**状态**：✅ 已全部清理（2026-05-11）。`npm run build` 零报错。
 
 ---
 
 ## 待达成的目标
 
 1. ~~**柱状图 hover tooltip**~~：✅ 已完成（2026-05-11）
-2. **项目页整体视觉打磨**：当前布局偏朴素，可考虑更精致的数据可视化
-3. **响应式优化**：弹窗在小屏幕上的适配
-4. **数据导出/备份**：项目 + 日历数据的导入导出功能
-5. **构建错误清理**：修复 `tsc -b` 下的所有遗留 TypeScript 错误，使 `npm run build` 能通过
+2. ~~**构建错误清理**~~：✅ 已完成（2026-05-11）
+3. ~~**代码重构（拆分大文件、提取 Hooks、统一类型）**~~：✅ 已完成（2026-05-11）
+4. **项目页整体视觉打磨**：当前布局偏朴素，可考虑更精致的数据可视化
+5. **响应式优化**：弹窗在小屏幕上的适配
+6. **数据导出/备份**：项目 + 日历数据的导入导出功能
 
 ---
 
 ## 技术债务
 
-- 日历相关类型（`DayEntry`、`TodoItem`、`TimeRecord`）散落在多个组件文件中，应统一从 `@/types/calendar` 导入
+- ~~日历相关类型（`DayEntry`、`TodoItem`、`TimeRecord`）散落在多个组件文件中~~：✅ 已统一从 `@/types/calendar` 导入
+- ~~`TodayTaskPanel.tsx`（已标记 DEPRECATED）~~：✅ 已删除
 - `calendar_entries` 的存储没有版本控制，未来模型变更需考虑迁移
-- 项目中存在 `TodayTaskPanel.tsx`（已标记 DEPRECATED），可安全删除
