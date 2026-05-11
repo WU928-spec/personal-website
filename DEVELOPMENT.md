@@ -490,5 +490,78 @@ npm run dev  # http://localhost:2667
 
 ---
 
-*最后更新: 2026-05-09*  
+---
+
+### 2026-05-11: 登录权限审查 + 全量数据上云 + 笔记静态托管
+
+**1. 登录权限审查与加固**
+
+审查所有 `isLoggedIn` / `isEditMode` 使用处，确定公众浏览模式下的隐藏功能：
+
+| 文件 | 保护方式 | 未登录行为 |
+|------|---------|-----------|
+| `Projects.tsx` | `isLoggedIn` + handler 拦截 | 隐藏"新建项目"按钮 |
+| `ProjectCard.tsx` | `isLoggedIn` prop 条件渲染 | 隐藏编辑/删除/完成/子项目按钮 |
+| `DayDetailPanel.tsx` | `isLoggedIn` 条件渲染 | 只读浏览（无添加/删除待办、无日记编辑、无保存）|
+| `TodayTaskList.tsx` | `isLoggedIn` + `disabled` | 禁用计时和勾选按钮 |
+| `MomentCard.tsx` | `isLoggedIn` + `disabled` | 禁用点赞和评论 |
+| `Footer.tsx` | `isLoggedIn && isEditMode` | 隐藏编辑页脚按钮（已有）|
+| `Moments.tsx` | `isLoggedIn` | 隐藏发布器和删除按钮（已有）|
+
+同时删除 `Login.tsx` 中的测试账号提示板块。
+
+**2. 记忆碎片接入 Supabase**
+
+- 安装 `@supabase/supabase-js`
+- 创建 `src/lib/supabase.ts` 客户端 + db↔app 类型映射
+- 重写 `src/hooks/useMoments.ts`：优先 Supabase，fallback localStorage
+- 添加 5s → 2s 超时，防止 Supabase 不可达时无限 loading
+- 加载逻辑改为：**先显示本地数据，后台静默同步 Supabase**（解决首次访问白屏问题）
+- SQL 建表：`moments`（id, author_id, content, images, attachments, location, likes, comments, created_at）
+
+**3. 全量数据接入 Supabase**
+
+除 Moments 外，将日历、项目、站点设置全部上云：
+
+| 表名 | 数据 | 本地行为 |
+|------|------|---------|
+| `moments` | 记忆碎片 | 先显本地，后台同步 |
+| `calendar_entries` | 日历任务+日记 | 先显本地，后台同步 |
+| `projects` | 项目列表 | 先显本地，后台同步 |
+| `site_settings` | Hero/Skills/Footer/About | 先显本地，后台同步 |
+
+修改文件：
+- `src/utils/calendarStorage.ts` — 双写 localStorage + Supabase
+- `src/utils/projectStorage.ts` — 双写 localStorage + Supabase
+- `src/data/site.ts` — 双写 localStorage + Supabase
+- `src/pages/Calendar.tsx` — 添加 `syncCalendarEntries()` 后台同步
+- `src/pages/Projects.tsx` — 添加 `syncProjects()` 后台同步
+
+**4. Obsidian 笔记迁移至静态托管**
+
+弃用 `obsidian-server`（localhost:2667，关机后无法访问），改为 `public/notes/` 静态文件托管：
+
+- 创建 `public/notes/` 目录结构
+- 从本地 Obsidian Vault 导入 **973 篇 .md 笔记** + **22 张图片**（排除 `.obsidian`、`.trash`、`日记`、`录音存放文件夹` 等私人/系统目录）
+- 重写 `src/services/obsidianClient.ts` — 从静态文件读取，移除 server 状态检查
+- 简化 `src/pages/ObsidianBrowser.tsx` — 移除 `serverOn` 状态和离线页面
+- 生成 `public/notes/index.json` — 包含 notes 元数据、文件树、inboundLinks
+- 替换 Obsidian wikilink 图片语法 `![[...]]` 为网页路径 `![](/notes/images/...)`
+
+**遇到的问题与修复**：
+- `encodeURIComponent(meta.filePath)` 把 `/` 编码为 `%2F`，导致 fetch 404
+- 修复：分段编码 `path.split('/').map(encodeURIComponent).join('/')`
+
+**Supabase 项目信息**：
+- URL: `https://flteigliukzlqnbpzwqj.supabase.co`
+- 区域: Northeast Asia (Tokyo)
+- 免费额度: 500MB（当前占用 < 50MB）
+
+**登录账号**：
+- 邮箱: `15258743752@163.com`
+- 密码: `vibecoding2025`
+
+---
+
+*最后更新: 2026-05-11*  
 *更新者: Kimi Code*
