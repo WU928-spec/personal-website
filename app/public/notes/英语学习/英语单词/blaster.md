@@ -1,0 +1,3 @@
+- **从事爆破工作的人**：指爆破工、放炮工，如 “An avalanche blaster must undergo three years of on - the - job training and take written exams.”（雪崩爆破工必须经过三年的在职培训并参加笔试。）
+- **具有喷射功能的工具或物体**：可以是喷射器，如 “a water blaster”（水枪）；“a carbon dioxide blaster”（二氧化碳喷射器）。
+- **科幻故事中的武器**：（科幻故事里的）爆破器、能量武器，例如 “they explored the planet, keeping their blasters ready in their hands.”（他们探索这个星球，手里随时拿着爆破器。）
