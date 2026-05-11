@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Moment, Comment } from '@/types/moment'
 import { useAuth } from '@/contexts/AuthContext'
+import { supabase, isSupabaseReady, dbToMoment, momentToDb } from '@/lib/supabase'
 
 const STORAGE_KEY = 'moments_v1'
 const API_BASE = 'http://localhost:2667'
@@ -60,19 +61,15 @@ const MOCK_MOMENTS: Moment[] = [
 
 /* ── Helpers ── */
 function migrateMoment(m: Moment): Moment {
-  // Migrate old data without authorId (old default was 'WU928-spec', now email)
   if (!m.authorId) {
     m = { ...m, authorId: '15258743752@163.com' }
   }
-  // Migrate old authorId from previous username to email
   if (m.authorId === 'WU928-spec') {
     m = { ...m, authorId: '15258743752@163.com' }
   }
-  // Migrate old likes from previous username to email
   if (m.likes) {
     m.likes = m.likes.map((uid) => (uid === 'WU928-spec' ? '15258743752@163.com' : uid))
   }
-  // Migrate old comments without userId
   if (m.comments) {
     m.comments = m.comments.map((c) => ({
       ...c,
@@ -121,33 +118,52 @@ function sortDesc(list: Moment[]): Moment[] {
   )
 }
 
+/* ── Supabase helpers ── */
+async function fetchFromSupabase(): Promise<Moment[]> {
+  if (!isSupabaseReady()) throw new Error('Supabase not configured')
+
+  const { data, error } = await supabase!
+    .from('moments')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  if (!data) return []
+
+  return (data as Record<string, unknown>[]).map(dbToMoment).map((m) => ({
+    ...m,
+    images: resolveImageUrls(m.images),
+  }))
+}
+
 /* ── Hook ── */
 export function useMoments() {
   const { userId, user, getUserDisplay } = useAuth()
   const [moments, setMoments] = useState<Moment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [usingLocal, setUsingLocal] = useState(false)
 
   const fetchMoments = useCallback(async () => {
     setLoading(true)
     setError(null)
-    try {
-      const res = await fetch(`${API_BASE}/api/moments`)
-      if (res.ok) {
-        const data = (await res.json()) as Moment[]
-        const resolved = data.map((m) => ({
-          ...m,
-          images: resolveImageUrls(m.images),
-        }))
-        setMoments(sortDesc(resolved))
-        saveLocal(resolved)
+    setUsingLocal(false)
+
+    // 1. Try Supabase first
+    if (isSupabaseReady()) {
+      try {
+        const list = await fetchFromSupabase()
+        setMoments(list)
+        saveLocal(list)
         setLoading(false)
         return
+      } catch (err) {
+        console.warn('Supabase fetch failed, falling back to local:', err)
       }
-    } catch {
-      // backend unavailable → fallback to localStorage
     }
-    // fallback
+
+    // 2. Fallback to localStorage
+    setUsingLocal(true)
     const local = loadLocal()
     if (local.length > 0) {
       setMoments(sortDesc(local))
@@ -175,21 +191,21 @@ export function useMoments() {
         comments: [],
       }
 
-      try {
-        const res = await fetch(`${API_BASE}/api/moments`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newMoment),
-        })
-        if (res.ok) {
+      // Try Supabase first
+      if (isSupabaseReady()) {
+        try {
+          const { error } = await supabase!
+            .from('moments')
+            .insert(momentToDb(newMoment))
+          if (error) throw error
           await fetchMoments()
           return
+        } catch (err) {
+          console.warn('Supabase insert failed, falling back to local:', err)
         }
-      } catch {
-        // backend unavailable
       }
 
-      // local fallback
+      // Local fallback
       const next = [newMoment, ...moments]
       setMoments(sortDesc(next))
       saveLocal(next)
@@ -210,14 +226,18 @@ export function useMoments() {
       setMoments(list)
       saveLocal(list)
 
-      try {
-        await fetch(`${API_BASE}/api/moments/${id}/like`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        })
-      } catch {
-        // ignore
+      if (isSupabaseReady()) {
+        try {
+          const target = list.find((m) => m.id === id)
+          if (target) {
+            await supabase!
+              .from('moments')
+              .update({ likes: target.likes })
+              .eq('id', id)
+          }
+        } catch (err) {
+          console.warn('Supabase like update failed:', err)
+        }
       }
     },
     [moments, userId]
@@ -239,14 +259,18 @@ export function useMoments() {
       setMoments(list)
       saveLocal(list)
 
-      try {
-        await fetch(`${API_BASE}/api/moments/${id}/comment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(comment),
-        })
-      } catch {
-        // ignore
+      if (isSupabaseReady()) {
+        try {
+          const target = list.find((m) => m.id === id)
+          if (target) {
+            await supabase!
+              .from('moments')
+              .update({ comments: target.comments })
+              .eq('id', id)
+          }
+        } catch (err) {
+          console.warn('Supabase comment update failed:', err)
+        }
       }
     },
     [moments, userId, user, getUserDisplay]
@@ -258,10 +282,12 @@ export function useMoments() {
       setMoments(list)
       saveLocal(list)
 
-      try {
-        await fetch(`${API_BASE}/api/moments/${id}`, { method: 'DELETE' })
-      } catch {
-        // ignore
+      if (isSupabaseReady()) {
+        try {
+          await supabase!.from('moments').delete().eq('id', id)
+        } catch (err) {
+          console.warn('Supabase delete failed:', err)
+        }
       }
     },
     [moments]
@@ -271,6 +297,7 @@ export function useMoments() {
     moments,
     loading,
     error,
+    usingLocal,
     fetchMoments,
     addMoment,
     toggleLike,
