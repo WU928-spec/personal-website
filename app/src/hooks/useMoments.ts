@@ -122,9 +122,9 @@ function sortDesc(list: Moment[]): Moment[] {
 async function fetchFromSupabase(): Promise<Moment[]> {
   if (!isSupabaseReady()) throw new Error('Supabase not configured')
 
-  // 5s timeout — don't block UI if Supabase is unreachable
+  // 2s timeout — don't block UI if Supabase is unreachable
   const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('Supabase timeout')), 5000)
+    setTimeout(() => reject(new Error('Supabase timeout')), 2000)
   )
 
   const query = supabase!
@@ -156,21 +156,7 @@ export function useMoments() {
     setError(null)
     setUsingLocal(false)
 
-    // 1. Try Supabase first
-    if (isSupabaseReady()) {
-      try {
-        const list = await fetchFromSupabase()
-        setMoments(list)
-        saveLocal(list)
-        setLoading(false)
-        return
-      } catch (err) {
-        console.warn('Supabase fetch failed, falling back to local:', err)
-      }
-    }
-
-    // 2. Fallback to localStorage
-    setUsingLocal(true)
+    // 1. Show local data immediately — never block UI
     const local = loadLocal()
     if (local.length > 0) {
       setMoments(sortDesc(local))
@@ -179,6 +165,18 @@ export function useMoments() {
       saveLocal(MOCK_MOMENTS)
     }
     setLoading(false)
+
+    // 2. Silently sync with Supabase in background
+    if (isSupabaseReady()) {
+      try {
+        const list = await fetchFromSupabase()
+        setMoments(list)
+        saveLocal(list)
+      } catch (err) {
+        console.warn('Supabase sync failed, using local:', err)
+        setUsingLocal(true)
+      }
+    }
   }, [])
 
   useEffect(() => {
