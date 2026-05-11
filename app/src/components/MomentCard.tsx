@@ -25,7 +25,7 @@ export default function MomentCard({
   onDelete,
 }: Props) {
   const navigate = useNavigate()
-  const { userId, getUserDisplay } = useAuth()
+  const { userId, getUserDisplay, isLoggedIn } = useAuth()
   const [showCommentInput, setShowCommentInput] = useState(false)
   const [commentText, setCommentText] = useState('')
 
@@ -140,8 +140,11 @@ export default function MomentCard({
         <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onLike(moment.id)}
-              className="flex items-center gap-1 text-sm transition-colors"
+              onClick={() => isLoggedIn && onLike(moment.id)}
+              disabled={!isLoggedIn}
+              className={`flex items-center gap-1 text-sm transition-colors ${
+                !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
+              }`}
             >
               <Heart
                 size={16}
@@ -156,8 +159,11 @@ export default function MomentCard({
               </span>
             </button>
             <button
-              onClick={() => setShowCommentInput((v) => !v)}
-              className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-Amber transition-colors"
+              onClick={() => isLoggedIn && setShowCommentInput((v) => !v)}
+              disabled={!isLoggedIn}
+              className={`flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-Amber transition-colors ${
+                !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
+              }`}
             >
               <MessageCircle size={16} />
               <span>{moment.comments.length > 0 ? moment.comments.length : '评论'}</span>
@@ -217,7 +223,7 @@ export default function MomentCard({
 
         {/* Comment input */}
         <AnimatePresence>
-          {showCommentInput && (
+          {isLoggedIn && showCommentInput && (
             <motion.form
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}

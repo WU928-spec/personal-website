@@ -5,6 +5,7 @@ import { getLunarDate, getDayDetail, getSolarTerms } from 'chinese-days'
 import type { TodoItem, Project } from '@/types/calendar'
 import { loadProjects } from '@/utils/projectStorage'
 import { loadEntry, saveEntry, formatDateStr } from '@/utils/calendarStorage'
+import { useAuth } from '@/contexts/AuthContext'
 
 /* ─── Component ─── */
 interface DayDetailPanelProps {
@@ -20,6 +21,7 @@ export default function DayDetailPanel({
   onClose,
   onEntryChange,
 }: DayDetailPanelProps) {
+  const { isLoggedIn } = useAuth()
   if (!date) return null
 
   const dateStr = formatDateStr(date)
@@ -220,8 +222,10 @@ export default function DayDetailPanel({
                           className="flex items-center gap-2 bg-white dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg px-3 py-2.5 group"
                         >
                           <button
-                            onClick={() => toggleTodo(todo.id)}
+                            onClick={() => isLoggedIn && toggleTodo(todo.id)}
                             className={`shrink-0 transition-colors ${
+                              !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
+                            } ${
                               todo.done
                                 ? 'text-Sage'
                                 : 'text-Slate/40 dark:text-white/30 hover:text-Amber'
@@ -250,13 +254,15 @@ export default function DayDetailPanel({
                               />
                             )}
                           </div>
-                          <button
-                            onClick={() => removeTodo(todo.id)}
-                            className="opacity-0 group-hover:opacity-100 text-Slate/40 hover:text-Rose transition-all duration-200 shrink-0"
-                            aria-label="删除"
-                          >
-                            <Trash2 size={15} />
-                          </button>
+                          {isLoggedIn && (
+                            <button
+                              onClick={() => removeTodo(todo.id)}
+                              className="opacity-0 group-hover:opacity-100 text-Slate/40 hover:text-Rose transition-all duration-200 shrink-0"
+                              aria-label="删除"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -267,8 +273,8 @@ export default function DayDetailPanel({
                       </p>
                     )}
 
-                    {/* Add todo — only for today & future */}
-                    {!isPast && (
+                    {/* Add todo — only for today & future & logged-in */}
+                    {isLoggedIn && !isPast && (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <input
@@ -360,19 +366,33 @@ export default function DayDetailPanel({
                             ? '回忆这一天...'
                             : '提前写点什么...'}
                       </label>
-                      <textarea
-                        value={diary}
-                        onChange={(e) => setDiary(e.target.value)}
-                        placeholder={
-                          isToday
-                            ? '记录下今天的点点滴滴...'
-                            : isPast
-                              ? '写下那天发生的事...'
-                              : '对这一天有什么期待...'
-                        }
-                        rows={10}
-                        className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20 resize-none leading-relaxed"
-                      />
+                      {isLoggedIn ? (
+                        <textarea
+                          value={diary}
+                          onChange={(e) => setDiary(e.target.value)}
+                          placeholder={
+                            isToday
+                              ? '记录下今天的点点滴滴...'
+                              : isPast
+                                ? '写下那天发生的事...'
+                                : '对这一天有什么期待...'
+                          }
+                          rows={10}
+                          className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20 resize-none leading-relaxed"
+                        />
+                      ) : (
+                        <div className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] min-h-[120px]">
+                          {diary.trim() || (
+                            <span className="text-Slate/40 dark:text-white/20">
+                              {isToday
+                                ? '登录后可记录今天...'
+                                : isPast
+                                  ? '登录后可记录那天发生的事...'
+                                  : '登录后可提前规划...'}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -380,28 +400,30 @@ export default function DayDetailPanel({
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-Sand dark:border-white/10">
-              <button
-                onClick={handleSave}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[0.875rem] font-semibold transition-all duration-200 ${
-                  saved
-                    ? 'bg-Sage text-white'
-                    : 'bg-Amber text-white hover:bg-[#B06A2F]'
-                }`}
-              >
-                {saved ? (
-                  <>
-                    <CheckCircle2 size={16} />
-                    已保存
-                  </>
-                ) : (
-                  <>
-                    <CalendarCheck size={16} />
-                    保存
-                  </>
-                )}
-              </button>
-            </div>
+            {isLoggedIn && (
+              <div className="px-6 py-4 border-t border-Sand dark:border-white/10">
+                <button
+                  onClick={handleSave}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[0.875rem] font-semibold transition-all duration-200 ${
+                    saved
+                      ? 'bg-Sage text-white'
+                      : 'bg-Amber text-white hover:bg-[#B06A2F]'
+                  }`}
+                >
+                  {saved ? (
+                    <>
+                      <CheckCircle2 size={16} />
+                      已保存
+                    </>
+                  ) : (
+                    <>
+                      <CalendarCheck size={16} />
+                      保存
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </motion.div>
         </>
       )}

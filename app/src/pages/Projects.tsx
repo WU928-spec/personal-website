@@ -14,6 +14,7 @@ import {
 } from '@/utils/projectStorage'
 import { getProjectStats } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
+import { useAuth } from '@/contexts/AuthContext'
 import PageSEO from '@/components/PageSEO'
 import ProjectCard from '@/components/project/ProjectCard'
 import ProjectHistoryModal from '@/components/project/ProjectHistoryModal'
@@ -26,6 +27,7 @@ interface ProjectStats {
 }
 
 export default function Projects() {
+  const { isLoggedIn } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [historyProjectId, setHistoryProjectId] = useState<string | null>(null)
@@ -123,6 +125,7 @@ export default function Projects() {
   }
 
   const handleDelete = (id: string) => {
+    if (!isLoggedIn) return
     if (confirm('确定删除此项目？关联的日历任务将保留但不再显示项目标签。')) {
       deleteProject(id)
       if (expandedId === id) setExpandedId(null)
@@ -131,11 +134,13 @@ export default function Projects() {
   }
 
   const handleComplete = (id: string) => {
+    if (!isLoggedIn) return
     completeProject(id)
     refresh()
   }
 
   const handleReactivate = (id: string) => {
+    if (!isLoggedIn) return
     activateProject(id)
     refresh()
   }
@@ -178,16 +183,18 @@ export default function Projects() {
       <section className="px-6 pb-20">
         <div className="max-w-4xl mx-auto space-y-4">
           {/* Add button */}
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            onClick={() => openForm()}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-Sand dark:border-white/15 text-Slate dark:text-white/50 hover:border-Amber hover:text-Amber transition-all duration-200"
-          >
-            <Plus size={18} />
-            <span className="text-[0.9375rem] font-medium">新建项目</span>
-          </motion.button>
+          {isLoggedIn && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              onClick={() => openForm()}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-Sand dark:border-white/15 text-Slate dark:text-white/50 hover:border-Amber hover:text-Amber transition-all duration-200"
+            >
+              <Plus size={18} />
+              <span className="text-[0.9375rem] font-medium">新建项目</span>
+            </motion.button>
+          )}
 
           {/* Project list */}
           {sortedProjects.length === 0 ? (
@@ -206,6 +213,7 @@ export default function Projects() {
                 subProjects={getSubProjects(project.id)}
                 isExpanded={expandedId === project.id}
                 index={idx}
+                isLoggedIn={isLoggedIn}
                 onToggle={() => toggleExpand(project.id)}
                 onOpenHistory={() => setHistoryProjectId(project.id)}
                 onEdit={() => openForm(project)}

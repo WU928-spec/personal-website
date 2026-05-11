@@ -22,6 +22,7 @@ interface ProjectCardProps {
   subProjects: Project[]
   isExpanded: boolean
   index: number
+  isLoggedIn?: boolean
   onToggle: () => void
   onOpenHistory: () => void
   onEdit: () => void
@@ -37,6 +38,7 @@ export default function ProjectCard({
   subProjects,
   isExpanded,
   index,
+  isLoggedIn = false,
   onToggle,
   onOpenHistory,
   onEdit,
@@ -175,7 +177,7 @@ export default function ProjectCard({
                 </div>
               )}
 
-              {!isCompleted && (
+              {isLoggedIn && !isCompleted && (
                 <button
                   onClick={onAddSubProject}
                   className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-Sand dark:border-white/10 text-[0.8125rem] text-Slate/60 dark:text-white/40 hover:border-Amber hover:text-Amber transition-colors"
@@ -186,7 +188,7 @@ export default function ProjectCard({
               )}
 
               {/* Actions */}
-              {!isCompleted && (
+              {isLoggedIn && !isCompleted && (
                 <div className="flex items-center gap-2 mt-4 pt-3 border-t border-Sand/50 dark:border-white/5">
                   <button
                     onClick={onEdit}
@@ -211,7 +213,7 @@ export default function ProjectCard({
                   </button>
                 </div>
               )}
-              {isCompleted && (
+              {isLoggedIn && isCompleted && (
                 <div className="flex items-center gap-2 mt-4 pt-3 border-t border-Sand/50 dark:border-white/5">
                   <button
                     onClick={onReactivate}

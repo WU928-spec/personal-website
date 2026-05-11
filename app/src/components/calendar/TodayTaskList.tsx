@@ -12,9 +12,11 @@ import {
   formatDateStr,
 } from '@/utils/calendarStorage'
 import { useLiveTick } from '@/hooks/useLiveTick'
+import { useAuth } from '@/contexts/AuthContext'
 
 /* Component */
 export default function TodayTaskList() {
+  const { isLoggedIn } = useAuth()
   const [entry, setEntry] = useState<DayEntry | null>(loadTodayEntry)
   const [projects, setProjects] = useState<Project[]>([])
   const tick = useLiveTick()
@@ -49,6 +51,7 @@ export default function TodayTaskList() {
 
   const handleToggleTrack = useCallback(
     (todoId: string) => {
+      if (!isLoggedIn) return
       const current = loadTodayEntry()
       if (!current) return
       const todo = current.todos.find((t) => t.id === todoId)
@@ -75,11 +78,12 @@ export default function TodayTaskList() {
       saveTodayEntry(current)
       refresh()
     },
-    [refresh]
+    [refresh, isLoggedIn]
   )
 
   const handleToggleDone = useCallback(
     (todoId: string) => {
+      if (!isLoggedIn) return
       const current = loadTodayEntry()
       if (!current) return
       const todo = current.todos.find((t) => t.id === todoId)
@@ -100,7 +104,7 @@ export default function TodayTaskList() {
       saveTodayEntry(current)
       refresh()
     },
-    [refresh]
+    [refresh, isLoggedIn]
   )
 
   const todos = entry?.todos || []
@@ -147,7 +151,10 @@ export default function TodayTaskList() {
             >
               <button
                 onClick={() => handleToggleDone(todo.id)}
+                disabled={!isLoggedIn}
                 className={`shrink-0 transition-colors ${
+                  !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
+                } ${
                   todo.done
                     ? 'text-Sage'
                     : 'text-Slate/30 dark:text-white/20 hover:text-Amber'
@@ -180,8 +187,10 @@ export default function TodayTaskList() {
 
               <button
                 onClick={() => handleToggleTrack(todo.id)}
+                disabled={!isLoggedIn}
                 className={`
                   shrink-0 flex items-center justify-center w-6 h-6 rounded-md transition-all duration-200
+                  ${!isLoggedIn ? 'cursor-not-allowed opacity-40' : ''}
                   ${isTracking
                     ? 'bg-Amber text-white'
                     : 'bg-Mist dark:bg-white/10 text-Slate dark:text-white/50 hover:text-Amber hover:bg-Amber/10'
