@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X, FileText, Tag } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLang } from '@/contexts/PreferencesContext'
+
 
 interface ObsidianNoteMeta {
   slug: string
@@ -66,7 +66,6 @@ function calcScore(item: SearchResult, query: string): number {
 }
 
 export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
-  const { t } = useLang()
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])

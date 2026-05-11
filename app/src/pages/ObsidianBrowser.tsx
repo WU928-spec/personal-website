@@ -118,7 +118,7 @@ export default function ObsidianBrowser() {
     const idx = state?.idx ?? 0
     setHistoryIdx(idx)
     maxHistoryIdx.current = Math.max(maxHistoryIdx.current, idx)
-  }, [location.key])
+  }, [location.pathname, location.search])
 
   const canGoBack = historyIdx > 0
   const canGoForward = historyIdx < maxHistoryIdx.current

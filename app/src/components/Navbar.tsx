@@ -20,8 +20,8 @@ export default function Navbar() {
     { path: '/', label: t('nav.home') },
     { path: '/moments', label: t('nav.moments') },
     { path: '/obsidian', label: t('nav.obsidian') },
+    { path: '/calendar', label: t('nav.calendar') },
     { path: '/projects', label: t('nav.projects') },
-    { path: '/about', label: t('nav.about') },
   ]
 
   useEffect(() => {

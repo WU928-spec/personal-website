@@ -406,6 +406,39 @@ obsidian-server/
 
 ## 最近更新
 
+### 2026-05-11: 项目追踪柱状图 Tooltip 优化
+
+**问题**：
+- 柱子形状异常（顶部圆角过大）
+- Tooltip 显示在错误位置（图表顶部而非柱子上方）
+- Tooltip 文字看不见（深色模式下白底白字）
+
+**解决方案**：
+1. 调整柱子圆角：`rounded-t-sm` → `rounded-t`
+2. 重新设计 tooltip 定位：将 `group` 和 `relative` 直接放在柱子 div 上，tooltip 作为柱子的直接子元素
+3. 使用 `bottom-full mb-2` 让 tooltip 相对于柱子顶部定位
+4. 去掉背景框，直接显示纯文字
+5. 文字颜色自适应：`text-Ink dark:text-white`
+6. Tooltip 内容：时长（加粗）+ 占比百分比
+
+**关键代码**：
+```tsx
+<div className="group w-full rounded-t transition-all duration-500 relative" style={{...}}>
+  {hasData && (
+    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap text-Ink dark:text-white text-[0.625rem]">
+      <div className="text-[0.6875rem] font-medium">
+        {formatDuration(d.seconds)}
+      </div>
+      <div className="text-[0.6875rem]">
+        占比: {((d.seconds / totalSeconds) * 100).toFixed(1)}%
+      </div>
+    </div>
+  )}
+</div>
+```
+
+**相关文件**: `app/src/pages/Projects.tsx`
+
 ### 2026-05-10: 全面代码重构 ⭐
 
 **重构内容**: 

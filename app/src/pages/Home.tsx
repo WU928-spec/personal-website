@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ChevronDown, ExternalLink, MapPin, Briefcase, Globe, Heart, Sparkles, Star, GitFork } from 'lucide-react'
@@ -194,7 +194,7 @@ function IntroSection() {
               {about.p2}
             </p>
             <Link
-              to="/about"
+              to="/projects"
               className="inline-block mt-6 font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300"
             >
               {t('home.learnMore')}

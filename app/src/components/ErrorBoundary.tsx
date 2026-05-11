@@ -64,7 +64,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               抱歉，页面遇到了一些问题。请尝试刷新页面或返回首页。
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="mb-6 p-4 bg-Rose/5 border border-Rose/20 rounded-lg text-left">
                 <p className="font-mono text-[0.75rem] text-Rose mb-2 font-semibold">
                   {this.state.error.name}: {this.state.error.message}

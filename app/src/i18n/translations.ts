@@ -6,9 +6,9 @@ const translations = {
     nav: {
       home: '首页',
       moments: '记忆碎片',
+      calendar: '任务管理',
       projects: '项目',
       obsidian: '笔记',
-      about: '关于',
       login: '登录',
       profile: '个人资料',
       search: '搜索',
@@ -209,9 +209,9 @@ const translations = {
     nav: {
       home: 'Home',
       moments: 'Moments',
+      calendar: 'Tasks',
       projects: 'Projects',
       obsidian: 'Notes',
-      about: 'About',
       login: 'Login',
       profile: 'Profile',
       search: 'Search',

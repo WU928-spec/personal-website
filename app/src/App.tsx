@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Layout from './components/Layout.tsx'
 import Home from './pages/Home.tsx'
@@ -7,9 +7,10 @@ import Login from './pages/Login.tsx'
 import Profile from './pages/Profile.tsx'
 import NotFound from './pages/NotFound.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
+import { seedDemoDataIfEmpty } from './utils/projectSeed.ts'
 
+const Calendar = lazy(() => import('./pages/Calendar.tsx'))
 const Projects = lazy(() => import('./pages/Projects.tsx'))
-const About = lazy(() => import('./pages/About.tsx'))
 const ObsidianBrowser = lazy(() => import('./pages/ObsidianBrowser.tsx'))
 const Moments = lazy(() => import('./pages/Moments.tsx'))
 
@@ -35,6 +36,10 @@ const fallback = (
 function App() {
   const location = useLocation()
 
+  useEffect(() => {
+    seedDemoDataIfEmpty()
+  }, [])
+
   return (
     <ErrorBoundary>
     <Layout>
@@ -58,18 +63,18 @@ function App() {
             }
           />
           <Route
-            path="/projects"
+            path="/calendar"
             element={
               <Suspense fallback={fallback}>
-                <PageTransition><Projects /></PageTransition>
+                <PageTransition><Calendar /></PageTransition>
               </Suspense>
             }
           />
           <Route
-            path="/about"
+            path="/projects"
             element={
               <Suspense fallback={fallback}>
-                <PageTransition><About /></PageTransition>
+                <PageTransition><Projects /></PageTransition>
               </Suspense>
             }
           />

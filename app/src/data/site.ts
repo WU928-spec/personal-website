@@ -280,9 +280,9 @@ const defaultFooter: Record<Lang, FooterData> = {
     links: [
       { path: '/', label: '首页' },
       { path: '/blog', label: '博客' },
+      { path: '/calendar', label: '任务管理' },
       { path: '/projects', label: '项目' },
-      { path: '/about', label: '关于' },
-      { path: '/about', label: '联系' },
+      { path: '/projects', label: '联系' },
     ],
     socials: [
       { icon: 'Github', href: 'https://github.com/WU928-spec', label: 'GitHub' },
@@ -298,9 +298,9 @@ const defaultFooter: Record<Lang, FooterData> = {
     links: [
       { path: '/', label: 'Home' },
       { path: '/blog', label: 'Blog' },
+      { path: '/calendar', label: 'Tasks' },
       { path: '/projects', label: 'Projects' },
-      { path: '/about', label: 'About' },
-      { path: '/about', label: 'Contact' },
+      { path: '/projects', label: 'Contact' },
     ],
     socials: [
       { icon: 'Github', href: 'https://github.com/WU928-spec', label: 'GitHub' },
