@@ -1,0 +1,72 @@
+{
+  "notes": [
+    {
+      "slug": "数字园艺",
+      "title": "数字园艺的艺术",
+      "date": "2025-01-08",
+      "category": "随笔",
+      "tags": ["数字园艺", "个人网站", "知识管理"],
+      "excerpt": "为什么我把网站当作花园而不是作品集——以及这如何改变了一切。",
+      "modified": "2025-01-08",
+      "outboundLinks": ["项目复盘", "旅行计划"],
+      "filePath": "数字园艺.md"
+    },
+    {
+      "slug": "项目复盘",
+      "title": "项目复盘",
+      "date": "2025-03-15",
+      "category": "工作",
+      "tags": ["React", "TypeScript", "重构"],
+      "excerpt": "把个人网站从 Next.js 迁移到 React + Vite 的经验总结。",
+      "modified": "2025-03-15",
+      "outboundLinks": [],
+      "filePath": "工作/项目复盘.md"
+    },
+    {
+      "slug": "旅行计划",
+      "title": "旅行计划",
+      "date": "2025-04-20",
+      "category": "生活",
+      "tags": ["旅行", "日本", "规划"],
+      "excerpt": "2025 春季日本旅行计划，包含行程、美食和注意事项。",
+      "modified": "2025-04-20",
+      "outboundLinks": [],
+      "filePath": "生活/旅行计划.md"
+    }
+  ],
+  "tree": [
+    {
+      "name": "工作",
+      "path": "工作",
+      "type": "folder",
+      "children": [
+        {
+          "name": "项目复盘",
+          "path": "工作/项目复盘.md",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "生活",
+      "path": "生活",
+      "type": "folder",
+      "children": [
+        {
+          "name": "旅行计划",
+          "path": "生活/旅行计划.md",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "数字园艺",
+      "path": "数字园艺.md",
+      "type": "file"
+    }
+  ],
+  "inboundLinks": {
+    "项目复盘": ["数字园艺"],
+    "旅行计划": ["数字园艺"]
+  }
+}

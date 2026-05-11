@@ -8,7 +8,6 @@ import {
   fetchObsidianNotes,
   fetchObsidianNote,
   fetchVaultTree,
-  isObsidianServerAvailable,
 } from '@/services/obsidianClient'
 import type { ObsidianNoteMeta, ObsidianNote, VaultFile } from '@/types'
 import { useLang } from '@/contexts/PreferencesContext'
@@ -19,7 +18,6 @@ export default function ObsidianBrowser() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const [serverOn, setServerOn] = useState<boolean | null>(null)
   const [tree, setTree] = useState<VaultFile[]>([])
   const [notes, setNotes] = useState<ObsidianNoteMeta[]>([])
   const [selectedNote, setSelectedNote] = useState<ObsidianNote | null>(null)
@@ -32,18 +30,12 @@ export default function ObsidianBrowser() {
 
   const loadData = useCallback(async () => {
     setLoading(true)
-    const available = await isObsidianServerAvailable()
-    setServerOn(available)
-
-    if (available) {
-      const [treeData, notesData] = await Promise.all([
-        fetchVaultTree(),
-        fetchObsidianNotes(),
-      ])
-      setTree(treeData)
-      setNotes(notesData)
-    }
-
+    const [treeData, notesData] = await Promise.all([
+      fetchVaultTree(),
+      fetchObsidianNotes(),
+    ])
+    setTree(treeData)
+    setNotes(notesData)
     setLoading(false)
   }, [])
 
@@ -63,7 +55,7 @@ export default function ObsidianBrowser() {
 
   useEffect(() => {
     const noteSlug = searchParams.get('note')
-    if (noteSlug && serverOn === true) {
+    if (noteSlug) {
       if (noteSlug !== selectedSlug) {
         setSelectedSlug(noteSlug)
         fetchObsidianNote(noteSlug).then((note) => {
@@ -74,7 +66,7 @@ export default function ObsidianBrowser() {
       setSelectedSlug('')
       setSelectedNote(null)
     }
-  }, [searchParams, serverOn, selectedSlug, selectedNote])
+  }, [searchParams, selectedSlug, selectedNote])
 
   useEffect(() => {
     const el = treeScrollRef.current
@@ -161,47 +153,6 @@ export default function ObsidianBrowser() {
       .sort((a, b) => b.score - a.score)
       .map((item) => item.note)
   }, [searchQuery, notes, calcNoteScore])
-
-  if (serverOn === false) {
-    return (
-      <div className="bg-Parchment dark:bg-Graphite min-h-[60dvh]">
-        <PageSEO
-          title="Obsidian Vault"
-          description="Browse and preview notes from your local Obsidian vault."
-          path="/obsidian"
-        />
-        <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
-          <div className="text-center px-6">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="font-display text-[clamp(1.5rem,3vw,2.5rem)] font-medium text-Ink dark:text-white"
-            >
-              {t('obsidian.title')}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mt-4 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
-            >
-              {t('obsidian.serverOffline')}
-            </motion.p>
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              onClick={loadData}
-              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-Amber text-Parchment rounded-lg text-[0.875rem] font-semibold hover:bg-[#B06A2F] transition-colors"
-            >
-              <RefreshCw size={16} />
-              {t('obsidian.retry')}
-            </motion.button>
-          </div>
-        </section>
-      </div>
-    )
-  }
 
   return (
     <div className="bg-Parchment dark:bg-Graphite min-h-[100dvh]">

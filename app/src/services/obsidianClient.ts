@@ -1,117 +1,111 @@
 import type { ObsidianNoteMeta, ObsidianNote, VaultFile, InboundLinkIndex } from '@/types'
 
-const API_BASE = 'http://localhost:2667/api'
+const INDEX_URL = '/notes/index.json'
 
-let serverAvailable: boolean | null = null
+let indexCache: {
+  notes: ObsidianNoteMeta[]
+  tree: VaultFile[]
+  inboundLinks: InboundLinkIndex
+} | null = null
 
-async function checkServer(): Promise<boolean> {
-  if (serverAvailable !== null) return serverAvailable
+async function loadIndex(): Promise<typeof indexCache> {
+  if (indexCache) return indexCache
   try {
-    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) })
-    serverAvailable = res.ok
-    return serverAvailable
-  } catch {
-    serverAvailable = false
-    return false
-  }
-}
-
-export async function isObsidianServerAvailable(): Promise<boolean> {
-  return checkServer()
-}
-
-/* ───────────────────────────────────────────────
-   GET /api/notes
-   ─────────────────────────────────────────────── */
-export async function fetchObsidianNotes(): Promise<ObsidianNoteMeta[]> {
-  try {
-    const res = await fetch(`${API_BASE}/notes`, { signal: AbortSignal.timeout(5000) })
-    if (!res.ok) throw new Error('Server error')
+    const res = await fetch(INDEX_URL)
+    if (!res.ok) return null
     const data = await res.json()
-    return data.notes as ObsidianNoteMeta[]
-  } catch {
-    return []
-  }
-}
-
-/* ───────────────────────────────────────────────
-   GET /api/notes/:slug
-   ─────────────────────────────────────────────── */
-export async function fetchObsidianNote(slug: string): Promise<ObsidianNote | null> {
-  try {
-    const res = await fetch(`${API_BASE}/notes/${encodeURIComponent(slug)}`, {
-      signal: AbortSignal.timeout(5000),
-    })
-    if (!res.ok) throw new Error('Not found')
-    const data = await res.json()
-    return {
-      ...data.meta,
-      content: data.content,
-      frontmatter: data.frontmatter,
-    } as ObsidianNote
+    indexCache = {
+      notes: data.notes || [],
+      tree: data.tree || [],
+      inboundLinks: data.inboundLinks || {},
+    }
+    return indexCache
   } catch {
     return null
   }
 }
 
 /* ───────────────────────────────────────────────
-   GET /api/tree
+   Static files — always available
    ─────────────────────────────────────────────── */
+export async function isObsidianServerAvailable(): Promise<boolean> {
+  const idx = await loadIndex()
+  return idx !== null && idx.notes.length > 0
+}
+
+export async function fetchObsidianNotes(): Promise<ObsidianNoteMeta[]> {
+  const idx = await loadIndex()
+  return idx?.notes || []
+}
+
+export async function fetchObsidianNote(slug: string): Promise<ObsidianNote | null> {
+  const idx = await loadIndex()
+  if (!idx) return null
+
+  const meta = idx.notes.find((n) => n.slug === slug)
+  if (!meta) return null
+
+  try {
+    const res = await fetch(`/notes/${encodeURIComponent(meta.filePath)}`)
+    if (!res.ok) return null
+    const raw = await res.text()
+
+    // Simple frontmatter parser (avoids bundling gray-matter)
+    const frontmatter: Record<string, unknown> = {}
+    let content = raw
+
+    if (raw.startsWith('---')) {
+      const end = raw.indexOf('---', 3)
+      if (end !== -1) {
+        const yaml = raw.slice(3, end).trim()
+        content = raw.slice(end + 3).trim()
+        for (const line of yaml.split('\n')) {
+          const colonIdx = line.indexOf(':')
+          if (colonIdx > 0) {
+            const key = line.slice(0, colonIdx).trim()
+            const val = line.slice(colonIdx + 1).trim()
+            if (val.startsWith('[') && val.endsWith(']')) {
+              frontmatter[key] = val
+                .slice(1, -1)
+                .split(',')
+                .map((s) => s.trim().replace(/^["']|["']$/g, ''))
+            } else {
+              frontmatter[key] = val.replace(/^["']|["']$/g, '')
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      ...meta,
+      content,
+      frontmatter,
+    }
+  } catch {
+    return null
+  }
+}
+
 export async function fetchVaultTree(): Promise<VaultFile[]> {
-  try {
-    const res = await fetch(`${API_BASE}/tree`, { signal: AbortSignal.timeout(5000) })
-    if (!res.ok) throw new Error('Server error')
-    const data = await res.json()
-    return data.tree as VaultFile[]
-  } catch {
-    return []
-  }
+  const idx = await loadIndex()
+  return idx?.tree || []
 }
 
-/* ───────────────────────────────────────────────
-   GET /api/links
-   ─────────────────────────────────────────────── */
 export async function fetchInboundLinks(): Promise<InboundLinkIndex> {
-  try {
-    const res = await fetch(`${API_BASE}/links`, { signal: AbortSignal.timeout(5000) })
-    if (!res.ok) throw new Error('Server error')
-    const data = await res.json()
-    return data.inboundLinks as InboundLinkIndex
-  } catch {
-    return {}
-  }
+  const idx = await loadIndex()
+  return idx?.inboundLinks || {}
 }
 
 /* ───────────────────────────────────────────────
-   PUT /api/notes/:slug — Save note back to vault
+   Read-only — static files can't be saved back
    ─────────────────────────────────────────────── */
-export async function saveObsidianNote(slug: string, content: string): Promise<boolean> {
-  try {
-    const res = await fetch(`${API_BASE}/notes/${encodeURIComponent(slug)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content }),
-      signal: AbortSignal.timeout(10000),
-    })
-    return res.ok
-  } catch {
-    return false
-  }
+export async function saveObsidianNote(_slug: string, _content: string): Promise<boolean> {
+  console.warn('Static notes are read-only. Edit source files and redeploy.')
+  return false
 }
 
-/* ───────────────────────────────────────────────
-   POST /api/deploy
-   ─────────────────────────────────────────────── */
-export async function deployNotes(slugs: string[]): Promise<{ status: string }> {
-  const res = await fetch(`${API_BASE}/deploy`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ slugs }),
-    signal: AbortSignal.timeout(10000),
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.error || 'Deploy failed')
-  }
-  return res.json()
+export async function deployNotes(_slugs: string[]): Promise<{ status: string }> {
+  console.warn('Static notes are auto-deployed with the site. No manual deploy needed.')
+  return { status: 'noop' }
 }
