@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { fetchSetting, saveSetting } from '@/data/site'
 
 export interface User {
   userId: string   // 邮箱，唯一且不可变
@@ -112,6 +113,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     avatar: ownerInfo?.avatar || DEFAULT_USER.avatar,
   }
 
+  // Sync owner profile from Supabase on mount (so visitors see the same avatar)
+  useEffect(() => {
+    fetchSetting<{ username: string; avatar: string }>('owner_profile')
+      .then((profile) => {
+        if (!profile) return
+        setAuthData(prev => {
+          const next: AuthStorage = {
+            ...prev,
+            registry: {
+              ...prev.registry,
+              [DEFAULT_USER.userId]: profile,
+            },
+          }
+          saveAuth(next)
+          return next
+        })
+      })
+      .catch((err) => console.warn('Failed to fetch owner profile:', err))
+  }, [])
+
   const updateAuth = (updater: (prev: AuthStorage) => AuthStorage) => {
     setAuthData(prev => {
       const next = updater(prev)
@@ -156,12 +177,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatar: '/avatar.jpg'
       }
       const updated = { ...currentUser, avatar }
+      const registryEntry = { username: updated.username, avatar }
+      // Also sync to Supabase so visitors can see it
+      saveSetting('owner_profile', registryEntry).catch((e) =>
+        console.warn('Sync owner profile failed:', e)
+      )
       return {
         ...prev,
         currentUser: updated,
         registry: {
           ...prev.registry,
-          [updated.userId]: { username: updated.username, avatar }
+          [updated.userId]: registryEntry
         }
       }
     })
@@ -175,12 +201,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatar: '/avatar.jpg'
       }
       const updated = { ...currentUser, username }
+      const registryEntry = { username, avatar: updated.avatar }
+      // Also sync to Supabase so visitors can see it
+      saveSetting('owner_profile', registryEntry).catch((e) =>
+        console.warn('Sync owner profile failed:', e)
+      )
       return {
         ...prev,
         currentUser: updated,
         registry: {
           ...prev.registry,
-          [updated.userId]: { username, avatar: updated.avatar }
+          [updated.userId]: registryEntry
         }
       }
     })

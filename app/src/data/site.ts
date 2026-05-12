@@ -5,7 +5,7 @@ import { supabase, isSupabaseReady } from '@/lib/supabase'
 /* ───────────────────────────────────────────────
    Helpers
    ─────────────────────────────────────────────── */
-async function fetchSetting<T>(key: string): Promise<T | null> {
+export async function fetchSetting<T>(key: string): Promise<T | null> {
   if (!isSupabaseReady()) return null
   const { data, error } = await supabase!
     .from('site_settings')
@@ -16,7 +16,7 @@ async function fetchSetting<T>(key: string): Promise<T | null> {
   return (data as Record<string, unknown>).value as T
 }
 
-async function saveSetting<T>(key: string, value: T) {
+export async function saveSetting<T>(key: string, value: T) {
   if (!isSupabaseReady()) return
   await supabase!.from('site_settings').upsert({
     key,
