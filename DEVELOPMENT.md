@@ -26,6 +26,171 @@
 
 ## 最近解决的问题
 
+### 2026-05-12: 修复子目录笔记显示、日历同步和动态闪烁问题
+
+**问题 1: 子目录笔记无法显示**
+
+**现象**: 只有根目录的 21 篇笔记能正常显示，952 篇子目录笔记（如 `CPA/CPA学习/会计.md`）无法加载
+
+**原因**:
+- `TreeItem` 组件从文件的 `name` 字段生成 slug（如 `会计`）
+- 但 `index.json` 中的笔记 slug 是从完整路径生成的（如 `CPA-CPA学习-会计`）
+- 导致点击树形结构中的子目录笔记时，传递的 slug 不匹配，无法加载内容
+
+**解决方案** (`app/src/components/NoteTree.tsx`, `app/src/pages/ObsidianBrowser.tsx`):
+```typescript
+// 1. TreeItem 组件添加 notes 参数
+interface TreeItemProps {
+  notes?: ObsidianNoteMeta[]
+}
+
+// 2. 根据 filePath 查找真实 slug
+const note = notes.find((n) => n.filePath === item.path)
+const slug = note?.slug || fallbackSlug
+
+// 3. 在 ObsidianBrowser 中传递 notes 数组
+<TreeItem item={item} notes={notes} />
+<RootFilesGroup files={files} notes={notes} />
+```
+
+**测试结果**:
+- ✅ 所有 973 篇笔记（包括 952 篇子目录笔记）都能正常显示
+- ✅ 点击任意文件夹中的笔记都能正确加载内容
+
+---
+
+**问题 2: 日历待办不显示**
+
+**现象**: 在日历页面添加待办后，右侧的"今日待办"列表不显示，需要刷新页面才能看到
+
+**原因**:
+- `Calendar.tsx` 的 `syncCalendarEntries()` 是异步的，需要时间
+- `TodayTaskList` 和 `TodayStatsPanel` 在组件挂载时立即读取 localStorage
+- 如果 localStorage 为空（新设备/清空缓存），而 Supabase 数据还在同步中，就会显示空白
+
+**解决方案**:
+
+1. **calendarStorage.ts**: 同步完成后触发事件
+```typescript
+export async function syncCalendarEntries(): Promise<boolean> {
+  // ... 同步逻辑
+  window.dispatchEvent(new CustomEvent('calendar-sync-completed'))
+  return true
+}
+```
+
+2. **TodayTaskList.tsx**: 监听同步事件
+```typescript
+useEffect(() => {
+  const handleSyncCompleted = () => {
+    setEntry(loadTodayEntry())
+  }
+  window.addEventListener('calendar-sync-completed', handleSyncCompleted)
+  return () => window.removeEventListener('calendar-sync-completed', handleSyncCompleted)
+}, [])
+```
+
+3. **TodayStatsPanel.tsx**: 监听同步事件并刷新统计
+```typescript
+const [refreshKey, setRefreshKey] = useState(0)
+useEffect(() => {
+  const handleSyncCompleted = () => setRefreshKey(prev => prev + 1)
+  window.addEventListener('calendar-sync-completed', handleSyncCompleted)
+  // ...
+}, [])
+```
+
+**测试结果**:
+- ✅ 添加待办后，右侧列表立即更新
+- ✅ 首次加载时，Supabase 同步完成后自动显示数据
+- ✅ 统计面板（7天趋势、完成率等）同步刷新
+
+---
+
+**问题 3: 记忆碎片删除后闪烁重现**
+
+**现象**: 从笔记页面切换到记忆碎片页面时，已删除的动态会闪烁一下然后消失（即使清空了 localStorage）
+
+**原因**:
+- 旧的加载逻辑：先显示 localStorage → 再异步加载 Supabase → 替换显示
+- 这导致"先显示旧数据，再显示新数据"的闪烁效果
+- 即使 localStorage 为空，也会先显示 MOCK 数据，然后等 Supabase 加载完才替换
+
+**解决方案** (`app/src/hooks/useMoments.ts`):
+
+1. **改变加载顺序**：先等待 Supabase，成功后直接显示
+```typescript
+const fetchMoments = useCallback(async () => {
+  setLoading(true)
+  
+  // 1. 先尝试 Supabase（2s 超时保护）
+  if (isSupabaseReady()) {
+    try {
+      const list = await fetchFromSupabase()
+      setMoments(list)
+      saveLocal(list)
+      setLoading(false)
+      return  // 成功后直接返回，不闪烁
+    } catch (err) {
+      console.warn('Supabase sync failed, falling back to local:', err)
+    }
+  }
+  
+  // 2. 降级：只有 Supabase 不可用时才使用 localStorage
+  const local = loadLocal()
+  setMoments(local.length > 0 ? sortDesc(local) : sortDesc(MOCK_MOMENTS))
+  setLoading(false)
+}, [])
+```
+
+2. **改进删除逻辑**：先删除云端，成功后再更新本地
+```typescript
+const deleteMoment = useCallback(async (id: string) => {
+  // 先删除 Supabase
+  if (isSupabaseReady()) {
+    try {
+      await supabase!.from('moments').delete().eq('id', id)
+      // 成功后再更新本地
+      const list = moments.filter((m) => m.id !== id)
+      setMoments(list)
+      saveLocal(list)
+      return
+    } catch (err) {
+      console.warn('Supabase delete failed:', err)
+    }
+  }
+  // 降级：仅本地删除
+  const list = moments.filter((m) => m.id !== id)
+  setMoments(list)
+  saveLocal(list)
+}, [moments])
+```
+
+**权衡**:
+- 优点：彻底消除闪烁，数据一致性更好
+- 缺点：首次加载需要等待 Supabase（最多 2 秒，有 loading 提示）
+
+**测试结果**:
+- ✅ 刷新页面不再闪烁
+- ✅ 已删除的动态不会重新出现
+- ✅ Supabase 作为唯一数据源，保证一致性
+
+**相关文件**:
+- `app/src/components/NoteTree.tsx` - 笔记树 slug 匹配修复
+- `app/src/pages/ObsidianBrowser.tsx` - 传递 notes 数组
+- `app/src/utils/calendarStorage.ts` - 同步完成事件
+- `app/src/components/calendar/TodayTaskList.tsx` - 监听同步事件
+- `app/src/components/calendar/TodayStatsPanel.tsx` - 监听同步事件
+- `app/src/hooks/useMoments.ts` - 加载和删除逻辑优化
+
+**相关 Commit**: 
+- `184e5c4` - fix: 修复笔记浏览和日历同步问题
+- `66eceff` - fix: 修复删除动态后闪烁重现的问题
+- `80f42a5` - fix: 增强 Moments 同步逻辑和调试信息
+- `10096bf` - fix: 彻底解决记忆碎片刷新时的闪烁问题
+
+---
+
 ### 2026-05-09: Obsidian PDF 标注 Callout 显示修复 + 笔记搜索相关度排序
 
 **问题描述**:

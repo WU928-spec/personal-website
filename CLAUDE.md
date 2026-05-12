@@ -406,6 +406,55 @@ obsidian-server/
 
 ## 最近更新
 
+### 2026-05-12: 修复子目录笔记显示、日历同步和动态闪烁问题
+
+**问题 1: 子目录笔记无法显示**
+
+只有根目录的 21 篇笔记能正常显示，952 篇子目录笔记无法加载。
+
+**原因**: `TreeItem` 组件从文件名生成 slug，但实际 slug 是从完整路径生成的，导致 slug 不匹配。
+
+**解决**: 
+- 修改 `NoteTree.tsx`：添加 `notes` 参数，根据 `filePath` 查找真实 slug
+- 修改 `ObsidianBrowser.tsx`：传递 `notes` 数组给树形组件
+
+**相关文件**: `app/src/components/NoteTree.tsx`, `app/src/pages/ObsidianBrowser.tsx`
+
+---
+
+**问题 2: 日历待办不显示**
+
+添加待办后，右侧"今日待办"列表不显示，需要刷新页面。
+
+**原因**: Supabase 异步同步时，`TodayTaskList` 和 `TodayStatsPanel` 已经读取了空的 localStorage。
+
+**解决**:
+- `calendarStorage.ts`: 同步完成后触发 `calendar-sync-completed` 事件
+- `TodayTaskList.tsx` 和 `TodayStatsPanel.tsx`: 监听事件并刷新数据
+
+**相关文件**: `app/src/utils/calendarStorage.ts`, `app/src/components/calendar/TodayTaskList.tsx`, `app/src/components/calendar/TodayStatsPanel.tsx`
+
+---
+
+**问题 3: 记忆碎片删除后闪烁重现**
+
+刷新页面时，已删除的动态会闪烁一下然后消失。
+
+**原因**: 旧逻辑先显示 localStorage，再异步加载 Supabase 替换，导致"先显示旧数据，再显示新数据"的闪烁。
+
+**解决**:
+- 改为先等待 Supabase 加载完成，成功后直接显示（2s 超时保护）
+- 只有 Supabase 不可用时才降级使用 localStorage
+- 删除操作改为先删除云端，成功后再更新本地
+
+**权衡**: 首次加载需要等待 Supabase（最多 2 秒），但消除了闪烁，数据一致性更好。
+
+**相关文件**: `app/src/hooks/useMoments.ts`
+
+**相关 Commit**: `184e5c4`, `66eceff`, `80f42a5`, `10096bf`
+
+---
+
 ### 2026-05-11: 项目追踪柱状图 Tooltip 优化
 
 **问题**：
