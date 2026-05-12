@@ -170,12 +170,17 @@ export function useMoments() {
     if (isSupabaseReady()) {
       try {
         const list = await fetchFromSupabase()
+        // Always use Supabase data as source of truth
         setMoments(list)
         saveLocal(list)
+        console.log('[Moments] Synced from Supabase:', list.length, 'moments')
       } catch (err) {
         console.warn('Supabase sync failed, using local:', err)
         setUsingLocal(true)
       }
+    } else {
+      console.log('[Moments] Supabase not ready, using local data')
+      setUsingLocal(true)
     }
   }, [])
 
