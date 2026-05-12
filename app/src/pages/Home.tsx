@@ -131,12 +131,12 @@ const iconMap: Record<string, React.ElementType> = { MapPin, Briefcase, Globe, H
 
 function IntroSection() {
   const { t, lang } = useLang()
-  const { user } = useAuth()
+  const { owner } = useAuth()
   const [about, setAbout] = useState<AboutData>(() => loadAbout(lang))
 
   useEffect(() => { setAbout(loadAbout(lang)) }, [lang])
 
-  const avatar = user?.avatar || '/avatar.jpg'
+  const avatar = owner.avatar
 
   return (
     <section className="bg-Parchment py-24 md:py-32 relative dark:bg-Graphite">

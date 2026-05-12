@@ -7,9 +7,9 @@ import { useMoments } from '@/hooks/useMoments'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function Moments() {
-  const { user, isLoggedIn } = useAuth()
-  const avatarUrl = user?.avatar || '/avatar.jpg'
-  const displayName = user?.username || 'Jasper'
+  const { user, owner, isLoggedIn } = useAuth()
+  const avatarUrl = owner.avatar
+  const displayName = owner.username
   const {
     moments,
     loading,

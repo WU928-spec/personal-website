@@ -13,6 +13,7 @@ export interface UserInfo {
 
 interface AuthContextType {
   user: User | null
+  owner: User
   userId: string
   isLoggedIn: boolean
   isEditMode: boolean
@@ -103,6 +104,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isLoggedIn = user !== null
   const userId = user?.userId || authData.visitorId
 
+  // Owner is always the default user — visible to visitors too
+  const ownerInfo = authData.registry[DEFAULT_USER.userId]
+  const owner: User = {
+    userId: DEFAULT_USER.userId,
+    username: ownerInfo?.username || DEFAULT_USER.username,
+    avatar: ownerInfo?.avatar || DEFAULT_USER.avatar,
+  }
+
   const updateAuth = (updater: (prev: AuthStorage) => AuthStorage) => {
     setAuthData(prev => {
       const next = updater(prev)
@@ -186,6 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        owner,
         userId,
         isLoggedIn,
         isEditMode,
