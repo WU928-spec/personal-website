@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
-import { Camera, Pencil, Save, X } from 'lucide-react'
+import { Camera, Pencil, Save, X, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { User } from '@/contexts/AuthContext'
+import { uploadAvatar } from '@/services/avatarUpload'
 
 interface ProfileHeaderProps {
   user: User
@@ -17,29 +18,31 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [editUsername, setEditUsername] = useState(user.username)
   const [savedUsername, setSavedUsername] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const MAX_SIZE = 2 * 1024 * 1024 // 2MB
+    const MAX_SIZE = 5 * 1024 * 1024 // 5MB
     if (file.size > MAX_SIZE) {
-      alert('图片过大，请选择不超过 2MB 的图片')
+      alert('图片过大，请选择不超过 5MB 的图片')
       return
     }
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      setPreviewAvatar(event.target?.result as string)
-    }
-    reader.onerror = () => {
-      alert('读取图片失败，请重试')
-    }
-    reader.readAsDataURL(file)
-  }
 
-  const handleSaveAvatar = () => {
-    onAvatarUpdate(previewAvatar)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    setUploading(true)
+    try {
+      const url = await uploadAvatar(file, user.userId)
+      setPreviewAvatar(url)
+      onAvatarUpdate(url)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '上传失败，请重试')
+    } finally {
+      setUploading(false)
+      // 清空 input，允许重复选择同一张图
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
   }
 
   const handleSaveUsername = () => {
@@ -66,11 +69,12 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
           <img src={previewAvatar} alt={user.username} className="w-full h-full object-cover" />
         </div>
         <button
-          onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-Amber text-Parchment flex items-center justify-center shadow-md hover:bg-[#B06A2F] transition-colors"
+          onClick={() => !uploading && fileInputRef.current?.click()}
+          disabled={uploading}
+          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-Amber text-Parchment flex items-center justify-center shadow-md hover:bg-[#B06A2F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={t('profile.changeAvatar')}
         >
-          <Camera size={18} />
+          {uploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
         </button>
         <input
           ref={fileInputRef}
@@ -81,16 +85,9 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
         />
       </div>
 
-      {previewAvatar !== user.avatar && (
+      {saved && (
         <div className="mt-4 flex items-center justify-center gap-2">
-          {saved && <span className="text-[0.8125rem] text-Sage">{t('profile.saved')}</span>}
-          <button
-            onClick={handleSaveAvatar}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"
-          >
-            <Save size={14} />
-            {t('profile.saveAvatar')}
-          </button>
+          <span className="text-[0.8125rem] text-Sage">{t('profile.saved')}</span>
         </div>
       )}
 

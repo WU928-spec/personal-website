@@ -92,8 +92,6 @@ function saveAuth(data: AuthStorage) {
     localStorage.setItem(AUTH_KEY, JSON.stringify(data))
   } catch (err) {
     console.error('Failed to save auth data:', err)
-    // QuotaExceededError can happen with large base64 avatars
-    alert('保存失败：头像文件过大，请使用更小的图片（建议不超过 1MB）')
   }
 }
 
