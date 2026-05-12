@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Clock, TrendingUp, Sun, Sunrise, Sunset, Moon } from 'lucide-react'
 import type { DayEntry } from '@/types/calendar'
 import {
@@ -54,10 +54,24 @@ function getTimeSlotDistribution(entry: DayEntry | null): { name: string; hours:
 /* ─── Component ─── */
 export default function TodayStatsPanel() {
   const tick = useLiveTick()
+  const [refreshKey, setRefreshKey] = useState(0)
 
+  useEffect(() => {
+    const handleSyncCompleted = () => {
+      setRefreshKey((prev) => prev + 1)
+    }
+    const handleEntrySaved = () => {
+      setRefreshKey((prev) => prev + 1)
+    }
+    window.addEventListener('calendar-sync-completed', handleSyncCompleted)
+    window.addEventListener('calendar-entry-saved', handleEntrySaved)
+    return () => {
+      window.removeEventListener('calendar-sync-completed', handleSyncCompleted)
+      window.removeEventListener('calendar-entry-saved', handleEntrySaved)
+    }
+  }, [])
 
-
-  const entry = useMemo(() => loadEntry(formatDateStr(new Date())), [tick])
+  const entry = useMemo(() => loadEntry(formatDateStr(new Date())), [tick, refreshKey])
   const todos = entry?.todos || []
   const doneCount = todos.filter((t) => t.done).length
   const totalCount = todos.length
@@ -65,9 +79,9 @@ export default function TodayStatsPanel() {
   const totalTrackedToday = getDayTotalDuration(entry)
   const activeTodo = todos.find((t) => t.timeRecords.some((r) => !r.endAt))
 
-  const weekData = useMemo(() => getWeekData(), [tick])
+  const weekData = useMemo(() => getWeekData(), [tick, refreshKey])
   const maxWeekDuration = Math.max(...weekData.map((d) => d.duration), 1)
-  const timeSlots = useMemo(() => getTimeSlotDistribution(entry), [tick])
+  const timeSlots = useMemo(() => getTimeSlotDistribution(entry), [tick, refreshKey])
   const maxSlotHours = Math.max(...timeSlots.map((s) => s.hours), 1)
 
   return (

@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Folder, FileText, ChevronRight, ChevronDown } from 'lucide-react'
-import type { VaultFile } from '@/types'
+import type { VaultFile, ObsidianNoteMeta } from '@/types'
 
 interface TreeItemProps {
   item: VaultFile
   depth?: number
   onSelect: (slug: string) => void
   selectedSlug?: string
+  notes?: ObsidianNoteMeta[]
 }
 
-export function TreeItem({ item, depth = 0, onSelect, selectedSlug }: TreeItemProps) {
+export function TreeItem({ item, depth = 0, onSelect, selectedSlug, notes = [] }: TreeItemProps) {
   const [expanded, setExpanded] = useState(false)
 
   if (item.type === 'folder') {
@@ -46,6 +47,7 @@ export function TreeItem({ item, depth = 0, onSelect, selectedSlug }: TreeItemPr
                   depth={depth + 1}
                   onSelect={onSelect}
                   selectedSlug={selectedSlug}
+                  notes={notes}
                 />
               ))}
             </motion.div>
@@ -55,7 +57,9 @@ export function TreeItem({ item, depth = 0, onSelect, selectedSlug }: TreeItemPr
     )
   }
 
-  const slug = item.name
+  // Find the note by matching filePath
+  const note = notes.find((n) => n.filePath === item.path)
+  const slug = note?.slug || item.name
     .trim()
     .replace(/\s+/g, '-')
     .replace(/[^a-zA-Z0-9一-龥\-_]/g, '')
@@ -84,9 +88,10 @@ interface RootFilesGroupProps {
   onSelect: (slug: string) => void
   selectedSlug?: string
   label: string
+  notes?: ObsidianNoteMeta[]
 }
 
-export function RootFilesGroup({ files, onSelect, selectedSlug, label }: RootFilesGroupProps) {
+export function RootFilesGroup({ files, onSelect, selectedSlug, label, notes = [] }: RootFilesGroupProps) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -122,6 +127,7 @@ export function RootFilesGroup({ files, onSelect, selectedSlug, label }: RootFil
                 depth={1}
                 onSelect={onSelect}
                 selectedSlug={selectedSlug}
+                notes={notes}
               />
             ))}
           </motion.div>

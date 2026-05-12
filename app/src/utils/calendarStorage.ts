@@ -103,6 +103,8 @@ export async function syncCalendarEntries(): Promise<boolean> {
     // Merge: remote wins for same date
     const merged = { ...local, ...remote }
     saveLocalAll(merged)
+    // Notify all components that sync completed
+    window.dispatchEvent(new CustomEvent('calendar-sync-completed'))
     return true
   } catch (e) {
     console.warn('Calendar sync failed:', e)

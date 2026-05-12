@@ -36,11 +36,17 @@ export default function TodayTaskList() {
       }
       setProjects(loadProjects())
     }
+    const handleSyncCompleted = () => {
+      setEntry(loadTodayEntry())
+      setProjects(loadProjects())
+    }
     window.addEventListener('focus', handleFocus)
     window.addEventListener('calendar-entry-saved', handleSaved)
+    window.addEventListener('calendar-sync-completed', handleSyncCompleted)
     return () => {
       window.removeEventListener('focus', handleFocus)
       window.removeEventListener('calendar-entry-saved', handleSaved)
+      window.removeEventListener('calendar-sync-completed', handleSyncCompleted)
     }
   }, [])
 

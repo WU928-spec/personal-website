@@ -276,7 +276,7 @@ export default function ObsidianBrowser() {
                         ) : (
                           <>
                             {tree.filter(i => i.type === 'folder').map(item => (
-                              <TreeItem key={item.path} item={item} onSelect={handleSelectNote} selectedSlug={selectedSlug} />
+                              <TreeItem key={item.path} item={item} onSelect={handleSelectNote} selectedSlug={selectedSlug} notes={notes} />
                             ))}
                             {tree.some(i => i.type === 'file') && (
                               <RootFilesGroup
@@ -284,6 +284,7 @@ export default function ObsidianBrowser() {
                                 onSelect={handleSelectNote}
                                 selectedSlug={selectedSlug}
                                 label={t('obsidian.rootNotes')}
+                                notes={notes}
                               />
                             )}
                           </>
