@@ -156,7 +156,23 @@ export function useMoments() {
     setError(null)
     setUsingLocal(false)
 
-    // 1. Show local data immediately — never block UI
+    // Try Supabase first
+    if (isSupabaseReady()) {
+      try {
+        const list = await fetchFromSupabase()
+        // Supabase is source of truth — use it directly
+        setMoments(list)
+        saveLocal(list)
+        setLoading(false)
+        console.log('[Moments] Synced from Supabase:', list.length, 'moments')
+        return
+      } catch (err) {
+        console.warn('Supabase sync failed, falling back to local:', err)
+        setUsingLocal(true)
+      }
+    }
+
+    // Fallback: use local data if Supabase unavailable
     const local = loadLocal()
     if (local.length > 0) {
       setMoments(sortDesc(local))
@@ -165,23 +181,7 @@ export function useMoments() {
       saveLocal(MOCK_MOMENTS)
     }
     setLoading(false)
-
-    // 2. Silently sync with Supabase in background
-    if (isSupabaseReady()) {
-      try {
-        const list = await fetchFromSupabase()
-        // Always use Supabase data as source of truth
-        setMoments(list)
-        saveLocal(list)
-        console.log('[Moments] Synced from Supabase:', list.length, 'moments')
-      } catch (err) {
-        console.warn('Supabase sync failed, using local:', err)
-        setUsingLocal(true)
-      }
-    } else {
-      console.log('[Moments] Supabase not ready, using local data')
-      setUsingLocal(true)
-    }
+    console.log('[Moments] Using local data:', local.length || MOCK_MOMENTS.length, 'moments')
   }, [])
 
   useEffect(() => {
