@@ -563,5 +563,39 @@ npm run dev  # http://localhost:2667
 
 ---
 
-*最后更新: 2026-05-11*  
+### 2026-05-12: 日历自动保存 + 个人资料 i18n + 头像上云
+
+**1. 日历详情面板删除保存按钮，改为自动保存**
+
+文件: `app/src/components/calendar/DayDetailPanel.tsx`
+
+- 移除底部"保存"按钮
+- `useEffect` 监听 `todos` / `diary` 变化，500ms debounce 后自动调用 `saveEntry`
+- 初始加载时用 `isInitialLoad` ref 跳过，避免打开面板就触发保存
+- 保留"已自动保存"轻量提示（1.5s 后自动消失）
+- 仍然 dispatch `calendar-entry-saved` 事件通知其他组件刷新
+
+**2. 个人资料页面 i18n 翻译缺失修复**
+
+文件: `app/src/i18n/translations.ts`
+
+补充 `profile` 命名空间缺失的 9 个 key（中英文）：
+`subtitle`, `description`, `changeAvatar`, `save`, `cancel`, `editUsername`, `usernameSaved`, `aboutInfo`, `edit`
+
+**3. 头像上传迁移至 Supabase Storage**
+
+文件: `app/src/services/avatarUpload.ts`（新建）、`app/src/components/ProfileHeader.tsx`、`app/src/contexts/AuthContext.tsx`
+
+- 弃用 base64 存 localStorage 方案（单机、占配额、换设备丢失）
+- 新建 `avatarUpload.ts`：调用 `supabase.storage.from('avatars').upload()`
+- `ProfileHeader.tsx`：选择图片后自动上传，限制放宽到 5MB，加 `Loader2` loading 状态
+- `AuthContext.tsx`：移除 base64 超限警告（现在只存 tiny URL）
+
+**Supabase Storage 配置**：
+- Bucket: `avatars`（Public）
+- RLS Policy: `SELECT` + `INSERT`，均 applied to `public`
+
+---
+
+*最后更新: 2026-05-12*  
 *更新者: Kimi Code*
