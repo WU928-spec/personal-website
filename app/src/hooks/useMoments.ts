@@ -283,17 +283,26 @@ export function useMoments() {
 
   const deleteMoment = useCallback(
     async (id: string) => {
+      // Try Supabase first
+      if (isSupabaseReady()) {
+        try {
+          const { error } = await supabase!.from('moments').delete().eq('id', id)
+          if (error) throw error
+          // Supabase delete succeeded — update local
+          const list = moments.filter((m) => m.id !== id)
+          setMoments(list)
+          saveLocal(list)
+          return
+        } catch (err) {
+          console.warn('Supabase delete failed:', err)
+          // Fall through to local-only delete
+        }
+      }
+
+      // Local-only fallback (Supabase unavailable or failed)
       const list = moments.filter((m) => m.id !== id)
       setMoments(list)
       saveLocal(list)
-
-      if (isSupabaseReady()) {
-        try {
-          await supabase!.from('moments').delete().eq('id', id)
-        } catch (err) {
-          console.warn('Supabase delete failed:', err)
-        }
-      }
     },
     [moments]
   )
