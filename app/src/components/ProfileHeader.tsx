@@ -21,9 +21,17 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const MAX_SIZE = 2 * 1024 * 1024 // 2MB
+    if (file.size > MAX_SIZE) {
+      alert('图片过大，请选择不超过 2MB 的图片')
+      return
+    }
     const reader = new FileReader()
     reader.onload = (event) => {
       setPreviewAvatar(event.target?.result as string)
+    }
+    reader.onerror = () => {
+      alert('读取图片失败，请重试')
     }
     reader.readAsDataURL(file)
   }
