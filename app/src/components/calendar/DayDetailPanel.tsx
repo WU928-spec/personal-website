@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Trash2, BookOpen, CalendarCheck, CheckCircle2, Circle, Tag } from 'lucide-react'
 import { getLunarDate, getDayDetail, getSolarTerms } from 'chinese-days'
@@ -47,6 +47,8 @@ export default function DayDetailPanel({
   const [selectedProjectId, setSelectedProjectId] = useState('')
   const [projects, setProjects] = useState<Project[]>([])
   const [saved, setSaved] = useState(false)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isInitialLoad = useRef(true)
 
   /* ── Load data when panel opens ── */
   useEffect(() => {
@@ -72,18 +74,28 @@ export default function DayDetailPanel({
   }, [isOpen, date, dateStr, isPast])
 
   /* ── Save handler ── */
-  const handleSave = useCallback(() => {
+  const autoSave = useCallback(() => {
     saveEntry({
       date: dateStr,
       todos: todos.filter((t) => t.text.trim()),
       diary: diary.trim(),
     })
     setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => setSaved(false), 1500)
     onEntryChange?.()
-    // Notify other components to refresh immediately
     window.dispatchEvent(new CustomEvent('calendar-entry-saved', { detail: { date: dateStr } }))
   }, [dateStr, todos, diary, onEntryChange])
+
+  // Auto-save when todos or diary change (skip initial load)
+  useEffect(() => {
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false
+      return
+    }
+    const timer = setTimeout(() => autoSave(), 500)
+    return () => clearTimeout(timer)
+  }, [todos, diary, autoSave])
 
   /* ── Todo handlers ── */
   const addTodo = useCallback(() => {
@@ -399,29 +411,13 @@ export default function DayDetailPanel({
               </AnimatePresence>
             </div>
 
-            {/* Footer */}
-            {isLoggedIn && (
-              <div className="px-6 py-4 border-t border-Sand dark:border-white/10">
-                <button
-                  onClick={handleSave}
-                  className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[0.875rem] font-semibold transition-all duration-200 ${
-                    saved
-                      ? 'bg-Sage text-white'
-                      : 'bg-Amber text-white hover:bg-[#B06A2F]'
-                  }`}
-                >
-                  {saved ? (
-                    <>
-                      <CheckCircle2 size={16} />
-                      已保存
-                    </>
-                  ) : (
-                    <>
-                      <CalendarCheck size={16} />
-                      保存
-                    </>
-                  )}
-                </button>
+            {/* Auto-save indicator */}
+            {isLoggedIn && saved && (
+              <div className="px-6 py-2 border-t border-Sand dark:border-white/10">
+                <span className="flex items-center justify-center gap-1.5 text-[0.8125rem] text-Sage">
+                  <CheckCircle2 size={14} />
+                  已自动保存
+                </span>
               </div>
             )}
           </motion.div>
