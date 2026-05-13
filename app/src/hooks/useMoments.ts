@@ -6,59 +6,6 @@ import { supabase, isSupabaseReady, dbToMoment, momentToDb } from '@/lib/supabas
 const STORAGE_KEY = 'moments_v1'
 const API_BASE = 'http://localhost:2667'
 
-/* ── Mock data ── */
-const MOCK_MOMENTS: Moment[] = [
-  {
-    id: 'mock-1',
-    authorId: 'alice',
-    content:
-      '今天去了西湖，风景真的很美。湖面波光粼粼，柳树依依。\n\n拍了几张照片，分享给你们～',
-    images: [
-      'https://images.unsplash.com/photo-1548013146-72479768bada?w=600&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=600&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=600&fit=crop',
-    ],
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    location: '杭州·西湖',
-    likes: ['alice', 'bob', 'carol'],
-    comments: [
-      {
-        id: 'c1',
-        userId: 'alice',
-        name: 'Alice',
-        text: '好漂亮！下次一起去',
-        time: new Date(Date.now() - 1000 * 60 * 55).toISOString(),
-      },
-      {
-        id: 'c2',
-        userId: 'bob',
-        name: 'Bob',
-        text: '西湖的柳树确实很有意境',
-        time: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-      },
-    ],
-  },
-  {
-    id: 'mock-2',
-    authorId: 'bob',
-    content: '终于把项目重构完了，用了 React 19 + Tailwind，体验很棒。',
-    images: [
-      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=600&fit=crop',
-    ],
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
-    likes: ['dave'],
-    comments: [
-      {
-        id: 'c3',
-        userId: 'dave',
-        name: 'Dave',
-        text: 'congrats! 期待上线',
-        time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-      },
-    ],
-  },
-]
-
 /* ── Helpers ── */
 function migrateMoment(m: Moment): Moment {
   if (!m.authorId) {
@@ -174,14 +121,9 @@ export function useMoments() {
 
     // Fallback: use local data if Supabase unavailable
     const local = loadLocal()
-    if (local.length > 0) {
-      setMoments(sortDesc(local))
-    } else {
-      setMoments(sortDesc(MOCK_MOMENTS))
-      saveLocal(MOCK_MOMENTS)
-    }
+    setMoments(sortDesc(local))
     setLoading(false)
-    console.log('[Moments] Using local data:', local.length || MOCK_MOMENTS.length, 'moments')
+    console.log('[Moments] Using local data:', local.length, 'moments')
   }, [])
 
   useEffect(() => {
