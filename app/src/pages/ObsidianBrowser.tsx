@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  RefreshCw,
   ChevronLeft,
   ChevronRight,
   Search,
@@ -39,7 +38,6 @@ export default function ObsidianBrowser() {
   const [notes, setNotes] = useState<ObsidianNoteMeta[]>([])
   const [selectedNote, setSelectedNote] = useState<ObsidianNote | null>(null)
   const [selectedSlug, setSelectedSlug] = useState<string>('')
-  const [loading, setLoading] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const treeScrollRef = useRef<HTMLDivElement>(null)
@@ -69,11 +67,9 @@ export default function ObsidianBrowser() {
   const [draggedPath, setDraggedPath] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
-    setLoading(true)
     const [treeData, notesData] = await Promise.all([fetchVaultTree(), fetchObsidianNotes()])
     setTree(treeData)
     setNotes(notesData)
-    setLoading(false)
   }, [])
 
   useEffect(() => {
@@ -489,16 +485,8 @@ export default function ObsidianBrowser() {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="mt-6 flex items-center justify-center gap-3"
           >
-            <button
-              onClick={loadData}
-              disabled={loading}
-              className="inline-flex items-center gap-1.5 px-4 py-2 border border-Ink/30 rounded-lg text-[0.8125rem] font-medium text-Ink hover:bg-Ink/5 transition-colors disabled:opacity-50 dark:border-white/30 dark:text-white dark:hover:bg-white/10"
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              {t('obsidian.refresh')}
-            </button>
             <span className="text-[0.8125rem] text-Slate">
-              {notes.length} {t('obsidian.notes')}
+              {notes.filter((n) => !n.filePath.endsWith('__folder__')).length} {t('obsidian.notes')}
             </span>
           </motion.div>
         </div>
@@ -601,7 +589,7 @@ export default function ObsidianBrowser() {
                             </div>
                           )
                         ) : tree.length === 0 ? (
-                          <p className="text-[0.75rem] text-[#858585] px-3 py-2">Vault 为空</p>
+                          <p className="text-[0.75rem] text-[#858585] px-3 py-2">{t('obsidian.emptyVault')}</p>
                         ) : (
                           <ManagedTree
                             tree={tree}
