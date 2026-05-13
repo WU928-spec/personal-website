@@ -9,10 +9,8 @@ import {
   X,
   FolderPlus,
   FileText,
-  Trash2,
   Edit3,
   Eye,
-  Upload,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 // Tree rendering is inlined below as ManagedTree
@@ -45,7 +43,6 @@ export default function ObsidianBrowser() {
   const [searchQuery, setSearchQuery] = useState('')
   const treeScrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   /* ── Editor state ── */
   const [editorOpen, setEditorOpen] = useState(false)
@@ -500,21 +497,7 @@ export default function ObsidianBrowser() {
                               >
                                 <FileText size={14} />
                               </button>
-                              <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="p-1 rounded text-[#858585] hover:text-[#cccccc] hover:bg-[#2a2d2e] transition-colors"
-                                title="导入本地 .md"
-                              >
-                                <Upload size={14} />
-                              </button>
-                              <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept=".md"
-                                multiple
-                                onChange={handleFileSelect}
-                                className="hidden"
-                              />
+
                             </>
                           )}
                           <button
@@ -583,8 +566,6 @@ export default function ObsidianBrowser() {
                             selectedSlug={selectedSlug}
                             notes={notes}
                             isLoggedIn={isLoggedIn}
-                            onDelete={openDeleteDialog}
-                            onRename={openRenameDialog}
                             onContextMenu={(path, isFolder, e) => {
                               e.preventDefault()
                               setContextMenu({ x: e.clientX, y: e.clientY, path, isFolder })
@@ -723,8 +704,6 @@ interface ManagedTreeProps {
   selectedSlug?: string
   notes?: ObsidianNoteMeta[]
   isLoggedIn: boolean
-  onDelete: (path: string, isFolder: boolean) => void
-  onRename: (path: string) => void
   onContextMenu: (path: string, isFolder: boolean, e: React.MouseEvent) => void
   draggedPath: string | null
   setDraggedPath: (path: string | null) => void
@@ -737,8 +716,6 @@ interface ManagedTreeItemProps {
   selectedSlug?: string
   notes?: ObsidianNoteMeta[]
   isLoggedIn: boolean
-  onDelete: (path: string, isFolder: boolean) => void
-  onRename: (path: string) => void
   onContextMenu: (path: string, isFolder: boolean, e: React.MouseEvent) => void
   draggedPath: string | null
   setDraggedPath: (path: string | null) => void
