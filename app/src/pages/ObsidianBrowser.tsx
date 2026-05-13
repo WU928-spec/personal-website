@@ -7,12 +7,10 @@ import {
   ChevronRight,
   Search,
   X,
-  Plus,
   FolderPlus,
   FileText,
   Trash2,
   Edit3,
-  Save,
   Eye,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
@@ -264,7 +262,7 @@ export default function ObsidianBrowser() {
     setDialogTarget('')
   }
 
-  const openDeleteDialog = (path: string, isFolder: boolean) => {
+  const openDeleteDialog = (path: string, _isFolder: boolean) => {
     setDialogTarget(path)
     setDialog('delete')
   }
@@ -671,7 +669,7 @@ function ManagedTreeItem({
   onDelete,
   onRename,
   depth = 0,
-}: ManagedTreeProps & { item: VaultFile; depth?: number }) {
+}: Omit<ManagedTreeProps, 'tree'> & { item: VaultFile; depth?: number }) {
   const [expanded, setExpanded] = useState(false)
   const [hovered, setHovered] = useState(false)
 
