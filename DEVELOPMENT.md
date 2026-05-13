@@ -26,6 +26,49 @@
 
 ## 最近解决的问题
 
+### 2026-05-13: Obsidian 笔记系统功能修复与重构
+
+**1. 修复空文件夹不显示**
+
+文件: `app/src/services/obsidianClient.ts`
+
+- `buildTree` 在 "Ensure all parent folders exist" 阶段不再跳过 `__folder__` 占位符
+- 空文件夹（如 `folder1/__folder__`）现在能正确渲染在侧边栏中
+
+**2. 修复右键"新建笔记"路径前缀缺失**
+
+文件: `app/src/pages/ObsidianBrowser.tsx`
+
+- `handleCreateNote` 中，当 `dialogTarget` 为文件夹路径时，自动 prepend 文件夹路径
+- 例如：右键 `folder1` → 输入 `note1` → 实际创建 `folder1/note1.md`
+
+**3. 简化新建笔记对话框 + 本地 Markdown 导入**
+
+文件: `app/src/pages/ObsidianBrowser.tsx`
+
+- 去掉 "路径如：math/linear-algebra.md" 提示文字
+- placeholder 从 "路径/文件名.md" 改为 "笔记名"
+- 新增"从本地上传 Markdown"按钮（支持多选 `.md` 文件）
+- 导入时自动读取文件内容，文件名作为笔记名，支持放到当前文件夹下
+
+**4. UI 微调**
+
+文件: `app/src/i18n/translations.ts`, `app/src/pages/ObsidianBrowser.tsx`
+
+- 侧边栏标题 "Vault 目录" → "目录"，"Vault 为空" → "目录为空"
+- 删除主内容区刷新按钮（去除了未使用的 `loading` 状态）
+- 笔记计数现在过滤掉 `__folder__` 占位符
+
+**5. 重构：提取 NoteTree 组件**
+
+文件: `app/src/components/NoteTree.tsx`（新建）, `app/src/pages/ObsidianBrowser.tsx`
+
+- 将内联的 `ManagedTree` / `ManagedTreeItem` 拆分为独立的 `NoteTree.tsx`
+- `ObsidianBrowser.tsx`: 846 行 → 730 行（-116 行）
+- `NoteTree.tsx`: 135 行，自包含 imports、类型和递归渲染逻辑
+
+---
+
 ### 2026-05-12: 修复子目录笔记显示、日历同步和动态闪烁问题
 
 **问题 1: 子目录笔记无法显示**
@@ -762,5 +805,5 @@ npm run dev  # http://localhost:2667
 
 ---
 
-*最后更新: 2026-05-12*  
-*更新者: Kimi Code*
+*最后更新: 2026-05-13*  
+*更新者: Kimi Code*. 
