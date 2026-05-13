@@ -12,6 +12,7 @@ import {
   Trash2,
   Edit3,
   Eye,
+  Upload,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 // Tree rendering is inlined below as ManagedTree
@@ -44,6 +45,7 @@ export default function ObsidianBrowser() {
   const [searchQuery, setSearchQuery] = useState('')
   const treeScrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   /* ── Editor state ── */
   const [editorOpen, setEditorOpen] = useState(false)
@@ -55,6 +57,17 @@ export default function ObsidianBrowser() {
   const [dialog, setDialog] = useState<'none' | 'newNote' | 'newFolder' | 'rename' | 'delete'>('none')
   const [dialogPath, setDialogPath] = useState('')
   const [dialogTarget, setDialogTarget] = useState('')
+
+  /* ── Context menu ── */
+  const [contextMenu, setContextMenu] = useState<{
+    x: number
+    y: number
+    path: string
+    isFolder: boolean
+  } | null>(null)
+
+  /* ── Drag & drop ── */
+  const [draggedPath, setDraggedPath] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -274,6 +287,15 @@ export default function ObsidianBrowser() {
     setDialog('rename')
   }
 
+  /* ── Drag & drop move ── */
+  const handleMoveNote = async (filePath: string, folderPath: string) => {
+    const fileName = filePath.split('/').pop() || filePath
+    const newPath = `${folderPath}/${fileName}`
+    const ok = await renameNoteInSupabase(filePath, newPath)
+    if (ok) await loadData()
+    setDraggedPath(null)
+  }
+
   return (
     <div className="bg-Parchment dark:bg-Graphite min-h-[100dvh]">
       <PageSEO title="Obsidian Vault" description="Browse and preview notes." path="/obsidian" />
@@ -362,6 +384,47 @@ export default function ObsidianBrowser() {
         )}
       </AnimatePresence>
 
+      {/* Context menu */}
+      {contextMenu && (
+        <div
+          className="fixed z-50 bg-[#252526] border border-[#3c3c3c] rounded-md py-1 shadow-xl min-w-[140px]"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={() => setContextMenu(null)}
+        >
+          {contextMenu.isFolder && (
+            <button
+              className="w-full text-left px-3 py-1.5 text-[0.8125rem] text-[#cccccc] hover:bg-[#094771] hover:text-white transition-colors"
+              onClick={() => {
+                setDialogPath('')
+                setDialogTarget(contextMenu.path)
+                setDialog('newNote')
+                setContextMenu(null)
+              }}
+            >
+              新建笔记
+            </button>
+          )}
+          <button
+            className="w-full text-left px-3 py-1.5 text-[0.8125rem] text-[#cccccc] hover:bg-[#094771] hover:text-white transition-colors"
+            onClick={() => {
+              openRenameDialog(contextMenu.path)
+              setContextMenu(null)
+            }}
+          >
+            重命名
+          </button>
+          <button
+            className="w-full text-left px-3 py-1.5 text-[0.8125rem] text-[#cccccc] hover:bg-[#094771] hover:text-white transition-colors"
+            onClick={() => {
+              openDeleteDialog(contextMenu.path, contextMenu.isFolder)
+              setContextMenu(null)
+            }}
+          >
+            删除
+          </button>
+        </div>
+      )}
+
       <section className="relative h-[35vh] flex items-center justify-center overflow-hidden">
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
           <motion.h1
@@ -414,89 +477,105 @@ export default function ObsidianBrowser() {
                   className="overflow-hidden"
                 >
                   <div className="w-[260px]">
-                    <div className="bg-Linen/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-Sand dark:border-white/10">
-                        <h3 className="text-[0.75rem] font-semibold uppercase tracking-[0.06em] text-Slate dark:text-white/60">
+                    <div className="bg-[#1e1e1e] text-[#cccccc] rounded-lg overflow-hidden select-none">
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-3 py-2">
+                        <h3 className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[#858585]">
                           {t('obsidian.vault')}
                         </h3>
-                        <button
-                          onClick={() => setSidebarCollapsed(true)}
-                          className="text-Slate hover:text-Ink dark:text-white/60 dark:hover:text-white transition-colors"
-                          aria-label="收起侧边栏"
-                        >
-                          <ChevronLeft size={16} />
-                        </button>
-                      </div>
-
-                      {/* Management toolbar */}
-                      {isLoggedIn && (
-                        <div className="px-3 py-2 border-b border-Sand dark:border-white/10 flex gap-2">
+                        <div className="flex items-center gap-0.5">
+                          {isLoggedIn && (
+                            <>
+                              <button
+                                onClick={() => { setDialog('newFolder'); setDialogPath('') }}
+                                className="p-1 rounded text-[#858585] hover:text-[#cccccc] hover:bg-[#2a2d2e] transition-colors"
+                                title="新建文件夹"
+                              >
+                                <FolderPlus size={14} />
+                              </button>
+                              <button
+                                onClick={() => { setDialog('newNote'); setDialogPath('') }}
+                                className="p-1 rounded text-[#858585] hover:text-[#cccccc] hover:bg-[#2a2d2e] transition-colors"
+                                title="新建笔记"
+                              >
+                                <FileText size={14} />
+                              </button>
+                              <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-1 rounded text-[#858585] hover:text-[#cccccc] hover:bg-[#2a2d2e] transition-colors"
+                                title="导入本地 .md"
+                              >
+                                <Upload size={14} />
+                              </button>
+                              <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".md"
+                                multiple
+                                onChange={handleFileSelect}
+                                className="hidden"
+                              />
+                            </>
+                          )}
                           <button
-                            onClick={() => { setDialog('newFolder'); setDialogPath('') }}
-                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[0.75rem] font-medium bg-Amber/10 text-Amber hover:bg-Amber/20 transition-colors"
-                            title="新建文件夹"
+                            onClick={() => setSidebarCollapsed(true)}
+                            className="p-1 rounded text-[#858585] hover:text-[#cccccc] hover:bg-[#2a2d2e] transition-colors"
+                            aria-label="收起侧边栏"
                           >
-                            <FolderPlus size={14} />
-                            文件夹
-                          </button>
-                          <button
-                            onClick={() => { setDialog('newNote'); setDialogPath('') }}
-                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[0.75rem] font-medium bg-Sage/10 text-Sage hover:bg-Sage/20 transition-colors"
-                            title="新建笔记"
-                          >
-                            <FileText size={14} />
-                            笔记
+                            <ChevronLeft size={14} />
                           </button>
                         </div>
-                      )}
+                      </div>
 
-                      <div className="px-3 py-2 border-b border-Sand dark:border-white/10">
+                      {/* Search */}
+                      <div className="px-3 pb-2">
                         <div className="relative">
-                          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-Slate" />
+                          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#858585]" />
                           <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={t('obsidian.search')}
-                            className="w-full pl-8 pr-7 py-1.5 text-[0.8125rem] bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+                            className="w-full pl-6 pr-6 py-1 text-[0.75rem] bg-[#3c3c3c] rounded text-[#cccccc] placeholder:text-[#858585] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
                           />
                           {searchQuery && (
                             <button
                               onClick={() => setSearchQuery('')}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-Slate hover:text-Ink dark:hover:text-white"
+                              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[#858585] hover:text-[#cccccc]"
                             >
-                              <X size={14} />
+                              <X size={12} />
                             </button>
                           )}
                         </div>
                       </div>
+
+                      {/* Tree */}
                       <div
                         ref={treeScrollRef}
-                        className="p-3 max-h-[calc(100dvh-280px)] overflow-y-auto overscroll-contain"
+                        className="max-h-[calc(100dvh-220px)] overflow-y-auto overscroll-contain pb-2"
                       >
                         {searchQuery.trim() ? (
                           filteredNotes.length === 0 ? (
-                            <p className="text-[0.8125rem] text-Slate px-2 py-4 text-center">{t('obsidian.noResults')}</p>
+                            <p className="text-[0.75rem] text-[#858585] px-3 py-4 text-center">无结果</p>
                           ) : (
-                            <div className="space-y-1">
+                            <div>
                               {filteredNotes.map((note) => (
                                 <button
                                   key={note.slug}
                                   onClick={() => handleSelectNote(note.slug)}
-                                  className={`w-full text-left px-2 py-1.5 rounded-md text-[0.8125rem] transition-colors ${
+                                  className={`w-full text-left px-3 py-1 text-[0.8125rem] transition-colors ${
                                     selectedSlug === note.slug
-                                      ? 'bg-Amber/10 text-Amber'
-                                      : 'text-Ink dark:text-white hover:bg-Ink/5 dark:hover:bg-white/5'
+                                      ? 'bg-[#37373d] text-white'
+                                      : 'text-[#cccccc] hover:bg-[#2a2d2e]'
                                   }`}
                                 >
-                                  <div className="font-medium truncate">{note.title}</div>
-                                  <div className="text-[0.6875rem] text-Slate truncate mt-0.5">{note.excerpt.slice(0, 60)}...</div>
+                                  <div className="truncate">{note.title}</div>
                                 </button>
                               ))}
                             </div>
                           )
                         ) : tree.length === 0 ? (
-                          <p className="text-[0.8125rem] text-Slate px-2">{t('obsidian.emptyVault')}</p>
+                          <p className="text-[0.75rem] text-[#858585] px-3 py-2">Vault 为空</p>
                         ) : (
                           <ManagedTree
                             tree={tree}
@@ -506,6 +585,13 @@ export default function ObsidianBrowser() {
                             isLoggedIn={isLoggedIn}
                             onDelete={openDeleteDialog}
                             onRename={openRenameDialog}
+                            onContextMenu={(path, isFolder, e) => {
+                              e.preventDefault()
+                              setContextMenu({ x: e.clientX, y: e.clientY, path, isFolder })
+                            }}
+                            draggedPath={draggedPath}
+                            setDraggedPath={setDraggedPath}
+                            onMove={handleMoveNote}
                           />
                         )}
                       </div>
@@ -629,7 +715,7 @@ export default function ObsidianBrowser() {
 }
 
 /* ───────────────────────────────────────────────
-   Managed Tree with delete/rename actions
+   Managed Tree — Obsidian-style
    ─────────────────────────────────────────────── */
 interface ManagedTreeProps {
   tree: VaultFile[]
@@ -639,22 +725,32 @@ interface ManagedTreeProps {
   isLoggedIn: boolean
   onDelete: (path: string, isFolder: boolean) => void
   onRename: (path: string) => void
+  onContextMenu: (path: string, isFolder: boolean, e: React.MouseEvent) => void
+  draggedPath: string | null
+  setDraggedPath: (path: string | null) => void
+  onMove: (filePath: string, folderPath: string) => void
 }
 
-function ManagedTree({ tree, onSelect, selectedSlug, notes = [], isLoggedIn, onDelete, onRename }: ManagedTreeProps) {
+interface ManagedTreeItemProps {
+  item: VaultFile
+  onSelect: (slug: string) => void
+  selectedSlug?: string
+  notes?: ObsidianNoteMeta[]
+  isLoggedIn: boolean
+  onDelete: (path: string, isFolder: boolean) => void
+  onRename: (path: string) => void
+  onContextMenu: (path: string, isFolder: boolean, e: React.MouseEvent) => void
+  draggedPath: string | null
+  setDraggedPath: (path: string | null) => void
+  onMove: (filePath: string, folderPath: string) => void
+  depth?: number
+}
+
+function ManagedTree({ tree, ...props }: ManagedTreeProps) {
   return (
     <>
       {tree.map((item) => (
-        <ManagedTreeItem
-          key={item.path}
-          item={item}
-          onSelect={onSelect}
-          selectedSlug={selectedSlug}
-          notes={notes}
-          isLoggedIn={isLoggedIn}
-          onDelete={onDelete}
-          onRename={onRename}
-        />
+        <ManagedTreeItem key={item.path} item={item} {...props} />
       ))}
     </>
   )
@@ -666,46 +762,40 @@ function ManagedTreeItem({
   selectedSlug,
   notes = [],
   isLoggedIn,
-  onDelete,
-  onRename,
+  onContextMenu,
+  draggedPath,
+  setDraggedPath,
+  onMove,
   depth = 0,
-}: Omit<ManagedTreeProps, 'tree'> & { item: VaultFile; depth?: number }) {
+}: ManagedTreeItemProps) {
   const [expanded, setExpanded] = useState(false)
-  const [hovered, setHovered] = useState(false)
 
   if (item.type === 'folder') {
+    const isDropTarget = draggedPath && draggedPath !== item.path
     return (
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <div className="flex items-center gap-1 group">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 flex-1 text-left py-1.5 px-2 rounded-md hover:bg-Ink/5 transition-colors dark:hover:bg-white/5"
-            style={{ paddingLeft: `${depth * 12 + 8}px` }}
-          >
+      <div>
+        <div
+          className={`flex items-center text-left py-[3px] pr-2 cursor-pointer transition-colors ${
+            isDropTarget ? 'bg-[#094771]/30' : 'hover:bg-[#2a2d2e]'
+          }`}
+          style={{ paddingLeft: `${depth * 16 + 4}px` }}
+          onClick={() => setExpanded(!expanded)}
+          onContextMenu={(e) => onContextMenu(item.path, true, e)}
+          onDragOver={(e) => {
+            if (isDropTarget) e.preventDefault()
+          }}
+          onDrop={() => {
+            if (draggedPath) onMove(draggedPath, item.path)
+          }}
+        >
+          <span className="w-4 flex items-center justify-center shrink-0">
             {expanded ? (
-              <ChevronRight size={14} className="text-Slate shrink-0 rotate-90" />
+              <ChevronRight size={11} className="text-[#858585] rotate-90" />
             ) : (
-              <ChevronRight size={14} className="text-Slate shrink-0" />
+              <ChevronRight size={11} className="text-[#858585]" />
             )}
-            <FolderPlus size={14} className="text-Amber shrink-0" />
-            <span className="text-[0.8125rem] font-medium text-Ink dark:text-white truncate">
-              {item.name}
-            </span>
-          </button>
-          {isLoggedIn && hovered && (
-            <div className="flex items-center gap-0.5 pr-1">
-              <button
-                onClick={(e) => { e.stopPropagation(); onDelete(item.path, true) }}
-                className="p-1 rounded text-Slate hover:text-Rose transition-colors"
-                title="删除文件夹"
-              >
-                <Trash2 size={12} />
-              </button>
-            </div>
-          )}
+          </span>
+          <span className="text-[0.8125rem] text-[#cccccc] truncate">{item.name}</span>
         </div>
         <AnimatePresence initial={false}>
           {expanded && item.children && (
@@ -713,20 +803,10 @@ function ManagedTreeItem({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
             >
               {item.children.map((child) => (
-                <ManagedTreeItem
-                  key={child.path}
-                  item={child}
-                  onSelect={onSelect}
-                  selectedSlug={selectedSlug}
-                  notes={notes}
-                  isLoggedIn={isLoggedIn}
-                  onDelete={onDelete}
-                  onRename={onRename}
-                  depth={depth + 1}
-                />
+                <ManagedTreeItem key={child.path} item={child} {...{ onSelect, selectedSlug, notes, isLoggedIn, onContextMenu, draggedPath, setDraggedPath, onMove }} depth={depth + 1} />
               ))}
             </motion.div>
           )}
@@ -742,40 +822,17 @@ function ManagedTreeItem({
 
   return (
     <div
-      className="flex items-center gap-1 group"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      draggable={isLoggedIn}
+      onDragStart={() => setDraggedPath(item.path)}
+      onDragEnd={() => setDraggedPath(null)}
+      className="flex items-center text-left py-[3px] pr-2 cursor-pointer transition-colors"
+      style={{ paddingLeft: `${depth * 16 + 20}px` }}
+      onClick={() => onSelect(slug)}
+      onContextMenu={(e) => onContextMenu(item.path, false, e)}
     >
-      <button
-        onClick={() => onSelect(slug)}
-        className={`flex items-center gap-2 flex-1 text-left py-1.5 px-2 rounded-md transition-colors ${
-          isSelected
-            ? 'bg-Amber/10 text-Amber'
-            : 'hover:bg-Ink/5 text-Ink dark:text-white dark:hover:bg-white/5'
-        }`}
-        style={{ paddingLeft: `${depth * 12 + 24}px` }}
-      >
-        <FileText size={14} className={isSelected ? 'text-Amber' : 'text-Slate'} />
-        <span className="text-[0.8125rem] font-medium truncate">{item.name}</span>
-      </button>
-      {isLoggedIn && hovered && (
-        <div className="flex items-center gap-0.5 pr-1">
-          <button
-            onClick={(e) => { e.stopPropagation(); onRename(item.path) }}
-            className="p-1 rounded text-Slate hover:text-Amber transition-colors"
-            title="重命名"
-          >
-            <Edit3 size={12} />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onDelete(item.path, false) }}
-            className="p-1 rounded text-Slate hover:text-Rose transition-colors"
-            title="删除"
-          >
-            <Trash2 size={12} />
-          </button>
-        </div>
-      )}
+      <span className={`text-[0.8125rem] truncate ${isSelected ? 'text-white bg-[#37373d]' : 'text-[#cccccc] hover:bg-[#2a2d2e]'}`}>
+        {item.name}
+      </span>
     </div>
   )
 }
