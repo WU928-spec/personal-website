@@ -11,6 +11,7 @@ import {
   FileText,
   Edit3,
   Eye,
+  Upload,
 } from 'lucide-react'
 import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 // Tree rendering is inlined below as ManagedTree
@@ -48,6 +49,7 @@ export default function ObsidianBrowser() {
   const [editorOpen, setEditorOpen] = useState(false)
   const [editContent, setEditContent] = useState('')
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [saveIndicator, setSaveIndicator] = useState(false)
 
   /* ── Dialogs ── */
@@ -225,6 +227,28 @@ export default function ObsidianBrowser() {
     setDialogPath('')
   }
 
+  const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    let lastSlug = ''
+    for (const file of files) {
+      if (!file.name.endsWith('.md')) continue
+      const name = file.name.replace(/\.md$/i, '')
+      let path = dialogTarget && !dialogTarget.endsWith('.md') ? `${dialogTarget}/${name}` : name
+      const fullPath = `${path}.md`
+      const content = await file.text()
+      const ok = await saveNoteToSupabase(fullPath, content)
+      if (ok) {
+        lastSlug = fullPath.replace(/\.md$/i, '').replace(/\//g, '-').replace(/[^a-zA-Z0-9一-龥\-_]/g, '')
+      }
+    }
+    await loadData()
+    if (lastSlug) handleSelectNote(lastSlug)
+    setDialog('none')
+    setDialogPath('')
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   const handleCreateFolder = async () => {
     const name = dialogPath.trim()
     if (!name) return
@@ -320,18 +344,34 @@ export default function ObsidianBrowser() {
               {dialog === 'newNote' && (
                 <>
                   <h3 className="text-[1rem] font-semibold text-Ink dark:text-white mb-3">新建笔记</h3>
-                  <p className="text-[0.8125rem] text-Slate mb-3">路径如：math/linear-algebra.md</p>
                   <input
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}
-                    placeholder="路径/文件名.md"
-                    className="w-full px-3 py-2 text-[0.875rem] bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-4"
+                    placeholder="笔记名"
+                    className="w-full px-3 py-2 text-[0.875rem] bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-3"
                     autoFocus
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateNote()}
                   />
-                  <div className="flex justify-end gap-2">
+                  <div className="flex justify-end gap-2 mb-3">
                     <button onClick={() => setDialog('none')} className="px-3 py-1.5 text-[0.8125rem] text-Slate hover:text-Ink dark:hover:text-white">取消</button>
                     <button onClick={handleCreateNote} className="px-3 py-1.5 text-[0.8125rem] bg-Sage text-white rounded-md hover:bg-[#5a7a5a]">创建</button>
+                  </div>
+                  <div className="border-t border-Sand dark:border-white/10 pt-3">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 text-[0.8125rem] text-Slate hover:text-Ink dark:hover:text-white transition-colors"
+                    >
+                      <Upload size={14} />
+                      从本地上传 Markdown
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".md"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileImport}
+                    />
                   </div>
                 </>
               )}
