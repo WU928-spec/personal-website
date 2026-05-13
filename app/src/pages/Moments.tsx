@@ -7,7 +7,7 @@ import { useMoments } from '@/hooks/useMoments'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function Moments() {
-  const { user, owner, isLoggedIn } = useAuth()
+  const { owner, isLoggedIn } = useAuth()
   const avatarUrl = owner.avatar
   const displayName = owner.username
   const {
