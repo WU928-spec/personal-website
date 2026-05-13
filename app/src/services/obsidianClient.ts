@@ -142,7 +142,7 @@ export async function fetchObsidianNote(slug: string): Promise<ObsidianNote | nu
   if (!isSupabaseReady()) return null
   const { data, error } = await supabase
     .from(TABLE)
-    .select('content,frontmatter')
+    .select('content')
     .eq('path', meta.filePath)
     .maybeSingle()
 
@@ -151,7 +151,7 @@ export async function fetchObsidianNote(slug: string): Promise<ObsidianNote | nu
   return {
     ...meta,
     content: String(data.content || ''),
-    frontmatter: (data.frontmatter as Record<string, unknown>) || {},
+    frontmatter: {},
   }
 }
 
