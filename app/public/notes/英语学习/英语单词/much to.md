@@ -1,2 +1,0 @@
-- **结构**：much to + 某人’s + 情感类名词（如 annoyance, surprise, relief）
-- **功能**：作状语，强调某情况引发的强烈情感反应
