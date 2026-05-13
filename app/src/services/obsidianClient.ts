@@ -44,9 +44,8 @@ export function buildTree(paths: string[]): VaultFile[] {
   const root: VaultFile[] = []
   const folderMap = new Map<string, VaultFile>()
 
-  // Ensure all parent folders exist
+  // Ensure all parent folders exist (including __folder__ placeholders)
   paths.forEach((path) => {
-    if (path.endsWith('/__folder__')) return // skip placeholders
     const parts = path.split('/')
     let currentPath = ''
     for (let i = 0; i < parts.length - 1; i++) {

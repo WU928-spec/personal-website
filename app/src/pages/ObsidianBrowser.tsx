@@ -209,8 +209,11 @@ export default function ObsidianBrowser() {
 
   /* ── CRUD handlers ── */
   const handleCreateNote = async () => {
-    const path = dialogPath.trim()
+    let path = dialogPath.trim()
     if (!path) return
+    if (dialogTarget && !dialogTarget.endsWith('.md')) {
+      path = `${dialogTarget}/${path}`
+    }
     const fullPath = path.endsWith('.md') ? path : `${path}.md`
     const ok = await saveNoteToSupabase(fullPath, '')
     if (ok) {
