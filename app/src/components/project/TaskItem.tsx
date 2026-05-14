@@ -16,7 +16,7 @@ export default function TaskItem({ todo }: TaskItemProps) {
           : 'text-Ink/70 dark:text-white/60'
       }`}
     >
-      <span className="shrink-0">{todo.done ? '✅' : '○'}</span>
+      <span className="shrink-0">{todo.done ? '·' : '○'}</span>
       <span className="flex-1 truncate">{todo.text}</span>
       <span className="text-[0.625rem] font-mono text-Slate/40 dark:text-white/25 shrink-0">
         {formatDuration(duration)}
