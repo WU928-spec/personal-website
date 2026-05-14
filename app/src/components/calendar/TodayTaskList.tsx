@@ -14,11 +14,66 @@ import {
 import { useLiveTick } from '@/hooks/useLiveTick'
 import { useAuth } from '@/contexts/AuthContext'
 
+/* ─── Project Timer Helpers ─── */
+
+interface ActiveProjectTimer {
+  projectId: string
+  startAt: string
+  date: string
+}
+
+const PROJECT_TIMER_KEY = 'active_project_timer'
+
+function loadActiveProjectTimer(): ActiveProjectTimer | null {
+  try {
+    const raw = localStorage.getItem(PROJECT_TIMER_KEY)
+    if (!raw) return null
+    const timer = JSON.parse(raw) as ActiveProjectTimer
+    if (timer.date !== formatDateStr(new Date())) return null
+    return timer
+  } catch {
+    return null
+  }
+}
+
+function saveActiveProjectTimer(timer: ActiveProjectTimer | null) {
+  if (timer) localStorage.setItem(PROJECT_TIMER_KEY, JSON.stringify(timer))
+  else localStorage.removeItem(PROJECT_TIMER_KEY)
+}
+
+function saveProjectTimerToEntry(projectId: string) {
+  const timer = loadActiveProjectTimer()
+  if (!timer || timer.projectId !== projectId) return
+  const elapsed = Math.floor((Date.now() - new Date(timer.startAt).getTime()) / 1000)
+  if (elapsed <= 0) return
+
+  const entry = loadTodayEntry() || { date: formatDateStr(new Date()), todos: [], diary: '' }
+  let todo = entry.todos.find((t) => t.projectId === projectId && t.text === '')
+  if (!todo) {
+    todo = {
+      id: `pt-${projectId}-${Date.now()}`,
+      text: '',
+      done: true,
+      timeRecords: [],
+      projectId,
+    }
+    entry.todos.push(todo)
+  }
+  todo.timeRecords.push({
+    id: generateId(),
+    startAt: timer.startAt,
+    endAt: new Date().toISOString(),
+    duration: elapsed,
+  })
+  saveTodayEntry(entry)
+}
+
 /* Component */
 export default function TodayTaskList() {
   const { isLoggedIn } = useAuth()
   const [entry, setEntry] = useState<DayEntry | null>(loadTodayEntry)
   const [projects, setProjects] = useState<Project[]>([])
+  const [activeProjectTimer, setActiveProjectTimer] = useState<ActiveProjectTimer | null>(loadActiveProjectTimer)
   const tick = useLiveTick()
   void tick // drives re-render for live timer durations
 
@@ -39,6 +94,7 @@ export default function TodayTaskList() {
     const handleSyncCompleted = () => {
       setEntry(loadTodayEntry())
       setProjects(loadProjects())
+      setActiveProjectTimer(loadActiveProjectTimer())
     }
     window.addEventListener('focus', handleFocus)
     window.addEventListener('calendar-entry-saved', handleSaved)
@@ -58,6 +114,15 @@ export default function TodayTaskList() {
   const handleToggleTrack = useCallback(
     (todoId: string) => {
       if (!isLoggedIn) return
+
+      // Stop project timer if active
+      const pt = loadActiveProjectTimer()
+      if (pt) {
+        saveProjectTimerToEntry(pt.projectId)
+        saveActiveProjectTimer(null)
+        setActiveProjectTimer(null)
+      }
+
       const current = loadTodayEntry()
       if (!current) return
       const todo = current.todos.find((t) => t.id === todoId)
@@ -82,6 +147,53 @@ export default function TodayTaskList() {
         todo.timeRecords.push({ id: generateId(), startAt: new Date().toISOString(), duration: 0 })
       }
       saveTodayEntry(current)
+      refresh()
+    },
+    [refresh, isLoggedIn]
+  )
+
+  const handleToggleProjectTimer = useCallback(
+    (projectId: string) => {
+      if (!isLoggedIn) return
+      const timer = loadActiveProjectTimer()
+
+      if (timer?.projectId === projectId) {
+        // Stop
+        saveProjectTimerToEntry(projectId)
+        saveActiveProjectTimer(null)
+        setActiveProjectTimer(null)
+        refresh()
+        return
+      }
+
+      // Stop existing project timer
+      if (timer) {
+        saveProjectTimerToEntry(timer.projectId)
+      }
+
+      // Stop all todo timers
+      const current = loadTodayEntry()
+      if (current) {
+        current.todos.forEach((t) => {
+          const active = t.timeRecords.find((r) => !r.endAt)
+          if (active) {
+            active.endAt = new Date().toISOString()
+            active.duration = Math.floor(
+              (Date.now() - new Date(active.startAt).getTime()) / 1000
+            )
+          }
+        })
+        saveTodayEntry(current)
+      }
+
+      // Start new project timer
+      const newTimer: ActiveProjectTimer = {
+        projectId,
+        startAt: new Date().toISOString(),
+        date: formatDateStr(new Date()),
+      }
+      saveActiveProjectTimer(newTimer)
+      setActiveProjectTimer(newTimer)
       refresh()
     },
     [refresh, isLoggedIn]
@@ -114,8 +226,14 @@ export default function TodayTaskList() {
   )
 
   const todos = entry?.todos || []
-  const activeTodo = todos.find((t) => t.timeRecords.some((r) => !r.endAt))
+  const displayTodos = todos.filter((t) => t.text !== '')
+  const activeTodo = displayTodos.find((t) => t.timeRecords.some((r) => !r.endAt))
   const totalTrackedToday = todos.reduce((sum, t) => sum + getTotalDuration(t) + getCurrentElapsed(t), 0)
+
+  const activeProjects = projects.filter((p) => p.status === 'active' && !p.parentId)
+  const projectTimerElapsed = activeProjectTimer
+    ? Math.floor((Date.now() - new Date(activeProjectTimer.startAt).getTime()) / 1000)
+    : 0
 
   return (
     <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-3 flex flex-col h-full">
@@ -130,15 +248,15 @@ export default function TodayTaskList() {
         </span>
       </div>
 
-      {/* Todo list */}
+      {/* Upper: Todo list */}
       <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
-        {todos.length === 0 && (
+        {displayTodos.length === 0 && (
           <p className="text-[0.6875rem] text-Slate/40 dark:text-white/20 text-center py-4">
             暂无今日待办
           </p>
         )}
 
-        {todos.map((todo) => {
+        {displayTodos.map((todo) => {
           const isTracking = todo.timeRecords.some((r) => !r.endAt)
           const totalSec = getTotalDuration(todo) + getCurrentElapsed(todo)
 
@@ -211,6 +329,67 @@ export default function TodayTaskList() {
         })}
       </div>
 
+      {/* Lower: Project Timer */}
+      <div className="flex-1 overflow-y-auto min-h-0 border-t border-Sand dark:border-white/10 pt-2 mt-2">
+        <h4 className="text-[0.75rem] font-medium text-Slate/60 dark:text-white/40 mb-2 flex items-center gap-1.5">
+          <Play size={12} />
+          项目计时
+        </h4>
+        {activeProjects.length === 0 ? (
+          <p className="text-[0.6875rem] text-Slate/40 dark:text-white/20 text-center py-2">
+            暂无活跃项目
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {activeProjects.map((project) => {
+              const isTracking = activeProjectTimer?.projectId === project.id
+              const projectTodosToday = todos.filter((t) => t.projectId === project.id)
+              const totalToday = projectTodosToday.reduce(
+                (sum, t) => sum + getTotalDuration(t) + getCurrentElapsed(t), 0
+              )
+              const displayTime = totalToday + (isTracking ? projectTimerElapsed : 0)
+
+              return (
+                <div
+                  key={project.id}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all ${
+                    isTracking
+                      ? 'bg-Amber/5 border border-Amber/20'
+                      : 'border border-transparent'
+                  }`}
+                >
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: project.color }}
+                  />
+                  <span className="flex-1 text-[0.8125rem] truncate text-Ink dark:text-white/80">
+                    {project.name}
+                  </span>
+                  <span className="text-[0.625rem] font-mono text-Slate/60 dark:text-white/40 shrink-0">
+                    {formatDurationShort(displayTime)}
+                  </span>
+                  <button
+                    onClick={() => handleToggleProjectTimer(project.id)}
+                    disabled={!isLoggedIn}
+                    className={`
+                      shrink-0 flex items-center justify-center w-6 h-6 rounded-md transition-all
+                      ${!isLoggedIn ? 'cursor-not-allowed opacity-40' : ''}
+                      ${isTracking
+                        ? 'bg-Amber text-white'
+                        : 'bg-Mist dark:bg-white/10 text-Slate dark:text-white/50 hover:text-Amber hover:bg-Amber/10'
+                      }
+                    `}
+                    title={isTracking ? '停止计时' : '开始计时'}
+                  >
+                    {isTracking ? <Square size={11} /> : <Play size={11} />}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Active tracker indicator */}
       {activeTodo && (
         <div className="mt-2 shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-Amber/5 border border-Amber/20">
@@ -222,6 +401,17 @@ export default function TodayTaskList() {
             {formatDurationShort(
               getTotalDuration(activeTodo) + getCurrentElapsed(activeTodo)
             )}
+          </span>
+        </div>
+      )}
+      {activeProjectTimer && !activeTodo && (
+        <div className="mt-2 shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-Amber/5 border border-Amber/20">
+          <div className="w-1.5 h-1.5 rounded-full bg-Amber animate-pulse shrink-0" />
+          <span className="text-[0.6875rem] text-Amber truncate flex-1">
+            {projects.find((p) => p.id === activeProjectTimer.projectId)?.name || ''}
+          </span>
+          <span className="text-[0.75rem] font-mono text-Amber font-semibold shrink-0">
+            {formatDurationShort(projectTimerElapsed)}
           </span>
         </div>
       )}
