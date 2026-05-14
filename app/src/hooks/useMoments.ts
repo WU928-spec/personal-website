@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Moment, Comment } from '@/types/moment'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase, isSupabaseReady, dbToMoment, momentToDb } from '@/lib/supabase'
+import { createStorageKey } from '@/utils/storage'
 
 const STORAGE_KEY = 'moments_v1'
 const API_BASE = 'http://localhost:2667'
+const momentStorage = createStorageKey<Moment[]>(STORAGE_KEY, [])
 
 /* ── Helpers ── */
 function migrateMoment(m: Moment): Moment {
@@ -36,27 +38,15 @@ function resolveImageUrls(images: string[]): string[] {
 }
 
 function loadLocal(): Moment[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const list = JSON.parse(raw) as Moment[]
-      return list.map(migrateMoment).map((m) => ({
-        ...m,
-        images: resolveImageUrls(m.images),
-      }))
-    }
-  } catch {
-    // ignore
-  }
-  return []
+  const list = momentStorage.load()
+  return list.map(migrateMoment).map((m) => ({
+    ...m,
+    images: resolveImageUrls(m.images),
+  }))
 }
 
 function saveLocal(list: Moment[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-  } catch {
-    // ignore
-  }
+  momentStorage.save(list)
 }
 
 function sortDesc(list: Moment[]): Moment[] {
@@ -114,7 +104,6 @@ export function useMoments() {
         console.log('[Moments] Synced from Supabase:', list.length, 'moments')
         return
       } catch (err) {
-        console.warn('Supabase sync failed, falling back to local:', err)
         setUsingLocal(true)
       }
     }
@@ -153,7 +142,7 @@ export function useMoments() {
           await fetchMoments()
           return
         } catch (err) {
-          console.warn('Supabase insert failed, falling back to local:', err)
+          /* fallback to local */
         }
       }
 
@@ -188,7 +177,7 @@ export function useMoments() {
               .eq('id', id)
           }
         } catch (err) {
-          console.warn('Supabase like update failed:', err)
+          /* ignore sync error */
         }
       }
     },
@@ -221,7 +210,7 @@ export function useMoments() {
               .eq('id', id)
           }
         } catch (err) {
-          console.warn('Supabase comment update failed:', err)
+          /* ignore sync error */
         }
       }
     },
@@ -241,7 +230,6 @@ export function useMoments() {
           saveLocal(list)
           return
         } catch (err) {
-          console.warn('Supabase delete failed:', err)
           // Fall through to local-only delete
         }
       }
@@ -267,22 +255,5 @@ export function useMoments() {
   }
 }
 
-/* ── Relative time ── */
-export function formatRelativeTime(iso: string): string {
-  const now = Date.now()
-  const then = new Date(iso).getTime()
-  const diff = now - then
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-
-  if (seconds < 60) return '刚刚'
-  if (minutes < 60) return `${minutes}分钟前`
-  if (hours < 24) return `${hours}小时前`
-  if (days === 1) return '昨天'
-  if (days === 2) return '前天'
-  if (days < 7) return `${days}天前`
-  if (days < 30) return `${Math.floor(days / 7)}周前`
-  return new Date(iso).toLocaleDateString('zh-CN')
-}
+/* Re-export for backward compatibility */
+export { formatRelativeTime } from '@/utils/time'

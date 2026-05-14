@@ -36,7 +36,7 @@ export function useAsync<T>(
 
   useEffect(() => {
     if (immediate) {
-      execute()
+      execute().catch(() => {})
     }
   }, [execute, immediate])
 

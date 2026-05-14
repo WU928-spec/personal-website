@@ -4,7 +4,7 @@ import { Heart, MessageCircle, MapPin, Trash2, Paperclip, BookOpen } from 'lucid
 import { useNavigate } from 'react-router-dom'
 import type { Moment, MomentAttachment } from '@/types/moment'
 import ImageGrid from './ImageGrid'
-import { formatRelativeTime } from '@/hooks/useMoments'
+import { formatRelativeTime } from '@/utils/time'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Props {

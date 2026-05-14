@@ -1,4 +1,5 @@
-import { formatDuration, formatDateStr } from '@/utils/projectAggregation'
+import { formatDuration } from '@/utils/projectAggregation'
+import { formatDateStr } from '@/utils/calendarStorage'
 
 export interface BarData {
   date: string

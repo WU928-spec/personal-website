@@ -852,5 +852,93 @@ npm run dev  # http://localhost:2667
 
 ---
 
+### 2026-05-15: 全代码库重构与清理（第二轮）
+
+**目标**: 消除技术债务，提升代码可维护性，零构建错误，补充测试覆盖。
+
+**1. 删除死代码**
+
+- 文件: `app/src/data/posts.ts`（558 行）
+- 该文件包含早期博客系统的模拟数据，自 Obsidian 笔记系统上线后无任何引用
+- 直接删除，减少维护负担
+
+**2. 大组件拆分（5 个文件 → 20+ 子组件）**
+
+| 原文件 | 行数 | 拆分后 | 净减少 |
+|--------|------|--------|--------|
+| `MarkdownRenderer.tsx` | 992 | `markdown/` 目录（parser.ts、theme.tsx、render-components.tsx、heading-context.tsx） | ~200 |
+| `MomentUploader.tsx` | 653 | `moment-uploader/` 目录（ImagePreviewStrip、AttachmentList、NotePicker） | ~150 |
+| `Home.tsx` | 493 | `home/` 目录（HeroSection、IntroSection、SkillSection、GitHubSection、useTypingEffect） | ~100 |
+| `DayDetailPanel.tsx` | 445 | `calendar/day-detail/` 目录（PlanTab、DiaryTab、ProjectTag） | ~80 |
+| `ProjectCard.tsx` | 350 | `project/card-parts/` 目录（ProjectCardHeader、SummarySection、ProjectActions） | ~60 |
+
+**3. 统一 localStorage 封装**
+
+文件: `app/src/utils/storage.ts`（新建）
+
+- 提供 `createStorageKey<T>(key, defaultValue)` → `{ load, save, remove }`
+- 提供 `createLangStorageKey<T>(keyPrefix, defaultValues)` → 多语言版本
+- 7 个文件迁移使用：
+  - `projectStorage.ts`、`calendarStorage.ts`
+  - `useMoments.ts`、`PreferencesContext.tsx`
+  - `useLocalStorage.ts`、`DayCell.tsx`、`TodayTaskList.tsx`
+
+**4. 消除重复工具函数**
+
+| 函数 | 之前位置 | 统一后位置 |
+|------|---------|-----------|
+| `formatDuration` | `calendarStorage.ts` + `projectAggregation.ts` | `projectAggregation.ts`（唯一来源）|
+| `formatDurationShort` | `calendarStorage.ts` + `projectAggregation.ts` | `projectAggregation.ts` |
+| `formatDateStr` | `projectAggregation.ts` + `projectSeed.ts` | `calendarStorage.ts` |
+| `formatRelativeTime` | `hooks/useMoments.ts`（内联） | 提取至 `utils/time.ts` |
+| 项目计时 localStorage | `TodayTaskList.tsx`（内联） | 提取至 `utils/projectTimerStorage.ts` |
+
+**5. 类型安全修复**
+
+- `types/api.ts`: `z.ZodType<any>` → `z.ZodType<VaultFileAPI>`（仅保留 `VaultFileSchema` 因 `z.lazy` 自引用循环必须使用 `any`）
+- `test/setup.ts`: `as any` → `as unknown as Storage`
+- `AuthContext.tsx` / `data/site.ts`: 未使用的 catch 参数 `(e)` → `()` 以通过 `noUnusedParameters`
+
+**6. Console 清理**
+
+- 删除 27 处生产环境 `console.warn`（Supabase 同步失败、Obsidian 连接超时等）
+- 保留必要日志：ErrorBoundary 错误、API 验证失败、调试日志
+- Supabase 同步策略：所有 `.catch` 静默处理（免费版断网/限流不输出 warn）
+
+**7. 性能优化**
+
+- `Projects.tsx`: 预加载 `loadProjects()` 和 `loadAllEntries()` 一次，循环传入 `getProjectStats`，避免每秒 2×N 次 localStorage 读取 → 降至 2 次
+- `GitHubSection.tsx`: 贡献图随机网格缓存为模块常量 `DEFAULT_CONTRIBUTIONS`，避免每次渲染重新生成导致闪烁
+
+**8. 测试覆盖补充**
+
+新增 5 个测试文件，从 3 文件/10 测试 → 8 文件/52 测试：
+
+| 文件 | 测试数 | 覆盖内容 |
+|------|--------|---------|
+| `utils/storage.test.ts` | 9 | `createStorageKey` load/save/remove/JSON 异常 |
+| `utils/time.test.ts` | 8 | `formatRelativeTime` 各时间区间 |
+| `utils/projectAggregation.test.ts` | 8 | `getProjectStats` 聚合、`formatDuration` |
+| `utils/calendarStorage.test.ts` | 7 | entry CRUD、`getDayTotalDuration` |
+| `components/markdown/parser.test.ts` | 10 | `extractToc`、`preprocessWikilinks` |
+
+**9. 构建错误修复（`tsc -b` 严格模式）**
+
+修复 8 个构建错误：
+1. 语法错误（`catch` 回调写法）
+2. 未使用变量/导入（`noUnusedLocals`/`noUnusedParameters`）
+3. 循环类型引用（Zod schema 自引用）
+
+`tsconfig.app.json` 更新：
+- `"noUnusedLocals": true`, `"noUnusedParameters": true`
+- `"exclude": ["src/test", "**/*.test.ts"]` — 避免 vitest 全局类型污染构建
+
+**代码统计**:
+- 总代码: ~12,400 行（净减少 ~600 行）
+- 测试: 8 文件 / 52 测试 / 0 失败
+- 构建: `npm run build` ✅ 零报错
+
+---
+
 *最后更新: 2026-05-14*  
 *更新者: Kimi Code*. 

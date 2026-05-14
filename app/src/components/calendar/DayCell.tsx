@@ -1,7 +1,7 @@
 import { getLunarDate, isHoliday, isWorkday, getSolarTerms, getDayDetail } from 'chinese-days'
 import { useMemo } from 'react'
 import { loadProjects } from '@/utils/projectStorage'
-import { formatDateStr } from '@/utils/calendarStorage'
+import { formatDateStr, loadEntry } from '@/utils/calendarStorage'
 
 interface DayCellProps {
   date: Date
@@ -34,24 +34,17 @@ export default function DayCell({
   /* Project dots */
   const projectColors = useMemo(() => {
     if (!isCurrentMonth) return []
-    try {
-      const raw = localStorage.getItem('calendar_entries')
-      if (!raw) return []
-      const all: Record<string, { todos: { projectId?: string }[] }> = JSON.parse(raw)
-      const entry = all[dateStr]
-      if (!entry?.todos?.length) return []
-      const projects = loadProjects()
-      const colors = new Set<string>()
-      for (const todo of entry.todos) {
-        if (todo.projectId) {
-          const p = projects.find((proj) => proj.id === todo.projectId)
-          if (p) colors.add(p.color)
-        }
+    const entry = loadEntry(dateStr)
+    if (!entry?.todos?.length) return []
+    const projects = loadProjects()
+    const colors = new Set<string>()
+    for (const todo of entry.todos) {
+      if (todo.projectId) {
+        const p = projects.find((proj) => proj.id === todo.projectId)
+        if (p) colors.add(p.color)
       }
-      return Array.from(colors).slice(0, 3)
-    } catch {
-      return []
     }
+    return Array.from(colors).slice(0, 3)
   }, [dateStr, isCurrentMonth])
 
   const showProjectDots = projectColors.length > 0

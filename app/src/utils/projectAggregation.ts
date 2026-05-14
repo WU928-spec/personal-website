@@ -1,16 +1,8 @@
 import type { Project, DayEntry, TodoItem } from '@/types/calendar'
 import { loadProjects } from './projectStorage'
-
-const ENTRIES_KEY = 'calendar_entries'
+import { formatDateStr, getTotalDuration, getCurrentElapsed, loadAllEntries } from './calendarStorage'
 
 /* ─── Helpers ─── */
-
-export function formatDateStr(date: Date): string {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
 
 export function formatDuration(totalSeconds: number): string {
   const h = Math.floor(totalSeconds / 3600)
@@ -19,24 +11,11 @@ export function formatDuration(totalSeconds: number): string {
   return `${m}m`
 }
 
-function getTotalDuration(todo: TodoItem): number {
-  return todo.timeRecords.reduce((sum, r) => sum + (r.duration || 0), 0)
-}
-
-function getCurrentElapsed(todo: TodoItem): number {
-  const active = todo.timeRecords.find((r) => !r.endAt)
-  if (!active) return 0
-  return Math.floor((Date.now() - new Date(active.startAt).getTime()) / 1000)
-}
-
-function loadAllEntries(): Record<string, DayEntry> {
-  try {
-    const raw = localStorage.getItem(ENTRIES_KEY)
-    if (!raw) return {}
-    return JSON.parse(raw)
-  } catch {
-    return {}
-  }
+export function formatDurationShort(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600)
+  const m = Math.floor((totalSeconds % 3600) / 60)
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}`
+  return `${m}m`
 }
 
 /* ─── Aggregation: calendar → project stats ─── */
@@ -49,8 +28,12 @@ export interface ProjectStat {
   dailyBreakdown: { date: string; seconds: number; todos: TodoItem[] }[]
 }
 
-export function getProjectStats(projectId: string): ProjectStat | null {
-  const projects = loadProjects()
+export function getProjectStats(
+  projectId: string,
+  allProjects?: Project[],
+  allEntries?: Record<string, DayEntry>
+): ProjectStat | null {
+  const projects = allProjects ?? loadProjects()
   const project = projects.find((p) => p.id === projectId)
   if (!project) return null
 
@@ -59,13 +42,13 @@ export function getProjectStats(projectId: string): ProjectStat | null {
   const subProjects = projects.filter((p) => p.parentId === projectId)
   subProjects.forEach((sp) => projectIds.add(sp.id))
 
-  const allEntries = loadAllEntries()
+  const entries = allEntries ?? loadAllEntries()
   const dailyBreakdown: ProjectStat['dailyBreakdown'] = []
   let totalSeconds = 0
   let totalTodos = 0
   let doneTodos = 0
 
-  for (const [date, entry] of Object.entries(allEntries)) {
+  for (const [date, entry] of Object.entries(entries)) {
     const projectTodos = entry.todos.filter((t) => t.projectId && projectIds.has(t.projectId))
     if (projectTodos.length === 0) continue
 
@@ -96,10 +79,14 @@ export function getProjectStats(projectId: string): ProjectStat | null {
   }
 }
 
-export function getAllProjectStats(): ProjectStat[] {
-  const projects = loadProjects()
+export function getAllProjectStats(
+  allProjects?: Project[],
+  allEntries?: Record<string, DayEntry>
+): ProjectStat[] {
+  const projects = allProjects ?? loadProjects()
+  const entries = allEntries ?? loadAllEntries()
   return projects
-    .map((p) => getProjectStats(p.id))
+    .map((p) => getProjectStats(p.id, projects, entries))
     .filter((s): s is ProjectStat => s !== null)
 }
 
@@ -107,17 +94,18 @@ export function getAllProjectStats(): ProjectStat[] {
 
 export function getRecentDaysBreakdown(
   projectId: string,
-  days: number
+  days: number,
+  allEntries?: Record<string, DayEntry>
 ): { date: string; seconds: number }[] {
   const result: { date: string; seconds: number }[] = []
   const today = new Date()
-  const allEntries = loadAllEntries()
+  const entries = allEntries ?? loadAllEntries()
 
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today)
     d.setDate(d.getDate() - i)
     const dateStr = formatDateStr(d)
-    const entry = allEntries[dateStr]
+    const entry = entries[dateStr]
     const seconds = entry
       ? entry.todos
           .filter((t) => t.projectId === projectId)

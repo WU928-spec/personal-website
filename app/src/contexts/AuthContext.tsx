@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { fetchSetting, saveSetting } from '@/data/site'
+import { createStorageKey } from '@/utils/storage'
 
 export interface User {
   userId: string   // 邮箱，唯一且不可变
@@ -44,19 +45,20 @@ interface AuthStorage {
   registry: Record<string, UserInfo>
 }
 
+const authStorage = createStorageKey<AuthStorage>(AUTH_KEY, {
+  currentUser: null,
+  visitorId: 'visitor_' + Math.random().toString(36).slice(2, 10),
+  registry: {}
+})
+
 function loadAuth(): AuthStorage {
-  try {
-    const raw = localStorage.getItem(AUTH_KEY)
-    if (raw) {
-      const data = JSON.parse(raw) as AuthStorage
-      // 迁移旧数据
-      if (data.currentUser?.userId === 'WU928-spec') {
-        data.currentUser.userId = DEFAULT_USER.userId
-      }
-      return data
-    }
-  } catch {
-    // 尝试迁移旧格式数据
+  const data = authStorage.load()
+  // 迁移旧数据
+  if (data.currentUser?.userId === 'WU928-spec') {
+    data.currentUser.userId = DEFAULT_USER.userId
+  }
+  // 尝试迁移旧格式数据
+  if (!data.registry || Object.keys(data.registry).length === 0) {
     try {
       const oldUser = localStorage.getItem('vibecoding_user')
       const oldRegistry = localStorage.getItem('vibecoding_user_registry')
@@ -69,32 +71,22 @@ function loadAuth(): AuthStorage {
           registry: oldRegistry ? JSON.parse(oldRegistry) : {}
         }
 
-        // 清理旧数据
         localStorage.removeItem('vibecoding_user')
         localStorage.removeItem('vibecoding_logged_in')
         localStorage.removeItem('vibecoding_avatar')
         localStorage.removeItem('vibecoding_user_registry')
         localStorage.removeItem('vibecoding_visitor_id')
 
-        saveAuth(migrated)
+        authStorage.save(migrated)
         return migrated
       }
     } catch {}
   }
-
-  return {
-    currentUser: null,
-    visitorId: 'visitor_' + Math.random().toString(36).slice(2, 10),
-    registry: {}
-  }
+  return data
 }
 
 function saveAuth(data: AuthStorage) {
-  try {
-    localStorage.setItem(AUTH_KEY, JSON.stringify(data))
-  } catch (err) {
-    console.error('Failed to save auth data:', err)
-  }
+  authStorage.save(data)
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -130,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return next
         })
       })
-      .catch((err) => console.warn('Failed to fetch owner profile:', err))
+      .catch(() => {})
   }, [])
 
   const updateAuth = (updater: (prev: AuthStorage) => AuthStorage) => {
@@ -179,9 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updated = { ...currentUser, avatar }
       const registryEntry = { username: updated.username, avatar }
       // Also sync to Supabase so visitors can see it
-      saveSetting('owner_profile', registryEntry).catch((e) =>
-        console.warn('Sync owner profile failed:', e)
-      )
+      saveSetting('owner_profile', registryEntry).catch(() => {})
       return {
         ...prev,
         currentUser: updated,
@@ -203,9 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updated = { ...currentUser, username }
       const registryEntry = { username, avatar: updated.avatar }
       // Also sync to Supabase so visitors can see it
-      saveSetting('owner_profile', registryEntry).catch((e) =>
-        console.warn('Sync owner profile failed:', e)
-      )
+      saveSetting('owner_profile', registryEntry).catch(() => {})
       return {
         ...prev,
         currentUser: updated,

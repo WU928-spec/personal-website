@@ -140,3 +140,9 @@
 - ~~日历相关类型（`DayEntry`、`TodoItem`、`TimeRecord`）散落在多个组件文件中~~：✅ 已统一从 `@/types/calendar` 导入
 - ~~`TodayTaskPanel.tsx`（已标记 DEPRECATED）~~：✅ 已删除
 - `calendar_entries` 的存储没有版本控制，未来模型变更需考虑迁移
+- ~~`data/posts.ts`（558 行死代码，无任何引用）~~：✅ 已删除
+- ~~`MarkdownRenderer.tsx`（992 行）、`MomentUploader.tsx`（653 行）等超大组件~~：✅ 已拆分
+- ~~`loadLocal`/`saveLocal` 在多个 storage 文件中重复实现~~：✅ 已统一使用 `createStorageKey`
+- ~~`formatDuration`、`formatDateStr` 在多个文件中重复定义~~：✅ 已统一来源
+- ~~`z.ZodType<any>` 和 `as any`~~：✅ 已修复
+- ~~生产环境 console.warn 刷屏~~：✅ 已清理（Supabase sync 失败等 25+ 处）

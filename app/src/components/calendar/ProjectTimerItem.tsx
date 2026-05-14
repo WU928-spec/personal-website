@@ -1,6 +1,6 @@
 import { Play, Square } from 'lucide-react'
 import type { Project } from '@/types/calendar'
-import { formatDurationShort } from '@/utils/calendarStorage'
+import { formatDurationShort } from '@/utils/projectAggregation'
 
 interface ProjectTimerItemProps {
   project: Project

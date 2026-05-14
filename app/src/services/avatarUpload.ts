@@ -43,6 +43,6 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
 export async function deleteAvatar(path: string): Promise<void> {
   const { error } = await supabase.storage.from(BUCKET_NAME).remove([path])
   if (error) {
-    console.warn('删除旧头像失败:', error.message)
+    /* ignore */
   }
 }

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Clock } from 'lucide-react'
-import { getProjectStats, formatDuration, formatDateStr } from '@/utils/projectAggregation'
+import { getProjectStats, formatDuration } from '@/utils/projectAggregation'
+import { formatDateStr, loadAllEntries } from '@/utils/calendarStorage'
 import { useLiveTick } from '@/hooks/useLiveTick'
 import TaskItem from './TaskItem'
 
@@ -20,7 +21,10 @@ export default function ProjectDetail({
   showAllHistory = false,
 }: ProjectDetailProps) {
   const tick = useLiveTick()
-  const stats = useMemo(() => getProjectStats(projectId), [projectId, tick])
+  const stats = useMemo(() => {
+    const entries = loadAllEntries()
+    return getProjectStats(projectId, undefined, entries)
+  }, [projectId, tick])
 
   let dayCount: number
   let headerLabel: string

@@ -3,13 +3,12 @@ import { Clock, TrendingUp, Sun, Sunrise, Sunset, Moon } from 'lucide-react'
 import type { DayEntry } from '@/types/calendar'
 import {
   loadEntry,
-  formatDuration,
-  formatDurationShort,
   getTotalDuration,
   getCurrentElapsed,
   getDayTotalDuration,
   formatDateStr,
 } from '@/utils/calendarStorage'
+import { formatDuration, formatDurationShort } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
 
 /* ─── Week data ─── */

@@ -1,6 +1,6 @@
 import type { DayEntry, TodoItem } from '@/types/calendar'
 import { loadProjects, saveProjects, generateId } from './projectStorage'
-import { formatDateStr } from './projectAggregation'
+import { formatDateStr } from './calendarStorage'
 
 const ENTRIES_KEY = 'calendar_entries'
 const SEED_MARKER = '__demo_seeded_v2__'

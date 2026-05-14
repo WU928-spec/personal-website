@@ -52,7 +52,7 @@ export function loadHero(lang: Lang): HeroData {
 
 export function saveHero(data: Record<Lang, HeroData>) {
   heroStorage.saveAll(data)
-  saveSetting('hero', data).catch((e) => console.warn('Hero Supabase sync failed:', e))
+  saveSetting('hero', data).catch(() => {})
 }
 
 /* ───────────────────────────────────────────────
@@ -120,7 +120,7 @@ export function loadSkills(): SkillCategory[] {
 
 export function saveSkills(data: SkillCategory[]) {
   skillsStorage.save(data)
-  saveSetting('skills', data).catch((e) => console.warn('Skills Supabase sync failed:', e))
+  saveSetting('skills', data).catch(() => {})
 }
 
 /* ───────────────────────────────────────────────
@@ -198,9 +198,7 @@ export function loadBlogPreview(lang: Lang): BlogPreviewPost[] {
 
 export function saveBlogPreview(data: Record<Lang, BlogPreviewPost[]>) {
   blogPreviewStorage.saveAll(data)
-  saveSetting('blogPreview', data).catch((e) =>
-    console.warn('BlogPreview Supabase sync failed:', e)
-  )
+  saveSetting('blogPreview', data).catch(() => {})
 }
 
 /* ───────────────────────────────────────────────
@@ -277,7 +275,7 @@ export function loadGitHub(): GitHubData {
 
 export function saveGitHub(data: GitHubData) {
   githubStorage.save(data)
-  saveSetting('github', data).catch((e) => console.warn('GitHub Supabase sync failed:', e))
+  saveSetting('github', data).catch(() => {})
 }
 
 /* ───────────────────────────────────────────────
@@ -349,7 +347,7 @@ export function loadFooter(lang: Lang): FooterData {
 
 export function saveFooter(data: Record<Lang, FooterData>) {
   footerStorage.saveAll(data)
-  saveSetting('footer', data).catch((e) => console.warn('Footer Supabase sync failed:', e))
+  saveSetting('footer', data).catch(() => {})
 }
 
 /* ───────────────────────────────────────────────
@@ -373,7 +371,6 @@ export async function syncSiteSettings(): Promise<boolean> {
     }
     return true
   } catch (e) {
-    console.warn('Site settings sync failed:', e)
     return false
   }
 }

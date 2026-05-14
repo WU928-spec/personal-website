@@ -16,6 +16,7 @@ import {
   deleteProjectSummary,
 } from '@/utils/projectStorage'
 import { getProjectStats } from '@/utils/projectAggregation'
+import { loadAllEntries } from '@/utils/calendarStorage'
 import { useLiveTick } from '@/hooks/useLiveTick'
 import { useAuth } from '@/contexts/AuthContext'
 import PageSEO from '@/components/PageSEO'
@@ -59,11 +60,13 @@ export default function Projects() {
     }
   }, [refresh])
 
-  /* Stats map */
+  /* Stats map — pre-load data once to avoid repeated localStorage reads */
   const statsMap = useMemo(() => {
+    const allProjects = loadProjects()
+    const allEntries = loadAllEntries()
     const map = new Map<string, ProjectStats>()
     for (const p of projects) {
-      const s = getProjectStats(p.id)
+      const s = getProjectStats(p.id, allProjects, allEntries)
       if (s) {
         map.set(p.id, {
           totalSeconds: s.totalSeconds,
@@ -131,38 +134,25 @@ export default function Projects() {
     refresh()
   }
 
-  const handleDelete = (id: string) => {
+  const withAuth = (fn: () => void) => {
     if (!isLoggedIn) return
+    fn()
+    refresh()
+  }
+
+  const handleDelete = (id: string) => withAuth(() => {
     if (confirm('确定删除此项目？关联的日历任务将保留但不再显示项目标签。')) {
       deleteProject(id)
       if (expandedId === id) setExpandedId(null)
-      refresh()
     }
-  }
+  })
 
-  const handleComplete = (id: string) => {
-    if (!isLoggedIn) return
-    completeProject(id)
-    refresh()
-  }
-
-  const handleReactivate = (id: string) => {
-    if (!isLoggedIn) return
-    activateProject(id)
-    refresh()
-  }
-
-  const handleAddSummary = (projectId: string, title: string, content: string) => {
-    if (!isLoggedIn) return
-    addProjectSummary(projectId, title, content)
-    refresh()
-  }
-
-  const handleDeleteSummary = (projectId: string, summaryId: string) => {
-    if (!isLoggedIn) return
-    deleteProjectSummary(projectId, summaryId)
-    refresh()
-  }
+  const handleComplete = (id: string) => withAuth(() => completeProject(id))
+  const handleReactivate = (id: string) => withAuth(() => activateProject(id))
+  const handleAddSummary = (projectId: string, title: string, content: string) =>
+    withAuth(() => addProjectSummary(projectId, title, content))
+  const handleDeleteSummary = (projectId: string, summaryId: string) =>
+    withAuth(() => deleteProjectSummary(projectId, summaryId))
 
   /* Active first, then completed; only parent projects */
   const sortedProjects = [...projects]

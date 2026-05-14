@@ -1,0 +1,226 @@
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { ExternalLink, Star, GitFork } from 'lucide-react'
+import { useLang } from '@/contexts/PreferencesContext'
+import { loadGitHub, type GitHubData, type GitHubRepo } from '@/data/site'
+import { parseGitHubRepos, type GitHubAPIRepo } from '@/types/api'
+
+const LANG_COLORS: Record<string, string> = {
+  TypeScript: '#3178c6',
+  JavaScript: '#f1e05a',
+  Python: '#3572A5',
+  Go: '#00ADD8',
+  Rust: '#dea584',
+  Java: '#b07219',
+  'C++': '#f34b7d',
+  C: '#555555',
+  HTML: '#e34c26',
+  CSS: '#563d7c',
+  Shell: '#89e051',
+  Vue: '#41b883',
+  React: '#61dafb',
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  if (days < 7) return `${days} days ago`
+  if (days < 30) return `${Math.floor(days / 7)} weeks ago`
+  if (days < 365) return `${Math.floor(days / 30)} months ago`
+  return `${Math.floor(days / 365)} years ago`
+}
+
+function generateContributionGrid(): number[][] {
+  const grid: number[][] = []
+  for (let w = 0; w < 52; w++) {
+    const week: number[] = []
+    for (let d = 0; d < 7; d++) {
+      const rand = Math.random()
+      if (rand < 0.4) week.push(0)
+      else if (rand < 0.6) week.push(1)
+      else if (rand < 0.8) week.push(2)
+      else week.push(3)
+    }
+    grid.push(week)
+  }
+  return grid
+}
+
+const DEFAULT_CONTRIBUTIONS = generateContributionGrid()
+
+export default function GitHubSection() {
+  const { t } = useLang()
+  const [github, setGithub] = useState<GitHubData>(() => loadGitHub())
+  const [contributions, setContributions] = useState<number[][]>(DEFAULT_CONTRIBUTIONS)
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/WU928-spec/repos?sort=updated&per_page=4')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return
+        const validatedRepos = parseGitHubRepos(data)
+        if (validatedRepos.length === 0) return
+
+        const repos: GitHubRepo[] = validatedRepos.map((r: GitHubAPIRepo) => ({
+          name: r.name,
+          description: r.description || '',
+          language: r.language || 'Other',
+          languageColor: LANG_COLORS[r.language || ''] || '#8b949e',
+          stars: r.stargazers_count,
+          forks: r.forks_count,
+          updated: formatRelativeDate(r.updated_at),
+        }))
+        const totalStars = repos.reduce((s, r) => s + r.stars, 0)
+        setGithub({ repos, stats: { repos: validatedRepos.length, stars: totalStars, streak: 0 } })
+      })
+      .catch(() => {
+        /* ignore fetch error */
+      })
+  }, [])
+
+  useEffect(() => {
+    fetch('https://github-contributions-api.deno.dev/WU928-spec.json')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data || !Array.isArray(data.contributions)) return
+        const levelMap: Record<string, number> = {
+          NONE: 0,
+          FIRST_QUARTILE: 1,
+          SECOND_QUARTILE: 2,
+          THIRD_QUARTILE: 3,
+          FOURTH_QUARTILE: 3,
+        }
+        const grid: number[][] = data.contributions.map((week: { contributionLevel: string }[]) =>
+          week.map((day) => levelMap[day.contributionLevel] ?? 0)
+        )
+        setContributions(grid)
+      })
+      .catch(() => {})
+  }, [])
+
+  const contributionColors = [
+    'rgba(247,244,239,0.05)',
+    'rgba(196,120,58,0.3)',
+    'rgba(196,120,58,0.6)',
+    'rgba(196,120,58,1)',
+  ]
+
+  return (
+    <section className="bg-Graphite py-24 md:py-32 relative">
+      <div className="max-w-6xl mx-auto px-6 md:px-12">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage/80 mb-4">
+            {t('home.openSource')}
+          </p>
+          <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-white">
+            {t('home.buildingTitle')}
+          </h2>
+          <p className="font-body text-[0.9375rem] leading-[1.65] text-white/60 mt-2">
+            {t('home.buildingDesc')}
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="mt-8"
+        >
+          <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mb-3">
+            {t('home.contributionActivity')}
+          </p>
+          <div className="flex gap-[3px] overflow-x-auto pb-2">
+            {contributions.map((week, wi) => (
+              <div key={wi} className="flex flex-col gap-[3px]">
+                {week.map((level, di) => (
+                  <motion.div
+                    key={di}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 0.005 * (wi * 7 + di),
+                      ease: [0.25, 0.1, 0.25, 1],
+                    }}
+                    className="w-[10px] h-[10px] rounded-sm shrink-0"
+                    style={{ backgroundColor: contributionColors[level] }}
+                    title={`${level} ${t('github.contributions')}`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+          {github.repos.map((repo, i) => (
+            <motion.a
+              key={repo.name}
+              href={`https://github.com/WU928-spec/${repo.name}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 * i, ease: [0.16, 1, 0.3, 1] }}
+              className="block bg-Graphite/90 border border-white/[0.08] rounded-xl p-6 hover:border-white/[0.15] hover:shadow-deep hover:-translate-y-[2px] transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-mono text-[0.875rem] leading-[1.6] text-Amber">{repo.name}</h3>
+                <ExternalLink size={14} className="text-white/40" />
+              </div>
+              <p className="font-body text-[0.9375rem] leading-[1.65] text-white/70 mt-2 line-clamp-2">
+                {repo.description}
+              </p>
+              <div className="flex items-center gap-4 mt-4">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: repo.languageColor }} />
+                  <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/60">{repo.language}</span>
+                </span>
+                <span className="flex items-center gap-1 text-white/60">
+                  <Star size={14} />
+                  <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.stars}</span>
+                </span>
+                <span className="flex items-center gap-1 text-white/60">
+                  <GitFork size={14} />
+                  <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.forks}</span>
+                </span>
+                <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/40 ml-auto">
+                  {repo.updated}
+                </span>
+              </div>
+            </motion.a>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="text-center mt-10"
+        >
+          <a
+            href="https://github.com/WU928-spec"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
+          >
+            {t('home.viewFullProfile')}
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  )
+}

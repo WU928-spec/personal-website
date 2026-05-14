@@ -1,26 +1,9 @@
 import type { DayEntry, TodoItem } from '@/types/calendar'
 import { supabase, isSupabaseReady } from '@/lib/supabase'
+import { createStorageKey } from './storage'
 
 export const ENTRIES_KEY = 'calendar_entries'
-
-/* ─── Local helpers ─── */
-function loadLocalAll(): Record<string, DayEntry> {
-  try {
-    const raw = localStorage.getItem(ENTRIES_KEY)
-    if (!raw) return {}
-    return JSON.parse(raw)
-  } catch {
-    return {}
-  }
-}
-
-function saveLocalAll(all: Record<string, DayEntry>) {
-  try {
-    localStorage.setItem(ENTRIES_KEY, JSON.stringify(all))
-  } catch {
-    // ignore
-  }
-}
+const entryStorage = createStorageKey<Record<string, DayEntry>>(ENTRIES_KEY, {})
 
 function normalizeEntry(entry: DayEntry): DayEntry {
   return {
@@ -61,26 +44,24 @@ async function upsertEntryToSupabase(entry: DayEntry) {
 /* ─── Entry CRUD ─── */
 
 export function loadEntry(dateStr: string): DayEntry | null {
-  const all = loadLocalAll()
+  const all = entryStorage.load()
   const entry = all[dateStr]
   return entry ? normalizeEntry(entry) : null
 }
 
 export function loadAllEntries(): Record<string, DayEntry> {
-  const all = loadLocalAll()
+  const all = entryStorage.load()
   return Object.fromEntries(
     Object.entries(all).map(([k, v]) => [k, normalizeEntry(v)])
   )
 }
 
 export function saveEntry(entry: DayEntry) {
-  const all = loadLocalAll()
+  const all = entryStorage.load()
   all[entry.date] = entry
-  saveLocalAll(all)
+  entryStorage.save(all)
   // Async sync to Supabase — never block UI
-  upsertEntryToSupabase(entry).catch((e) =>
-    console.warn('Calendar Supabase sync failed:', e)
-  )
+  upsertEntryToSupabase(entry).catch(() => {})
 }
 
 export function loadTodayEntry(): DayEntry | null {
@@ -99,15 +80,14 @@ export async function syncCalendarEntries(): Promise<boolean> {
   if (!isSupabaseReady()) return false
   try {
     const remote = await fetchAllEntriesFromSupabase()
-    const local = loadLocalAll()
+    const local = entryStorage.load()
     // Merge: remote wins for same date
     const merged = { ...local, ...remote }
-    saveLocalAll(merged)
+    entryStorage.save(merged)
     // Notify all components that sync completed
     window.dispatchEvent(new CustomEvent('calendar-sync-completed'))
     return true
   } catch (e) {
-    console.warn('Calendar sync failed:', e)
     return false
   }
 }
@@ -119,20 +99,6 @@ export function formatDateStr(date: Date): string {
   const m = String(date.getMonth() + 1).padStart(2, '0')
   const d = String(date.getDate()).padStart(2, '0')
   return `${y}-${m}-${d}`
-}
-
-export function formatDuration(totalSeconds: number): string {
-  const h = Math.floor(totalSeconds / 3600)
-  const m = Math.floor((totalSeconds % 3600) / 60)
-  if (h > 0) return `${h}h ${m}m`
-  return `${m}m`
-}
-
-export function formatDurationShort(totalSeconds: number): string {
-  const h = Math.floor(totalSeconds / 3600)
-  const m = Math.floor((totalSeconds % 3600) / 60)
-  if (h > 0) return `${h}:${String(m).padStart(2, '0')}`
-  return `${m}m`
 }
 
 export function getTotalDuration(todo: TodoItem): number {

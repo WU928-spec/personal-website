@@ -6,43 +6,21 @@ import {
   ENTRIES_KEY,
   loadTodayEntry,
   saveTodayEntry,
-  formatDurationShort,
   getTotalDuration,
   getCurrentElapsed,
   formatDateStr,
 } from '@/utils/calendarStorage'
+import { formatDurationShort } from '@/utils/projectAggregation'
 import { getProjectStats } from '@/utils/projectAggregation'
+import {
+  loadActiveProjectTimer,
+  saveActiveProjectTimer,
+} from '@/utils/projectTimerStorage'
+import type { ActiveProjectTimer } from '@/utils/projectTimerStorage'
 import { useLiveTick } from '@/hooks/useLiveTick'
 import { useAuth } from '@/contexts/AuthContext'
 import TodoItem from './TodoItem'
 import ProjectTimerItem from './ProjectTimerItem'
-
-/* ─── Project Timer Helpers ─── */
-
-interface ActiveProjectTimer {
-  projectId: string
-  startAt: string
-  date: string
-}
-
-const PROJECT_TIMER_KEY = 'active_project_timer'
-
-function loadActiveProjectTimer(): ActiveProjectTimer | null {
-  try {
-    const raw = localStorage.getItem(PROJECT_TIMER_KEY)
-    if (!raw) return null
-    const timer = JSON.parse(raw) as ActiveProjectTimer
-    if (timer.date !== formatDateStr(new Date())) return null
-    return timer
-  } catch {
-    return null
-  }
-}
-
-function saveActiveProjectTimer(timer: ActiveProjectTimer | null) {
-  if (timer) localStorage.setItem(PROJECT_TIMER_KEY, JSON.stringify(timer))
-  else localStorage.removeItem(PROJECT_TIMER_KEY)
-}
 
 function saveProjectTimerToEntry(projectId: string) {
   const timer = loadActiveProjectTimer()

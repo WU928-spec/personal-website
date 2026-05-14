@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Clock, CheckCircle2, Circle, Square, Play, X } from 'lucide-react'
 import type { TodoItem as TodoItemType, Project } from '@/types/calendar'
-import { formatDurationShort } from '@/utils/calendarStorage'
+import { formatDurationShort } from '@/utils/projectAggregation'
 
 interface TodoItemProps {
   todo: TodoItemType

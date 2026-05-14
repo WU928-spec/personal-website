@@ -127,7 +127,7 @@ export async function fetchObsidianNotes(): Promise<ObsidianNoteMeta[]> {
   if (!isSupabaseReady()) return []
   const { data, error } = await supabase.from(TABLE).select('path,content,created_at,updated_at')
   if (error) {
-    console.warn('Failed to fetch notes:', error.message)
+    /* ignore */
     return []
   }
   return (data || []).map((r) => rowToMeta(r as Record<string, unknown>))
@@ -158,7 +158,7 @@ export async function fetchVaultTree(): Promise<VaultFile[]> {
   if (!isSupabaseReady()) return []
   const { data, error } = await supabase.from(TABLE).select('path')
   if (error) {
-    console.warn('Failed to fetch paths:', error.message)
+    /* ignore */
     return []
   }
   const paths = (data || []).map((r) => String((r as Record<string, unknown>).path))
@@ -188,7 +188,7 @@ export async function saveNoteToSupabase(path: string, content: string): Promise
     { onConflict: 'path' }
   )
   if (error) {
-    console.warn('Failed to save note:', error.message)
+    /* ignore */
     return false
   }
   return true
@@ -198,7 +198,7 @@ export async function deleteNoteFromSupabase(path: string): Promise<boolean> {
   if (!isSupabaseReady()) return false
   const { error } = await supabase.from(TABLE).delete().eq('path', path)
   if (error) {
-    console.warn('Failed to delete note:', error.message)
+    /* ignore */
     return false
   }
   return true
@@ -210,7 +210,7 @@ export async function deleteFolderFromSupabase(folderPath: string): Promise<bool
   const prefix = folderPath.endsWith('/') ? folderPath : `${folderPath}/`
   const { error } = await supabase.from(TABLE).delete().like('path', `${prefix}%`)
   if (error) {
-    console.warn('Failed to delete folder:', error.message)
+    /* ignore */
     return false
   }
   return true
@@ -230,7 +230,7 @@ export async function renameNoteInSupabase(oldPath: string, newPath: string): Pr
     updated_at: new Date().toISOString(),
   })
   if (error) {
-    console.warn('Failed to rename note:', error.message)
+    /* ignore */
     return false
   }
   return true
@@ -240,7 +240,7 @@ export async function renameNoteInSupabase(oldPath: string, newPath: string): Pr
    Legacy no-ops (kept for compatibility)
    ─────────────────────────────────────────────── */
 export async function saveObsidianNote(_slug: string, _content: string): Promise<boolean> {
-  console.warn('Use saveNoteToSupabase instead.')
+  /* deprecated: use saveNoteToSupabase */
   return false
 }
 

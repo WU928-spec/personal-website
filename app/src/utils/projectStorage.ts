@@ -1,22 +1,9 @@
 import type { Project, ProjectSummary } from '@/types/calendar'
 import { supabase, isSupabaseReady } from '@/lib/supabase'
+import { createStorageKey } from './storage'
 
 const PROJECTS_KEY = 'calendar_projects'
-
-/* ─── Local helpers ─── */
-function loadLocal(): Project[] {
-  try {
-    const raw = localStorage.getItem(PROJECTS_KEY)
-    if (!raw) return []
-    return JSON.parse(raw)
-  } catch {
-    return []
-  }
-}
-
-function saveLocal(projects: Project[]) {
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects))
-}
+const projectStorage = createStorageKey<Project[]>(PROJECTS_KEY, [])
 
 /* ─── Supabase helpers ─── */
 async function fetchFromSupabase(): Promise<Project[]> {
@@ -64,7 +51,7 @@ export function addProjectSummary(projectId: string, title: string, content: str
     content,
     createdAt: new Date().toISOString(),
   })
-  saveLocal(projects)
+  projectStorage.save(projects)
 }
 
 export function deleteProjectSummary(projectId: string, summaryId: string) {
@@ -72,7 +59,7 @@ export function deleteProjectSummary(projectId: string, summaryId: string) {
   const p = projects.find((x) => x.id === projectId)
   if (!p || !p.summaries) return
   p.summaries = p.summaries.filter((s) => s.id !== summaryId)
-  saveLocal(projects)
+  projectStorage.save(projects)
 }
 
 async function deleteFromSupabase(projectId: string) {
@@ -83,20 +70,18 @@ async function deleteFromSupabase(projectId: string) {
 /* ─── Project CRUD ─── */
 
 export function loadProjects(): Project[] {
-  return loadLocal()
+  return projectStorage.load()
 }
 
 export function saveProjects(projects: Project[]) {
-  saveLocal(projects)
+  projectStorage.save(projects)
 }
 
 export function addProject(project: Project) {
   const projects = loadProjects()
   projects.push(project)
-  saveLocal(projects)
-  upsertToSupabase(project).catch((e) =>
-    console.warn('Project add Supabase sync failed:', e)
-  )
+  projectStorage.save(projects)
+  upsertToSupabase(project).catch(() => {})
 }
 
 export function updateProject(updated: Project) {
@@ -104,10 +89,8 @@ export function updateProject(updated: Project) {
   const idx = projects.findIndex((p) => p.id === updated.id)
   if (idx >= 0) {
     projects[idx] = updated
-    saveLocal(projects)
-    upsertToSupabase(updated).catch((e) =>
-      console.warn('Project update Supabase sync failed:', e)
-    )
+    projectStorage.save(projects)
+    upsertToSupabase(updated).catch(() => {})
   }
 }
 
@@ -118,12 +101,10 @@ export function deleteProject(projectId: string) {
     if (p.parentId && toDelete.has(p.parentId)) toDelete.add(p.id)
   })
   const next = projects.filter((p) => !toDelete.has(p.id))
-  saveLocal(next)
+  projectStorage.save(next)
 
   toDelete.forEach((id) => {
-    deleteFromSupabase(id).catch((e) =>
-      console.warn('Project delete Supabase sync failed:', e)
-    )
+    deleteFromSupabase(id).catch(() => {})
   })
 }
 
@@ -132,10 +113,8 @@ export function completeProject(projectId: string) {
   const p = projects.find((x) => x.id === projectId)
   if (p) {
     p.status = 'completed'
-    saveLocal(projects)
-    upsertToSupabase(p).catch((e) =>
-      console.warn('Project complete Supabase sync failed:', e)
-    )
+    projectStorage.save(projects)
+    upsertToSupabase(p).catch(() => {})
   }
 }
 
@@ -144,10 +123,8 @@ export function activateProject(projectId: string) {
   const p = projects.find((x) => x.id === projectId)
   if (p) {
     p.status = 'active'
-    saveLocal(projects)
-    upsertToSupabase(p).catch((e) =>
-      console.warn('Project activate Supabase sync failed:', e)
-    )
+    projectStorage.save(projects)
+    upsertToSupabase(p).catch(() => {})
   }
 }
 
@@ -166,10 +143,9 @@ export async function syncProjects(): Promise<boolean> {
   if (!isSupabaseReady()) return false
   try {
     const remote = await fetchFromSupabase()
-    saveLocal(remote)
+    projectStorage.save(remote)
     return true
   } catch (e) {
-    console.warn('Projects sync failed:', e)
     return false
   }
 }
