@@ -66,6 +66,9 @@ function saveProjectTimerToEntry(projectId: string) {
     duration: elapsed,
   })
   saveTodayEntry(entry)
+  window.dispatchEvent(
+    new CustomEvent('calendar-entry-saved', { detail: { date: entry.date } })
+  )
 }
 
 /* Component */
