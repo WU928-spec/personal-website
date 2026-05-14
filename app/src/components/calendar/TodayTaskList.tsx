@@ -11,6 +11,7 @@ import {
   getCurrentElapsed,
   formatDateStr,
 } from '@/utils/calendarStorage'
+import { getProjectStats } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -346,11 +347,9 @@ export default function TodayTaskList() {
           <div className="space-y-1">
             {activeProjects.map((project) => {
               const isTracking = activeProjectTimer?.projectId === project.id
-              const projectTodosToday = todos.filter((t) => t.projectId === project.id)
-              const totalToday = projectTodosToday.reduce(
-                (sum, t) => sum + getTotalDuration(t) + getCurrentElapsed(t), 0
-              )
-              const displayTime = totalToday + (isTracking ? projectTimerElapsed : 0)
+              const projectStats = getProjectStats(project.id)
+              const totalProjectTime = projectStats ? projectStats.totalSeconds : 0
+              const displayTime = totalProjectTime + (isTracking ? projectTimerElapsed : 0)
 
               return (
                 <div
