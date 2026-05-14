@@ -1,4 +1,4 @@
-import type { Project } from '@/types/calendar'
+import type { Project, ProjectSummary } from '@/types/calendar'
 import { supabase, isSupabaseReady } from '@/lib/supabase'
 
 const PROJECTS_KEY = 'calendar_projects'
@@ -32,6 +32,7 @@ async function fetchFromSupabase(): Promise<Project[]> {
     status: String(row.status || 'active') as Project['status'],
     createdAt: String(row.created_at),
     parentId: row.parent_id ? String(row.parent_id) : undefined,
+    summaries: row.summaries ? (row.summaries as ProjectSummary[]) : undefined,
   }))
 }
 
@@ -46,10 +47,11 @@ async function upsertToSupabase(project: Project) {
     status: project.status,
     parent_id: project.parentId,
     created_at: project.createdAt,
+    summaries: project.summaries,
   })
 }
 
-/* ─── Summary helpers (localStorage only, not synced to Supabase) ─── */
+/* ─── Summary helpers ─── */
 
 export function addProjectSummary(projectId: string, title: string, content: string) {
   const projects = loadProjects()
