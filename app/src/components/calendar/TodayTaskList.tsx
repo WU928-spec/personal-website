@@ -229,7 +229,7 @@ export default function TodayTaskList() {
   )
 
   const todos = entry?.todos || []
-  const displayTodos = todos.filter((t) => t.text !== '')
+  const displayTodos = todos.filter((t) => !!t.text)
   const activeTodo = displayTodos.find((t) => t.timeRecords.some((r) => !r.endAt))
   const totalTrackedToday = todos.reduce((sum, t) => sum + getTotalDuration(t) + getCurrentElapsed(t), 0)
 
