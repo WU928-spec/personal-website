@@ -112,7 +112,7 @@ export default function ProjectDetail({
                   {day.date}
                 </p>
                 <div className="space-y-1 pl-1">
-                  {day.todos.filter((t) => !!t.text).map((todo) => (
+                  {day.todos.filter((t) => !!t.text && t.projectId === projectId).map((todo) => (
                     <TaskItem key={todo.id} todo={todo} />
                   ))}
                 </div>
