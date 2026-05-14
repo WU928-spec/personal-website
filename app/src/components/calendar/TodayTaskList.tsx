@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Play, Square, Clock, CheckCircle2, Circle, X } from 'lucide-react'
+import { Play, Clock } from 'lucide-react'
 import type { DayEntry, Project } from '@/types/calendar'
 import { loadProjects, generateId } from '@/utils/projectStorage'
 import {
@@ -14,6 +14,8 @@ import {
 import { getProjectStats } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
 import { useAuth } from '@/contexts/AuthContext'
+import TodoItem from './TodoItem'
+import ProjectTimerItem from './ProjectTimerItem'
 
 /* ─── Project Timer Helpers ─── */
 
@@ -78,8 +80,6 @@ export default function TodayTaskList() {
   const [entry, setEntry] = useState<DayEntry | null>(loadTodayEntry)
   const [projects, setProjects] = useState<Project[]>([])
   const [activeProjectTimer, setActiveProjectTimer] = useState<ActiveProjectTimer | null>(loadActiveProjectTimer)
-  const [editingTodoId, setEditingTodoId] = useState<string | null>(null)
-  const [draftRecords, setDraftRecords] = useState<{ id: string; duration: number }[] | null>(null)
   const tick = useLiveTick()
   void tick // drives re-render for live timer durations
 
@@ -205,23 +205,14 @@ export default function TodayTaskList() {
     [refresh, isLoggedIn]
   )
 
-  const startEditTodo = useCallback((todoId: string) => {
-    const current = loadTodayEntry()
-    if (!current) return
-    const todo = current.todos.find((t) => t.id === todoId)
-    if (!todo) return
-    setEditingTodoId(todoId)
-    setDraftRecords(todo.timeRecords.map((r) => ({ id: r.id, duration: r.duration || 0 })))
-  }, [])
-
-  const saveEditTodo = useCallback(
-    (todoId: string) => {
-      if (!isLoggedIn || !draftRecords) return
+  const handleSaveTimeRecords = useCallback(
+    (todoId: string, records: { id: string; duration: number }[]) => {
+      if (!isLoggedIn) return
       const current = loadTodayEntry()
       if (!current) return
       const todo = current.todos.find((t) => t.id === todoId)
       if (!todo) return
-      todo.timeRecords = draftRecords.map((d) => {
+      todo.timeRecords = records.map((d) => {
         const original = todo.timeRecords.find((r) => r.id === d.id)
         return {
           id: d.id,
@@ -231,17 +222,10 @@ export default function TodayTaskList() {
         }
       })
       saveTodayEntry(current)
-      setEditingTodoId(null)
-      setDraftRecords(null)
       refresh()
     },
-    [draftRecords, isLoggedIn, refresh]
+    [isLoggedIn, refresh]
   )
-
-  const cancelEditTodo = useCallback(() => {
-    setEditingTodoId(null)
-    setDraftRecords(null)
-  }, [])
 
   const handleToggleDone = useCallback(
     (todoId: string) => {
@@ -300,140 +284,17 @@ export default function TodayTaskList() {
           </p>
         )}
 
-        {displayTodos.map((todo) => {
-          const isTracking = todo.timeRecords.some((r) => !r.endAt)
-          const totalSec = getTotalDuration(todo) + getCurrentElapsed(todo)
-
-          return (
-            <div key={todo.id}>
-              <div
-                className={`
-                  group flex items-center gap-1.5 rounded-lg px-2 py-1.5 border transition-all duration-200
-                  ${isTracking
-                    ? 'bg-Amber/5 border-Amber/30'
-                    : todo.done
-                      ? 'bg-Sage/5 border-Sage/20 opacity-60'
-                      : 'bg-transparent border-Sand dark:border-white/10'
-                  }
-                `}
-              >
-              <button
-                onClick={() => handleToggleDone(todo.id)}
-                disabled={!isLoggedIn}
-                className={`shrink-0 transition-colors ${
-                  !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
-                } ${
-                  todo.done
-                    ? 'text-Sage'
-                    : 'text-Slate/30 dark:text-white/20 hover:text-Amber'
-                }`}
-              >
-                {todo.done ? <CheckCircle2 size={14} /> : <Circle size={14} />}
-              </button>
-
-              <span
-                className={`flex-1 text-[0.8125rem] truncate ${
-                  todo.done
-                    ? 'line-through text-Slate/40 dark:text-white/30'
-                    : 'text-Ink dark:text-white/80'
-                }`}
-              >
-                {todo.text}
-                {todo.projectId && (
-                  <ProjectDot
-                    projectId={todo.projectId}
-                    projects={projects}
-                  />
-                )}
-              </span>
-
-              {totalSec > 0 && (
-                <span className="text-[0.625rem] font-mono text-Slate/60 dark:text-white/40 shrink-0">
-                  {formatDurationShort(totalSec)}
-                </span>
-              )}
-
-              {totalSec > 0 && isLoggedIn && !isTracking && (
-                <button
-                  onClick={() => startEditTodo(todo.id)}
-                  className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-Slate/30 hover:text-Amber"
-                  title="修改时间"
-                >
-                  <Clock size={12} />
-                </button>
-              )}
-              <button
-                onClick={() => handleToggleTrack(todo.id)}
-                disabled={!isLoggedIn}
-                className={`
-                  shrink-0 flex items-center justify-center w-6 h-6 rounded-md transition-all duration-200
-                  ${!isLoggedIn ? 'cursor-not-allowed opacity-40' : ''}
-                  ${isTracking
-                    ? 'bg-Amber text-white'
-                    : 'bg-Mist dark:bg-white/10 text-Slate dark:text-white/50 hover:text-Amber hover:bg-Amber/10'
-                  }
-                `}
-                title={isTracking ? '停止计时' : '开始计时'}
-              >
-                {isTracking ? <Square size={11} /> : <Play size={11} />}
-              </button>
-              </div>
-
-              {/* Time edit panel */}
-              {editingTodoId === todo.id && draftRecords && (
-                <div className="mt-1.5 rounded-lg bg-Mist/30 dark:bg-white/[0.03] p-2 space-y-1">
-                  {draftRecords.map((record, idx) => (
-                    <div key={record.id} className="flex items-center gap-2">
-                      <span className="text-[0.625rem] text-Slate/40 w-4">{idx + 1}.</span>
-                      <input
-                        type="number"
-                        min={0}
-                        value={Math.round(record.duration / 60)}
-                        onChange={(e) => {
-                          const minutes = parseInt(e.target.value) || 0
-                          setDraftRecords((prev) =>
-                            prev
-                              ? prev.map((r, i) =>
-                                  i === idx ? { ...r, duration: minutes * 60 } : r
-                                )
-                              : prev
-                          )
-                        }}
-                        className="w-16 px-1 py-0.5 text-[0.75rem] bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 rounded text-Ink dark:text-white text-center"
-                      />
-                      <span className="text-[0.625rem] text-Slate/40">分钟</span>
-                      <button
-                        onClick={() =>
-                          setDraftRecords((prev) =>
-                            prev ? prev.filter((_, i) => i !== idx) : prev
-                          )
-                        }
-                        className="text-Slate/30 hover:text-Rose transition-colors"
-                        title="删除记录"
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  ))}
-                  <div className="flex justify-end gap-2 pt-1">
-                    <button
-                      onClick={cancelEditTodo}
-                      className="px-2 py-0.5 text-[0.75rem] text-Slate hover:text-Ink dark:hover:text-white transition-colors"
-                    >
-                      取消
-                    </button>
-                    <button
-                      onClick={() => saveEditTodo(todo.id)}
-                      className="px-2 py-0.5 text-[0.75rem] bg-Sage text-white rounded-md hover:bg-[#5a7a5a] transition-colors"
-                    >
-                      保存
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        })}
+        {displayTodos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            projects={projects}
+            isLoggedIn={isLoggedIn}
+            onToggleDone={() => handleToggleDone(todo.id)}
+            onToggleTrack={() => handleToggleTrack(todo.id)}
+            onSaveTimeRecords={(records) => handleSaveTimeRecords(todo.id, records)}
+          />
+        ))}
       </div>
 
       {/* Lower: Project Timer */}
@@ -455,40 +316,14 @@ export default function TodayTaskList() {
               const displayTime = totalProjectTime + (isTracking ? projectTimerElapsed : 0)
 
               return (
-                <div
+                <ProjectTimerItem
                   key={project.id}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-all ${
-                    isTracking
-                      ? 'bg-Amber/5 border border-Amber/20'
-                      : 'border border-transparent'
-                  }`}
-                >
-                  <div
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: project.color }}
-                  />
-                  <span className="flex-1 text-[0.8125rem] truncate text-Ink dark:text-white/80">
-                    {project.name}
-                  </span>
-                  <span className="text-[0.625rem] font-mono text-Slate/60 dark:text-white/40 shrink-0">
-                    {formatDurationShort(displayTime)}
-                  </span>
-                  <button
-                    onClick={() => handleToggleProjectTimer(project.id)}
-                    disabled={!isLoggedIn}
-                    className={`
-                      shrink-0 flex items-center justify-center w-6 h-6 rounded-md transition-all
-                      ${!isLoggedIn ? 'cursor-not-allowed opacity-40' : ''}
-                      ${isTracking
-                        ? 'bg-Amber text-white'
-                        : 'bg-Mist dark:bg-white/10 text-Slate dark:text-white/50 hover:text-Amber hover:bg-Amber/10'
-                      }
-                    `}
-                    title={isTracking ? '停止计时' : '开始计时'}
-                  >
-                    {isTracking ? <Square size={11} /> : <Play size={11} />}
-                  </button>
-                </div>
+                  project={project}
+                  isTracking={isTracking}
+                  isLoggedIn={isLoggedIn}
+                  displayTime={displayTime}
+                  onToggleTimer={() => handleToggleProjectTimer(project.id)}
+                />
               )
             })}
           </div>
@@ -524,14 +359,4 @@ export default function TodayTaskList() {
   )
 }
 
-function ProjectDot({ projectId, projects }: { projectId: string; projects: Project[] }) {
-  const project = projects.find((p) => p.id === projectId)
-  if (!project) return null
-  return (
-    <span
-      className="inline-block w-2 h-2 rounded-full ml-1.5 align-middle"
-      style={{ backgroundColor: project.color }}
-      title={project.name}
-    />
-  )
-}
+
