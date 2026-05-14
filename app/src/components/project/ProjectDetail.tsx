@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Clock } from 'lucide-react'
-import { getProjectStats, getRecentDaysBreakdown, formatDuration, formatDateStr } from '@/utils/projectAggregation'
+import { getProjectStats, formatDuration, formatDateStr } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
 import TaskItem from './TaskItem'
 
@@ -69,12 +69,7 @@ export default function ProjectDetail({
     headerLabel = `最近 ${dayCount} 天`
   }
 
-  const data = useMemo(
-    () => getRecentDaysBreakdown(projectId, dayCount),
-    [projectId, dayCount, tick]
-  )
-
-  const totalSeconds = data.reduce((s, d) => s + d.seconds, 0)
+  const totalSeconds = stats ? stats.totalSeconds : 0
 
   const cutoffDate = new Date()
   cutoffDate.setDate(cutoffDate.getDate() - dayCount + 1)
