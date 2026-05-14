@@ -26,6 +26,13 @@ export interface DayEntry {
 
 export type ProjectStatus = 'active' | 'completed'
 
+export interface ProjectSummary {
+  id: string
+  title: string
+  content: string
+  createdAt: string
+}
+
 export interface Project {
   id: string
   name: string
@@ -35,6 +42,7 @@ export interface Project {
   status: ProjectStatus
   createdAt: string
   parentId?: string
+  summaries?: ProjectSummary[]
 }
 
 /* ─── Preset Color Palette ─── */

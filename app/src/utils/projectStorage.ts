@@ -49,6 +49,30 @@ async function upsertToSupabase(project: Project) {
   })
 }
 
+/* ─── Summary helpers (localStorage only, not synced to Supabase) ─── */
+
+export function addProjectSummary(projectId: string, title: string, content: string) {
+  const projects = loadProjects()
+  const p = projects.find((x) => x.id === projectId)
+  if (!p) return
+  if (!p.summaries) p.summaries = []
+  p.summaries.unshift({
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    title,
+    content,
+    createdAt: new Date().toISOString(),
+  })
+  saveLocal(projects)
+}
+
+export function deleteProjectSummary(projectId: string, summaryId: string) {
+  const projects = loadProjects()
+  const p = projects.find((x) => x.id === projectId)
+  if (!p || !p.summaries) return
+  p.summaries = p.summaries.filter((s) => s.id !== summaryId)
+  saveLocal(projects)
+}
+
 async function deleteFromSupabase(projectId: string) {
   if (!isSupabaseReady()) return
   await supabase!.from('projects').delete().eq('id', projectId)

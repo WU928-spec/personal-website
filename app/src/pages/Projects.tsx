@@ -12,6 +12,8 @@ import {
   getSubProjects,
   generateId,
   syncProjects,
+  addProjectSummary,
+  deleteProjectSummary,
 } from '@/utils/projectStorage'
 import { getProjectStats } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
@@ -150,6 +152,18 @@ export default function Projects() {
     refresh()
   }
 
+  const handleAddSummary = (projectId: string, title: string, content: string) => {
+    if (!isLoggedIn) return
+    addProjectSummary(projectId, title, content)
+    refresh()
+  }
+
+  const handleDeleteSummary = (projectId: string, summaryId: string) => {
+    if (!isLoggedIn) return
+    deleteProjectSummary(projectId, summaryId)
+    refresh()
+  }
+
   /* Active first, then completed; only parent projects */
   const sortedProjects = [...projects]
     .filter((p) => !p.parentId)
@@ -226,6 +240,8 @@ export default function Projects() {
                 onComplete={() => handleComplete(project.id)}
                 onReactivate={() => handleReactivate(project.id)}
                 onAddSubProject={() => openForm(undefined, project.id)}
+                onAddSummary={handleAddSummary}
+                onDeleteSummary={handleDeleteSummary}
               />
             ))
           )}

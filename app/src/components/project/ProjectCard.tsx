@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ChevronDown,
@@ -9,6 +10,8 @@ import {
   Target,
   ListChecks,
   Plus,
+  FileText,
+  X,
 } from 'lucide-react'
 import type { Project } from '@/types/calendar'
 import { formatDuration } from '@/utils/projectAggregation'
@@ -30,6 +33,8 @@ interface ProjectCardProps {
   onComplete: () => void
   onReactivate: () => void
   onAddSubProject: () => void
+  onAddSummary: (projectId: string, title: string, content: string) => void
+  onDeleteSummary: (projectId: string, summaryId: string) => void
 }
 
 export default function ProjectCard({
@@ -46,7 +51,13 @@ export default function ProjectCard({
   onComplete,
   onReactivate,
   onAddSubProject,
+  onAddSummary,
+  onDeleteSummary,
 }: ProjectCardProps) {
+  const [showSummaryForm, setShowSummaryForm] = useState(false)
+  const [summaryTitle, setSummaryTitle] = useState('')
+  const [summaryContent, setSummaryContent] = useState('')
+  const summaries = project.summaries || []
   const { totalSeconds, totalTodos, doneTodos } = stats
   const progress = project.targetHours > 0
     ? Math.min(totalSeconds / 3600 / project.targetHours, 1)
@@ -185,6 +196,99 @@ export default function ProjectCard({
                   <Plus size={14} />
                   添加子项目
                 </button>
+              )}
+
+              {/* ── Phase Summaries ── */}
+              {summaries.length > 0 && (
+                <div className="mt-5">
+                  <h4 className="text-[0.75rem] font-medium text-Slate/60 dark:text-white/40 mb-2 flex items-center gap-1.5">
+                    <FileText size={12} />
+                    阶段总结 ({summaries.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {summaries.map((s) => (
+                      <div
+                        key={s.id}
+                        className="relative rounded-lg bg-Mist/30 dark:bg-white/[0.03] px-3 py-2.5"
+                      >
+                        {isLoggedIn && !isCompleted && (
+                          <button
+                            onClick={() => onDeleteSummary(project.id, s.id)}
+                            className="absolute top-1.5 right-1.5 text-Slate/30 hover:text-Rose transition-colors"
+                            title="删除"
+                          >
+                            <X size={12} />
+                          </button>
+                        )}
+                        <p className="text-[0.8125rem] font-medium text-Ink dark:text-white/80 pr-5">
+                          {s.title}
+                        </p>
+                        <p className="text-[0.625rem] text-Slate/40 dark:text-white/20 mt-0.5">
+                          {new Date(s.createdAt).toLocaleDateString('zh-CN')}
+                        </p>
+                        <p className="text-[0.75rem] text-Slate/70 dark:text-white/50 mt-1 whitespace-pre-wrap">
+                          {s.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isLoggedIn && !isCompleted && (
+                <div className="mt-3">
+                  {!showSummaryForm ? (
+                    <button
+                      onClick={() => setShowSummaryForm(true)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-Sand dark:border-white/10 text-[0.8125rem] text-Slate/60 dark:text-white/40 hover:border-Amber hover:text-Amber transition-colors"
+                    >
+                      <Plus size={14} />
+                      添加阶段总结
+                    </button>
+                  ) : (
+                    <div className="rounded-lg bg-Mist/30 dark:bg-white/[0.03] p-3 space-y-2">
+                      <input
+                        value={summaryTitle}
+                        onChange={(e) => setSummaryTitle(e.target.value)}
+                        placeholder="总结标题"
+                        className="w-full px-2.5 py-1.5 text-[0.8125rem] bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50"
+                        autoFocus
+                      />
+                      <textarea
+                        value={summaryContent}
+                        onChange={(e) => setSummaryContent(e.target.value)}
+                        placeholder="总结内容..."
+                        rows={3}
+                        className="w-full px-2.5 py-1.5 text-[0.8125rem] bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 resize-none"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setShowSummaryForm(false)
+                            setSummaryTitle('')
+                            setSummaryContent('')
+                          }}
+                          className="px-3 py-1 text-[0.75rem] text-Slate hover:text-Ink dark:hover:text-white transition-colors"
+                        >
+                          取消
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (summaryTitle.trim() && summaryContent.trim()) {
+                              onAddSummary(project.id, summaryTitle.trim(), summaryContent.trim())
+                              setShowSummaryForm(false)
+                              setSummaryTitle('')
+                              setSummaryContent('')
+                            }
+                          }}
+                          className="px-3 py-1 text-[0.75rem] bg-Sage text-white rounded-md hover:bg-[#5a7a5a] transition-colors"
+                        >
+                          保存
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Actions */}
