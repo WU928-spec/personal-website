@@ -26,6 +26,53 @@
 
 ## 最近解决的问题
 
+### 2026-05-14: 项目系统增强与日历项目计时
+
+**1. 项目阶段总结**
+
+文件: `app/src/types/calendar.ts`, `app/src/utils/projectStorage.ts`, `app/src/pages/Projects.tsx`, `app/src/components/project/ProjectCard.tsx`
+
+- 新增 `ProjectSummary` 类型（标题/内容/日期），支持为每个项目添加多个阶段总结
+- 项目卡片展开区域显示总结列表，支持添加和删除
+- 数据随项目存 localStorage，Supabase 同步已对接（需 `projects` 表 `summaries` 列）
+
+**2. 项目页面 UI 优化**
+
+文件: `app/src/components/project/ProjectDetail.tsx`, `app/src/components/project/ProjectCard.tsx`, `app/src/components/project/TaskItem.tsx`
+
+- 删除柱状图（`ProjectBarChart`）
+- "添加子项目"和"添加阶段总结"按钮从展开区域的大按钮改为头部小 icon 按钮
+- `TaskItem` 完成指示符从 `✅` 改为 `·`
+- 修复 `ProjectDetail` 头部"最近 7 天 共 0m"与任务列表数据不一致的问题
+- 父项目任务列表不再显示子项目的 todo
+
+**3. 日历面板：今日待办 + 项目计时上下分屏**
+
+文件: `app/src/components/calendar/TodayTaskList.tsx`（及拆分出的 `TodoItem.tsx`、`ProjectTimerItem.tsx`）
+
+- 上半部分：今日待办（过滤掉项目计时的隐藏记录）
+- 下半部分：活跃项目列表，可直接开始/停止计时
+- 项目计时与待办计时互斥，停止后自动保存为隐藏 todo（`text: ''`）
+- 项目计时的时间自动统计到项目中（dispatch `calendar-entry-saved` 事件）
+- 项目计时区域显示项目总累计时间（非仅限今天）
+
+**4. 任务时间编辑**
+
+文件: `app/src/components/calendar/TodoItem.tsx`
+
+- hover todo 行显示 `Clock` 编辑按钮
+- 展开编辑面板，显示所有 timeRecords，每条可修改时长（分钟）和删除
+- 适用于忘记停止计时、需要修正时长的场景
+
+**5. 重构：拆分 TodayTaskList**
+
+- `TodayTaskList.tsx`: 537 → 362 行（-175）
+- 新建 `TodoItem.tsx`（181 行）：自包含编辑状态，渲染 todo 行 + 编辑面板
+- 新建 `ProjectTimerItem.tsx`（55 行）：渲染单条项目计时
+- 两个子组件可复用、可独立测试
+
+---
+
 ### 2026-05-13: Obsidian 笔记系统功能修复与重构
 
 **1. 修复空文件夹不显示**
@@ -805,5 +852,5 @@ npm run dev  # http://localhost:2667
 
 ---
 
-*最后更新: 2026-05-13*  
+*最后更新: 2026-05-14*  
 *更新者: Kimi Code*. 
