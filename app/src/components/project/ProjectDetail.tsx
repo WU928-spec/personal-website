@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { Clock } from 'lucide-react'
 import { getProjectStats, getRecentDaysBreakdown, formatDuration, formatDateStr } from '@/utils/projectAggregation'
 import { useLiveTick } from '@/hooks/useLiveTick'
-import ProjectBarChart from './ProjectBarChart'
 import TaskItem from './TaskItem'
 
 interface ProjectDetailProps {
@@ -15,8 +14,8 @@ interface ProjectDetailProps {
 
 export default function ProjectDetail({
   projectId,
-  color,
-  isCompleted,
+  color: _color,
+  isCompleted: _isCompleted,
   onOpenHistory,
   showAllHistory = false,
 }: ProjectDetailProps) {
@@ -105,15 +104,6 @@ export default function ProjectDetail({
           </button>
         )}
       </div>
-
-      {/* Bar chart */}
-      <ProjectBarChart
-        data={data}
-        color={color}
-        isCompleted={isCompleted}
-        totalSeconds={totalSeconds}
-        variant="compact"
-      />
 
       {/* Task list */}
       {hasHistory && (

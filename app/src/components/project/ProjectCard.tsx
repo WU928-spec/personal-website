@@ -9,9 +9,9 @@ import {
   Clock,
   Target,
   ListChecks,
-  Plus,
   FileText,
   X,
+  FolderPlus,
 } from 'lucide-react'
 import type { Project } from '@/types/calendar'
 import { formatDuration } from '@/utils/projectAggregation'
@@ -113,6 +113,31 @@ export default function ProjectCard({
 
         {/* Stats */}
         <div className="hidden sm:flex items-center gap-4 shrink-0">
+          {isLoggedIn && !isCompleted && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onAddSubProject()
+                }}
+                className="p-1 rounded text-Slate/40 dark:text-white/30 hover:text-Amber hover:bg-Amber/10 transition-colors"
+                title="添加子项目"
+              >
+                <FolderPlus size={14} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!isExpanded) onToggle()
+                  setShowSummaryForm(true)
+                }}
+                className="p-1 rounded text-Slate/40 dark:text-white/30 hover:text-Amber hover:bg-Amber/10 transition-colors"
+                title="添加阶段总结"
+              >
+                <FileText size={14} />
+              </button>
+            </div>
+          )}
           <div className="text-right">
             <p className="text-[0.6875rem] text-Slate/50 dark:text-white/30">已投入</p>
             <p className="text-[0.8125rem] font-medium text-Ink dark:text-white/80">
@@ -188,16 +213,6 @@ export default function ProjectCard({
                 </div>
               )}
 
-              {isLoggedIn && !isCompleted && (
-                <button
-                  onClick={onAddSubProject}
-                  className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-Sand dark:border-white/10 text-[0.8125rem] text-Slate/60 dark:text-white/40 hover:border-Amber hover:text-Amber transition-colors"
-                >
-                  <Plus size={14} />
-                  添加子项目
-                </button>
-              )}
-
               {/* ── Phase Summaries ── */}
               {summaries.length > 0 && (
                 <div className="mt-5">
@@ -235,18 +250,9 @@ export default function ProjectCard({
                 </div>
               )}
 
-              {isLoggedIn && !isCompleted && (
+              {isLoggedIn && !isCompleted && showSummaryForm && (
                 <div className="mt-3">
-                  {!showSummaryForm ? (
-                    <button
-                      onClick={() => setShowSummaryForm(true)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-Sand dark:border-white/10 text-[0.8125rem] text-Slate/60 dark:text-white/40 hover:border-Amber hover:text-Amber transition-colors"
-                    >
-                      <Plus size={14} />
-                      添加阶段总结
-                    </button>
-                  ) : (
-                    <div className="rounded-lg bg-Mist/30 dark:bg-white/[0.03] p-3 space-y-2">
+                  <div className="rounded-lg bg-Mist/30 dark:bg-white/[0.03] p-3 space-y-2">
                       <input
                         value={summaryTitle}
                         onChange={(e) => setSummaryTitle(e.target.value)}
@@ -287,8 +293,7 @@ export default function ProjectCard({
                         </button>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
               )}
 
               {/* Actions */}
