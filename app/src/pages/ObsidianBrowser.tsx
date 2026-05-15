@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronLeft,
@@ -12,7 +12,6 @@ import {
   Eye,
   Upload,
 } from 'lucide-react'
-import MarkdownRenderer from '@/components/MarkdownRenderer.tsx'
 import NoteTree from '@/components/NoteTree'
 // Tree rendering is inlined below as ManagedTree
 import {
@@ -23,16 +22,26 @@ import {
   deleteNoteFromSupabase,
   deleteFolderFromSupabase,
   renameNoteInSupabase,
+  slugifyNotePath,
 } from '@/services/obsidianClient'
 import type { ObsidianNoteMeta, ObsidianNote, VaultFile } from '@/types'
 import { useLang } from '@/contexts/PreferencesContext'
 import { useAuth } from '@/contexts/AuthContext'
 import PageSEO from '@/components/PageSEO'
 
+const MarkdownRenderer = lazy(() => import('@/components/MarkdownRenderer.tsx'))
+
+const markdownFallback = (
+  <div className="py-8 flex items-center justify-center">
+    <div className="w-6 h-6 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+  </div>
+)
+
 export default function ObsidianBrowser() {
   const { t } = useLang()
   const { isLoggedIn } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
 
   const [tree, setTree] = useState<VaultFile[]>([])
@@ -217,7 +226,7 @@ export default function ObsidianBrowser() {
     const ok = await saveNoteToSupabase(fullPath, '')
     if (ok) {
       await loadData()
-      const slug = fullPath.replace(/\.md$/i, '').replace(/\//g, '-').replace(/[^a-zA-Z0-9一-龥\-_]/g, '')
+      const slug = slugifyNotePath(fullPath)
       handleSelectNote(slug)
     }
     setDialog('none')
@@ -231,12 +240,12 @@ export default function ObsidianBrowser() {
     for (const file of files) {
       if (!file.name.endsWith('.md')) continue
       const name = file.name.replace(/\.md$/i, '')
-      let path = dialogTarget && !dialogTarget.endsWith('.md') ? `${dialogTarget}/${name}` : name
+      const path = dialogTarget && !dialogTarget.endsWith('.md') ? `${dialogTarget}/${name}` : name
       const fullPath = `${path}.md`
       const content = await file.text()
       const ok = await saveNoteToSupabase(fullPath, content)
       if (ok) {
-        lastSlug = fullPath.replace(/\.md$/i, '').replace(/\//g, '-').replace(/[^a-zA-Z0-9一-龥\-_]/g, '')
+        lastSlug = slugifyNotePath(fullPath)
       }
     }
     await loadData()
@@ -287,7 +296,7 @@ export default function ObsidianBrowser() {
     if (ok) {
       await loadData()
       if (selectedNote?.filePath === oldPath) {
-        const slug = newPath.replace(/\.md$/i, '').replace(/\//g, '-').replace(/[^a-zA-Z0-9一-龥\-_]/g, '')
+        const slug = slugifyNotePath(newPath)
         handleSelectNote(slug)
       }
     }
@@ -296,7 +305,7 @@ export default function ObsidianBrowser() {
     setDialogTarget('')
   }
 
-  const openDeleteDialog = (path: string, _isFolder: boolean) => {
+  const openDeleteDialog = (path: string) => {
     setDialogTarget(path)
     setDialog('delete')
   }
@@ -453,7 +462,7 @@ export default function ObsidianBrowser() {
           <button
             className="w-full text-left px-3 py-1.5 text-[0.8125rem] text-[#cccccc] hover:bg-[#094771] hover:text-white transition-colors"
             onClick={() => {
-              openDeleteDialog(contextMenu.path, contextMenu.isFolder)
+              openDeleteDialog(contextMenu.path)
               setContextMenu(null)
             }}
           >
@@ -697,11 +706,13 @@ export default function ObsidianBrowser() {
                     spellCheck={false}
                   />
                 ) : (
-                  <MarkdownRenderer
-                    content={selectedNote.content}
-                    existingSlugs={allSlugs}
-                    onWikilinkClick={handleSelectNote}
-                  />
+                  <Suspense fallback={markdownFallback}>
+                    <MarkdownRenderer
+                      content={selectedNote.content}
+                      existingSlugs={allSlugs}
+                      onWikilinkClick={handleSelectNote}
+                    />
+                  </Suspense>
                 )}
 
                 <div className="mt-8 pt-6 border-t border-Sand dark:border-white/10 flex flex-wrap gap-2">
@@ -726,5 +737,3 @@ export default function ObsidianBrowser() {
     </div>
   )
 }
-
-

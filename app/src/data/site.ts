@@ -370,7 +370,7 @@ export async function syncSiteSettings(): Promise<boolean> {
       }
     }
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }

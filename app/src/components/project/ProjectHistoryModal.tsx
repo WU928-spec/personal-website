@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { getProjectStats, getRecentDaysBreakdown, formatDuration } from '@/utils/projectAggregation'
@@ -14,25 +13,19 @@ interface ProjectHistoryModalProps {
 }
 
 export default function ProjectHistoryModal({ projectId, isOpen, onClose }: ProjectHistoryModalProps) {
-  const tick = useLiveTick()
-  const stats = useMemo(() => {
-    const entries = loadAllEntries()
-    return getProjectStats(projectId, undefined, entries)
-  }, [projectId, tick])
+  useLiveTick()
+  const stats = getProjectStats(projectId, undefined, loadAllEntries())
 
   // 计算覆盖完整历史所需的天数
-  const totalDayCount = useMemo(() => {
+  const totalDayCount = (() => {
     if (!stats || stats.dailyBreakdown.length === 0) return 0
     const earliest = new Date(stats.dailyBreakdown[0].date)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     return Math.floor((today.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  }, [stats])
+  })()
 
-  const allData = useMemo(() => {
-    const entries = loadAllEntries()
-    return getRecentDaysBreakdown(projectId, totalDayCount, entries)
-  }, [projectId, totalDayCount, tick])
+  const allData = getRecentDaysBreakdown(projectId, totalDayCount, loadAllEntries())
 
   const totalSeconds = allData.reduce((s, d) => s + d.seconds, 0)
   const project = stats?.project

@@ -22,8 +22,29 @@ export default function DayDetailPanel({
   onClose,
   onEntryChange,
 }: DayDetailPanelProps) {
-  const { isLoggedIn } = useAuth()
   if (!date) return null
+
+  return (
+    <DayDetailPanelContent
+      date={date}
+      isOpen={isOpen}
+      onClose={onClose}
+      onEntryChange={onEntryChange}
+    />
+  )
+}
+
+interface DayDetailPanelContentProps extends Omit<DayDetailPanelProps, 'date'> {
+  date: Date
+}
+
+function DayDetailPanelContent({
+  date,
+  isOpen,
+  onClose,
+  onEntryChange,
+}: DayDetailPanelContentProps) {
+  const { isLoggedIn } = useAuth()
 
   const dateStr = formatDateStr(date)
   const todayStr = formatDateStr(new Date())

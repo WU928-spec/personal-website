@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Clock } from 'lucide-react'
 import { getProjectStats, formatDuration } from '@/utils/projectAggregation'
 import { formatDateStr, loadAllEntries } from '@/utils/calendarStorage'
@@ -15,16 +14,11 @@ interface ProjectDetailProps {
 
 export default function ProjectDetail({
   projectId,
-  color: _color,
-  isCompleted: _isCompleted,
   onOpenHistory,
   showAllHistory = false,
 }: ProjectDetailProps) {
-  const tick = useLiveTick()
-  const stats = useMemo(() => {
-    const entries = loadAllEntries()
-    return getProjectStats(projectId, undefined, entries)
-  }, [projectId, tick])
+  useLiveTick()
+  const stats = getProjectStats(projectId, undefined, loadAllEntries())
 
   let dayCount: number
   let headerLabel: string

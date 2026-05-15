@@ -48,8 +48,11 @@ CREATE TABLE IF NOT EXISTS projects (
   target_hours NUMERIC DEFAULT 0,
   status      TEXT DEFAULT 'active',
   parent_id   TEXT,
+  summaries   JSONB DEFAULT '[]'::JSONB,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS summaries JSONB DEFAULT '[]'::JSONB;
 
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 
@@ -71,3 +74,18 @@ CREATE POLICY "Allow public select" ON site_settings FOR SELECT USING (true);
 CREATE POLICY "Allow public insert" ON site_settings FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update" ON site_settings FOR UPDATE USING (true);
 CREATE POLICY "Allow public delete" ON site_settings FOR DELETE USING (true);
+
+-- ── 5. Obsidian 笔记 ──
+CREATE TABLE IF NOT EXISTS notes (
+  path       TEXT PRIMARY KEY,
+  content    TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public select" ON notes FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON notes FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON notes FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON notes FOR DELETE USING (true);

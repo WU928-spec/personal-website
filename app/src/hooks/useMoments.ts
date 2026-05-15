@@ -5,7 +5,7 @@ import { supabase, isSupabaseReady, dbToMoment, momentToDb } from '@/lib/supabas
 import { createStorageKey } from '@/utils/storage'
 
 const STORAGE_KEY = 'moments_v1'
-const API_BASE = 'http://localhost:2667'
+const legacyUploadBaseUrl = (import.meta.env.VITE_LEGACY_UPLOAD_BASE_URL || '').replace(/\/$/, '')
 const momentStorage = createStorageKey<Moment[]>(STORAGE_KEY, [])
 
 /* ── Helpers ── */
@@ -31,7 +31,7 @@ function migrateMoment(m: Moment): Moment {
 function resolveImageUrls(images: string[]): string[] {
   return images.map((img) => {
     if (img.startsWith('/api/uploads/')) {
-      return `${API_BASE}${img}`
+      return `${legacyUploadBaseUrl}${img}`
     }
     return img
   })
@@ -103,7 +103,7 @@ export function useMoments() {
         setLoading(false)
         console.log('[Moments] Synced from Supabase:', list.length, 'moments')
         return
-      } catch (err) {
+      } catch {
         setUsingLocal(true)
       }
     }
@@ -141,7 +141,7 @@ export function useMoments() {
           if (error) throw error
           await fetchMoments()
           return
-        } catch (err) {
+        } catch {
           /* fallback to local */
         }
       }
@@ -176,7 +176,7 @@ export function useMoments() {
               .update({ likes: target.likes })
               .eq('id', id)
           }
-        } catch (err) {
+        } catch {
           /* ignore sync error */
         }
       }
@@ -209,7 +209,7 @@ export function useMoments() {
               .update({ comments: target.comments })
               .eq('id', id)
           }
-        } catch (err) {
+        } catch {
           /* ignore sync error */
         }
       }
@@ -229,7 +229,7 @@ export function useMoments() {
           setMoments(list)
           saveLocal(list)
           return
-        } catch (err) {
+        } catch {
           // Fall through to local-only delete
         }
       }

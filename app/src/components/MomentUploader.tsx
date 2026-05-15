@@ -4,6 +4,7 @@ import type { Moment, MomentAttachment } from '@/types/moment'
 import ImagePreviewStrip from './moment-uploader/ImagePreviewStrip'
 import AttachmentList from './moment-uploader/AttachmentList'
 import NotePicker from './moment-uploader/NotePicker'
+import { slugifyNotePath } from '@/services/obsidianClient'
 
 interface Props {
   onSubmit: (moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments' | 'authorId'>) => Promise<void>
@@ -101,11 +102,7 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
   }
 
   const handleNoteSelect = (item: { name: string; path: string }) => {
-    const noteSlug = item.name
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_]/g, '')
-      .substring(0, 60)
+    const noteSlug = slugifyNotePath(item.path)
     setAttachments((prev) => [
       ...prev,
       { name: item.name + '.md', type: 'md-link', data: noteSlug },

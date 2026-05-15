@@ -145,7 +145,7 @@ export async function syncProjects(): Promise<boolean> {
     const remote = await fetchFromSupabase()
     projectStorage.save(remote)
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }
