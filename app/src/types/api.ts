@@ -49,7 +49,12 @@ export const ObsidianNoteSchema = ObsidianNoteMetaSchema.extend({
 export type ObsidianNoteAPI = z.infer<typeof ObsidianNoteSchema>
 
 // Vault 文件树
-export const VaultFileSchema: z.ZodType<any> = z.lazy(() =>
+export const VaultFileSchema: z.ZodType<{
+  name: string
+  path: string
+  type: 'file' | 'folder'
+  children?: VaultFileAPI[]
+}> = z.lazy(() =>
   z.object({
     name: z.string(),
     path: z.string(),

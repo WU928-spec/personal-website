@@ -2,22 +2,9 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X, FileText, Tag } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-
-interface ObsidianNoteMeta {
-  slug: string
-  title: string
-  excerpt: string
-  category: string
-  tags: string[]
-}
-
-interface MomentItem {
-  id: string
-  content: string
-  createdAt: string
-  location?: string
-}
+import { fetchObsidianNotes } from '@/services/obsidianClient'
+import { dbToMoment, isSupabaseReady, supabase } from '@/lib/supabase'
+import type { Moment } from '@/types/moment'
 
 interface SearchResult {
   type: 'note' | 'moment'
@@ -65,6 +52,35 @@ function calcScore(item: SearchResult, query: string): number {
   return score
 }
 
+function loadLocalMoments(): Moment[] {
+  try {
+    const raw = localStorage.getItem('moments_v1')
+    if (!raw) return []
+    return JSON.parse(raw) as Moment[]
+  } catch {
+    return []
+  }
+}
+
+async function fetchMomentsForSearch(): Promise<Moment[]> {
+  if (!isSupabaseReady()) return loadLocalMoments()
+
+  try {
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Supabase timeout')), 2000)
+    )
+    const query = supabase!
+      .from('moments')
+      .select('*')
+      .order('created_at', { ascending: false })
+    const { data, error } = await Promise.race([query, timeout])
+    if (error || !data) return loadLocalMoments()
+    return (data as Record<string, unknown>[]).map(dbToMoment)
+  } catch {
+    return loadLocalMoments()
+  }
+}
+
 export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
@@ -77,44 +93,35 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     if (searchResults.length > 0) return
     setSearchLoading(true)
     try {
-      const [notesRes, momentsRes] = await Promise.all([
-        fetch('http://localhost:2667/api/notes', { signal: AbortSignal.timeout(3000) }).catch(() => null),
-        fetch('http://localhost:2667/api/moments', { signal: AbortSignal.timeout(3000) }).catch(() => null),
-      ])
-
+      const [notes, moments] = await Promise.all([fetchObsidianNotes(), fetchMomentsForSearch()])
       const results: SearchResult[] = []
 
-      if (notesRes?.ok) {
-        const data = (await notesRes.json()) as { notes: ObsidianNoteMeta[] }
-        data.notes.forEach((n) =>
-          results.push({
-            type: 'note',
-            id: n.slug,
-            title: n.title,
-            excerpt: n.excerpt,
-            category: n.category,
-            tags: n.tags,
-          })
-        )
-      }
+      notes.forEach((n) =>
+        results.push({
+          type: 'note',
+          id: n.slug,
+          title: n.title,
+          excerpt: n.excerpt,
+          category: n.category,
+          tags: n.tags,
+        })
+      )
 
-      if (momentsRes?.ok) {
-        const moments = (await momentsRes.json()) as MomentItem[]
-        moments.forEach((m) =>
-          results.push({
-            type: 'moment',
-            id: m.id,
-            title: m.content.slice(0, 30) + (m.content.length > 30 ? '...' : ''),
-            excerpt: m.content,
-            createdAt: m.createdAt,
-            location: m.location,
-          })
-        )
-      }
+      moments.forEach((m) => {
+        const content = m.content.trim()
+        results.push({
+          type: 'moment',
+          id: m.id,
+          title: content ? content.slice(0, 30) + (content.length > 30 ? '...' : '') : '图片动态',
+          excerpt: content,
+          createdAt: m.createdAt,
+          location: m.location,
+        })
+      })
 
       setSearchResults(results)
     } catch {
-      // backend unavailable
+      setSearchResults([])
     }
     setSearchLoading(false)
   }, [searchResults.length])
@@ -157,7 +164,11 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       const note = filtered[highlightedIndex]
       if (note) {
         onClose()
-        navigate(`/obsidian?note=${encodeURIComponent(note.id)}`)
+        if (note.type === 'note') {
+          navigate(`/obsidian?note=${encodeURIComponent(note.id)}`)
+        } else {
+          navigate('/moments')
+        }
       }
     }
   }

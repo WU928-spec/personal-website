@@ -1,4 +1,29 @@
-import { createHighlighter, type ThemeInput } from 'shiki'
+import { createJavaScriptRegexEngine } from '@shikijs/engine-javascript'
+import bash from '@shikijs/langs/bash'
+import c from '@shikijs/langs/c'
+import cpp from '@shikijs/langs/cpp'
+import css from '@shikijs/langs/css'
+import go from '@shikijs/langs/go'
+import html from '@shikijs/langs/html'
+import java from '@shikijs/langs/java'
+import javascript from '@shikijs/langs/javascript'
+import json from '@shikijs/langs/json'
+import jsx from '@shikijs/langs/jsx'
+import kotlin from '@shikijs/langs/kotlin'
+import markdown from '@shikijs/langs/markdown'
+import perl from '@shikijs/langs/perl'
+import php from '@shikijs/langs/php'
+import python from '@shikijs/langs/python'
+import ruby from '@shikijs/langs/ruby'
+import rust from '@shikijs/langs/rust'
+import shell from '@shikijs/langs/shell'
+import sql from '@shikijs/langs/sql'
+import swift from '@shikijs/langs/swift'
+import tsx from '@shikijs/langs/tsx'
+import typescript from '@shikijs/langs/typescript'
+import yaml from '@shikijs/langs/yaml'
+import { createHighlighterCore } from 'shiki/core'
+import type { ThemeInput } from '@shikijs/types'
 
 /* ───────────────────────────────────────────────
    Shiki warm theme (amber / sage / gold / rose)
@@ -68,17 +93,37 @@ export const warmGardenTheme: ThemeInput = {
 /* ───────────────────────────────────────────────
    Singleton highlighter
    ─────────────────────────────────────────────── */
-let highlighterPromise: ReturnType<typeof createHighlighter> | null = null
+let highlighterPromise: ReturnType<typeof createHighlighterCore> | null = null
 
 export function getHighlighter() {
   if (!highlighterPromise) {
-    highlighterPromise = createHighlighter({
+    highlighterPromise = createHighlighterCore({
       themes: [warmGardenTheme],
+      engine: createJavaScriptRegexEngine(),
       langs: [
-        'typescript', 'javascript', 'python', 'yaml', 'json',
-        'bash', 'shell', 'html', 'css', 'markdown', 'tsx', 'jsx',
-        'rust', 'go', 'sql', 'java', 'c', 'cpp', 'ruby', 'php',
-        'perl', 'swift', 'kotlin',
+        typescript,
+        javascript,
+        python,
+        yaml,
+        json,
+        bash,
+        shell,
+        html,
+        css,
+        markdown,
+        tsx,
+        jsx,
+        rust,
+        go,
+        sql,
+        java,
+        c,
+        cpp,
+        ruby,
+        php,
+        perl,
+        swift,
+        kotlin,
       ],
     })
   }

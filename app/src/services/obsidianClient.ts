@@ -6,7 +6,7 @@ const TABLE = 'notes'
 /* ───────────────────────────────────────────────
    Helpers
    ─────────────────────────────────────────────── */
-function slugifyPath(path: string): string {
+export function slugifyNotePath(path: string): string {
   return path
     .replace(/\.md$/i, '')
     .replace(/\//g, '-')
@@ -25,7 +25,7 @@ function dirname(path: string): string {
 }
 
 function extractExcerpt(content: string): string {
-  return content.replace(/[#*`_\[\]!]/g, '').slice(0, 120)
+  return content.replace(/[#*`_![\]]/g, '').slice(0, 120)
 }
 
 function extractTags(content: string): string[] {
@@ -108,7 +108,7 @@ function rowToMeta(row: Record<string, unknown>): ObsidianNoteMeta {
   const title = basename(path).replace(/\.md$/i, '')
   const folder = dirname(path)
   return {
-    slug: slugifyPath(path),
+    slug: slugifyNotePath(path),
     title,
     date: row.created_at ? String(row.created_at).slice(0, 10) : '',
     category: folder || '笔记',

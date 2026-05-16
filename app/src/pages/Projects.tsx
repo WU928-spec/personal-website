@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Plus, FolderOpen } from 'lucide-react'
 import type { Project } from '@/types/calendar'
@@ -38,7 +38,7 @@ export default function Projects() {
   const [showForm, setShowForm] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [formParentId, setFormParentId] = useState<string>('')
-  const tick = useLiveTick()
+  useLiveTick()
 
   /* Load projects */
   const refresh = useCallback(() => {
@@ -61,22 +61,19 @@ export default function Projects() {
   }, [refresh])
 
   /* Stats map — pre-load data once to avoid repeated localStorage reads */
-  const statsMap = useMemo(() => {
-    const allProjects = loadProjects()
-    const allEntries = loadAllEntries()
-    const map = new Map<string, ProjectStats>()
-    for (const p of projects) {
-      const s = getProjectStats(p.id, allProjects, allEntries)
-      if (s) {
-        map.set(p.id, {
-          totalSeconds: s.totalSeconds,
-          totalTodos: s.totalTodos,
-          doneTodos: s.doneTodos,
-        })
-      }
+  const allProjects = loadProjects()
+  const allEntries = loadAllEntries()
+  const statsMap = new Map<string, ProjectStats>()
+  for (const p of projects) {
+    const s = getProjectStats(p.id, allProjects, allEntries)
+    if (s) {
+      statsMap.set(p.id, {
+        totalSeconds: s.totalSeconds,
+        totalTodos: s.totalTodos,
+        doneTodos: s.doneTodos,
+      })
     }
-    return map
-  }, [projects, tick])
+  }
 
   const getStats = (id: string): ProjectStats =>
     statsMap.get(id) || { totalSeconds: 0, totalTodos: 0, doneTodos: 0 }

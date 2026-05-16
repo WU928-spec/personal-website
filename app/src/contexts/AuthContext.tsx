@@ -80,7 +80,9 @@ function loadAuth(): AuthStorage {
         authStorage.save(migrated)
         return migrated
       }
-    } catch {}
+    } catch {
+      // Ignore malformed legacy auth data and fall back to current storage.
+    }
   }
   return data
 }

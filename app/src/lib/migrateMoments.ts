@@ -62,6 +62,5 @@ export async function migrateLocalMomentsToSupabase(): Promise<{
  * 如果上面的 import 路径不对，可以直接在 DevTools 中执行：
  */
 export function runMigrationInDevTools() {
-  // eslint-disable-next-line no-console
   console.log('请在浏览器控制台执行 migrateLocalMomentsToSupabase()')
 }

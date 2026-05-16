@@ -87,7 +87,7 @@ export async function syncCalendarEntries(): Promise<boolean> {
     // Notify all components that sync completed
     window.dispatchEvent(new CustomEvent('calendar-sync-completed'))
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }

@@ -1,13 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Folder, ChevronRight, ChevronDown, FileText, X } from 'lucide-react'
-
-export interface VaultFile {
-  name: string
-  path: string
-  type: 'file' | 'folder'
-  children?: VaultFile[]
-}
+import { fetchVaultTree } from '@/services/obsidianClient'
+import type { VaultFile } from '@/types'
 
 interface Props {
   open: boolean
@@ -152,16 +147,11 @@ export default function NotePicker({ open, onSelect, onClose }: Props) {
   const loadTree = async () => {
     setTreeLoading(true)
     try {
-      const res = await fetch('http://localhost:2667/api/tree', {
-        signal: AbortSignal.timeout(5000),
-      })
-      if (res.ok) {
-        const json = (await res.json()) as { tree: VaultFile[] }
-        setTree(json.tree)
-        setExpandedFolders(new Set())
-      }
+      const treeData = await fetchVaultTree()
+      setTree(treeData)
+      setExpandedFolders(new Set())
     } catch {
-      // backend unavailable
+      setTree([])
     }
     setTreeLoading(false)
   }
@@ -170,7 +160,7 @@ export default function NotePicker({ open, onSelect, onClose }: Props) {
     if (open && tree.length === 0) {
       loadTree()
     }
-  }, [open])
+  }, [open, tree.length])
 
   const toggleFolder = useCallback((path: string) => {
     setExpandedFolders((prev) => {

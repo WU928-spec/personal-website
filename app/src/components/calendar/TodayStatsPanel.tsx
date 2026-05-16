@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Clock, TrendingUp, Sun, Sunrise, Sunset, Moon } from 'lucide-react'
 import type { DayEntry } from '@/types/calendar'
 import {
@@ -52,8 +52,8 @@ function getTimeSlotDistribution(entry: DayEntry | null): { name: string; hours:
 
 /* ─── Component ─── */
 export default function TodayStatsPanel() {
-  const tick = useLiveTick()
-  const [refreshKey, setRefreshKey] = useState(0)
+  useLiveTick()
+  const [_refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     const handleSyncCompleted = () => {
@@ -70,7 +70,7 @@ export default function TodayStatsPanel() {
     }
   }, [])
 
-  const entry = useMemo(() => loadEntry(formatDateStr(new Date())), [tick, refreshKey])
+  const entry = loadEntry(formatDateStr(new Date()))
   const todos = entry?.todos || []
   const doneCount = todos.filter((t) => t.done).length
   const totalCount = todos.length
@@ -78,9 +78,9 @@ export default function TodayStatsPanel() {
   const totalTrackedToday = getDayTotalDuration(entry)
   const activeTodo = todos.find((t) => t.timeRecords.some((r) => !r.endAt))
 
-  const weekData = useMemo(() => getWeekData(), [tick, refreshKey])
+  const weekData = getWeekData()
   const maxWeekDuration = Math.max(...weekData.map((d) => d.duration), 1)
-  const timeSlots = useMemo(() => getTimeSlotDistribution(entry), [tick, refreshKey])
+  const timeSlots = getTimeSlotDistribution(entry)
   const maxSlotHours = Math.max(...timeSlots.map((s) => s.hours), 1)
 
   return (
@@ -175,4 +175,3 @@ export default function TodayStatsPanel() {
     </div>
   )
 }
-
