@@ -118,10 +118,10 @@ export default function StarryEasterEgg() {
         // Twinkle
         s.phase += 0.008 + s.memoir.brightness * 0.015
         const twinkle = 0.85 + Math.sin(s.phase) * 0.15
-        const alpha = 0.65 + s.memoir.brightness * 0.35
+        const alpha = (0.65 + s.memoir.brightness * 0.35) * twinkle
 
         const isHovered = hoveredId === s.memoir.id
-        const r = (isHovered ? s.targetR * 1.3 : s.targetR) * twinkle
+        const r = isHovered ? s.targetR * 1.3 : s.targetR
 
         // Glow
         const glowR = r * 4
