@@ -5,6 +5,7 @@ import { ChevronDown } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import { loadHero, type HeroData } from '@/data/site'
 import { useTypingEffect } from '@/hooks/useTypingEffect'
+import PlutoCharonBadge from '@/components/PlutoCharonBadge'
 
 export default function HeroSection() {
   const { t, lang } = useLang()
@@ -17,6 +18,7 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
       <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+        <PlutoCharonBadge />
         <h1 className="font-display text-[clamp(2.75rem,6vw,5rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-Ink dark:text-white">
           {displayed}
           {showCursor && <span className="text-Amber animate-blink ml-0.5">|</span>}

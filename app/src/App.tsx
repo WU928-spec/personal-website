@@ -6,6 +6,8 @@ import Home from './pages/Home.tsx'
 import Login from './pages/Login.tsx'
 import Profile from './pages/Profile.tsx'
 import NotFound from './pages/NotFound.tsx'
+import StarryEasterEgg from './pages/StarryEasterEgg.tsx'
+import StarryMemoir from './pages/StarryMemoir.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import { seedDemoDataIfEmpty } from './utils/projectSeed.ts'
 
@@ -39,6 +41,17 @@ function App() {
   useEffect(() => {
     seedDemoDataIfEmpty()
   }, [])
+
+  if (location.pathname === '/starry' || location.pathname.startsWith('/starry/')) {
+    return (
+      <ErrorBoundary>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/starry" element={<StarryEasterEgg />} />
+          <Route path="/starry/:id" element={<StarryMemoir />} />
+        </Routes>
+      </ErrorBoundary>
+    )
+  }
 
   return (
     <ErrorBoundary>

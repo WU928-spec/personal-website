@@ -1,0 +1,146 @@
+import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { ArrowLeft } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { memoirs } from '@/data/memoirs'
+
+function NebulaField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let w = window.innerWidth
+    let h = window.innerHeight
+    canvas.width = w
+    canvas.height = h
+
+    const particles: { x: number; y: number; r: number; vx: number; vy: number; alpha: number }[] = []
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 2 + 0.5,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        alpha: Math.random() * 0.5 + 0.1,
+      })
+    }
+
+    let animId: number
+    const draw = () => {
+      ctx.fillStyle = '#080810'
+      ctx.fillRect(0, 0, w, h)
+
+      // 绘制柔和的星云团
+      for (let i = 0; i < 5; i++) {
+        const nx = w * (0.2 + i * 0.15)
+        const ny = h * (0.3 + (i % 3) * 0.2)
+        const gradient = ctx.createRadialGradient(nx, ny, 0, nx, ny, 200)
+        gradient.addColorStop(0, `rgba(60, 40, 90, ${0.08 + i * 0.02})`)
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
+        ctx.fillStyle = gradient
+        ctx.fillRect(0, 0, w, h)
+      }
+
+      for (const p of particles) {
+        p.x += p.vx
+        p.y += p.vy
+        if (p.x < 0) p.x = w
+        if (p.x > w) p.x = 0
+        if (p.y < 0) p.y = h
+        if (p.y > h) p.y = 0
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(180, 170, 220, ${p.alpha})`
+        ctx.fill()
+      }
+
+      animId = requestAnimationFrame(draw)
+    }
+    animId = requestAnimationFrame(draw)
+
+    const onResize = () => {
+      w = window.innerWidth
+      h = window.innerHeight
+      canvas.width = w
+      canvas.height = h
+    }
+    window.addEventListener('resize', onResize)
+    return () => {
+      cancelAnimationFrame(animId)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />
+}
+
+export default function StarryMemoir() {
+  const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
+  const memoir = memoirs.find((m) => m.id === id)
+
+  if (!memoir) {
+    return (
+      <div className="relative w-screen h-screen overflow-hidden bg-[#080810] flex items-center justify-center">
+        <NebulaField />
+        <div className="relative z-10 text-center text-white/60">
+          <p className="text-lg">这颗星星尚未亮起</p>
+          <button
+            onClick={() => navigate('/starry')}
+            className="mt-4 flex items-center gap-2 mx-auto text-white/50 hover:text-white transition-colors"
+          >
+            <ArrowLeft size={16} />
+            <span className="text-sm">返回星空</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative w-screen h-screen overflow-hidden bg-[#080810]">
+      <NebulaField />
+
+      {/* Back button */}
+      <motion.button
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3, duration: 0.6 }}
+        onClick={() => navigate('/starry')}
+        className="absolute top-6 left-6 z-30 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+      >
+        <ArrowLeft size={18} />
+        <span className="text-sm font-body">返回星空</span>
+      </motion.button>
+
+      {/* Content */}
+      <div className="relative z-20 flex items-center justify-center h-full px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          className="max-w-xl w-full"
+        >
+          <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
+            {memoir.date}
+          </p>
+          <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight mb-8">
+            {memoir.title}
+          </h1>
+          <div className="relative">
+            <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent mb-6" />
+            <p className="text-[1.0625rem] leading-[2] text-white/65 font-body whitespace-pre-wrap">
+              {memoir.content}
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
