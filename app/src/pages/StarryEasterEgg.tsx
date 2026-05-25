@@ -67,12 +67,12 @@ export default function StarryEasterEgg() {
       h = container.clientHeight
       canvas.width = w * dpr
       canvas.height = h * dpr
-      ctx.scale(dpr, dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       // Re-position stars on resize
       starsRef.current = memoirs.map((m) => {
         const pos = getStarPosition(m.id, w, h)
         const existing = starsRef.current.find((s) => s.memoir.id === m.id)
-        const baseR = 8 + m.brightness * 10
+        const baseR = 5 + m.brightness * 5
         return {
           memoir: m,
           x: pos.x,
@@ -160,7 +160,7 @@ export default function StarryEasterEgg() {
       const dx = x - s.x
       const dy = y - s.y
       const dist = Math.sqrt(dx * dx + dy * dy)
-      const hitRadius = Math.max(36, s.baseR * 8)
+      const hitRadius = Math.max(28, s.baseR * 4)
 
       if (dist < hitRadius && dist < nearestDist) {
         nearest = s
@@ -185,8 +185,8 @@ export default function StarryEasterEgg() {
     [findStarAt]
   )
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()
@@ -220,7 +220,7 @@ export default function StarryEasterEgg() {
         ref={canvasRef}
         className="absolute inset-0 z-10 cursor-pointer"
         onMouseMove={handleMouseMove}
-        onClick={handleClick}
+        onPointerUp={handlePointerUp}
         onMouseLeave={() => setHoveredId(null)}
       />
 
