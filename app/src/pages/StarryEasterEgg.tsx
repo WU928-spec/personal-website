@@ -72,7 +72,7 @@ export default function StarryEasterEgg() {
       starsRef.current = memoirs.map((m) => {
         const pos = getStarPosition(m.id, w, h)
         const existing = starsRef.current.find((s) => s.memoir.id === m.id)
-        const baseR = 2 + m.brightness * 3.5
+        const baseR = 8 + m.brightness * 10
         return {
           memoir: m,
           x: pos.x,
@@ -117,11 +117,11 @@ export default function StarryEasterEgg() {
 
         // Twinkle
         s.phase += 0.008 + s.memoir.brightness * 0.015
-        const twinkle = 0.6 + Math.sin(s.phase) * 0.4
-        const alpha = s.memoir.brightness * twinkle
+        const twinkle = 0.85 + Math.sin(s.phase) * 0.15
+        const alpha = 0.65 + s.memoir.brightness * 0.35
 
         const isHovered = hoveredId === s.memoir.id
-        const r = isHovered ? s.targetR * 1.8 : s.targetR
+        const r = (isHovered ? s.targetR * 1.3 : s.targetR) * twinkle
 
         // Glow
         const glowR = r * 4
