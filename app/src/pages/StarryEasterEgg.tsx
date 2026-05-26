@@ -1,211 +1,127 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Play } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { memoirs, getStarPosition } from '@/data/memoirs'
-import type { Memoir } from '@/data/memoirs'
+import { memoirs } from '@/data/memoirs'
 
-interface Star {
-  memoir: Memoir
-  x: number
-  y: number
-  baseR: number
-  targetR: number
-  phase: number
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed * 127.1) * 43758.5453
+  return x - Math.floor(x)
+}
+
+const getStarPos = (id: string) => {
+  const n = parseInt(id, 10)
+  let xPct = 10 + seededRandom(n * 1.1) * 80
+  let yPct = 10 + seededRandom(n * 2.3) * 80
+  const cx = Math.abs(xPct - 50)
+  const cy = Math.abs(yPct - 50)
+  if (cx < 12 && cy < 12) {
+    xPct = xPct < 50 ? xPct - 15 : xPct + 15
+  }
+  return { x: `${xPct}%`, y: `${yPct}%` }
+}
+
+function DraggableStar({
+  memoir,
+  x,
+  y,
+}: {
+  memoir: (typeof memoirs)[0]
+  x: string
+  y: string
+}) {
+  const navigate = useNavigate()
+  const [hovered, setHovered] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const size = 4 + memoir.brightness * 6
+
+  return (
+    <div
+      className="absolute"
+      style={{ left: x, top: y }}
+    >
+      <motion.button
+        drag
+        dragMomentum={false}
+        whileDrag={{ scale: 1.4, cursor: 'grabbing' }}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+        onClick={() => {
+          if (!isDragging) navigate(`/starry/${memoir.id}`)
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="relative z-10 cursor-grab"
+        style={{ x: '-50%', y: '-50%' }}
+      >
+        {/* 光晕 */}
+        <span
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: size * 5,
+            height: size * 5,
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: `radial-gradient(circle, rgba(180,210,255,${0.1 + memoir.brightness * 0.2}) 0%, rgba(100,150,255,0) 70%)`,
+            animation: `starPulse ${2 + (1 - memoir.brightness) * 2}s ease-in-out infinite`,
+            animationDelay: `${seededRandom(parseInt(memoir.id)) * -3}s`,
+          }}
+        />
+
+        {/* 星星本体 */}
+        <span
+          className="relative block rounded-full"
+          style={{
+            width: size,
+            height: size,
+            background: hovered
+              ? 'radial-gradient(circle, #fff 0%, #aaccff 100%)'
+              : 'radial-gradient(circle, #e8f0ff 0%, #9bb8e8 100%)',
+            boxShadow: hovered
+              ? `0 0 ${size * 2}px ${size}px rgba(180,210,255,0.5), 0 0 ${size * 4}px ${size * 2}px rgba(100,150,255,0.15)`
+              : `0 0 ${size}px ${size / 2}px rgba(180,210,255,${0.15 + memoir.brightness * 0.25}), 0 0 ${size * 3}px ${size}px rgba(100,150,255,${0.03 + memoir.brightness * 0.08})`,
+            transition: 'box-shadow 0.3s ease, background 0.3s ease',
+          }}
+        />
+
+        {/* Tooltip */}
+        {hovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute left-1/2 -translate-x-1/2 mt-3 pointer-events-none whitespace-nowrap z-20"
+          >
+            <div className="bg-black/70 backdrop-blur-md border border-white/15 rounded-lg px-4 py-2">
+              <p className="text-xs text-white/50 font-body">{memoir.date}</p>
+            </div>
+          </motion.div>
+        )}
+      </motion.button>
+    </div>
+  )
 }
 
 export default function StarryEasterEgg() {
   const navigate = useNavigate()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const starsRef = useRef<Star[]>([])
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [showText, setShowText] = useState(false)
-  const mouseRef = useRef({ x: -1, y: -1 })
+  const [showVideo, setShowVideo] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setShowText(true), 400)
     return () => clearTimeout(timer)
   }, [])
 
-  // Initialize stars
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-    const rect = container.getBoundingClientRect()
-    const w = rect.width
-    const h = rect.height
-
-    starsRef.current = memoirs.map((m) => {
-      const pos = getStarPosition(m.id, w, h)
-      const baseR = 2 + m.brightness * 3.5
-      return {
-        memoir: m,
-        x: pos.x,
-        y: pos.y,
-        baseR,
-        targetR: baseR,
-        phase: Math.random() * Math.PI * 2,
-      }
-    })
-  }, [])
-
-  // Canvas animation loop
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const container = containerRef.current
-    if (!canvas || !container) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const dpr = window.devicePixelRatio || 1
-    let w = container.clientWidth
-    let h = container.clientHeight
-
-    const resize = () => {
-      w = container.clientWidth
-      h = container.clientHeight
-      canvas.width = w * dpr
-      canvas.height = h * dpr
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      // Re-position stars on resize
-      starsRef.current = memoirs.map((m) => {
-        const pos = getStarPosition(m.id, w, h)
-        const existing = starsRef.current.find((s) => s.memoir.id === m.id)
-        const baseR = 5 + m.brightness * 5
-        return {
-          memoir: m,
-          x: pos.x,
-          y: pos.y,
-          baseR,
-          targetR: existing ? existing.targetR : baseR,
-          phase: existing ? existing.phase : Math.random() * Math.PI * 2,
-        }
-      })
+    if (showVideo && videoRef.current) {
+      videoRef.current.play().catch(() => {})
     }
-    resize()
-
-    let animId: number
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h)
-
-      // Draw faint connections between nearby bright stars
-      ctx.strokeStyle = 'rgba(255,255,255,0.03)'
-      ctx.lineWidth = 0.5
-      for (let i = 0; i < starsRef.current.length; i++) {
-        for (let j = i + 1; j < starsRef.current.length; j++) {
-          const s1 = starsRef.current[i]
-          const s2 = starsRef.current[j]
-          const dx = s1.x - s2.x
-          const dy = s1.y - s2.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 120) {
-            const opacity = (1 - dist / 120) * 0.03
-            ctx.strokeStyle = `rgba(255,255,255,${opacity})`
-            ctx.beginPath()
-            ctx.moveTo(s1.x, s1.y)
-            ctx.lineTo(s2.x, s2.y)
-            ctx.stroke()
-          }
-        }
-      }
-
-      // Draw stars
-      for (const s of starsRef.current) {
-        // Smooth radius transition
-        s.targetR += (s.baseR - s.targetR) * 0.1
-
-        // Twinkle
-        s.phase += 0.008 + s.memoir.brightness * 0.015
-        const twinkle = 0.85 + Math.sin(s.phase) * 0.15
-        const alpha = (0.65 + s.memoir.brightness * 0.35) * twinkle
-
-        const isHovered = hoveredId === s.memoir.id
-        const r = isHovered ? s.targetR * 1.3 : s.targetR
-
-        // Glow
-        const glowR = r * 4
-        const gradient = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR)
-        const glowAlpha = isHovered ? alpha * 0.4 : alpha * 0.15
-        gradient.addColorStop(0, `rgba(255,255,255,${glowAlpha})`)
-        gradient.addColorStop(1, 'rgba(255,255,255,0)')
-        ctx.fillStyle = gradient
-        ctx.beginPath()
-        ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Core
-        ctx.fillStyle = `rgba(255,255,255,${isHovered ? Math.min(alpha + 0.3, 1) : alpha})`
-        ctx.beginPath()
-        ctx.arc(s.x, s.y, r, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      animId = requestAnimationFrame(() => draw())
-    }
-    animId = requestAnimationFrame(() => draw())
-
-    window.addEventListener('resize', resize)
-    return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener('resize', resize)
-    }
-  }, [hoveredId])
-
-  const findStarAt = useCallback((x: number, y: number) => {
-    let nearest: Star | null = null
-    let nearestDist = Infinity
-
-    for (const s of starsRef.current) {
-      const dx = x - s.x
-      const dy = y - s.y
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      const hitRadius = Math.max(28, s.baseR * 4)
-
-      if (dist < hitRadius && dist < nearestDist) {
-        nearest = s
-        nearestDist = dist
-      }
-    }
-
-    return nearest
-  }, [])
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      mouseRef.current = { x, y }
-
-      setHoveredId(findStarAt(x, y)?.memoir.id ?? null)
-    },
-    [findStarAt]
-  )
-
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      const star = findStarAt(x, y)
-
-      if (star) {
-        navigate(`/starry/${star.memoir.id}`)
-      }
-    },
-    [findStarAt, navigate]
-  )
-
-  const hoveredMemoir = hoveredId ? memoirs.find((m) => m.id === hoveredId) : null
+  }, [showVideo])
 
   return (
-    <div ref={containerRef} className="relative w-screen h-screen overflow-hidden bg-[#0a0a12]">
-      {/* Background image */}
+    <div className="relative w-screen h-screen overflow-hidden bg-[#050508]">
+      {/* 背景图 */}
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -214,17 +130,29 @@ export default function StarryEasterEgg() {
           backgroundPosition: 'center',
         }}
       />
-      <div className="absolute inset-0 bg-black/40 z-[1]" />
 
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 z-10 cursor-pointer"
-        onMouseMove={handleMouseMove}
-        onPointerUp={handlePointerUp}
-        onMouseLeave={() => setHoveredId(null)}
+      {/* 全屏视频 - 硬切无淡入淡出 */}
+      <video
+        ref={videoRef}
+        src="/starry-video.mp4"
+        muted
+        playsInline
+        className={`absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-700 ${showVideo ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onEnded={() => setShowVideo(false)}
+        onClick={() => setShowVideo(false)}
       />
 
-      {/* Back button */}
+      {/* 可拖动星星 */}
+      <div
+        className={`absolute inset-0 z-10 transition-opacity duration-700 ${showVideo ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        {memoirs.map((m) => {
+          const pos = getStarPos(m.id)
+          return <DraggableStar key={m.id} memoir={m} x={pos.x} y={pos.y} />
+        })}
+      </div>
+
+      {/* UI 层 */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -236,7 +164,6 @@ export default function StarryEasterEgg() {
         <span className="text-sm font-body">返回</span>
       </motion.button>
 
-      {/* Top text */}
       {showText && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -250,7 +177,6 @@ export default function StarryEasterEgg() {
         </motion.div>
       )}
 
-      {/* Bottom quote */}
       {showText && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -264,26 +190,24 @@ export default function StarryEasterEgg() {
         </motion.div>
       )}
 
-      {/* Hover tooltip */}
-      {hoveredMemoir && (
-        <motion.div
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute z-30 pointer-events-none"
-          style={{
-            left: mouseRef.current.x + 16,
-            top: mouseRef.current.y - 8,
-          }}
-        >
-          <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-lg px-4 py-2">
-            <p className="text-sm text-white/90 font-body whitespace-nowrap">
-              {hoveredMemoir.title}
-            </p>
-            <p className="text-xs text-white/40 mt-0.5">{hoveredMemoir.date}</p>
-          </div>
-        </motion.div>
-      )}
+      {/* 播放视频按钮 */}
+      <motion.button
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        onClick={() => setShowVideo(true)}
+        className="absolute bottom-24 right-8 z-30 flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/5 px-5 py-3 rounded-full border border-white/10 hover:bg-white/10 hover:scale-105"
+      >
+        <Play size={16} fill="currentColor" />
+        <span className="text-sm font-body">观看星轨</span>
+      </motion.button>
+
+      <style>{`
+        @keyframes starPulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+          50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }
