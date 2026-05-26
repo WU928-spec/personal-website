@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Play } from 'lucide-react'
+import { ArrowLeft, Play, Move, Pin } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { memoirs } from '@/data/memoirs'
 
@@ -25,10 +25,12 @@ function DraggableStar({
   memoir,
   x,
   y,
+  draggable,
 }: {
   memoir: (typeof memoirs)[0]
   x: string
   y: string
+  draggable: boolean
 }) {
   const navigate = useNavigate()
   const [hovered, setHovered] = useState(false)
@@ -41,7 +43,7 @@ function DraggableStar({
       style={{ left: x, top: y }}
     >
       <motion.button
-        drag
+        drag={draggable}
         dragMomentum={false}
         whileDrag={{ scale: 1.4, cursor: 'grabbing' }}
         onDragStart={() => setIsDragging(true)}
@@ -51,7 +53,7 @@ function DraggableStar({
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative z-10 cursor-grab"
+        className={`relative z-10 ${draggable ? 'cursor-grab' : 'cursor-pointer'}`}
         style={{ x: '-50%', y: '-50%' }}
       >
         {/* 光晕 */}
@@ -106,6 +108,7 @@ export default function StarryEasterEgg() {
   const navigate = useNavigate()
   const [showText, setShowText] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
+  const [draggable, setDraggable] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -148,7 +151,7 @@ export default function StarryEasterEgg() {
       >
         {memoirs.map((m) => {
           const pos = getStarPos(m.id)
-          return <DraggableStar key={m.id} memoir={m} x={pos.x} y={pos.y} />
+          return <DraggableStar key={m.id} memoir={m} x={pos.x} y={pos.y} draggable={draggable} />
         })}
       </div>
 
@@ -189,6 +192,19 @@ export default function StarryEasterEgg() {
           </p>
         </motion.div>
       )}
+
+      {/* 切换拖动模式 */}
+      <motion.button
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+        onClick={() => setDraggable((v) => !v)}
+        className="absolute top-6 right-6 z-30 flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 hover:scale-105"
+        title={draggable ? '切换为固定模式' : '切换为拖动模式'}
+      >
+        {draggable ? <Move size={16} /> : <Pin size={16} />}
+        <span className="text-sm font-body">{draggable ? '可拖动' : '已固定'}</span>
+      </motion.button>
 
       {/* 播放视频按钮 */}
       <motion.button
