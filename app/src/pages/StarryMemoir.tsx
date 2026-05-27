@@ -130,9 +130,11 @@ export default function StarryMemoir() {
           <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
             {memoir.date}
           </p>
-          <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight mb-8">
-            {memoir.title}
-          </h1>
+          {memoir.title && (
+            <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight mb-8">
+              {memoir.title}
+            </h1>
+          )}
           <div className="relative">
             <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent mb-6" />
             <p className="text-[1.0625rem] leading-[2] text-white/65 font-body whitespace-pre-wrap">

@@ -261,7 +261,7 @@ function MemoirManager({
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={save}
-                  disabled={!draft.title.trim() || !draft.content.trim()}
+                  disabled={!draft.content.trim()}
                   className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/10 text-white/80 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-body"
                 >
                   <Save size={14} />
@@ -311,7 +311,7 @@ function MemoirManager({
                 }}
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white/80 font-body truncate">{m.title}</p>
+                <p className="text-sm text-white/80 font-body truncate">{m.title || <span className="italic text-white/40">无标题</span>}</p>
                 <p className="text-xs text-white/30 font-body">{m.date}</p>
               </div>
               <span className="text-[10px] text-white/20 font-body flex-shrink-0">
