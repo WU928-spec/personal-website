@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Play, Move, Pin, Settings, X, Plus, Trash2, Save, RotateCcw, Image } from 'lucide-react'
+import { ArrowLeft, Play, Move, Pin, Settings, X, Plus, Trash2, Save, RotateCcw, Image, Upload, X as XIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getMemoirs, saveMemoirs, resetMemoirs, type Memoir } from '@/data/memoirs'
 
@@ -250,14 +250,45 @@ function MemoirManager({
                 </div>
               </div>
               <div>
-                <label className="text-xs text-white/40 font-body mb-1 block">图片链接</label>
+                <label className="text-xs text-white/40 font-body mb-1 block">图片</label>
                 <input
-                  type="text"
-                  value={draft.image || ''}
-                  onChange={(e) => setDraft({ ...draft, image: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
-                  placeholder="粘贴图片 URL（可选）"
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  id={`memoir-image-${editingId}`}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    const reader = new FileReader()
+                    reader.onload = (ev) => {
+                      setDraft({ ...draft, image: ev.target?.result as string })
+                    }
+                    reader.readAsDataURL(file)
+                  }}
                 />
+                {draft.image ? (
+                  <div className="relative inline-block">
+                    <img
+                      src={draft.image}
+                      alt="预览"
+                      className="w-full max-h-40 object-contain rounded-lg border border-white/10 bg-white/5"
+                    />
+                    <button
+                      onClick={() => setDraft({ ...draft, image: undefined })}
+                      className="absolute -top-2 -right-2 p-1 rounded-full bg-black/70 text-white/60 hover:text-white border border-white/10"
+                    >
+                      <XIcon size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor={`memoir-image-${editingId}`}
+                    className="flex items-center justify-center gap-2 w-full py-6 rounded-lg border border-dashed border-white/15 text-white/40 hover:text-white/70 hover:border-white/30 hover:bg-white/5 cursor-pointer transition-all"
+                  >
+                    <Upload size={16} />
+                    <span className="text-sm font-body">点击选取图片</span>
+                  </label>
+                )}
               </div>
               <div>
                 <label className="text-xs text-white/40 font-body mb-1 block">内容</label>
