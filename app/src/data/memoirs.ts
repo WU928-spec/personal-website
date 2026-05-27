@@ -4,6 +4,7 @@ export interface Memoir {
   date: string
   content: string
   brightness: number // 0.1 ~ 1.0，越激动越亮
+  image?: string // 相框图片 URL
 }
 
 const STORAGE_KEY = 'starry-memoirs-v1'

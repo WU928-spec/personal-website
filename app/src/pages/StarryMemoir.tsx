@@ -80,6 +80,24 @@ function NebulaField() {
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />
 }
 
+function PhotoFrame({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="photo-frame-wrapper flex-shrink-0 mx-auto md:mx-0">
+      <div className="photo-frame">
+        <div className="photo-mat">
+          <img src={src} alt={alt} className="photo-image" loading="lazy" />
+        </div>
+      </div>
+      {/* 钉子阴影 */}
+      <div className="pin-shadow" />
+      {/* 钉子 */}
+      <div className="pin">
+        <div className="pin-head" />
+      </div>
+    </div>
+  )
+}
+
 export default function StarryMemoir() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
@@ -125,16 +143,23 @@ export default function StarryMemoir() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="max-w-xl w-full"
+          className="max-w-3xl w-full"
         >
-          <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
-            {memoir.date}
-          </p>
-          {memoir.title && (
-            <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight mb-8">
-              {memoir.title}
-            </h1>
-          )}
+          {/* 日期 + 标题 + 相框 */}
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
+                {memoir.date}
+              </p>
+              {memoir.title && (
+                <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight">
+                  {memoir.title}
+                </h1>
+              )}
+            </div>
+            {memoir.image && <PhotoFrame src={memoir.image} alt={memoir.title || '记忆'} />}
+          </div>
+
           <div className="relative">
             <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent mb-6" />
             <p className="text-[1.0625rem] leading-[2] text-white/65 font-body whitespace-pre-wrap">
@@ -143,6 +168,85 @@ export default function StarryMemoir() {
           </div>
         </motion.div>
       </div>
+
+      <style>{`
+        .photo-frame-wrapper {
+          position: relative;
+          display: inline-block;
+          margin-top: 8px;
+        }
+        .photo-frame {
+          position: relative;
+          background: #ebe5da;
+          padding: 8px 8px 28px 8px;
+          border-radius: 2px;
+          transform: rotate(-2.5deg);
+          box-shadow:
+            inset 0 0 30px rgba(0,0,0,0.04),
+            0 1px 2px rgba(0,0,0,0.12),
+            0 4px 8px rgba(0,0,0,0.08),
+            0 12px 24px rgba(0,0,0,0.06),
+            0 24px 48px rgba(0,0,0,0.04);
+          border: 1px solid rgba(0,0,0,0.06);
+        }
+        .photo-mat {
+          background: #f7f4ee;
+          padding: 4px;
+          box-shadow: inset 0 0 8px rgba(0,0,0,0.04);
+        }
+        .photo-image {
+          display: block;
+          width: 160px;
+          height: 200px;
+          object-fit: cover;
+          filter: sepia(6%) contrast(104%) saturate(96%);
+          box-shadow: inset 0 0 6px rgba(0,0,0,0.08);
+          border-radius: 1px;
+        }
+        .pin {
+          position: absolute;
+          top: -6px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 14px;
+          height: 14px;
+          z-index: 2;
+        }
+        .pin-head {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: radial-gradient(circle at 32% 32%, #e0e0e0, #a0a0a0 60%, #707070);
+          box-shadow:
+            0 1px 3px rgba(0,0,0,0.35),
+            0 0 0 0.5px rgba(0,0,0,0.1),
+            inset 0 -1px 2px rgba(0,0,0,0.15);
+        }
+        .pin-head::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: radial-gradient(circle at 30% 30%, #c0c0c0, #808080);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
+        }
+        .pin-shadow {
+          position: absolute;
+          top: -2px;
+          left: 50%;
+          transform: translateX(-40%) rotate(30deg);
+          width: 16px;
+          height: 3px;
+          background: rgba(0,0,0,0.15);
+          border-radius: 50%;
+          filter: blur(1px);
+          z-index: 1;
+        }
+      `}</style>
     </div>
   )
 }

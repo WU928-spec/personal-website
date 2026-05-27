@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Play, Move, Pin, Settings, X, Plus, Trash2, Save, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Play, Move, Pin, Settings, X, Plus, Trash2, Save, RotateCcw, Image } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getMemoirs, saveMemoirs, resetMemoirs, type Memoir } from '@/data/memoirs'
 
@@ -123,6 +123,7 @@ function MemoirManager({
       date: new Date().toISOString().slice(0, 10),
       content: '',
       brightness: 0.5,
+      image: '',
     })
   }
 
@@ -249,6 +250,16 @@ function MemoirManager({
                 </div>
               </div>
               <div>
+                <label className="text-xs text-white/40 font-body mb-1 block">图片链接</label>
+                <input
+                  type="text"
+                  value={draft.image || ''}
+                  onChange={(e) => setDraft({ ...draft, image: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
+                  placeholder="粘贴图片 URL（可选）"
+                />
+              </div>
+              <div>
                 <label className="text-xs text-white/40 font-body mb-1 block">内容</label>
                 <textarea
                   value={draft.content}
@@ -314,9 +325,12 @@ function MemoirManager({
                 <p className="text-sm text-white/80 font-body truncate">{m.title || <span className="italic text-white/40">无标题</span>}</p>
                 <p className="text-xs text-white/30 font-body">{m.date}</p>
               </div>
-              <span className="text-[10px] text-white/20 font-body flex-shrink-0">
-                {Math.round(m.brightness * 100)}%
-              </span>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {m.image && <Image size={12} className="text-white/30" />}
+                <span className="text-[10px] text-white/20 font-body">
+                  {Math.round(m.brightness * 100)}%
+                </span>
+              </div>
             </div>
           ))}
       </div>
