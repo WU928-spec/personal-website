@@ -101,14 +101,34 @@ function DraggableStar({
   )
 }
 
+function compressImage(base64: string, maxWidth = 800, quality = 0.75): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement('img')
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ratio = Math.min(maxWidth / img.width, 1)
+      canvas.width = Math.round(img.width * ratio)
+      canvas.height = Math.round(img.height * ratio)
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return reject(new Error('canvas error'))
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      resolve(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.onerror = reject
+    img.src = base64
+  })
+}
+
 function MemoirManager({
   memoirs,
   onChange,
   onClose,
+  saveError,
 }: {
   memoirs: Memoir[]
   onChange: (m: Memoir[]) => void
   onClose: () => void
+  saveError?: string | null
 }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState<Memoir | null>(null)
@@ -152,9 +172,10 @@ function MemoirManager({
     }
   }
 
-  const handleReset = () => {
-    resetMemoirs()
-    onChange(getMemoirs())
+  const handleReset = async () => {
+    await resetMemoirs()
+    const refreshed = await getMemoirs()
+    onChange(refreshed)
     setShowResetConfirm(false)
     setEditingId(null)
     setDraft(null)
@@ -174,6 +195,11 @@ function MemoirManager({
       <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
         <h2 className="text-white/90 font-body text-lg">记忆管理</h2>
         <div className="flex items-center gap-2">
+          {saveError && (
+            <span className="text-[11px] text-red-400/80 font-body mr-1 max-w-[140px] truncate" title={saveError}>
+              {saveError}
+            </span>
+          )}
           <button
             onClick={() => setShowResetConfirm(true)}
             className="p-2 rounded-full text-white/40 hover:text-red-400 hover:bg-white/5 transition-colors"
@@ -256,18 +282,29 @@ function MemoirManager({
                   accept="image/*"
                   hidden
                   id={`memoir-image-${editingId}`}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0]
                     if (!file) return
                     const reader = new FileReader()
-                    reader.onload = (ev) => {
-                      const result = ev.target?.result as string
-                      setDraft({
-                        ...draft,
-                        images: [...(draft.images || []), result],
-                      })
+                    reader.onload = async (ev) => {
+                      const raw = ev.target?.result as string
+                      try {
+                        const compressed = await compressImage(raw)
+                        setDraft((prev) => ({
+                          ...prev!,
+                          images: [...(prev?.images || []), compressed],
+                        }))
+                      } catch {
+                        // fallback to raw if compression fails
+                        setDraft((prev) => ({
+                          ...prev!,
+                          images: [...(prev?.images || []), raw],
+                        }))
+                      }
                     }
                     reader.readAsDataURL(file)
+                    // reset input so same file can be selected again
+                    e.target.value = ''
                   }}
                 />
                 <div className="flex flex-wrap gap-2 mb-2">
@@ -280,10 +317,10 @@ function MemoirManager({
                       />
                       <button
                         onClick={() =>
-                          setDraft({
-                            ...draft,
-                            images: (draft.images || []).filter((_, idx) => idx !== i),
-                          })
+                          setDraft((prev) => ({
+                            ...prev!,
+                            images: (prev?.images || []).filter((_, idx) => idx !== i),
+                          }))
                         }
                         className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-black/70 text-white/60 hover:text-white border border-white/10"
                       >
@@ -428,8 +465,12 @@ export default function StarryEasterEgg() {
   const [showVideo, setShowVideo] = useState(false)
   const [draggable, setDraggable] = useState(true)
   const [showManager, setShowManager] = useState(false)
-  const [memoirs, setMemoirs] = useState<Memoir[]>(getMemoirs)
+  const [memoirs, setMemoirs] = useState<Memoir[]>([])
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    getMemoirs().then(setMemoirs)
+  }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => setShowText(true), 400)
@@ -442,9 +483,17 @@ export default function StarryEasterEgg() {
     }
   }, [showVideo])
 
+  const [saveError, setSaveError] = useState<string | null>(null)
+
   const handleChange = (next: Memoir[]) => {
-    setMemoirs(next)
     saveMemoirs(next)
+      .then(() => {
+        setMemoirs(next)
+        setSaveError(null)
+      })
+      .catch(() => {
+        setSaveError('保存失败：存储空间已满')
+      })
   }
 
   return (
@@ -562,6 +611,7 @@ export default function StarryEasterEgg() {
             memoirs={memoirs}
             onChange={handleChange}
             onClose={() => setShowManager(false)}
+            saveError={saveError}
           />
         )}
       </AnimatePresence>

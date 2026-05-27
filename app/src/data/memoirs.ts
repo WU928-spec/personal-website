@@ -9,6 +9,9 @@ export interface Memoir {
 }
 
 const STORAGE_KEY = 'starry-memoirs-v1'
+const DB_NAME = 'starry-db'
+const STORE_NAME = 'memoirs'
+const DB_KEY = 'data'
 
 export const DEFAULT_MEMOIRS: Memoir[] = [
   {
@@ -116,27 +119,87 @@ function migrateMemoir(m: Memoir): Memoir {
   return m
 }
 
-export function getMemoirs(): Memoir[] {
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1)
+    req.onerror = () => reject(req.error)
+    req.onsuccess = () => resolve(req.result)
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(STORE_NAME)
+    }
+  })
+}
+
+// 尝试从 localStorage 读取旧数据并迁移到 IndexedDB（一次性）
+async function migrateFromLocalStorage(): Promise<Memoir[] | null> {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       const parsed = JSON.parse(saved) as Memoir[]
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map(migrateMemoir)
+        // 迁移到 IndexedDB 后删除 localStorage
+        const migrated = parsed.map(migrateMemoir)
+        const db = await openDB()
+        const tx = db.transaction(STORE_NAME, 'readwrite')
+        tx.objectStore(STORE_NAME).put(JSON.stringify(migrated), DB_KEY)
+        localStorage.removeItem(STORAGE_KEY)
+        return migrated
       }
     }
   } catch {
     // ignore
   }
-  return DEFAULT_MEMOIRS
+  return null
 }
 
-export function saveMemoirs(memoirs: Memoir[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(memoirs))
+export async function getMemoirs(): Promise<Memoir[]> {
+  // 先检查是否有旧数据需要迁移
+  const migrated = await migrateFromLocalStorage()
+  if (migrated) return migrated
+
+  try {
+    const db = await openDB()
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly')
+      const req = tx.objectStore(STORE_NAME).get(DB_KEY)
+      req.onsuccess = () => {
+        const data = req.result
+        if (data) {
+          try {
+            const parsed = JSON.parse(data) as Memoir[]
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              resolve(parsed.map(migrateMemoir))
+              return
+            }
+          } catch {}
+        }
+        resolve(DEFAULT_MEMOIRS)
+      }
+      req.onerror = () => reject(req.error)
+    })
+  } catch {
+    return DEFAULT_MEMOIRS
+  }
 }
 
-export function resetMemoirs() {
-  localStorage.removeItem(STORAGE_KEY)
+export async function saveMemoirs(memoirs: Memoir[]) {
+  const db = await openDB()
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const req = tx.objectStore(STORE_NAME).put(JSON.stringify(memoirs), DB_KEY)
+    req.onsuccess = () => resolve()
+    req.onerror = () => reject(req.error)
+  })
+}
+
+export async function resetMemoirs() {
+  const db = await openDB()
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const req = tx.objectStore(STORE_NAME).delete(DB_KEY)
+    req.onsuccess = () => resolve()
+    req.onerror = () => reject(req.error)
+  })
 }
 
 // 为每颗 memoir 生成固定的随机坐标，避免每次渲染位置变化

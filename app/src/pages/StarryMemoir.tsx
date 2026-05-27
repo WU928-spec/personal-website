@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getMemoirs } from '@/data/memoirs'
+import { getMemoirs, type Memoir } from '@/data/memoirs'
 
 function NebulaField() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -101,7 +101,24 @@ function PhotoFrame({ src, alt, rotation = -2.5 }: { src: string; alt: string; r
 export default function StarryMemoir() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const memoir = getMemoirs().find((m) => m.id === id)
+  const [memoir, setMemoir] = useState<Memoir | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getMemoirs().then((all) => {
+      setMemoir(all.find((m) => m.id === id) || null)
+      setLoading(false)
+    })
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="relative w-screen h-screen overflow-hidden bg-[#080810] flex items-center justify-center">
+        <NebulaField />
+        <div className="relative z-10 text-white/30 text-sm font-body">加载中...</div>
+      </div>
+    )
+  }
 
   if (!memoir) {
     return (
