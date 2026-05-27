@@ -133,7 +133,7 @@ function MemoirManager({
 
   const save = () => {
     if (!draft) return
-    if (!draft.title.trim() || !draft.content.trim()) return
+    if (!draft.content.trim()) return
     if (editingId === '__new__') {
       onChange([...memoirs, draft])
     } else {
