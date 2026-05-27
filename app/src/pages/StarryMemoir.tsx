@@ -193,7 +193,7 @@ export default function StarryMemoir() {
           </div>
 
           <div className="relative">
-            <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent mb-6" />
+            <div className="w-px h-6 bg-gradient-to-b from-white/40 to-transparent mb-3" />
             <p className="text-[1.0625rem] leading-[2] text-white/65 font-body whitespace-pre-wrap">
               {memoir.content}
             </p>
