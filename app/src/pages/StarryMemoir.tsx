@@ -194,9 +194,26 @@ export default function StarryMemoir() {
 
           <div className="relative">
             <div className="w-px h-6 bg-gradient-to-b from-white/40 to-transparent mb-3" />
-            <p className="text-[1.0625rem] leading-[2] text-white/65 font-body whitespace-pre-wrap">
-              {memoir.content}
-            </p>
+            <div className="text-[1.0625rem] leading-[2] text-white/65 font-body">
+              {memoir.content.split(/\n\s*\n/).filter(Boolean).map((para, i) => {
+                if (i === 0) {
+                  const first = para[0] || ''
+                  const rest = para.slice(1)
+                  return (
+                    <p key={i} className="mb-0">
+                      <span className="drop-cap">{first}</span>
+                      {rest}
+                    </p>
+                  )
+                }
+                return (
+                  <div key={i}>
+                    <div className="paragraph-divider">✦</div>
+                    <p>{para}</p>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </motion.div>
       </div>
@@ -276,6 +293,23 @@ export default function StarryMemoir() {
           border-radius: 50%;
           filter: blur(1px);
           z-index: 1;
+        }
+        .drop-cap {
+          float: left;
+          font-size: 3.2em;
+          line-height: 0.85;
+          padding-right: 10px;
+          padding-top: 2px;
+          font-family: Georgia, 'Times New Roman', serif;
+          color: rgba(255,255,255,0.92);
+          font-weight: 400;
+        }
+        .paragraph-divider {
+          text-align: center;
+          color: rgba(255,255,255,0.18);
+          font-size: 0.7rem;
+          margin: 1.2rem 0;
+          letter-spacing: 0.3em;
         }
       `}</style>
     </div>
