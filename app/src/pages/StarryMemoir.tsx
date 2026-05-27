@@ -163,7 +163,7 @@ export default function StarryMemoir() {
           className="max-w-3xl w-full"
         >
           {/* 日期 + 标题 + 相框 */}
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
             <div className="flex-1 min-w-0">
               <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
                 {memoir.date}
@@ -205,7 +205,6 @@ export default function StarryMemoir() {
         .photo-frame-wrapper {
           position: relative;
           display: inline-block;
-          margin-top: 8px;
         }
         .photo-frame {
           position: relative;
