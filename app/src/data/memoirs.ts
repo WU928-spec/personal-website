@@ -6,7 +6,9 @@ export interface Memoir {
   brightness: number // 0.1 ~ 1.0，越激动越亮
 }
 
-export const memoirs: Memoir[] = [
+const STORAGE_KEY = 'starry-memoirs-v1'
+
+export const DEFAULT_MEMOIRS: Memoir[] = [
   {
     id: '1',
     title: '第一次看见极光',
@@ -104,6 +106,27 @@ export const memoirs: Memoir[] = [
     brightness: 0.42,
   },
 ]
+
+export function getMemoirs(): Memoir[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      const parsed = JSON.parse(saved) as Memoir[]
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_MEMOIRS
+}
+
+export function saveMemoirs(memoirs: Memoir[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(memoirs))
+}
+
+export function resetMemoirs() {
+  localStorage.removeItem(STORAGE_KEY)
+}
 
 // 为每颗 memoir 生成固定的随机坐标，避免每次渲染位置变化
 const seededRandom = (seed: number) => {

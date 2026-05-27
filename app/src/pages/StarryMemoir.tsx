@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { memoirs } from '@/data/memoirs'
+import { getMemoirs } from '@/data/memoirs'
 
 function NebulaField() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -83,7 +83,7 @@ function NebulaField() {
 export default function StarryMemoir() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const memoir = memoirs.find((m) => m.id === id)
+  const memoir = getMemoirs().find((m) => m.id === id)
 
   if (!memoir) {
     return (
