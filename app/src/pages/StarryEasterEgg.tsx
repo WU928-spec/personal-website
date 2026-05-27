@@ -123,7 +123,7 @@ function MemoirManager({
       date: new Date().toISOString().slice(0, 10),
       content: '',
       brightness: 0.5,
-      image: '',
+      images: [],
     })
   }
 
@@ -261,34 +261,44 @@ function MemoirManager({
                     if (!file) return
                     const reader = new FileReader()
                     reader.onload = (ev) => {
-                      setDraft({ ...draft, image: ev.target?.result as string })
+                      const result = ev.target?.result as string
+                      setDraft({
+                        ...draft,
+                        images: [...(draft.images || []), result],
+                      })
                     }
                     reader.readAsDataURL(file)
                   }}
                 />
-                {draft.image ? (
-                  <div className="relative inline-block">
-                    <img
-                      src={draft.image}
-                      alt="预览"
-                      className="w-full max-h-40 object-contain rounded-lg border border-white/10 bg-white/5"
-                    />
-                    <button
-                      onClick={() => setDraft({ ...draft, image: undefined })}
-                      className="absolute -top-2 -right-2 p-1 rounded-full bg-black/70 text-white/60 hover:text-white border border-white/10"
-                    >
-                      <XIcon size={12} />
-                    </button>
-                  </div>
-                ) : (
-                  <label
-                    htmlFor={`memoir-image-${editingId}`}
-                    className="flex items-center justify-center gap-2 w-full py-6 rounded-lg border border-dashed border-white/15 text-white/40 hover:text-white/70 hover:border-white/30 hover:bg-white/5 cursor-pointer transition-all"
-                  >
-                    <Upload size={16} />
-                    <span className="text-sm font-body">点击选取图片</span>
-                  </label>
-                )}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {(draft.images || []).map((img, i) => (
+                    <div key={i} className="relative">
+                      <img
+                        src={img}
+                        alt={`预览 ${i + 1}`}
+                        className="w-16 h-16 object-cover rounded border border-white/10"
+                      />
+                      <button
+                        onClick={() =>
+                          setDraft({
+                            ...draft,
+                            images: (draft.images || []).filter((_, idx) => idx !== i),
+                          })
+                        }
+                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-black/70 text-white/60 hover:text-white border border-white/10"
+                      >
+                        <XIcon size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <label
+                  htmlFor={`memoir-image-${editingId}`}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-lg border border-dashed border-white/15 text-white/40 hover:text-white/70 hover:border-white/30 hover:bg-white/5 cursor-pointer transition-all"
+                >
+                  <Upload size={16} />
+                  <span className="text-sm font-body">添加图片</span>
+                </label>
               </div>
               <div>
                 <label className="text-xs text-white/40 font-body mb-1 block">内容</label>
@@ -357,7 +367,12 @@ function MemoirManager({
                 <p className="text-xs text-white/30 font-body">{m.date}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                {m.image && <Image size={12} className="text-white/30" />}
+                {(m.images?.length || 0) > 0 && (
+                  <span className="flex items-center gap-1 text-white/30">
+                    <Image size={12} />
+                    <span className="text-[10px]">{m.images?.length}</span>
+                  </span>
+                )}
                 <span className="text-[10px] text-white/20 font-body">
                   {Math.round(m.brightness * 100)}%
                 </span>

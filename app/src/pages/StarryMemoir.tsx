@@ -80,10 +80,10 @@ function NebulaField() {
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />
 }
 
-function PhotoFrame({ src, alt }: { src: string; alt: string }) {
+function PhotoFrame({ src, alt, rotation = -2.5 }: { src: string; alt: string; rotation?: number }) {
   return (
     <div className="photo-frame-wrapper flex-shrink-0 mx-auto md:mx-0">
-      <div className="photo-frame">
+      <div className="photo-frame" style={{ transform: `rotate(${rotation}deg)` }}>
         <div className="photo-mat">
           <img src={src} alt={alt} className="photo-image" loading="lazy" />
         </div>
@@ -157,7 +157,22 @@ export default function StarryMemoir() {
                 </h1>
               )}
             </div>
-            {memoir.image && <PhotoFrame src={memoir.image} alt={memoir.title || '记忆'} />}
+            {(() => {
+              const imgs = memoir.images || (memoir.image ? [memoir.image] : [])
+              if (imgs.length === 0) return null
+              return (
+                <div className="flex flex-wrap gap-4 flex-shrink-0">
+                  {imgs.map((img, i) => (
+                    <PhotoFrame
+                      key={i}
+                      src={img}
+                      alt={memoir.title || '记忆'}
+                      rotation={-3 + i * 2.5}
+                    />
+                  ))}
+                </div>
+              )
+            })()}
           </div>
 
           <div className="relative">

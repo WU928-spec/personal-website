@@ -4,7 +4,8 @@ export interface Memoir {
   date: string
   content: string
   brightness: number // 0.1 ~ 1.0，越激动越亮
-  image?: string // 相框图片 URL
+  image?: string // deprecated，向后兼容
+  images?: string[]
 }
 
 const STORAGE_KEY = 'starry-memoirs-v1'
@@ -108,12 +109,21 @@ export const DEFAULT_MEMOIRS: Memoir[] = [
   },
 ]
 
+function migrateMemoir(m: Memoir): Memoir {
+  if (m.image && !m.images) {
+    return { ...m, images: [m.image] }
+  }
+  return m
+}
+
 export function getMemoirs(): Memoir[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       const parsed = JSON.parse(saved) as Memoir[]
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(migrateMemoir)
+      }
     }
   } catch {
     // ignore
