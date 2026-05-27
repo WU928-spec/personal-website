@@ -162,38 +162,40 @@ export default function StarryMemoir() {
           transition={{ duration: 1, ease: 'easeOut' }}
           className="max-w-3xl w-full"
         >
-          {/* 日期 + 标题 + 相框 */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
-                {memoir.date}
-              </p>
-              {memoir.title && (
-                <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight">
-                  {memoir.title}
-                </h1>
-              )}
-            </div>
-            {(() => {
-              const imgs = memoir.images || (memoir.image ? [memoir.image] : [])
-              if (imgs.length === 0) return null
-              return (
-                <div className="flex flex-wrap gap-4 flex-shrink-0">
-                  {imgs.map((img, i) => (
-                    <PhotoFrame
-                      key={i}
-                      src={img}
-                      alt={memoir.title || '记忆'}
-                      rotation={-3 + i * 2.5}
-                    />
-                  ))}
-                </div>
-              )
-            })()}
-          </div>
+          <div className="relative pl-5">
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-white/40 via-white/15 to-transparent" />
 
-          <div className="relative">
-            <div className="w-px h-6 bg-gradient-to-b from-white/40 to-transparent mb-3" />
+            {/* 日期 + 标题 + 相框 */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-white/30 font-body tracking-widest uppercase mb-3">
+                  {memoir.date}
+                </p>
+                {memoir.title && (
+                  <h1 className="font-display text-[clamp(1.5rem,4vw,2.5rem)] font-medium text-white/95 tracking-wide leading-tight">
+                    {memoir.title}
+                  </h1>
+                )}
+              </div>
+              {(() => {
+                const imgs = memoir.images || (memoir.image ? [memoir.image] : [])
+                if (imgs.length === 0) return null
+                return (
+                  <div className="flex flex-wrap gap-4 flex-shrink-0">
+                    {imgs.map((img, i) => (
+                      <PhotoFrame
+                        key={i}
+                        src={img}
+                        alt={memoir.title || '记忆'}
+                        rotation={-3 + i * 2.5}
+                      />
+                    ))}
+                  </div>
+                )
+              })()}
+            </div>
+
+            {/* 正文 */}
             <div className="text-[1.0625rem] leading-[2] text-white/65 font-body">
               {memoir.content.split(/\n\s*\n/).filter(Boolean).map((para, i) => {
                 if (i === 0) {
