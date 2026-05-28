@@ -105,9 +105,9 @@ export default function StarryMemoir() {
   const [glassesPos, setGlassesPos] = useState(() => {
     try {
       const saved = localStorage.getItem('starry-glasses-position')
-      return saved ? JSON.parse(saved) : { x: 0, y: 0, scale: 1 }
+      return saved ? JSON.parse(saved) : { x: -148.8, y: 9.5, scale: 2.05 }
     } catch {
-      return { x: 0, y: 0, scale: 1 }
+      return { x: -148.8, y: 9.5, scale: 2.05 }
     }
   })
 
