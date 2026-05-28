@@ -155,7 +155,7 @@ export default function StarryMemoir() {
       </motion.button>
 
       {/* Content */}
-      <div className="relative z-20 h-full overflow-y-auto px-6 py-20">
+      <div className="relative z-20 h-full overflow-y-auto px-6 py-20 no-scrollbar">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -316,6 +316,13 @@ export default function StarryMemoir() {
           font-size: 0.7rem;
           margin: 1.2rem 0;
           letter-spacing: 0.3em;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>
