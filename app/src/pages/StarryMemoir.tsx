@@ -154,29 +154,6 @@ export default function StarryMemoir() {
         <span className="text-sm font-body">返回星空</span>
       </motion.button>
 
-      {/* 老夏页面装饰 — 金丝眼镜 */}
-      {memoir.title === '老夏' && (
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 0.5, y: [0, -10, 0] }}
-          transition={{
-            opacity: { delay: 1, duration: 1 },
-            y: { delay: 2, duration: 5, repeat: Infinity, ease: 'easeInOut' },
-          }}
-          className="hidden lg:block fixed right-[8vw] top-[20vh] z-10 pointer-events-none"
-        >
-          <img
-            src="/golden-glasses.png"
-            alt="金丝眼镜"
-            className="w-36"
-            style={{
-              transform: 'rotate(-8deg)',
-              filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.4))',
-            }}
-          />
-        </motion.div>
-      )}
-
       {/* Content */}
       <div className="relative z-20 h-full overflow-y-auto px-6 py-20 no-scrollbar">
         <motion.div
@@ -230,6 +207,24 @@ export default function StarryMemoir() {
                       <p key={i} className="mb-0">
                         <span className="drop-cap">{first}</span>
                         {rest}
+                        {memoir.title === '老夏' && (
+                          <span
+                            className="hidden lg:inline-block ml-2 align-middle"
+                            style={{ transform: 'rotate(-6deg)' }}
+                          >
+                            <motion.img
+                              src="/golden-glasses.png"
+                              alt="金丝眼镜"
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 0.5, y: [0, -5, 0] }}
+                              transition={{
+                                opacity: { delay: 1, duration: 0.8 },
+                                y: { delay: 2, duration: 5, repeat: Infinity, ease: 'easeInOut' },
+                              }}
+                              className="w-20 pointer-events-none"
+                            />
+                          </span>
+                        )}
                       </p>
                     )
                   }
