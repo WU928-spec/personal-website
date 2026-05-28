@@ -207,24 +207,6 @@ export default function StarryMemoir() {
                       <p key={i} className="mb-0">
                         <span className="drop-cap">{first}</span>
                         {rest}
-                        {memoir.title === '老夏' && (
-                          <span
-                            className="hidden lg:inline-block ml-2 align-middle"
-                            style={{ transform: 'rotate(-6deg)' }}
-                          >
-                            <motion.img
-                              src="/golden-glasses.png"
-                              alt="金丝眼镜"
-                              initial={{ opacity: 0, y: 8 }}
-                              animate={{ opacity: 0.5, y: [0, -5, 0] }}
-                              transition={{
-                                opacity: { delay: 1, duration: 0.8 },
-                                y: { delay: 2, duration: 5, repeat: Infinity, ease: 'easeInOut' },
-                              }}
-                              className="w-20 pointer-events-none"
-                            />
-                          </span>
-                        )}
                       </p>
                     )
                   }
@@ -232,6 +214,26 @@ export default function StarryMemoir() {
                 })
               })()}
             </div>
+
+            {/* 老夏页面装饰 — 金丝眼镜 */}
+            {memoir.title === '老夏' && (
+              <span
+                className="hidden lg:block absolute -right-28 top-10 pointer-events-none"
+                style={{ transform: 'rotate(-6deg)' }}
+              >
+                <motion.img
+                  src="/golden-glasses.png"
+                  alt="金丝眼镜"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 0.5, y: [0, -5, 0] }}
+                  transition={{
+                    opacity: { delay: 1, duration: 0.8 },
+                    y: { delay: 2, duration: 5, repeat: Infinity, ease: 'easeInOut' },
+                  }}
+                  className="w-24"
+                />
+              </span>
+            )}
           </div>
         </motion.div>
       </div>
