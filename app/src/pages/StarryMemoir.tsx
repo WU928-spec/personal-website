@@ -298,9 +298,9 @@ export default function StarryMemoir() {
         }
         .drop-cap {
           float: left;
-          font-size: 3.2em;
-          line-height: 0.85;
-          padding-right: 10px;
+          font-size: 2.4em;
+          line-height: 0.9;
+          padding-right: 8px;
           padding-top: 2px;
           font-family: Georgia, 'Times New Roman', serif;
           color: rgba(255,255,255,0.92);
