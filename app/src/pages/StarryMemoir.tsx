@@ -195,11 +195,30 @@ export default function StarryMemoir() {
               })()}
             </div>
 
-            {/* 正文 — 优先用空行分段，回退到单换行 */}
+            {/* 正文 — 优先用空行分段，回退到单换行，仍无分段则自动按句拆分 */}
             <div className="text-[1.0625rem] leading-[2] text-white/65 font-body">
               {(() => {
-                const byDouble = memoir.content.split(/\n\s*\n/).filter(Boolean)
-                const paragraphs = byDouble.length > 1 ? byDouble : memoir.content.split(/\n/).filter(Boolean)
+                let paragraphs = memoir.content.split(/\n\s*\n/).filter(Boolean)
+                if (paragraphs.length === 1) {
+                  paragraphs = memoir.content.split(/\n/).filter(Boolean)
+                }
+                // 仍只有一段且较长时，自动按句拆分（每 2-3 句为一段）
+                if (paragraphs.length === 1 && paragraphs[0].length > 120) {
+                  const sentences = paragraphs[0]
+                    .split(/(?<=[。！？.!?])\s*/)
+                    .filter(s => s.trim().length > 0)
+                  const grouped: string[] = []
+                  let group: string[] = []
+                  sentences.forEach((s, idx) => {
+                    group.push(s)
+                    if (group.length >= 2 && idx < sentences.length - 1) {
+                      grouped.push(group.join(''))
+                      group = []
+                    }
+                  })
+                  if (group.length) grouped.push(group.join(''))
+                  paragraphs = grouped
+                }
                 return paragraphs.map((para, i) => {
                   if (i === 0) {
                     const first = para[0] || ''
