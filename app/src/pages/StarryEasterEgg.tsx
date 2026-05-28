@@ -344,7 +344,7 @@ function MemoirManager({
                   onChange={(e) => setDraft({ ...draft, content: e.target.value })}
                   rows={5}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors resize-none"
-                  placeholder="写下这段记忆..."
+                  placeholder="写下这段记忆...（按回车分段，或长文自动分段）"
                 />
               </div>
               <div className="flex items-center gap-2 pt-1">
