@@ -155,12 +155,12 @@ export default function StarryMemoir() {
       </motion.button>
 
       {/* Content */}
-      <div className="relative z-20 flex items-center justify-center h-full px-6">
+      <div className="relative z-20 h-full overflow-y-auto px-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="max-w-3xl w-full"
+          className="max-w-3xl w-full mx-auto"
         >
           <div className="relative pl-5">
             <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-white/40 via-white/15 to-transparent" />
@@ -195,26 +195,30 @@ export default function StarryMemoir() {
               })()}
             </div>
 
-            {/* 正文 */}
+            {/* 正文 — 优先用空行分段，回退到单换行 */}
             <div className="text-[1.0625rem] leading-[2] text-white/65 font-body">
-              {memoir.content.split(/\n\s*\n/).filter(Boolean).map((para, i) => {
-                if (i === 0) {
-                  const first = para[0] || ''
-                  const rest = para.slice(1)
+              {(() => {
+                const byDouble = memoir.content.split(/\n\s*\n/).filter(Boolean)
+                const paragraphs = byDouble.length > 1 ? byDouble : memoir.content.split(/\n/).filter(Boolean)
+                return paragraphs.map((para, i) => {
+                  if (i === 0) {
+                    const first = para[0] || ''
+                    const rest = para.slice(1)
+                    return (
+                      <p key={i} className="mb-0">
+                        <span className="drop-cap">{first}</span>
+                        {rest}
+                      </p>
+                    )
+                  }
                   return (
-                    <p key={i} className="mb-0">
-                      <span className="drop-cap">{first}</span>
-                      {rest}
-                    </p>
+                    <div key={i}>
+                      <div className="paragraph-divider">✦</div>
+                      <p>{para}</p>
+                    </div>
                   )
-                }
-                return (
-                  <div key={i}>
-                    <div className="paragraph-divider">✦</div>
-                    <p>{para}</p>
-                  </div>
-                )
-              })}
+                })
+              })()}
             </div>
           </div>
         </motion.div>
