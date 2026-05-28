@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMemoirs, type Memoir } from '@/data/memoirs'
@@ -102,7 +102,17 @@ export default function StarryMemoir() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const [memoir, setMemoir] = useState<Memoir | null>(null)
-  const [glassesScale, setGlassesScale] = useState(1)
+  const [glassesPos, setGlassesPos] = useState(() => {
+    try {
+      const saved = localStorage.getItem('starry-glasses-position')
+      return saved ? JSON.parse(saved) : { x: 0, y: 0, scale: 1 }
+    } catch {
+      return { x: 0, y: 0, scale: 1 }
+    }
+  })
+
+  const x = useMotionValue(glassesPos.x)
+  const y = useMotionValue(glassesPos.y)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -216,21 +226,29 @@ export default function StarryMemoir() {
               })()}
             </div>
 
-            {/* 老夏页面装饰 — 金丝眼镜（可拖拽、滚轮缩放） */}
+            {/* 老夏页面装饰 — 金丝眼镜（可拖拽、滚轮缩放，位置自动记忆） */}
             {memoir.title === '老夏' && (
-              <span className="hidden lg:block absolute -right-28 top-10">
+              <span className="hidden lg:block absolute -right-28 top-10 pointer-events-auto">
                 <motion.span
                   drag
                   dragMomentum={false}
                   whileHover={{ cursor: 'grab' }}
                   whileDrag={{ cursor: 'grabbing' }}
+                  style={{ x, y, rotate: -6, scale: glassesPos.scale }}
                   onWheel={(e) => {
                     e.stopPropagation()
                     e.preventDefault()
-                    setGlassesScale(prev => Math.max(0.3, Math.min(2.5, prev + (e.deltaY > 0 ? -0.05 : 0.05))))
+                    const nextScale = Math.max(0.3, Math.min(2.5, glassesPos.scale + (e.deltaY > 0 ? -0.05 : 0.05)))
+                    const next = { ...glassesPos, scale: nextScale }
+                    setGlassesPos(next)
+                    localStorage.setItem('starry-glasses-position', JSON.stringify(next))
                   }}
-                  style={{ rotate: -6, scale: glassesScale }}
-                  className="block pointer-events-auto"
+                  onDragEnd={() => {
+                    const next = { x: x.get(), y: y.get(), scale: glassesPos.scale }
+                    setGlassesPos(next)
+                    localStorage.setItem('starry-glasses-position', JSON.stringify(next))
+                  }}
+                  className="block"
                 >
                   <motion.img
                     src="/golden-glasses.png"
