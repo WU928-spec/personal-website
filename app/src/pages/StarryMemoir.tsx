@@ -102,6 +102,7 @@ export default function StarryMemoir() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const [memoir, setMemoir] = useState<Memoir | null>(null)
+  const [glassesScale, setGlassesScale] = useState(1)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -215,23 +216,32 @@ export default function StarryMemoir() {
               })()}
             </div>
 
-            {/* 老夏页面装饰 — 金丝眼镜 */}
+            {/* 老夏页面装饰 — 金丝眼镜（可拖拽、滚轮缩放） */}
             {memoir.title === '老夏' && (
-              <span
-                className="hidden lg:block absolute -right-28 top-10 pointer-events-none"
-                style={{ transform: 'rotate(-6deg)' }}
-              >
-                <motion.img
-                  src="/golden-glasses.png"
-                  alt="金丝眼镜"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 0.5, y: [0, -5, 0] }}
-                  transition={{
-                    opacity: { delay: 1, duration: 0.8 },
-                    y: { delay: 2, duration: 5, repeat: Infinity, ease: 'easeInOut' },
+              <span className="hidden lg:block absolute -right-28 top-10">
+                <motion.span
+                  drag
+                  dragMomentum={false}
+                  whileHover={{ cursor: 'grab' }}
+                  whileDrag={{ cursor: 'grabbing' }}
+                  onWheel={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    setGlassesScale(prev => Math.max(0.3, Math.min(2.5, prev + (e.deltaY > 0 ? -0.05 : 0.05))))
                   }}
-                  className="w-24"
-                />
+                  style={{ rotate: -6, scale: glassesScale }}
+                  className="block pointer-events-auto"
+                >
+                  <motion.img
+                    src="/golden-glasses.png"
+                    alt="金丝眼镜"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.5 }}
+                    transition={{ delay: 1, duration: 0.8 }}
+                    className="w-24"
+                    draggable={false}
+                  />
+                </motion.span>
               </span>
             )}
           </div>
