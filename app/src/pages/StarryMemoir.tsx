@@ -124,6 +124,12 @@ export default function StarryMemoir() {
     })
   }, [id])
 
+  useEffect(() => {
+    if (showVideo && videoRef.current) {
+      videoRef.current.play().catch(() => {})
+    }
+  }, [showVideo])
+
   if (loading) {
     return (
       <div className="relative w-screen h-screen overflow-hidden bg-[#080810] flex items-center justify-center">
@@ -167,8 +173,8 @@ export default function StarryMemoir() {
         <span className="text-sm font-body">返回星空</span>
       </motion.button>
 
-      <AnimatePresence mode="wait">
-        {!showVideo ? (
+      <AnimatePresence>
+        {!showVideo && (
           <motion.div
             key="content"
             className="relative z-20 h-full overflow-y-auto px-6 py-20 no-scrollbar"
@@ -288,20 +294,22 @@ export default function StarryMemoir() {
               </div>
             </motion.div>
           </motion.div>
-        ) : (
+        {showVideo && (
           <motion.div
             key="video"
-            className="relative z-20 h-full flex items-center justify-center"
-            initial={{ x: '30%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
             <video
               ref={videoRef}
               src="/next-video.mp4"
               autoPlay
               playsInline
-              className="max-w-full max-h-full object-contain"
+              muted
+              controls
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
               onEnded={() => {
                 if (videoRef.current) {
                   videoRef.current.pause()
