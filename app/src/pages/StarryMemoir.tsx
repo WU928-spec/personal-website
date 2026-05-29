@@ -161,18 +161,6 @@ export default function StarryMemoir() {
     <div className="relative w-screen h-screen overflow-hidden bg-[#080810]">
       <NebulaField />
 
-      {/* Back button */}
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-        onClick={() => navigate('/starry')}
-        className="absolute top-6 left-6 z-30 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
-      >
-        <ArrowLeft size={18} />
-        <span className="text-sm font-body">返回星空</span>
-      </motion.button>
-
       <AnimatePresence>
         {!showVideo && (
           <motion.div
@@ -181,6 +169,17 @@ export default function StarryMemoir() {
             exit={{ x: '-30%', opacity: 0 }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
           >
+            {/* Back button */}
+            <motion.button
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              onClick={() => navigate('/starry')}
+              className="absolute top-6 left-6 z-30 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+            >
+              <ArrowLeft size={18} />
+              <span className="text-sm font-body">返回星空</span>
+            </motion.button>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
