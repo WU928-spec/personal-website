@@ -298,18 +298,26 @@ export default function StarryMemoir() {
         {showVideo && (
           <motion.div
             key="video"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            className="fixed inset-0 z-50 flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              onClick={() => setShowVideo(false)}
+              className="absolute top-6 left-6 z-50 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+            >
+              <ArrowLeft size={18} />
+              <span className="text-sm font-body">返回</span>
+            </motion.button>
             <video
               ref={videoRef}
               src="/next-video.mp4"
               autoPlay
               playsInline
-              muted
-              controls
               className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
               onEnded={() => {
                 if (videoRef.current) {
