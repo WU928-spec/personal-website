@@ -308,7 +308,7 @@ export default function StarryMemoir() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               onClick={() => setShowVideo(false)}
-              className="absolute top-6 left-6 z-50 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+              className="absolute bottom-8 left-6 z-50 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
             >
               <ArrowLeft size={18} />
               <span className="text-sm font-body">返回</span>
