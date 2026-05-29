@@ -294,6 +294,7 @@ export default function StarryMemoir() {
               </div>
             </motion.div>
           </motion.div>
+        )}
         {showVideo && (
           <motion.div
             key="video"
