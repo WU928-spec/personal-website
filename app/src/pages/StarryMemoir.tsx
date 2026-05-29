@@ -167,7 +167,7 @@ export default function StarryMemoir() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3, duration: 0.6 }}
         onClick={() => navigate('/starry')}
-        className="absolute top-6 left-6 z-30 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+        className="absolute top-6 left-6 z-[60] flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
       >
         <ArrowLeft size={18} />
         <span className="text-sm font-body">返回星空</span>
