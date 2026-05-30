@@ -132,26 +132,24 @@ export function useMoments() {
         comments: [],
       }
 
-      // Try Supabase first
+      // 乐观更新本地状态，确保立即显示
+      const next = [newMoment, ...moments]
+      setMoments(sortDesc(next))
+      saveLocal(next)
+
+      // 同步到 Supabase（后台，不阻塞 UI）
       if (isSupabaseReady()) {
         try {
           const { error } = await supabase!
             .from('moments')
             .insert(momentToDb(newMoment))
           if (error) throw error
-          await fetchMoments()
-          return
         } catch {
-          /* fallback to local */
+          /* ignore sync error */
         }
       }
-
-      // Local fallback
-      const next = [newMoment, ...moments]
-      setMoments(sortDesc(next))
-      saveLocal(next)
     },
-    [moments, fetchMoments, userId]
+    [moments, userId]
   )
 
   const toggleLike = useCallback(
