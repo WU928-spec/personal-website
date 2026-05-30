@@ -105,10 +105,20 @@ export default function MusicPlayer() {
     const file = e.target.files?.[0]
     if (!file) return
     const base64 = await fileToBase64(file)
+    // 去掉后缀
+    const rawName = file.name.replace(/\.(mp3|flac)$/i, '')
+    // 按 " - " 分割艺术家和歌曲名
+    const parts = rawName.split(' - ')
+    let title = rawName
+    let artist = '未知艺术家'
+    if (parts.length >= 2) {
+      artist = parts[0].trim()
+      title = parts.slice(1).join(' - ').trim()
+    }
     const track: Track = {
       id: Date.now().toString(),
-      title: file.name.replace(/\.(mp3|flac)$/i, ''),
-      artist: '未知艺术家',
+      title,
+      artist,
       data: base64,
     }
     await addTrack(track)
