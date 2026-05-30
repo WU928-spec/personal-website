@@ -107,7 +107,7 @@ export default function MusicPlayer() {
     const base64 = await fileToBase64(file)
     const track: Track = {
       id: Date.now().toString(),
-      title: file.name.replace(/\.mp3$/i, ''),
+      title: file.name.replace(/\.(mp3|flac)$/i, ''),
       artist: '未知艺术家',
       data: base64,
     }
@@ -240,7 +240,7 @@ export default function MusicPlayer() {
                 <label className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white/90 text-sm cursor-pointer transition-colors">
                   <Plus size={14} />
                   <span>上传 MP3</span>
-                  <input type="file" accept="audio/mp3,audio/mpeg,audio/*" onChange={handleUpload} className="hidden" />
+                  <input type="file" accept="audio/mp3,audio/mpeg,audio/flac,audio/*" onChange={handleUpload} className="hidden" />
                 </label>
               </div>
 
