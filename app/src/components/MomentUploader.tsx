@@ -113,17 +113,23 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
   const handleSubmit = async () => {
     if (!canSubmit || submitting) return
     setSubmitting(true)
-    await onSubmit({
-      content: content.trim(),
-      images,
-      attachments: attachments.length > 0 ? attachments : undefined,
-      location: location.trim() || undefined,
-    })
-    setContent('')
-    setImages([])
-    setAttachments([])
-    setLocation('')
-    setSubmitting(false)
+    try {
+      await onSubmit({
+        content: content.trim(),
+        images,
+        attachments: attachments.length > 0 ? attachments : undefined,
+        location: location.trim() || undefined,
+      })
+      setContent('')
+      setImages([])
+      setAttachments([])
+      setLocation('')
+    } catch (err) {
+      console.error('发布失败:', err)
+      alert('发布失败，请检查网络后重试')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
