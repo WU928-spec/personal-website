@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ExternalLink, Star, GitFork } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import { loadGitHub, type GitHubData, type GitHubRepo } from '@/data/site'
 import { parseGitHubRepos, type GitHubAPIRepo } from '@/types/api'
+import { formatRelativeDate } from '@/utils/time'
+import RepoCard from '@/components/RepoCard'
 
 const LANG_COLORS: Record<string, string> = {
   TypeScript: '#3178c6',
@@ -19,19 +20,6 @@ const LANG_COLORS: Record<string, string> = {
   Shell: '#89e051',
   Vue: '#41b883',
   React: '#61dafb',
-}
-
-function formatRelativeDate(dateStr: string): string {
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  if (days === 0) return 'today'
-  if (days === 1) return '1 day ago'
-  if (days < 7) return `${days} days ago`
-  if (days < 30) return `${Math.floor(days / 7)} weeks ago`
-  if (days < 365) return `${Math.floor(days / 30)} months ago`
-  return `${Math.floor(days / 365)} years ago`
 }
 
 function generateContributionGrid(): number[][] {
@@ -165,42 +153,7 @@ export default function GitHubSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
           {github.repos.map((repo, i) => (
-            <motion.a
-              key={repo.name}
-              href={`https://github.com/WU928-spec/${repo.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 * i, ease: [0.16, 1, 0.3, 1] }}
-              className="block bg-Graphite/90 border border-white/[0.08] rounded-xl p-6 hover:border-white/[0.15] hover:shadow-deep hover:-translate-y-[2px] transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-mono text-[0.875rem] leading-[1.6] text-Amber">{repo.name}</h3>
-                <ExternalLink size={14} className="text-white/40" />
-              </div>
-              <p className="font-body text-[0.9375rem] leading-[1.65] text-white/70 mt-2 line-clamp-2">
-                {repo.description}
-              </p>
-              <div className="flex items-center gap-4 mt-4">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: repo.languageColor }} />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/60">{repo.language}</span>
-                </span>
-                <span className="flex items-center gap-1 text-white/60">
-                  <Star size={14} />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.stars}</span>
-                </span>
-                <span className="flex items-center gap-1 text-white/60">
-                  <GitFork size={14} />
-                  <span className="font-ui text-[0.8125rem] tracking-[0.04em]">{repo.forks}</span>
-                </span>
-                <span className="font-ui text-[0.8125rem] tracking-[0.04em] text-white/40 ml-auto">
-                  {repo.updated}
-                </span>
-              </div>
-            </motion.a>
+            <RepoCard key={repo.name} repo={repo} index={i} />
           ))}
         </div>
 

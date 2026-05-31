@@ -12,6 +12,76 @@ const iconMap: Record<string, React.ElementType> = {
   Mail,
 }
 
+function EditorColumn({
+  langKey,
+  label,
+  data,
+  setData,
+}: {
+  langKey: string
+  label: string
+  data: FooterData
+  setData: React.Dispatch<React.SetStateAction<FooterData>>
+}) {
+  const { t } = useLang()
+
+  const updateField = (field: 'brandDesc' | 'copyright' | 'tagline', value: string) => {
+    setData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const updateLink = (i: number, field: 'label' | 'path', value: string) => {
+    setData((prev) => {
+      const next = { ...prev, links: [...prev.links] }
+      next.links[i] = { ...next.links[i], [field]: value }
+      return next
+    })
+  }
+
+  const updateSocial = (i: number, field: 'label' | 'href', value: string) => {
+    setData((prev) => {
+      const next = { ...prev, socials: [...prev.socials] }
+      next.socials[i] = { ...next.socials[i], [field]: value }
+      return next
+    })
+  }
+
+  return (
+    <div className="bg-Graphite rounded-xl border border-white/10 p-5 space-y-4">
+      <p className="font-ui text-[0.8125rem] uppercase tracking-[0.1em] text-Sage/80">{label}</p>
+      <div className="space-y-2">
+        <label className="font-ui text-xs text-white/40">{t('editor.brandDesc')}</label>
+        <input value={data.brandDesc} onChange={(e) => updateField('brandDesc', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+      </div>
+      <div className="space-y-2">
+        <label className="font-ui text-xs text-white/40">{t('editor.copyright')}</label>
+        <input value={data.copyright} onChange={(e) => updateField('copyright', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+      </div>
+      <div className="space-y-2">
+        <label className="font-ui text-xs text-white/40">{t('editor.tagline')}</label>
+        <input value={data.tagline} onChange={(e) => updateField('tagline', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+      </div>
+      <div className="space-y-2">
+        <label className="font-ui text-xs text-white/40">{t('editor.navLinks')}</label>
+        {data.links.map((link, i) => (
+          <div key={`${langKey}-link-${i}`} className="flex gap-2">
+            <input value={link.label} onChange={(e) => updateLink(i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+            <input value={link.path} onChange={(e) => updateLink(i, 'path', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+          </div>
+        ))}
+      </div>
+      <div className="space-y-2">
+        <label className="font-ui text-xs text-white/40">{t('editor.socialLinks')}</label>
+        {data.socials.map((social, i) => (
+          <div key={`${langKey}-social-${i}`} className="flex gap-2">
+            <input value={social.label} onChange={(e) => updateSocial(i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+            <input value={social.href} onChange={(e) => updateSocial(i, 'href', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Footer() {
   const { t, lang } = useLang()
   const { isLoggedIn, isEditMode } = useAuth()
@@ -36,38 +106,6 @@ export default function Footer() {
     setEditZh(zh)
     setEditEn(en)
     setIsEditing(false)
-  }
-
-  const updateLink = (langKey: 'zh' | 'en', i: number, field: 'path' | 'label', value: string) => {
-    if (langKey === 'zh') {
-      const next = { ...editZh, links: [...editZh.links] }
-      next.links[i] = { ...next.links[i], [field]: value }
-      setEditZh(next)
-    } else {
-      const next = { ...editEn, links: [...editEn.links] }
-      next.links[i] = { ...next.links[i], [field]: value }
-      setEditEn(next)
-    }
-  }
-
-  const updateSocial = (langKey: 'zh' | 'en', i: number, field: 'href' | 'label', value: string) => {
-    if (langKey === 'zh') {
-      const next = { ...editZh, socials: [...editZh.socials] }
-      next.socials[i] = { ...next.socials[i], [field]: value }
-      setEditZh(next)
-    } else {
-      const next = { ...editEn, socials: [...editEn.socials] }
-      next.socials[i] = { ...next.socials[i], [field]: value }
-      setEditEn(next)
-    }
-  }
-
-  const updateField = (langKey: 'zh' | 'en', field: 'brandDesc' | 'copyright' | 'tagline', value: string) => {
-    if (langKey === 'zh') {
-      setEditZh({ ...editZh, [field]: value })
-    } else {
-      setEditEn({ ...editEn, [field]: value })
-    }
   }
 
   const display = isEditing ? (lang === 'zh' ? editZh : editEn) : data
@@ -99,75 +137,8 @@ export default function Footer() {
         {isEditing ? (
           /* Edit mode — bilingual side by side */
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Chinese editor */}
-            <div className="bg-Graphite rounded-xl border border-white/10 p-5 space-y-4">
-              <p className="font-ui text-[0.8125rem] uppercase tracking-[0.1em] text-Sage/80">中文</p>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.brandDesc')}</label>
-                <input value={editZh.brandDesc} onChange={(e) => updateField('zh', 'brandDesc', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.copyright')}</label>
-                <input value={editZh.copyright} onChange={(e) => updateField('zh', 'copyright', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.tagline')}</label>
-                <input value={editZh.tagline} onChange={(e) => updateField('zh', 'tagline', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.navLinks')}</label>
-                {editZh.links.map((link, i) => (
-                  <div key={`zh-link-${i}`} className="flex gap-2">
-                    <input value={link.label} onChange={(e) => updateLink('zh', i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                    <input value={link.path} onChange={(e) => updateLink('zh', i, 'path', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.socialLinks')}</label>
-                {editZh.socials.map((social, i) => (
-                  <div key={`zh-social-${i}`} className="flex gap-2">
-                    <input value={social.label} onChange={(e) => updateSocial('zh', i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                    <input value={social.href} onChange={(e) => updateSocial('zh', i, 'href', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* English editor */}
-            <div className="bg-Graphite rounded-xl border border-white/10 p-5 space-y-4">
-              <p className="font-ui text-[0.8125rem] uppercase tracking-[0.1em] text-Sage/80">English</p>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.brandDesc')}</label>
-                <input value={editEn.brandDesc} onChange={(e) => updateField('en', 'brandDesc', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.copyright')}</label>
-                <input value={editEn.copyright} onChange={(e) => updateField('en', 'copyright', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.tagline')}</label>
-                <input value={editEn.tagline} onChange={(e) => updateField('en', 'tagline', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.navLinks')}</label>
-                {editEn.links.map((link, i) => (
-                  <div key={`en-link-${i}`} className="flex gap-2">
-                    <input value={link.label} onChange={(e) => updateLink('en', i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                    <input value={link.path} onChange={(e) => updateLink('en', i, 'path', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <label className="font-ui text-xs text-white/40">{t('editor.socialLinks')}</label>
-                {editEn.socials.map((social, i) => (
-                  <div key={`en-social-${i}`} className="flex gap-2">
-                    <input value={social.label} onChange={(e) => updateSocial('en', i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                    <input value={social.href} onChange={(e) => updateSocial('en', i, 'href', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <EditorColumn langKey="zh" label="中文" data={editZh} setData={setEditZh} />
+            <EditorColumn langKey="en" label="English" data={editEn} setData={setEditEn} />
           </div>
         ) : (
           /* View mode */

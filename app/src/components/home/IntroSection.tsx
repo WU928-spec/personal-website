@@ -5,6 +5,7 @@ import { MapPin, Briefcase, Globe, Heart, Sparkles } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { loadAbout, type AboutData } from '@/data/about'
+import LazyImage from '@/components/LazyImage'
 
 const iconMap: Record<string, React.ElementType> = { MapPin, Briefcase, Globe, Heart, Sparkles }
 
@@ -29,7 +30,7 @@ export default function IntroSection() {
             className="md:col-span-4 flex flex-col items-center"
           >
             <div className="w-[200px] h-[200px] rounded-full overflow-hidden border-[3px] border-Amber shadow-medium">
-              <img src={avatar} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
+              <LazyImage src={avatar} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col gap-3 mt-6 w-full max-w-[280px]">
               {about.fields.map((field, i) => {
