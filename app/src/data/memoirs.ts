@@ -12,6 +12,9 @@ export interface Memoir {
 
 const STATIC_MEMOIRS_URL = '/memoirs.json'
 
+let cachedMemoirs: Memoir[] | null = null
+let cachePromise: Promise<Memoir[]> | null = null
+
 export const DEFAULT_MEMOIRS: Memoir[] = [
   {
     id: '1',
@@ -32,31 +35,42 @@ function migrateMemoir(m: Memoir): Memoir {
 
 /**
  * 读取静态 memoirs.json 文件。
+ * 同一次会话内缓存，避免主界面和详情页重复请求。
  * 失败时回退到默认值。
  */
 export async function getMemoirs(): Promise<Memoir[]> {
-  try {
-    const res = await fetch(STATIC_MEMOIRS_URL, { cache: 'no-store' })
-    if (!res.ok) return DEFAULT_MEMOIRS
+  if (cachedMemoirs) return cachedMemoirs
+  if (cachePromise) return cachePromise
 
-    const data = (await res.json()) as unknown
-    if (!Array.isArray(data)) return DEFAULT_MEMOIRS
+  cachePromise = (async () => {
+    try {
+      const res = await fetch(STATIC_MEMOIRS_URL)
+      if (!res.ok) throw new Error('fetch failed')
 
-    return (data as Record<string, unknown>[]).map((row) =>
-      migrateMemoir({
-        id: String(row.id),
-        title: String(row.title ?? ''),
-        date: String(row.date ?? ''),
-        content: String(row.content ?? ''),
-        brightness: Number(row.brightness ?? 0.5),
-        images: Array.isArray(row.images) ? (row.images as string[]) : undefined,
-        x: row.x !== null && row.x !== undefined ? Number(row.x) : undefined,
-        y: row.y !== null && row.y !== undefined ? Number(row.y) : undefined,
-      })
-    )
-  } catch {
-    return DEFAULT_MEMOIRS
-  }
+      const data = (await res.json()) as unknown
+      if (!Array.isArray(data)) throw new Error('invalid format')
+
+      cachedMemoirs = (data as Record<string, unknown>[]).map((row) =>
+        migrateMemoir({
+          id: String(row.id),
+          title: String(row.title ?? ''),
+          date: String(row.date ?? ''),
+          content: String(row.content ?? ''),
+          brightness: Number(row.brightness ?? 0.5),
+          images: Array.isArray(row.images) ? (row.images as string[]) : undefined,
+          x: row.x !== null && row.x !== undefined ? Number(row.x) : undefined,
+          y: row.y !== null && row.y !== undefined ? Number(row.y) : undefined,
+        })
+      )
+      return cachedMemoirs
+    } catch {
+      return DEFAULT_MEMOIRS
+    } finally {
+      cachePromise = null
+    }
+  })()
+
+  return cachePromise
 }
 
 // 为每颗 memoir 生成固定的随机坐标，避免每次渲染位置变化
