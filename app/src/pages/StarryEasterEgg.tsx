@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Play, Mail } from 'lucide-react'
+import { ArrowLeft, Mail } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
@@ -215,17 +215,6 @@ export default function StarryEasterEgg() {
         </motion.button>
       )}
 
-      {/* 播放视频按钮 */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0, duration: 0.8 }}
-        onClick={() => setShowVideo(true)}
-        className="absolute bottom-8 right-8 z-30 flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/5 px-5 py-3 rounded-full border border-white/10 hover:bg-white/10 hover:scale-105"
-      >
-        <Play size={16} fill="currentColor" />
-        <span className="text-sm font-body">观看星轨</span>
-      </motion.button>
     </div>
   )
 }
