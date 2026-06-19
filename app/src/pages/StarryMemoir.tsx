@@ -14,9 +14,9 @@ export default function StarryMemoir() {
   const [glassesPos, setGlassesPos] = useState(() => {
     try {
       const saved = localStorage.getItem('starry-glasses-position')
-      return saved ? JSON.parse(saved) : { x: -148.8, y: 9.5, scale: 2.05 }
+      return saved ? JSON.parse(saved) : { x: 0, y: 0, scale: 1 }
     } catch {
-      return { x: -148.8, y: 9.5, scale: 2.05 }
+      return { x: 0, y: 0, scale: 1 }
     }
   })
 
@@ -180,7 +180,7 @@ export default function StarryMemoir() {
                       setGlassesPos(next)
                       localStorage.setItem('starry-glasses-position', JSON.stringify(next))
                     }}
-                    className="fixed top-20 right-4 lg:top-24 lg:right-12 z-30 pointer-events-auto w-16 lg:w-24"
+                    className="fixed top-16 left-[55%] lg:top-20 lg:left-[58%] z-30 pointer-events-auto w-16 lg:w-20"
                   >
                     <img
                       src="/golden-glasses.png"
