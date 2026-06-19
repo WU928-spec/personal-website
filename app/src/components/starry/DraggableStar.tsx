@@ -9,9 +9,16 @@ interface DraggableStarProps {
   x: string
   y: string
   draggable: boolean
+  onPositionChange?: (x: number, y: number) => void
 }
 
-export default function DraggableStar({ memoir, x, y, draggable }: DraggableStarProps) {
+export default function DraggableStar({
+  memoir,
+  x,
+  y,
+  draggable,
+  onPositionChange,
+}: DraggableStarProps) {
   const navigate = useNavigate()
   const [hovered, setHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -24,7 +31,31 @@ export default function DraggableStar({ memoir, x, y, draggable }: DraggableStar
         dragMomentum={false}
         whileDrag={{ scale: 1.4, cursor: 'grabbing' }}
         onDragStart={() => setIsDragging(true)}
-        onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
+        onDragEnd={(_, info) => {
+          setTimeout(() => setIsDragging(false), 50)
+
+          if (!onPositionChange) return
+
+          // 忽略微小移动（避免点击被误判为拖动）
+          const threshold = 3
+          if (Math.abs(info.offset.x) < threshold && Math.abs(info.offset.y) < threshold) {
+            return
+          }
+
+          // 原始位置（百分比 → 像素）
+          const origXPx = (parseFloat(x) / 100) * window.innerWidth
+          const origYPx = (parseFloat(y) / 100) * window.innerHeight
+
+          // 拖动后的新位置（像素）
+          const newXPx = origXPx + info.offset.x
+          const newYPx = origYPx + info.offset.y
+
+          // 转回百分比，并限制在 5% ~ 95% 范围内
+          const newX = Math.max(5, Math.min(95, (newXPx / window.innerWidth) * 100))
+          const newY = Math.max(5, Math.min(95, (newYPx / window.innerHeight) * 100))
+
+          onPositionChange(newX, newY)
+        }}
         onClick={() => {
           if (!isDragging) navigate(`/starry/${memoir.id}`)
         }}

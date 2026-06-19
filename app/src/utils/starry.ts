@@ -3,7 +3,14 @@ export function seededRandom(seed: number): number {
   return x - Math.floor(x)
 }
 
-export function getStarPos(id: string): { x: string; y: string } {
+export function getStarPos(
+  id: string,
+  saved?: { x?: number; y?: number }
+): { x: string; y: string } {
+  if (saved?.x !== undefined && saved?.y !== undefined) {
+    return { x: `${saved.x}%`, y: `${saved.y}%` }
+  }
+
   const n = parseInt(id, 10)
   let xPct = 10 + seededRandom(n * 1.1) * 80
   let yPct = 10 + seededRandom(n * 2.3) * 80

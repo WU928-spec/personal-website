@@ -50,6 +50,8 @@ export interface Memoir {
   brightness: number // 0.1 ~ 1.0，越激动越亮
   image?: string     // 已弃用，向后兼容
   images?: string[]  // Base64 图片数组
+  x?: number         // 0 ~ 100，屏幕宽度百分比（拖拽后保存）
+  y?: number         // 0 ~ 100，屏幕高度百分比（拖拽后保存）
 }
 ```
 
@@ -62,11 +64,15 @@ export interface Memoir {
 **文件**：`app/src/utils/starry.ts`
 
 ```ts
-export function getStarPos(id: string): { x: string; y: string }
+export function getStarPos(
+  id: string,
+  saved?: { x?: number; y?: number }
+): { x: string; y: string }
 ```
 
-- 使用基于 `id` 的伪随机种子：`Math.sin(seed * 127.1) * 43758.5453`
-- 同一颗 `id` 的星星位置固定，不会因为刷新而改变
+- 如果 `saved.x` / `saved.y` 存在，优先使用保存的拖拽位置。
+- 否则使用基于 `id` 的伪随机种子：`Math.sin(seed * 127.1) * 43758.5453`
+- 同一颗 `id` 的默认位置固定，不会因为刷新而改变
 - 会避开屏幕中心区域（防止遮挡文案）
 
 ## 五、持久化策略
@@ -76,8 +82,9 @@ export function getStarPos(id: string): { x: string; y: string }
 ### 5.1 云端存储：Supabase
 
 - 表名：`starry_memoirs`
-- 字段：`id`（PK）, `title`, `date`, `content`, `brightness`, `images`（JSONB）, `created_at`, `updated_at`
+- 字段：`id`（PK）, `title`, `date`, `content`, `brightness`, `images`（JSONB）, `x`, `y`, `created_at`, `updated_at`
 - 冲突策略：**云端优先**。`getMemoirs()` 优先拉取 Supabase；成功则覆盖本地缓存。Supabase 不可用时回退 IndexedDB / 默认值。
+- 拖拽位置：`x` / `y` 记录星星在屏幕上的百分比坐标，随 memoir 数据一起被保存和同步。
 - 写入策略：`saveMemoirs()` 先写 IndexedDB，再后台静默 upsert 到 Supabase；失败不阻塞 UI。
 
 ### 5.2 本地缓存：IndexedDB
@@ -138,6 +145,7 @@ export function getStarPos(id: string): { x: string; y: string }
 
 - 使用 Framer Motion 的 `drag` 实现拖拽
 - 点击（非拖拽时）跳转 `/starry/${memoir.id}`
+- 拖拽结束计算新的屏幕百分比坐标，回调给父组件保存
 - Hover 显示日期 tooltip
 - CSS 动画 `starPulse` 实现呼吸发光效果
 

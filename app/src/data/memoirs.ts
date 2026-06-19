@@ -8,6 +8,8 @@ export interface Memoir {
   brightness: number // 0.1 ~ 1.0，越激动越亮
   image?: string // deprecated，向后兼容
   images?: string[]
+  x?: number // 0 ~ 100，屏幕宽度百分比
+  y?: number // 0 ~ 100，屏幕高度百分比
 }
 
 const STORAGE_KEY = 'starry-memoirs-v1'
@@ -216,6 +218,8 @@ function dbToMemoir(row: Record<string, unknown>): Memoir {
     content: String(row.content ?? ''),
     brightness: Number(row.brightness ?? 0.5),
     images: Array.isArray(row.images) ? (row.images as string[]) : undefined,
+    x: row.x !== null && row.x !== undefined ? Number(row.x) : undefined,
+    y: row.y !== null && row.y !== undefined ? Number(row.y) : undefined,
   })
 }
 
@@ -227,6 +231,8 @@ function memoirToDb(m: Memoir): Record<string, unknown> {
     content: m.content,
     brightness: m.brightness,
     images: m.images ?? [],
+    x: m.x ?? null,
+    y: m.y ?? null,
     updated_at: new Date().toISOString(),
   }
 }

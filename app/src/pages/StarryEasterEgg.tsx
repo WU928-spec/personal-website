@@ -76,8 +76,22 @@ export default function StarryEasterEgg() {
         className={`absolute inset-0 z-10 transition-opacity duration-700 ${showVideo ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         {memoirs.map((m) => {
-          const pos = getStarPos(m.id)
-          return <DraggableStar key={m.id} memoir={m} x={pos.x} y={pos.y} draggable={draggable} />
+          const pos = getStarPos(m.id, { x: m.x, y: m.y })
+          return (
+            <DraggableStar
+              key={m.id}
+              memoir={m}
+              x={pos.x}
+              y={pos.y}
+              draggable={draggable}
+              onPositionChange={(x, y) => {
+                const next = memoirs.map((item) =>
+                  item.id === m.id ? { ...item, x, y } : item
+                )
+                handleChange(next)
+              }}
+            />
+          )
         })}
       </div>
 

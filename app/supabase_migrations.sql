@@ -108,3 +108,6 @@ CREATE POLICY "Allow public select" ON starry_memoirs FOR SELECT USING (true);
 CREATE POLICY "Allow public insert" ON starry_memoirs FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update" ON starry_memoirs FOR UPDATE USING (true);
 CREATE POLICY "Allow public delete" ON starry_memoirs FOR DELETE USING (true);
+
+ALTER TABLE starry_memoirs ADD COLUMN IF NOT EXISTS x NUMERIC;
+ALTER TABLE starry_memoirs ADD COLUMN IF NOT EXISTS y NUMERIC;
