@@ -7,18 +7,40 @@ import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import NebulaField from '@/components/starry/NebulaField'
 import PhotoFrame from '@/components/starry/PhotoFrame'
 
+interface GlassesPosition {
+  x: number
+  y: number
+  scale: number
+}
+
+const DEFAULT_GLASSES_POS: GlassesPosition = { x: 0, y: 0, scale: 1 }
+
+function loadGlassesPosition(): GlassesPosition {
+  try {
+    const saved = localStorage.getItem('starry-glasses-position')
+    if (saved) {
+      const parsed = JSON.parse(saved) as unknown
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        'x' in parsed &&
+        'y' in parsed &&
+        'scale' in parsed
+      ) {
+        return parsed as GlassesPosition
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_GLASSES_POS
+}
+
 export default function StarryMemoir() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const [memoir, setMemoir] = useState<Memoir | null>(null)
-  const [glassesPos, setGlassesPos] = useState(() => {
-    try {
-      const saved = localStorage.getItem('starry-glasses-position')
-      return saved ? JSON.parse(saved) : { x: 0, y: 0, scale: 1 }
-    } catch {
-      return { x: 0, y: 0, scale: 1 }
-    }
-  })
+  const [glassesPos, setGlassesPos] = useState<GlassesPosition>(loadGlassesPosition)
 
   const x = useMotionValue(glassesPos.x)
   const y = useMotionValue(glassesPos.y)
