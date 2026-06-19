@@ -102,7 +102,6 @@ export default function StarryEasterEgg() {
       }, 1000)
       return () => {
         clearTimeout(timer)
-        setIsTransitioning(false)
       }
     }
   }, [allBrightClicked, secret, navigate, location.state, isTransitioning, hasCompleted])
@@ -257,8 +256,8 @@ export default function StarryEasterEgg() {
 
       {/* 全部点亮后的平滑过渡遮罩 */}
       <div
-        className={`absolute inset-0 z-[40] bg-[#050508] pointer-events-none transition-opacity duration-1000 ease-in ${
-          isTransitioning ? 'opacity-100' : 'opacity-0'
+        className={`absolute inset-0 z-[40] bg-[#050508] transition-opacity duration-1000 ease-in ${
+          isTransitioning ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       />
 

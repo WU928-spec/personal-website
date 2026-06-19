@@ -231,8 +231,10 @@ export default function StarryEpilogue() {
                   {section.content?.map((text, i) => (
                     <p
                       key={i}
-                      className={`text-white/${i === 0 ? '90' : '60'} font-body ${
-                        i === 0 ? 'text-base tracking-[0.2em]' : 'text-sm md:text-[15px] leading-[2] tracking-wide'
+                      className={`font-body ${
+                        i === 0
+                          ? 'text-white/90 text-base tracking-[0.2em]'
+                          : 'text-white/60 text-sm md:text-[15px] leading-[2] tracking-wide'
                       }`}
                     >
                       {text}

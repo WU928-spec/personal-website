@@ -22,20 +22,4 @@ export function getStarPos(
   return { x: `${xPct}%`, y: `${yPct}%` }
 }
 
-export function compressImage(base64: string, maxWidth = 800, quality = 0.75): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = document.createElement('img')
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const ratio = Math.min(maxWidth / img.width, 1)
-      canvas.width = Math.round(img.width * ratio)
-      canvas.height = Math.round(img.height * ratio)
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return reject(new Error('canvas error'))
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      resolve(canvas.toDataURL('image/jpeg', quality))
-    }
-    img.onerror = reject
-    img.src = base64
-  })
-}
+

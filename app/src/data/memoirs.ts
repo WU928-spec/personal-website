@@ -130,16 +130,4 @@ export async function getStarrySecret(): Promise<StarrySecret> {
   }
 }
 
-// 为每颗 memoir 生成固定的随机坐标，避免每次渲染位置变化
-const seededRandom = (seed: number) => {
-  const x = Math.sin(seed * 127.1) * 43758.5453
-  return x - Math.floor(x)
-}
 
-export const getStarPosition = (id: string, width: number, height: number) => {
-  const seed = parseInt(id, 10)
-  const margin = 80
-  const x = margin + seededRandom(seed * 1.1) * (width - margin * 2)
-  const y = margin + seededRandom(seed * 2.3) * (height - margin * 2)
-  return { x, y }
-}

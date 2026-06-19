@@ -12,6 +12,18 @@ export default function StarryMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const currentSrcRef = useRef<string>('')
   const startedRef = useRef(false)
+  const activeRef = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      activeRef.current = false
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ''
+        audioRef.current = null
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const src = getMusicSrc(location.pathname)
@@ -24,7 +36,7 @@ export default function StarryMusic() {
       currentSrcRef.current = src
 
       const start = () => {
-        if (startedRef.current) return
+        if (!activeRef.current || startedRef.current) return
         startedRef.current = true
         audio.play().catch(() => {})
       }
@@ -40,32 +52,23 @@ export default function StarryMusic() {
     const audio = audioRef.current
     currentSrcRef.current = src
 
-    // 切换歌曲时先淡出再换源
-    const fadeOut = () => {
+    // 切换歌曲：暂停后直接换源并播放
+    const switchAndPlay = () => {
       audio.src = src
       audio.load()
-      audio.play().catch(() => {})
+      if (startedRef.current) {
+        audio.play().catch(() => {})
+      }
     }
 
     if (audio.paused) {
-      fadeOut()
+      switchAndPlay()
       return
     }
 
-    // 简单淡出：直接切歌（浏览器自带音频切换会有短暂停顿，可接受）
     audio.pause()
-    fadeOut()
+    switchAndPlay()
   }, [location.pathname])
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current.src = ''
-        audioRef.current = null
-      }
-    }
-  }, [])
 
   return null
 }

@@ -44,17 +44,10 @@ function loadAsset(url: string): Promise<void> {
     media.muted = true
     media.src = url
 
-    const cleanup = () => {
+    const finish = () => {
       media.oncanplaythrough = null
       media.onerror = null
       media.onstalled = null
-      media.pause()
-      media.src = ''
-      media.load()
-    }
-
-    const finish = () => {
-      cleanup()
       resolve()
     }
 

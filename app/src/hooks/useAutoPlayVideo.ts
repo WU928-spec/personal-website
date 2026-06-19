@@ -2,8 +2,13 @@ import { useEffect, type RefObject } from 'react'
 
 export function useAutoPlayVideo(videoRef: RefObject<HTMLVideoElement | null>, showVideo: boolean) {
   useEffect(() => {
-    if (showVideo && videoRef.current) {
-      videoRef.current.play().catch(() => {})
+    const video = videoRef.current
+    if (!video) return
+
+    if (showVideo) {
+      video.play().catch(() => {})
+    } else {
+      video.pause()
     }
   }, [showVideo, videoRef])
 }

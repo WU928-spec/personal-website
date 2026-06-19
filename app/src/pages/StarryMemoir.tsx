@@ -25,6 +25,7 @@ export default function StarryMemoir() {
   const [loading, setLoading] = useState(true)
   const [showVideo, setShowVideo] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const glassesRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     getMemoirs().then((all) => {
@@ -34,6 +35,30 @@ export default function StarryMemoir() {
   }, [id])
 
   useAutoPlayVideo(videoRef, showVideo)
+
+  // 金丝眼镜滚轮缩放：必须使用 { passive: false } 才能阻止默认滚动
+  useEffect(() => {
+    const el = glassesRef.current
+    if (!el) return
+
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
+      setGlassesPos((prev) => {
+        const nextScale = Math.max(0.3, Math.min(2.5, prev.scale + (e.deltaY > 0 ? -0.05 : 0.05)))
+        const next = { ...prev, scale: nextScale }
+        try {
+          localStorage.setItem('starry-glasses-position', JSON.stringify(next))
+        } catch {
+          // ignore
+        }
+        return next
+      })
+    }
+
+    el.addEventListener('wheel', handleWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleWheel)
+  }, [])
 
   if (loading) {
     return (
@@ -159,6 +184,7 @@ export default function StarryMemoir() {
                 {/* 老夏页面装饰 — 金丝眼镜 */}
                 {memoir.title === '老夏' && (
                   <motion.span
+                    ref={glassesRef}
                     drag
                     dragMomentum={false}
                     whileHover={{ cursor: 'grab' }}
@@ -167,18 +193,14 @@ export default function StarryMemoir() {
                     animate={{ opacity: 0.7 }}
                     transition={{ delay: 0.6, duration: 0.8 }}
                     style={{ x, y, rotate: -6, scale: glassesPos.scale }}
-                    onWheel={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      const nextScale = Math.max(0.3, Math.min(2.5, glassesPos.scale + (e.deltaY > 0 ? -0.05 : 0.05)))
-                      const next = { ...glassesPos, scale: nextScale }
-                      setGlassesPos(next)
-                      localStorage.setItem('starry-glasses-position', JSON.stringify(next))
-                    }}
                     onDragEnd={() => {
                       const next = { x: x.get(), y: y.get(), scale: glassesPos.scale }
                       setGlassesPos(next)
-                      localStorage.setItem('starry-glasses-position', JSON.stringify(next))
+                      try {
+                        localStorage.setItem('starry-glasses-position', JSON.stringify(next))
+                      } catch {
+                        // ignore
+                      }
                     }}
                     className="fixed top-16 left-[55%] lg:top-20 lg:left-[58%] z-30 pointer-events-auto w-16 lg:w-20"
                   >
