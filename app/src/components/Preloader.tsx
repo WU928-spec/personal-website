@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   preloadMemoirs,
@@ -21,32 +21,44 @@ const PRELOAD_ASSETS: string[] = [
   '/next-video.mp4',
 ]
 
+const MIN_WAIT_MS = 800
+const MAX_WAIT_MS = 5000
+const ASSET_TIMEOUT = 15000
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
+  return Promise.race([
+    promise,
+    new Promise<void>((resolve) => setTimeout(resolve, ms)),
+  ])
+}
+
 function loadAsset(url: string): Promise<HTMLImageElement | HTMLMediaElement | void> {
   return new Promise((resolve) => {
     const ext = url.split('.').pop()?.toLowerCase()
 
-    // 图片：用 Image 对象预加载，并等待解码完成，确保进入页面后能立即渲染
+    // 图片：先 attach 事件再设 src，并等待解码完成
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) {
       const img = new Image()
-      img.src = url
 
-      const finish = () => resolve(img)
-      const fallbackFinish = () => {
+      const finish = () => {
         img.onload = null
         img.onerror = null
-        finish()
+        resolve(img)
       }
 
-      if ('decode' in img && typeof img.decode === 'function') {
-        img.decode().then(fallbackFinish).catch(fallbackFinish)
-      } else {
-        img.onload = fallbackFinish
-        img.onerror = fallbackFinish
+      img.onload = () => {
+        if ('decode' in img && typeof img.decode === 'function') {
+          img.decode().then(finish).catch(finish)
+        } else {
+          finish()
+        }
       }
+      img.onerror = finish
+      img.src = url
       return
     }
 
-    // 音频/视频：用原生媒体元素预加载，浏览器会按媒体策略缓存并准备播放
+    // 音频/视频：用原生媒体元素预加载，设兜底超时避免某些浏览器不触发 canplaythrough
     const isAudio = ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'].includes(ext || '')
     const media = isAudio
       ? (new Audio() as HTMLAudioElement | HTMLVideoElement)
@@ -56,19 +68,25 @@ function loadAsset(url: string): Promise<HTMLImageElement | HTMLMediaElement | v
     media.muted = true
     media.src = url
 
+    let finished = false
     const finish = () => {
+      if (finished) return
+      finished = true
       media.oncanplaythrough = null
+      media.onloadedmetadata = null
       media.onerror = null
       media.onstalled = null
       resolve(media)
     }
 
     media.oncanplaythrough = finish
+    media.onloadedmetadata = finish
     media.onerror = finish
     media.onstalled = finish
-
-    // 部分浏览器不会自动开始加载，手动触发
     media.load()
+
+    // 兜底：即使事件未触发，也视为完成，避免卡住预加载器
+    setTimeout(finish, ASSET_TIMEOUT)
   })
 }
 
@@ -101,74 +119,77 @@ interface PreloaderProps {
 }
 
 export default function Preloader({ children }: PreloaderProps) {
+  const [ready, setReady] = useState(false)
   const [loaded, setLoaded] = useState(0)
-  const [done, setDone] = useState(false)
-  const assetsRef = useRef<(HTMLImageElement | HTMLMediaElement)[]>([])
   const total = PRELOAD_ASSETS.length
   const progress = total > 0 ? Math.round((loaded / total) * 100) : 100
 
   useEffect(() => {
     let cancelled = false
+    let entered = false
 
-    const finish = () => {
-      if (cancelled) return
-      // 进度条到达 100% 后短暂停顿再进入，视觉更完整
-      setTimeout(() => setDone(true), 400)
+    const enter = () => {
+      if (entered || cancelled) return
+      entered = true
+      setReady(true)
     }
 
-    const loadAll = async () => {
-      // 限制并发数，避免一次性发起过多请求导致网络拥塞或失败
-      const concurrency = 4
-      const queue = [...PRELOAD_ASSETS]
-      const workers = Array.from({ length: concurrency }, async () => {
-        while (queue.length > 0) {
-          const url = queue.shift()
-          if (!url) break
-          const asset = await loadAsset(url)
-          if (asset) assetsRef.current.push(asset)
-          if (!cancelled) {
-            setLoaded((prev) => Math.min(prev + 1, total))
-          }
-        }
-      })
+    // 数据必须加载完成；失败也由页面自身兜底
+    const dataPromise = preloadData().catch(() => {})
 
-      await Promise.all([Promise.all(workers), preloadData()])
+    // 资源后台预加载，不阻塞进入页面
+    Promise.all(
+      PRELOAD_ASSETS.map((url) =>
+        withTimeout(loadAsset(url), ASSET_TIMEOUT)
+          .catch(() => {})
+          .finally(() => {
+            if (!cancelled) {
+              setLoaded((prev) => Math.min(prev + 1, total))
+            }
+          })
+      )
+    ).then(() => {
+      // 如果全部资源很快加载完，可以比 MAX_WAIT_MS 更早进入
+      if (!cancelled) enter()
+    })
 
-      if (!cancelled) finish()
-    }
+    // 至少等待数据和最小视觉时间，避免闪烁
+    Promise.all([dataPromise, new Promise<void>((r) => setTimeout(r, MIN_WAIT_MS))]).then(() => {
+      if (!cancelled) enter()
+    })
 
-    loadAll()
+    // 全局兜底：无论如何最多等 5 秒，必须进入页面，防止任何原因卡死
+    const globalTimer = setTimeout(() => {
+      if (!cancelled) enter()
+    }, MAX_WAIT_MS)
 
     return () => {
       cancelled = true
-      assetsRef.current = []
+      clearTimeout(globalTimer)
     }
   }, [total])
 
   return (
     <AnimatePresence mode="wait">
-      {!done ? (
+      {!ready ? (
         <motion.div
           key="preloader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          transition={{ duration: 0.5, ease: 'easeInOut' }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050508] text-white"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="flex flex-col items-center gap-6 w-full max-w-md px-8"
           >
             <div className="text-center space-y-2">
               <h1 className="text-xl font-body tracking-[0.3em] text-white/90">正在装载星光</h1>
-              <p className="text-xs text-white/40 font-body tracking-widest">
-                {progress}%
-              </p>
+              <p className="text-xs text-white/40 font-body tracking-widest">{progress}%</p>
             </div>
 
-            {/* 进度条轨道 */}
             <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-white/60 to-white/90 rounded-full"
