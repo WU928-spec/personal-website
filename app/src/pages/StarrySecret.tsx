@@ -118,6 +118,7 @@ export default function StarrySecret() {
 
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={goPrev}
                     disabled={!hasPrev}
                     className="text-white/80 hover:text-white disabled:text-white/30 transition-colors"
@@ -127,17 +128,17 @@ export default function StarrySecret() {
                   </button>
 
                   {isLastPage ? (
-                    <motion.button
+                    <button
+                      type="button"
                       onClick={goNext}
-                      animate={{ scale: [1, 1.15, 1], opacity: [0.85, 1, 0.85] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                      className="text-white hover:text-yellow-200 transition-colors drop-shadow-[0_0_10px_rgba(255,255,200,0.6)]"
+                      className="text-white hover:text-yellow-200 transition-colors drop-shadow-[0_0_10px_rgba(255,255,200,0.6)] animate-starGlow"
                       aria-label="点亮星空"
                     >
                       <Star size={20} fill="currentColor" />
-                    </motion.button>
+                    </button>
                   ) : (
                     <button
+                      type="button"
                       onClick={goNext}
                       className="text-white/80 hover:text-white transition-colors"
                       aria-label="下一页"

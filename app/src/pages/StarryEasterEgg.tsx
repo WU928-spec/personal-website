@@ -70,10 +70,12 @@ export default function StarryEasterEgg() {
   }, [brightIds, clickedIds])
 
   useEffect(() => {
+    // 从信件页点击星星返回并播放视频时，不要再次跳转回信件页
+    if (location.state?.playVideo) return
     if (allBrightClicked && secret && secret.pages.length > 0) {
       navigate('/starry/secret')
     }
-  }, [allBrightClicked, secret, navigate])
+  }, [allBrightClicked, secret, navigate, location.state])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {
