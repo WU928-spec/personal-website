@@ -78,9 +78,9 @@ export default function StarrySecret() {
       className="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: 'url(/letter-bg.png)' }}
     >
-      {/* 文字区域：浮在花海偏左位置 */}
-      <div className="absolute inset-0 flex items-center justify-center md:justify-start md:pl-[12vw] lg:pl-[16vw]">
-        <div className="relative w-full max-w-[min(88vw,520px)] md:max-w-[420px] lg:max-w-[460px] px-6 md:px-0 -translate-y-[2vh] md:-translate-y-0">
+      {/* 文字区域：浮在花海左上方 */}
+      <div className="absolute inset-0 flex justify-center md:justify-start md:pl-[6vw] lg:pl-[8vw] pt-[14vh] md:pt-[16vh]">
+        <div className="relative w-full max-w-[min(84vw,420px)] md:max-w-[360px] lg:max-w-[400px] px-6 md:px-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={page}
@@ -90,16 +90,16 @@ export default function StarrySecret() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
             >
               {secret?.title && page === 0 && (
-                <h1 className="text-white font-body text-[clamp(1rem,4vw,1.35rem)] tracking-[0.25em] mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                <h1 className="text-white font-body text-[clamp(0.85rem,2.6vw,1.05rem)] tracking-[0.25em] mb-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
                   {secret.title}
                 </h1>
               )}
 
-              <p className="text-white font-body text-[clamp(1rem,4vw,1.25rem)] leading-[2.2] whitespace-pre-line drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              <p className="text-white font-body text-[clamp(0.85rem,2.4vw,1rem)] leading-[2] whitespace-pre-line drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
                 {pages[page]}
               </p>
 
-              <div className="mt-8 text-white/70 text-xs font-body tracking-widest drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
+              <div className="mt-6 text-white/70 text-xs font-body tracking-widest drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
                 {page + 1} / {total}
               </div>
             </motion.div>
