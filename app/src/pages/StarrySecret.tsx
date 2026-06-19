@@ -91,7 +91,7 @@ export default function StarrySecret() {
       style={{ backgroundImage: 'url(/letter-bg.png)' }}
     >
       {/* 文字区域：浮在花海左上方 */}
-      <div className="absolute inset-0 flex justify-center md:justify-start md:pl-[6vw] lg:pl-[8vw] pt-[8vh] md:pt-[16vh]">
+      <div className="absolute inset-0 flex justify-center md:justify-start md:pl-[6vw] lg:pl-[8vw] pt-[4vh] md:pt-[16vh]">
         <div className="relative w-full max-w-[min(90vw,460px)] md:max-w-[360px] lg:max-w-[400px] px-6 md:px-0">
           <AnimatePresence mode="wait">
             <motion.div
@@ -102,16 +102,16 @@ export default function StarrySecret() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
             >
               {secret?.title && page === 0 && (
-                <h1 className="text-white font-body text-[clamp(0.8rem,3vw,1.05rem)] tracking-[0.25em] mb-3 md:mb-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                <h1 className="text-white font-body text-[clamp(0.75rem,2.8vw,1.05rem)] tracking-[0.25em] mb-2 md:mb-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
                   {secret.title}
                 </h1>
               )}
 
-              <p className="text-white font-body text-[clamp(0.75rem,3.2vw,1rem)] leading-[1.75] md:leading-[2] whitespace-pre-line drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              <p className="text-white font-body text-[clamp(0.7rem,3vw,1rem)] leading-[1.65] md:leading-[2] whitespace-pre-line drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
                 {pages[page]}
               </p>
 
-              <div className="mt-4 md:mt-6 flex items-center justify-between">
+              <div className="mt-3 md:mt-6 flex items-center justify-between">
                 <span className="text-white/70 text-xs font-body tracking-widest drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
                   {page + 1} / {total}
                 </span>
