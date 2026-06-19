@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMemoirs, type Memoir } from '@/data/memoirs'
 import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
+import { useBackgroundMusic } from '@/hooks/useBackgroundMusic'
 import NebulaField from '@/components/starry/NebulaField'
 import PhotoFrame from '@/components/starry/PhotoFrame'
 
@@ -34,6 +35,7 @@ export default function StarryMemoir() {
   }, [id])
 
   useAutoPlayVideo(videoRef, showVideo)
+  useBackgroundMusic('/bg-music.mp3')
 
   if (loading) {
     return (
