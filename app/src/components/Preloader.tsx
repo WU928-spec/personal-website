@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import App from '../App.tsx'
 import {
   preloadMemoirs,
   preloadStarrySecret,
@@ -84,7 +83,11 @@ async function preloadData(): Promise<void> {
   }
 }
 
-export default function Preloader() {
+interface PreloaderProps {
+  children: ReactNode
+}
+
+export default function Preloader({ children }: PreloaderProps) {
   const [loaded, setLoaded] = useState(0)
   const [done, setDone] = useState(false)
   const total = PRELOAD_ASSETS.length
@@ -168,7 +171,7 @@ export default function Preloader() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <App />
+          {children}
         </motion.div>
       )}
     </AnimatePresence>

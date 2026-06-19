@@ -2,10 +2,10 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import 'katex/dist/katex.min.css'
 import './index.css'
-import Preloader from './components/Preloader.tsx'
+import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <HashRouter>
-    <Preloader />
+    <App />
   </HashRouter>,
 )

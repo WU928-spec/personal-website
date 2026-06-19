@@ -12,6 +12,7 @@ import StarryMemoir from './pages/StarryMemoir.tsx'
 import StarrySecret from './pages/StarrySecret.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
+import Preloader from './components/Preloader.tsx'
 import { seedDemoDataIfEmpty } from './utils/projectSeed.ts'
 
 const Calendar = lazy(() => import('./pages/Calendar.tsx'))
@@ -30,12 +31,14 @@ function App() {
     return (
       <>
         <ErrorBoundary>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/starry" element={<StarryEasterEgg />} />
-            <Route path="/starry/secret" element={<StarrySecret />} />
-            <Route path="/starry/epilogue" element={<StarryEpilogue />} />
-            <Route path="/starry/:id" element={<StarryMemoir />} />
-          </Routes>
+          <Preloader>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/starry" element={<StarryEasterEgg />} />
+              <Route path="/starry/secret" element={<StarrySecret />} />
+              <Route path="/starry/epilogue" element={<StarryEpilogue />} />
+              <Route path="/starry/:id" element={<StarryMemoir />} />
+            </Routes>
+          </Preloader>
         </ErrorBoundary>
       </>
     )
