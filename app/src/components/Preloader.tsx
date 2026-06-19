@@ -136,12 +136,10 @@ export default function Preloader() {
       if (!cancelled) finish()
     }
 
-    // 全局保险：即使个别资源一直不返回，最多 25 秒后强制进入
+    // 全局保险：即使 loading 流程自身 hang 住，最多 25 秒后也会退出预加载
+    // 注意：这里不再把进度硬拉到 100%，避免资源实际没加载完就误导用户
     globalTimer = setTimeout(() => {
-      if (!cancelled) {
-        setLoaded(total)
-        finish()
-      }
+      if (!cancelled) finish()
     }, 25000)
 
     loadAll()
