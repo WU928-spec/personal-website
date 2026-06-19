@@ -39,6 +39,7 @@ export default function StarryEasterEgg() {
   const [isLoading, setIsLoading] = useState(true)
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)
   const [secret, setSecret] = useState<StarrySecret | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const refreshMemoirs = useCallback(async () => {
@@ -72,10 +73,17 @@ export default function StarryEasterEgg() {
   useEffect(() => {
     // 从信件页点击星星返回并播放视频时，不要再次跳转回信件页
     if (location.state?.playVideo) return
-    if (allBrightClicked && secret && secret.pages.length > 0) {
-      navigate('/starry/secret')
+    if (allBrightClicked && secret && secret.pages.length > 0 && !isTransitioning) {
+      setIsTransitioning(true)
+      const timer = setTimeout(() => {
+        navigate('/starry/secret')
+      }, 1000)
+      return () => {
+        clearTimeout(timer)
+        setIsTransitioning(false)
+      }
     }
-  }, [allBrightClicked, secret, navigate, location.state])
+  }, [allBrightClicked, secret, navigate, location.state, isTransitioning])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {
@@ -201,6 +209,13 @@ export default function StarryEasterEgg() {
           还有 {remainingCount} 颗最亮的星等待点亮
         </motion.div>
       )}
+
+      {/* 全部点亮后的平滑过渡遮罩 */}
+      <div
+        className={`absolute inset-0 z-[40] bg-[#050508] pointer-events-none transition-opacity duration-1000 ease-in ${
+          isTransitioning ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
 
     </div>
   )
