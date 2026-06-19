@@ -129,13 +129,19 @@ export function getStarPos(
 
 ### 6.4 隐藏告白彩蛋
 
-当用户**点击过所有 `brightness >= 1.0` 的星星**后，会自动触发一个隐藏告白弹窗。
+当用户**点击过所有 `brightness >= 1.0` 的星星**后，会自动跳转到隐藏告白信页面 `/starry/secret`。
 
 - **数据源**：`app/public/starry-secret.json`
 - **进度持久化**：`localStorage` 键名为 `starry-bright-clicked`
-- **触发条件**：页面加载时检查当前所有高亮星是否都已在 `localStorage` 中
-- **显示方式**：屏幕中央淡入一个半透明毛玻璃卡片，展示 `message` 字段内容
-- **关闭方式**：点击卡片外部或右上角 × 关闭；再次触发条件会重新显示
+- **触发条件**：点完最后一颗高亮星时，自动 `navigate('/starry/secret')`
+- **页面地址**：`/starry/secret`
+- **页面内容**：
+  - 全屏星空背景
+  - 中央一封可上下滚动的信纸卡片
+  - 顶部称呼「致 点亮整片星空的你」
+  - 底部落款「—— 冥王星」
+  - 左上角「返回星空」按钮
+- **重复进入**：解锁后回到星空页，底部会出现「查看来信」按钮，可随时重新进入
 
 ```json
 {
@@ -210,7 +216,7 @@ export function getStarPos(
 |------|------|----------|
 | L1 | 首页 Pluto-Charon 徽章 | `/starry` 星空世界 |
 | L2 | 点击任意星星 | 单篇记忆详情 |
-| L3 | 点亮所有最亮的星 | 隐藏告白文字（`starry-secret.json`） |
+| L3 | 点亮所有最亮的星 | 隐藏告白信页面 `/starry/secret` |
 | L3 | 特定标题「2月26日 凌晨 冬雨」 | `/next-video.mp4` 视频 |
 | L3 | 特定标题「老夏」 | 可拖拽缩放的金丝眼镜 |
 
@@ -223,6 +229,7 @@ app/src/App.tsx                          # 路由定义
 app/src/data/memoirs.ts                  # 数据模型、静态文件读取、secret 读取
 app/src/utils/starry.ts                  # 坐标生成与图片压缩
 app/src/pages/StarryEasterEgg.tsx        # 星空总览页
+app/src/pages/StarrySecret.tsx           # 隐藏告白信页面
 app/src/pages/StarryMemoir.tsx           # 记忆详情页
 app/src/components/PlutoCharonBadge.tsx  # 首页入口徽章
 app/src/components/starry/DraggableStar.tsx   # 可拖拽星星

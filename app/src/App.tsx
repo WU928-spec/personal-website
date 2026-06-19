@@ -8,6 +8,7 @@ import Profile from './pages/Profile.tsx'
 import NotFound from './pages/NotFound.tsx'
 import StarryEasterEgg from './pages/StarryEasterEgg.tsx'
 import StarryMemoir from './pages/StarryMemoir.tsx'
+import StarrySecret from './pages/StarrySecret.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import MusicPlayer from './components/MusicPlayer.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
@@ -31,6 +32,7 @@ function App() {
         <ErrorBoundary>
           <Routes location={location} key={location.pathname}>
             <Route path="/starry" element={<StarryEasterEgg />} />
+            <Route path="/starry/secret" element={<StarrySecret />} />
             <Route path="/starry/:id" element={<StarryMemoir />} />
           </Routes>
         </ErrorBoundary>

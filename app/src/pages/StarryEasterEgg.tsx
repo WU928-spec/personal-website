@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Play, X } from 'lucide-react'
+import { ArrowLeft, Play, Mail } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
@@ -38,7 +38,6 @@ export default function StarryEasterEgg() {
   const [isLoading, setIsLoading] = useState(true)
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)
   const [secretMessage, setSecretMessage] = useState<string | null>(null)
-  const [showSecret, setShowSecret] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const refreshMemoirs = useCallback(async () => {
@@ -71,9 +70,9 @@ export default function StarryEasterEgg() {
 
   useEffect(() => {
     if (allBrightClicked && secretMessage) {
-      setShowSecret(true)
+      navigate('/starry/secret')
     }
-  }, [allBrightClicked, secretMessage])
+  }, [allBrightClicked, secretMessage, navigate])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {
@@ -190,7 +189,7 @@ export default function StarryEasterEgg() {
       )}
 
       {/* 剩余高亮星星提示 */}
-      {remainingCount > 0 && !showSecret && (
+      {remainingCount > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -198,6 +197,19 @@ export default function StarryEasterEgg() {
         >
           还有 {remainingCount} 颗最亮的星等待点亮
         </motion.div>
+      )}
+
+      {/* 已解锁：查看信件入口 */}
+      {remainingCount === 0 && secretMessage && (
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => navigate('/starry/secret')}
+          className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 text-white/80 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/10 px-5 py-2.5 rounded-full border border-white/20 hover:bg-white/15"
+        >
+          <Mail size={16} />
+          <span className="text-sm font-body tracking-widest">查看来信</span>
+        </motion.button>
       )}
 
       {/* 播放视频按钮 */}
@@ -211,29 +223,6 @@ export default function StarryEasterEgg() {
         <Play size={16} fill="currentColor" />
         <span className="text-sm font-body">观看星轨</span>
       </motion.button>
-
-      {/* 隐藏告白文字 */}
-      {showSecret && secretMessage && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="absolute inset-0 z-40 flex items-center justify-center px-6"
-          onClick={() => setShowSecret(false)}
-        >
-          <div className="relative max-w-2xl w-full bg-black/70 backdrop-blur-xl border border-white/10 rounded-2xl p-8 md:p-12 text-center">
-            <button
-              onClick={() => setShowSecret(false)}
-              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
-            >
-              <X size={20} />
-            </button>
-            <p className="text-[1.125rem] md:text-[1.375rem] leading-[2] text-white/85 font-body whitespace-pre-line">
-              {secretMessage}
-            </p>
-          </div>
-        </motion.div>
-      )}
     </div>
   )
 }
