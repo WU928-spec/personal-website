@@ -49,7 +49,7 @@ export default function StarryEasterEgg() {
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [hasCompleted, setHasCompleted] = useState(loadCompleted)
+  const [hasCompleted] = useState(loadCompleted)
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
