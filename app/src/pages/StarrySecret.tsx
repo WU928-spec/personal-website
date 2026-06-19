@@ -43,7 +43,6 @@ export default function StarrySecret() {
     })
   }, [navigate])
 
-  // 键盘翻页
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') setPage((p) => Math.max(0, p - 1))
@@ -60,7 +59,7 @@ export default function StarrySecret() {
 
   if (loading || !verified) {
     return (
-      <div className="relative w-screen h-screen flex items-center justify-center bg-[#f5f3ef]">
+      <div className="relative w-screen h-screen flex items-center justify-center bg-[#e8e6e1]">
         <div className="text-[#8c857c] text-sm font-body tracking-widest">正在展开这封信…</div>
       </div>
     )
@@ -68,16 +67,16 @@ export default function StarrySecret() {
 
   if (total === 0) {
     return (
-      <div className="relative w-screen h-screen flex items-center justify-center bg-[#f5f3ef]">
+      <div className="relative w-screen h-screen flex items-center justify-center bg-[#e8e6e1]">
         <div className="text-[#8c857c] text-sm font-body">信纸是空的</div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#f5f3ef] flex flex-col items-center justify-center p-6">
-      {/* 信件容器：A4 比例，固定最大尺寸 */}
-      <div className="relative w-full max-w-[min(90vw,560px)]" style={{ aspectRatio: '210 / 297' }}>
+    <div className="relative w-screen h-screen overflow-hidden bg-[#e8e6e1] flex flex-col items-center justify-center p-4 sm:p-8">
+      {/* 信件容器：A4 比例 */}
+      <div className="relative w-full max-w-[min(92vw,560px)] drop-shadow-[0_16px_48px_rgba(0,0,0,0.12)]" style={{ aspectRatio: '210 / 297' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={page}
@@ -85,42 +84,49 @@ export default function StarrySecret() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="absolute inset-0 bg-white shadow-[0_12px_40px_rgba(0,0,0,0.08)] rounded-sm p-[clamp(1.5rem,8vw,3.5rem)] flex flex-col"
+            className="absolute inset-0 rounded-sm overflow-hidden"
+            style={{
+              backgroundColor: '#fdfbf7',
+              backgroundImage: `
+                linear-gradient(90deg, transparent 47px, rgba(232, 180, 180, 0.45) 47px, rgba(232, 180, 180, 0.45) 48px, transparent 48px),
+                repeating-linear-gradient(
+                  transparent,
+                  transparent 31px,
+                  rgba(164, 176, 190, 0.35) 31px,
+                  rgba(164, 176, 190, 0.35) 32px
+                )
+              `,
+              backgroundSize: '100% 100%, 100% 32px',
+            }}
           >
-            {/* 信纸顶部装饰线 */}
-            <div className="w-full h-px bg-[#e2ddd4] mb-8" />
+            <div className="h-full px-8 sm:px-12 pt-8 pb-16 pl-[56px] sm:pl-[68px]">
+              {/* 称呼 / 标题 */}
+              {secret?.title && (
+                <h1 className="text-[#4a443d] font-body text-[clamp(0.95rem,3.8vw,1.15rem)] tracking-[0.2em] leading-[32px] mb-[32px]">
+                  {secret.title}
+                </h1>
+              )}
 
-            {/* 称呼 / 标题 */}
-            {secret?.title && (
-              <h1 className="text-[#4a443d] font-body text-[clamp(1rem,4vw,1.25rem)] tracking-widest mb-8">
-                {secret.title}
-              </h1>
-            )}
-
-            {/* 正文 */}
-            <div className="flex-1 overflow-hidden">
-              <p className="text-[#3d3832] font-body text-[clamp(0.95rem,3.6vw,1.125rem)] leading-[2.2] whitespace-pre-line">
+              {/* 正文：对齐行线 */}
+              <p className="text-[#3d3832] font-body text-[clamp(0.9rem,3.4vw,1.05rem)] leading-[32px] whitespace-pre-line">
                 {pages[page]}
               </p>
             </div>
 
             {/* 页码 */}
-            <div className="mt-8 text-right text-[#a8a095] text-xs font-body tracking-widest">
+            <div className="absolute bottom-6 right-8 text-[#a8a095] text-xs font-body tracking-widest">
               {page + 1} / {total}
             </div>
-
-            {/* 信纸底部装饰线 */}
-            <div className="w-full h-px bg-[#e2ddd4] mt-6" />
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* 翻页控制 */}
-      <div className="mt-8 flex items-center gap-6 z-10">
+      <div className="mt-8 flex items-center gap-8 z-10">
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={!hasPrev}
-          className="flex items-center gap-1 text-[#6b655e] hover:text-[#3d3832] disabled:text-[#c9c3ba] transition-colors font-body text-sm"
+          className="flex items-center gap-1 text-[#5c564f] hover:text-[#3d3832] disabled:text-[#a8a095] transition-colors font-body text-sm"
         >
           <ChevronLeft size={18} />
           <span>上一页</span>
@@ -128,7 +134,7 @@ export default function StarrySecret() {
 
         <button
           onClick={() => navigate('/starry')}
-          className="text-[#8c857c] hover:text-[#4a443d] transition-colors font-body text-sm tracking-widest"
+          className="text-[#6b655e] hover:text-[#3d3832] transition-colors font-body text-sm tracking-widest"
         >
           返回星空
         </button>
@@ -136,7 +142,7 @@ export default function StarrySecret() {
         <button
           onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
           disabled={!hasNext}
-          className="flex items-center gap-1 text-[#6b655e] hover:text-[#3d3832] disabled:text-[#c9c3ba] transition-colors font-body text-sm"
+          className="flex items-center gap-1 text-[#5c564f] hover:text-[#3d3832] disabled:text-[#a8a095] transition-colors font-body text-sm"
         >
           <span>下一页</span>
           <ChevronRight size={18} />
