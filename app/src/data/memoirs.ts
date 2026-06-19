@@ -10,7 +10,7 @@ export interface Memoir {
   y?: number // 0 ~ 100，屏幕高度百分比
 }
 
-const STATIC_MEMOIRS_URL = '/memoirs.json'
+const STATIC_MEMOIRS_URL = '/memoirs.json?v=2'
 const SECRET_URL = '/starry-secret.json'
 
 let cachedMemoirs: Memoir[] | null = null

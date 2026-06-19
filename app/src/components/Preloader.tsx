@@ -63,7 +63,7 @@ function loadAsset(url: string): Promise<void> {
 async function preloadData(): Promise<void> {
   try {
     const [memoirsRes, secretRes] = await Promise.all([
-      fetch('/memoirs.json', { method: 'GET', cache: 'force-cache' }),
+      fetch('/memoirs.json?v=2', { method: 'GET', cache: 'force-cache' }),
       fetch('/starry-secret.json', { method: 'GET', cache: 'force-cache' }),
     ])
 
