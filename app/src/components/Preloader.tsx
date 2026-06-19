@@ -7,44 +7,26 @@ import {
   type StarrySecret,
 } from '../data/memoirs.ts'
 
-// 需要预加载的站点资源（图片、音频、视频）
+// 仅预加载星空彩蛋相关资源（预加载器已限定在 /starry/* 路由）
 const PRELOAD_ASSETS: string[] = [
-  '/about-hero.jpg',
-  '/about-timeline-1.jpg',
-  '/about-timeline-2.jpg',
-  '/about-timeline-3.jpg',
-  '/avatar.jpg',
   '/bg-music.mp3',
   '/epilogue-music.mp3',
-  '/blog-hero.jpg',
-  '/blog-thumb-1.jpg',
-  '/blog-thumb-2.jpg',
-  '/blog-thumb-3.jpg',
-  '/blog-thumb-4.jpg',
-  '/blog-thumb-5.jpg',
-  '/blog-thumb-6.jpg',
-  '/chen_tong_diagnosis_wide.jpg',
-  '/chen_tong_wide.jpg',
-  '/golden-glasses.png',
-  '/hero-bg.jpg',
-  '/letter-bg.jpg',
-  '/meteorite.jpg',
-  '/next-video.mp4',
-  '/pluto_crying.jpg',
-  '/projects-hero.jpg',
   '/secret-music.mp3',
   '/starry-bg.jpg',
   '/starry-images/1-0.jpg',
   '/starry-images/1-1.jpg',
   '/starry-video.mp4',
+  '/letter-bg.jpg',
+  '/golden-glasses.png',
+  '/next-video.mp4',
 ]
 
 function loadAsset(url: string): Promise<void> {
   return new Promise((resolve) => {
     const ext = url.split('.').pop()?.toLowerCase()
-    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')
 
-    if (isImage) {
+    // 图片：用 Image 对象预加载
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) {
       const img = new Image()
       img.onload = () => resolve()
       img.onerror = () => resolve()
@@ -52,10 +34,36 @@ function loadAsset(url: string): Promise<void> {
       return
     }
 
-    // 音频/视频使用 fetch 预取到缓存
-    fetch(url, { method: 'GET', cache: 'force-cache' })
-      .then(() => resolve())
-      .catch(() => resolve())
+    // 音频/视频：用原生媒体元素预加载，浏览器会按媒体策略缓存并准备播放
+    const isAudio = ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'].includes(ext || '')
+    const media = isAudio
+      ? (new Audio() as HTMLAudioElement | HTMLVideoElement)
+      : document.createElement('video')
+
+    media.preload = 'auto'
+    media.muted = true
+    media.src = url
+
+    const cleanup = () => {
+      media.oncanplaythrough = null
+      media.onerror = null
+      media.onstalled = null
+      media.pause()
+      media.src = ''
+      media.load()
+    }
+
+    const finish = () => {
+      cleanup()
+      resolve()
+    }
+
+    media.oncanplaythrough = finish
+    media.onerror = finish
+    media.onstalled = finish
+
+    // 部分浏览器不会自动开始加载，手动触发
+    media.load()
   })
 }
 
@@ -103,18 +111,21 @@ export default function Preloader({ children }: PreloaderProps) {
     }
 
     const loadAll = async () => {
-      // 并发加载媒体资源，每完成一个更新进度；同时预加载页面数据
-      await Promise.all([
-        Promise.all(
-          PRELOAD_ASSETS.map(async (url) => {
-            await loadAsset(url)
-            if (!cancelled) {
-              setLoaded((prev) => Math.min(prev + 1, total))
-            }
-          })
-        ),
-        preloadData(),
-      ])
+      // 限制并发数，避免一次性发起过多请求导致网络拥塞或失败
+      const concurrency = 4
+      const queue = [...PRELOAD_ASSETS]
+      const workers = Array.from({ length: concurrency }, async () => {
+        while (queue.length > 0) {
+          const url = queue.shift()
+          if (!url) break
+          await loadAsset(url)
+          if (!cancelled) {
+            setLoaded((prev) => Math.min(prev + 1, total))
+          }
+        }
+      })
+
+      await Promise.all([Promise.all(workers), preloadData()])
 
       if (!cancelled) finish()
     }
