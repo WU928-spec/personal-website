@@ -130,7 +130,7 @@ export default function StarryEasterEgg() {
         muted
         playsInline
         className={`absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-700 ${showVideo ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onEnded={() => setShowVideo(false)}
+        onEnded={() => navigate('/starry/epilogue')}
         onClick={() => setShowVideo(false)}
       />
 
