@@ -74,20 +74,43 @@ export async function getMemoirs(): Promise<Memoir[]> {
   return cachePromise
 }
 
+export interface StarrySecret {
+  title?: string
+  pages: string[]
+  message?: string // 向后兼容：旧版单段文字
+}
+
 /**
- * 读取隐藏告白文字。
+ * 读取隐藏告白信内容。
  */
-export async function getStarrySecret(): Promise<string> {
+export async function getStarrySecret(): Promise<StarrySecret> {
   try {
     const res = await fetch(SECRET_URL)
-    if (!res.ok) return ''
+    if (!res.ok) return { pages: [] }
     const data = (await res.json()) as unknown
-    if (data && typeof data === 'object' && 'message' in data) {
-      return String((data as { message?: unknown }).message ?? '')
+    if (!data || typeof data !== 'object') return { pages: [] }
+
+    const obj = data as Record<string, unknown>
+
+    // 新版 pages 数组
+    if (Array.isArray(obj.pages)) {
+      return {
+        title: obj.title !== undefined ? String(obj.title) : undefined,
+        pages: obj.pages.filter((p): p is string => typeof p === 'string'),
+      }
     }
-    return ''
+
+    // 向后兼容：旧版单段 message
+    if ('message' in obj && obj.message !== undefined) {
+      return {
+        title: obj.title !== undefined ? String(obj.title) : undefined,
+        pages: [String(obj.message)],
+      }
+    }
+
+    return { pages: [] }
   } catch {
-    return ''
+    return { pages: [] }
   }
 }
 

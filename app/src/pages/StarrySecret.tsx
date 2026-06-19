@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getMemoirs, getStarrySecret } from '@/data/memoirs'
+import { getMemoirs, getStarrySecret, type StarrySecret } from '@/data/memoirs'
 
 const CLICKED_KEY = 'starry-bright-clicked'
 
@@ -21,12 +21,13 @@ function loadClickedIds(): Set<string> {
 
 export default function StarrySecret() {
   const navigate = useNavigate()
-  const [message, setMessage] = useState<string | null>(null)
+  const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [verified, setVerified] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(0)
 
   useEffect(() => {
-    Promise.all([getMemoirs(), getStarrySecret()]).then(([memoirs, secret]) => {
+    Promise.all([getMemoirs(), getStarrySecret()]).then(([memoirs, secretData]) => {
       const brightIds = memoirs.filter((m) => m.brightness >= 1).map((m) => m.id)
       const clickedIds = loadClickedIds()
       const allClicked = brightIds.length > 0 && brightIds.every((id) => clickedIds.has(id))
@@ -36,102 +37,111 @@ export default function StarrySecret() {
         return
       }
 
-      setMessage(secret)
+      setSecret(secretData)
       setVerified(true)
       setLoading(false)
     })
   }, [navigate])
 
+  // 键盘翻页
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') setPage((p) => Math.max(0, p - 1))
+      if (e.key === 'ArrowRight') setPage((p) => Math.min((secret?.pages.length ?? 1) - 1, p + 1))
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [secret?.pages.length])
+
+  const pages = secret?.pages ?? []
+  const total = pages.length
+  const hasPrev = page > 0
+  const hasNext = page < total - 1
+
   if (loading || !verified) {
     return (
-      <div className="relative w-screen h-screen overflow-hidden bg-[#050508] flex items-center justify-center">
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: 'url(/starry-bg.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <div className="relative z-10 text-white/30 text-sm font-body tracking-widest">正在展开这封信…</div>
+      <div className="relative w-screen h-screen flex items-center justify-center bg-[#f5f3ef]">
+        <div className="text-[#8c857c] text-sm font-body tracking-widest">正在展开这封信…</div>
+      </div>
+    )
+  }
+
+  if (total === 0) {
+    return (
+      <div className="relative w-screen h-screen flex items-center justify-center bg-[#f5f3ef]">
+        <div className="text-[#8c857c] text-sm font-body">信纸是空的</div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-screen min-h-screen overflow-hidden bg-[#050508]">
-      {/* 背景 */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(/starry-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
+    <div className="relative w-screen h-screen overflow-hidden bg-[#f5f3ef] flex flex-col items-center justify-center p-6">
+      {/* 信件容器：A4 比例，固定最大尺寸 */}
+      <div className="relative w-full max-w-[min(90vw,560px)]" style={{ aspectRatio: '210 / 297' }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={page}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+            className="absolute inset-0 bg-white shadow-[0_12px_40px_rgba(0,0,0,0.08)] rounded-sm p-[clamp(1.5rem,8vw,3.5rem)] flex flex-col"
+          >
+            {/* 信纸顶部装饰线 */}
+            <div className="w-full h-px bg-[#e2ddd4] mb-8" />
 
-      {/* 暗角 */}
-      <div className="fixed inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,5,8,0.6)_100%)]" />
-
-      {/* 返回按钮 */}
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-        onClick={() => navigate('/starry')}
-        className="fixed top-6 left-6 z-30 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
-      >
-        <ArrowLeft size={18} />
-        <span className="text-sm font-body">返回星空</span>
-      </motion.button>
-
-      {/* 信纸 */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
-        className="relative z-20 flex items-center justify-center min-h-screen px-6 py-28"
-      >
-        <div className="relative w-full max-w-2xl bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
-          {/* 顶部装饰线 */}
-          <div className="h-1 w-full bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-
-          <div className="px-8 py-12 md:px-14 md:py-16">
-            {/* 称呼 */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 1 }}
-              className="text-white/40 text-sm font-body tracking-widest mb-8"
-            >
-              致 点亮整片星空的你
-            </motion.p>
+            {/* 称呼 / 标题 */}
+            {secret?.title && (
+              <h1 className="text-[#4a443d] font-body text-[clamp(1rem,4vw,1.25rem)] tracking-widest mb-8">
+                {secret.title}
+              </h1>
+            )}
 
             {/* 正文 */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 1.2 }}
-              className="text-white/80 font-body text-[1.0625rem] md:text-[1.125rem] leading-[2.2] whitespace-pre-line"
-            >
-              {message}
-            </motion.div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-[#3d3832] font-body text-[clamp(0.95rem,3.6vw,1.125rem)] leading-[2.2] whitespace-pre-line">
+                {pages[page]}
+              </p>
+            </div>
 
-            {/* 落款 */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.4, duration: 1 }}
-              className="mt-14 text-right"
-            >
-              <p className="text-white/40 text-sm font-body tracking-widest">—— 冥王星</p>
-            </motion.div>
-          </div>
+            {/* 页码 */}
+            <div className="mt-8 text-right text-[#a8a095] text-xs font-body tracking-widest">
+              {page + 1} / {total}
+            </div>
 
-          {/* 底部装饰线 */}
-          <div className="h-1 w-full bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        </div>
-      </motion.div>
+            {/* 信纸底部装饰线 */}
+            <div className="w-full h-px bg-[#e2ddd4] mt-6" />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* 翻页控制 */}
+      <div className="mt-8 flex items-center gap-6 z-10">
+        <button
+          onClick={() => setPage((p) => Math.max(0, p - 1))}
+          disabled={!hasPrev}
+          className="flex items-center gap-1 text-[#6b655e] hover:text-[#3d3832] disabled:text-[#c9c3ba] transition-colors font-body text-sm"
+        >
+          <ChevronLeft size={18} />
+          <span>上一页</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/starry')}
+          className="text-[#8c857c] hover:text-[#4a443d] transition-colors font-body text-sm tracking-widest"
+        >
+          返回星空
+        </button>
+
+        <button
+          onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
+          disabled={!hasNext}
+          className="flex items-center gap-1 text-[#6b655e] hover:text-[#3d3832] disabled:text-[#c9c3ba] transition-colors font-body text-sm"
+        >
+          <span>下一页</span>
+          <ChevronRight size={18} />
+        </button>
+      </div>
     </div>
   )
 }

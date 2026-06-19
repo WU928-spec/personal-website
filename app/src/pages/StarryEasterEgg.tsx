@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Mail } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getMemoirs, getStarrySecret, type Memoir } from '@/data/memoirs'
+import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
 import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import DraggableStar from '@/components/starry/DraggableStar'
@@ -37,7 +37,7 @@ export default function StarryEasterEgg() {
   const [memoirs, setMemoirs] = useState<Memoir[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)
-  const [secretMessage, setSecretMessage] = useState<string | null>(null)
+  const [secret, setSecret] = useState<StarrySecret | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const refreshMemoirs = useCallback(async () => {
@@ -48,7 +48,7 @@ export default function StarryEasterEgg() {
 
   useEffect(() => {
     refreshMemoirs()
-    getStarrySecret().then(setSecretMessage)
+    getStarrySecret().then(setSecret)
   }, [refreshMemoirs])
 
   useEffect(() => {
@@ -69,10 +69,10 @@ export default function StarryEasterEgg() {
   }, [brightIds, clickedIds])
 
   useEffect(() => {
-    if (allBrightClicked && secretMessage) {
+    if (allBrightClicked && secret && secret.pages.length > 0) {
       navigate('/starry/secret')
     }
-  }, [allBrightClicked, secretMessage, navigate])
+  }, [allBrightClicked, secret, navigate])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {
@@ -200,7 +200,7 @@ export default function StarryEasterEgg() {
       )}
 
       {/* 已解锁：查看信件入口 */}
-      {remainingCount === 0 && secretMessage && (
+      {remainingCount === 0 && secret && secret.pages.length > 0 && (
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
