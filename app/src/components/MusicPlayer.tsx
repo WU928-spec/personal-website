@@ -1,11 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Music, Play, Pause, SkipForward, SkipBack, Shuffle, Volume2, Plus, X, Trash2 } from 'lucide-react'
 import { getTracks, addTrack, removeTrack, fileToBase64, type Track } from '@/data/music'
 
+const DEFAULT_TRACK: Track = {
+  id: 'default-nuna',
+  title: 'NUNA',
+  artist: '队长',
+  data: '/bg-music.mp3',
+}
+
 export default function MusicPlayer() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const allTracks = useMemo(() => (tracks.length > 0 ? tracks : [DEFAULT_TRACK]), [tracks])
   const [isPlaying, setIsPlaying] = useState(false)
   const [isShuffled, setIsShuffled] = useState(true)
   const [volume, setVolume] = useState(0.5)
@@ -20,7 +28,7 @@ export default function MusicPlayer() {
     const startOnInteraction = () => {
       if (hasAutoStartedRef.current) return
       hasAutoStartedRef.current = true
-      if (tracks.length > 0 && !isPlaying) {
+      if (allTracks.length > 0 && !isPlaying) {
         setIsPlaying(true)
       }
     }
@@ -30,7 +38,7 @@ export default function MusicPlayer() {
       window.removeEventListener('pointerdown', startOnInteraction)
       window.removeEventListener('keydown', startOnInteraction)
     }
-  }, [tracks.length, isPlaying])
+  }, [allTracks.length, isPlaying])
 
   // 加载 tracks
   useEffect(() => {
@@ -55,27 +63,29 @@ export default function MusicPlayer() {
   // 播放当前 track
   useEffect(() => {
     const audio = audioRef.current
-    if (!audio || !tracks.length || !hasLoaded) return
-    const track = tracks[currentIndex]
+    if (!audio || !allTracks.length || !hasLoaded) return
+    const track = allTracks[currentIndex]
     if (!track) return
     if (audio.src !== track.data) {
       audio.src = track.data
     }
+    // 只有一首默认背景音乐时循环播放
+    audio.loop = allTracks.length === 1
     if (isPlaying) {
       audio.play().catch(() => setIsPlaying(false))
     }
-  }, [currentIndex, tracks, hasLoaded, isPlaying])
+  }, [currentIndex, allTracks, hasLoaded, isPlaying])
 
   // 播放/暂停状态切换
   useEffect(() => {
     const audio = audioRef.current
-    if (!audio || !tracks.length) return
+    if (!audio || !allTracks.length) return
     if (isPlaying) {
       audio.play().catch(() => setIsPlaying(false))
     } else {
       audio.pause()
     }
-  }, [isPlaying, tracks.length])
+  }, [isPlaying, allTracks.length])
 
   // 音量
   useEffect(() => {
@@ -84,20 +94,19 @@ export default function MusicPlayer() {
     }
   }, [volume])
 
-  // 下一首逻辑
+  // 下一首逻辑（只有一首时靠 audio.loop 循环，不停止）
   const playNext = () => {
-    if (tracks.length <= 1) {
-      setIsPlaying(false)
+    if (allTracks.length <= 1) {
       return
     }
     if (isShuffled) {
-      let next = Math.floor(Math.random() * tracks.length)
-      while (next === currentIndex && tracks.length > 1) {
-        next = Math.floor(Math.random() * tracks.length)
+      let next = Math.floor(Math.random() * allTracks.length)
+      while (next === currentIndex && allTracks.length > 1) {
+        next = Math.floor(Math.random() * allTracks.length)
       }
       setCurrentIndex(next)
     } else {
-      setCurrentIndex((prev) => (prev + 1) % tracks.length)
+      setCurrentIndex((prev) => (prev + 1) % allTracks.length)
     }
     setIsPlaying(true)
   }
@@ -114,8 +123,8 @@ export default function MusicPlayer() {
   }, [])
 
   const playPrev = () => {
-    if (tracks.length <= 1) return
-    setCurrentIndex((prev) => (prev - 1 + tracks.length) % tracks.length)
+    if (allTracks.length <= 1) return
+    setCurrentIndex((prev) => (prev - 1 + allTracks.length) % allTracks.length)
     setIsPlaying(true)
   }
 
@@ -150,10 +159,12 @@ export default function MusicPlayer() {
   }
 
   const handleDelete = async (id: string) => {
+    if (id === DEFAULT_TRACK.id) return
     await removeTrack(id)
     const updated = await getTracks()
     setTracks(updated)
-    if (currentIndex >= updated.length) {
+    const newAllTracks = updated.length > 0 ? updated : [DEFAULT_TRACK]
+    if (currentIndex >= newAllTracks.length) {
       setCurrentIndex(0)
     }
     if (updated.length === 0) {
@@ -161,7 +172,7 @@ export default function MusicPlayer() {
     }
   }
 
-  const currentTrack = tracks[currentIndex]
+  const currentTrack = allTracks[currentIndex]
 
   if (!hasLoaded) return null
 
@@ -227,7 +238,7 @@ export default function MusicPlayer() {
                 </button>
                 <button
                   onClick={playPrev}
-                  disabled={tracks.length === 0}
+                  disabled={allTracks.length <= 1}
                   className="p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-30"
                 >
                   <SkipBack size={20} />
@@ -241,7 +252,7 @@ export default function MusicPlayer() {
                 </button>
                 <button
                   onClick={playNext}
-                  disabled={tracks.length === 0}
+                  disabled={allTracks.length <= 1}
                   className="p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-30"
                 >
                   <SkipForward size={20} />
@@ -274,7 +285,7 @@ export default function MusicPlayer() {
 
               {/* 播放列表 */}
               <div className="max-h-32 overflow-y-auto space-y-1 no-scrollbar">
-                {tracks.map((t, i) => (
+                {allTracks.map((t, i) => (
                   <div
                     key={t.id}
                     onClick={() => {
@@ -284,15 +295,17 @@ export default function MusicPlayer() {
                     className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-sm transition-colors ${i === currentIndex ? 'bg-white/10 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
                   >
                     <span className="truncate flex-1">{t.title}</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDelete(t.id)
-                      }}
-                      className="text-white/30 hover:text-red-400 transition-colors p-1"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+                    {t.id !== DEFAULT_TRACK.id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDelete(t.id)
+                        }}
+                        className="text-white/30 hover:text-red-400 transition-colors p-1"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
