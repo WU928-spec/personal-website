@@ -6,6 +6,7 @@ import {
   type Memoir,
   type StarrySecret,
 } from '../data/memoirs.ts'
+import { loadAndCacheImage } from '../utils/imageCache.ts'
 
 // 仅预加载星空彩蛋相关资源（预加载器已限定在 /starry/* 路由）
 const PRELOAD_ASSETS: string[] = [
@@ -25,26 +26,11 @@ function loadAsset(url: string): Promise<HTMLImageElement | HTMLMediaElement | v
   return new Promise((resolve) => {
     const ext = url.split('.').pop()?.toLowerCase()
 
-    // 图片：用 Image 对象预加载，并等待解码完成，确保进入页面后能立即渲染
+    // 图片：用模块级缓存预加载并等待解码完成，确保进入页面后能立即渲染
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) {
-      const img = new Image()
-
-      const finish = () => {
-        img.onload = null
-        img.onerror = null
-        resolve(img)
-      }
-
-      img.onload = () => {
-        // 等待解码完成，避免进入页面后出现黑屏或闪烁
-        if ('decode' in img && typeof img.decode === 'function') {
-          img.decode().then(finish).catch(finish)
-        } else {
-          finish()
-        }
-      }
-      img.onerror = finish
-      img.src = url
+      loadAndCacheImage(url)
+        .then((img) => resolve(img))
+        .catch(() => resolve())
       return
     }
 
