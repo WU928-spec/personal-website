@@ -323,9 +323,9 @@ export async function backgroundSyncMemoirs(): Promise<boolean> {
 
   if (!memoirsEqual(current, merged)) {
     await saveToIndexedDB(merged)
-    window.dispatchEvent(new CustomEvent('starry-sync-completed'))
   }
 
+  window.dispatchEvent(new CustomEvent('starry-sync-completed'))
   return true
 }
 
