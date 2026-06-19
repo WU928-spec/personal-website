@@ -89,3 +89,22 @@ CREATE POLICY "Allow public select" ON notes FOR SELECT USING (true);
 CREATE POLICY "Allow public insert" ON notes FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update" ON notes FOR UPDATE USING (true);
 CREATE POLICY "Allow public delete" ON notes FOR DELETE USING (true);
+
+-- ── 6. 星空彩蛋记忆 ──
+CREATE TABLE IF NOT EXISTS starry_memoirs (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL DEFAULT '',
+  date        TEXT NOT NULL DEFAULT '',
+  content     TEXT NOT NULL DEFAULT '',
+  brightness  NUMERIC DEFAULT 0.5,
+  images      JSONB DEFAULT '[]'::JSONB,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE starry_memoirs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public select" ON starry_memoirs FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON starry_memoirs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON starry_memoirs FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON starry_memoirs FOR DELETE USING (true);

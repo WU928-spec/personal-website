@@ -1,3 +1,5 @@
+import { supabase, isSupabaseReady } from '@/lib/supabase'
+
 export interface Memoir {
   id: string
   title: string
@@ -12,6 +14,7 @@ const STORAGE_KEY = 'starry-memoirs-v1'
 const DB_NAME = 'starry-db'
 const STORE_NAME = 'memoirs'
 const DB_KEY = 'data'
+const SUPABASE_TABLE = 'starry_memoirs'
 
 export const DEFAULT_MEMOIRS: Memoir[] = [
   {
@@ -119,6 +122,8 @@ function migrateMemoir(m: Memoir): Memoir {
   return m
 }
 
+/* ─── IndexedDB helpers ─── */
+
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 1)
@@ -152,8 +157,7 @@ async function migrateFromLocalStorage(): Promise<Memoir[] | null> {
   return null
 }
 
-export async function getMemoirs(): Promise<Memoir[]> {
-  // 先检查是否有旧数据需要迁移
+async function loadFromIndexedDB(): Promise<Memoir[] | null> {
   const migrated = await migrateFromLocalStorage()
   if (migrated) return migrated
 
@@ -173,18 +177,18 @@ export async function getMemoirs(): Promise<Memoir[]> {
             }
           } catch {}
         }
-        resolve(DEFAULT_MEMOIRS)
+        resolve(null)
       }
       req.onerror = () => reject(req.error)
     })
   } catch {
-    return DEFAULT_MEMOIRS
+    return null
   }
 }
 
-export async function saveMemoirs(memoirs: Memoir[]) {
+async function saveToIndexedDB(memoirs: Memoir[]): Promise<void> {
   const db = await openDB()
-  return new Promise<void>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite')
     const req = tx.objectStore(STORE_NAME).put(JSON.stringify(memoirs), DB_KEY)
     req.onsuccess = () => resolve()
@@ -192,15 +196,143 @@ export async function saveMemoirs(memoirs: Memoir[]) {
   })
 }
 
-export async function resetMemoirs() {
+async function clearIndexedDB(): Promise<void> {
   const db = await openDB()
-  return new Promise<void>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite')
     const req = tx.objectStore(STORE_NAME).delete(DB_KEY)
     req.onsuccess = () => resolve()
     req.onerror = () => reject(req.error)
   })
 }
+
+/* ─── Supabase helpers ─── */
+
+function dbToMemoir(row: Record<string, unknown>): Memoir {
+  return migrateMemoir({
+    id: String(row.id),
+    title: String(row.title ?? ''),
+    date: String(row.date ?? ''),
+    content: String(row.content ?? ''),
+    brightness: Number(row.brightness ?? 0.5),
+    images: Array.isArray(row.images) ? (row.images as string[]) : undefined,
+  })
+}
+
+function memoirToDb(m: Memoir): Record<string, unknown> {
+  return {
+    id: m.id,
+    title: m.title,
+    date: m.date,
+    content: m.content,
+    brightness: m.brightness,
+    images: m.images ?? [],
+    updated_at: new Date().toISOString(),
+  }
+}
+
+async function fetchFromSupabase(): Promise<Memoir[] | null> {
+  if (!isSupabaseReady()) return null
+
+  try {
+    const { data, error } = await supabase!.from(SUPABASE_TABLE).select('*')
+    if (error || !data || !Array.isArray(data)) return null
+    if (data.length === 0) return []
+    return (data as Record<string, unknown>[]).map(dbToMemoir)
+  } catch {
+    return null
+  }
+}
+
+async function upsertToSupabase(memoirs: Memoir[]): Promise<boolean> {
+  if (!isSupabaseReady()) return false
+
+  try {
+    const { error } = await supabase!
+      .from(SUPABASE_TABLE)
+      .upsert(memoirs.map(memoirToDb))
+    return !error
+  } catch {
+    return false
+  }
+}
+
+async function deleteAllFromSupabase(): Promise<boolean> {
+  if (!isSupabaseReady()) return false
+
+  try {
+    const { error } = await supabase!.from(SUPABASE_TABLE).delete().neq('id', '')
+    return !error
+  } catch {
+    return false
+  }
+}
+
+/* ─── Public API ─── */
+
+/**
+ * 读取记忆列表。
+ * 云端优先：如果 Supabase 可用且有数据，用云端数据覆盖本地缓存；
+ * 否则回退到 IndexedDB / 默认值。
+ */
+export async function getMemoirs(): Promise<Memoir[]> {
+  const remote = await fetchFromSupabase()
+
+  if (remote !== null) {
+    // 云端可用：云端数据作为权威来源
+    if (remote.length > 0) {
+      await saveToIndexedDB(remote)
+      return remote
+    }
+    // 云端为空：回退本地，方便用户后续手动上传
+    const local = await loadFromIndexedDB()
+    if (local && local.length > 0) {
+      return local
+    }
+    // 本地也为空：返回默认值
+    const defaults = DEFAULT_MEMOIRS
+    await saveToIndexedDB(defaults)
+    return defaults
+  }
+
+  // Supabase 不可用：完全回退本地
+  const local = await loadFromIndexedDB()
+  if (local && local.length > 0) return local
+  return DEFAULT_MEMOIRS
+}
+
+/**
+ * 保存记忆列表。
+ * 先写本地 IndexedDB，再后台同步到 Supabase（不阻塞 UI）。
+ */
+export async function saveMemoirs(memoirs: Memoir[]): Promise<void> {
+  await saveToIndexedDB(memoirs)
+  // 后台静默同步到云端
+  upsertToSupabase(memoirs).catch(() => {})
+}
+
+/**
+ * 重置记忆：清空本地和云端，下次读取时回到 DEFAULT_MEMOIRS。
+ */
+export async function resetMemoirs(): Promise<void> {
+  await clearIndexedDB()
+  await deleteAllFromSupabase()
+}
+
+/**
+ * 手动把当前本地数据推送到云端。
+ * 用于用户想把 Chrome 里编辑好的内容上传到 Supabase。
+ */
+export async function syncMemoirsToCloud(): Promise<boolean> {
+  if (!isSupabaseReady()) return false
+
+  const local = await loadFromIndexedDB()
+  const toUpload = local && local.length > 0 ? local : DEFAULT_MEMOIRS
+  const ok = await upsertToSupabase(toUpload)
+  return ok
+}
+
+/* ─── Position helpers ─── */
 
 // 为每颗 memoir 生成固定的随机坐标，避免每次渲染位置变化
 const seededRandom = (seed: number) => {

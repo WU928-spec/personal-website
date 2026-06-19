@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Play, Move, Pin, Settings } from 'lucide-react'
+import { ArrowLeft, Play, Move, Pin, Settings, Cloud, CloudOff, CheckCircle2, Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getMemoirs, saveMemoirs, type Memoir } from '@/data/memoirs'
+import { getMemoirs, saveMemoirs, syncMemoirsToCloud, type Memoir } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
 import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import DraggableStar from '@/components/starry/DraggableStar'
@@ -16,6 +16,7 @@ export default function StarryEasterEgg() {
   const [showManager, setShowManager] = useState(false)
   const [memoirs, setMemoirs] = useState<Memoir[]>([])
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle')
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -38,6 +39,13 @@ export default function StarryEasterEgg() {
       .catch(() => {
         setSaveError('保存失败：存储空间已满')
       })
+  }
+
+  const handleSyncToCloud = async () => {
+    setSyncStatus('syncing')
+    const ok = await syncMemoirsToCloud()
+    setSyncStatus(ok ? 'synced' : 'error')
+    setTimeout(() => setSyncStatus('idle'), 2500)
   }
 
   return (
@@ -134,6 +142,27 @@ export default function StarryEasterEgg() {
       >
         <Settings size={16} />
         <span className="text-sm font-body">管理记忆</span>
+      </motion.button>
+
+      {/* 同步到云端按钮 */}
+      <motion.button
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.8 }}
+        onClick={handleSyncToCloud}
+        disabled={syncStatus === 'syncing'}
+        className="absolute bottom-8 left-8 z-30 flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {syncStatus === 'syncing' && <Loader2 size={14} className="animate-spin" />}
+        {syncStatus === 'idle' && <Cloud size={14} />}
+        {syncStatus === 'synced' && <CheckCircle2 size={14} className="text-emerald-400" />}
+        {syncStatus === 'error' && <CloudOff size={14} className="text-red-400" />}
+        <span className="text-sm font-body">
+          {syncStatus === 'syncing' && '同步中...'}
+          {syncStatus === 'synced' && '已同步'}
+          {syncStatus === 'error' && '同步失败'}
+          {syncStatus === 'idle' && '同步到云端'}
+        </span>
       </motion.button>
 
       {/* 播放视频按钮 */}
