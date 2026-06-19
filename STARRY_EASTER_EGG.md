@@ -1,6 +1,6 @@
 # 星空彩蛋系统解析
 
-> 本文件是对 `/Users/a123456/Downloads/个人网站vibecoding` 中「星空彩蛋」系统的代码级理解笔记。
+> 本文件是对 `/Users/a123456/Downloads/个人网站vibecoding` 中「星空彩蛋」系统的代码级理解笔记。当前版本为**纯静态 JSON 架构**，不再依赖数据库。
 
 ## 一、整体定位
 
@@ -50,14 +50,31 @@ export interface Memoir {
   brightness: number // 0.1 ~ 1.0，越激动越亮
   image?: string     // 已弃用，向后兼容
   images?: string[]  // Base64 图片数组
-  x?: number         // 0 ~ 100，屏幕宽度百分比（拖拽后保存）
-  y?: number         // 0 ~ 100，屏幕高度百分比（拖拽后保存）
+  x?: number         // 0 ~ 100，屏幕宽度百分比
+  y?: number         // 0 ~ 100，屏幕高度百分比
 }
 ```
 
-### 4.2 默认数据
+### 4.2 静态数据源
 
-`DEFAULT_MEMOIRS` 包含 12 篇文学性短文，例如《第一次看见极光》《海边的告别》《旧书店的老猫》等。每篇对应一颗星星。
+所有星星数据存放在：
+
+```
+app/public/memoirs.json
+```
+
+构建时 Vercel 会把它作为静态资源托管，访问路径为 `/memoirs.json`。
+
+**优点**：
+- 不需要数据库
+- 不需要同步逻辑
+- 部署即生效
+- 数据在 Git 中有版本控制
+
+**修改方式**：
+1. 直接编辑 `app/public/memoirs.json`
+2. `git commit && git push`
+3. Vercel 自动重新部署
 
 ### 4.3 坐标生成
 
@@ -70,49 +87,19 @@ export function getStarPos(
 ): { x: string; y: string }
 ```
 
-- 如果 `saved.x` / `saved.y` 存在，优先使用保存的拖拽位置。
+- 如果 `saved.x` / `saved.y` 存在，优先使用保存的位置。
 - 否则使用基于 `id` 的伪随机种子：`Math.sin(seed * 127.1) * 43758.5453`
 - 同一颗 `id` 的默认位置固定，不会因为刷新而改变
 - 会避开屏幕中心区域（防止遮挡文案）
 
 ## 五、持久化策略
 
-采用 **Supabase 云端优先 + IndexedDB 本地缓存** 双写架构。
+当前为**纯静态**：
 
-### 5.1 云端存储：Supabase
-
-- 表名：`starry_memoirs`
-- 字段：`id`（PK）, `title`, `date`, `content`, `brightness`, `images`（JSONB）, `x`, `y`, `created_at`, `updated_at`
-- 冲突策略：**云端优先**。`backgroundSyncMemoirs()` 后台拉取 Supabase，有差异时更新 IndexedDB 并派发 `starry-sync-completed` 事件。Supabase 不可用时回退 IndexedDB / 默认值。
-- 读取策略：`getMemoirs()` 先立即返回本地缓存（首屏不阻塞），同时触发后台云端同步。
-- 拖拽位置：`x` / `y` 记录星星在屏幕上的百分比坐标，随 memoir 数据一起被保存和同步。
-- 写入策略：`saveMemoirs()` 先写 IndexedDB，再后台静默 upsert 到 Supabase；失败不阻塞 UI。
-
-### 5.2 本地缓存：IndexedDB
-
-- 数据库名：`starry-db`
-- 对象存储名：`memoirs`
-- Key：`data`
-- 作为离线兜底和快速读取缓存。
-
-### 5.3 同步 API
-
-| 函数 | 作用 |
-|------|------|
-| `getMemoirs()` | 立即返回本地缓存，同时触发后台云端同步 |
-| `backgroundSyncMemoirs()` | 后台拉取云端，有变化时更新本地并派发事件 |
-| `saveMemoirs(memoirs)` | 保存本地并后台同步到云端 |
-| `resetMemoirs()` | 清空本地和云端，回到默认值 |
-| `syncMemoirsToCloud()` | 手动把本地当前数据推送到云端 |
-
-### 5.4 向后兼容
-
-旧版本使用 `localStorage` 的 `starry-memoirs-v1`。启动时会自动迁移到 IndexedDB，然后删除旧 key。
-
-### 5.5 装饰状态
-
-单条页面的特殊装饰状态使用 `localStorage`：
-- `starry-glasses-position`：「老夏」页面金丝眼镜的位置和缩放
+- 数据源：`app/public/memoirs.json`
+- 读取方式：页面加载时 `fetch('/memoirs.json')`
+- 没有本地缓存，没有云端同步，没有数据库
+- 拖拽星星只是视觉互动，刷新后会回到 JSON 中定义的位置
 
 ## 六、星空总览页（`/starry`）
 
@@ -129,16 +116,13 @@ export function getStarPos(
 
 - 遍历 `memoirs`，每篇渲染一个 `DraggableStar`
 - 星星大小、发光强度由 `brightness` 决定
-- 支持拖拽模式 / 固定模式切换
+- 支持拖拽（纯视觉，不持久化）
 
 ### 6.3 控制按钮
 
 | 按钮 | 功能 |
 |------|------|
 | 返回 | `navigate('/')` 回到首页 |
-| 可拖动 / 已固定 | 切换星星是否可拖拽 |
-| 管理记忆 | 打开 `MemoirManager` 抽屉 |
-| 同步到云端 | 手动把本地记忆推送到 Supabase |
 | 观看星轨 | 全屏播放 `/starry-video.mp4` |
 
 ### 6.4 星星组件
@@ -146,8 +130,8 @@ export function getStarPos(
 **文件**：`app/src/components/starry/DraggableStar.tsx`
 
 - 使用 Framer Motion 的 `drag` 实现拖拽
+- 使用 `useMotionValue` 控制位置，避免拖拽后位置跳跃
 - 点击（非拖拽时）跳转 `/starry/${memoir.id}`
-- 拖拽结束计算新的屏幕百分比坐标，回调给父组件保存
 - Hover 显示日期 tooltip
 - CSS 动画 `starPulse` 实现呼吸发光效果
 
@@ -180,19 +164,7 @@ export function getStarPos(
 - 位置与缩放持久化到 `localStorage`
 - 这是第三个隐藏层级：特定人物页面的专属互动装饰
 
-## 八、记忆管理器
-
-**文件**：`app/src/components/starry/MemoirManager.tsx`
-
-右侧滑出抽屉，支持：
-
-- 添加新星星
-- 编辑标题、日期、亮度、内容、图片
-- 删除单条记忆
-- 图片上传并自动压缩（`utils/starry.ts` 中的 `compressImage`）
-- 重置为默认的 12 颗星星
-
-## 九、样式与动画
+## 八、样式与动画
 
 **文件**：`app/src/index.css`
 
@@ -213,28 +185,26 @@ export function getStarPos(
 .drop-cap { ... }
 ```
 
-## 十、彩蛋层级总结
+## 九、彩蛋层级总结
 
 | 层级 | 入口 | 隐藏内容 |
 |------|------|----------|
 | L1 | 首页 Pluto-Charon 徽章 | `/starry` 星空世界 |
-| L2 | 星空中的任意星星 | 单篇记忆详情 |
+| L2 | 点击任意星星 | 单篇记忆详情 |
 | L3 | 特定标题「2月26日 凌晨 冬雨」 | `/next-video.mp4` 视频 |
 | L3 | 特定标题「老夏」 | 可拖拽缩放的金丝眼镜 |
-| 管理 | 「管理记忆」按钮 | 用户可自定义星星内容 |
 
-## 十一、关键文件清单
+## 十、关键文件清单
 
 ```
-app/supabase_migrations.sql              # Supabase 建表 SQL（含 starry_memoirs）
+app/public/memoirs.json                  # 星星数据（静态 JSON）
 app/src/App.tsx                          # 路由定义
-app/src/data/memoirs.ts                  # 数据模型、本地缓存与云端同步
+app/src/data/memoirs.ts                  # 数据模型与静态文件读取
 app/src/utils/starry.ts                  # 坐标生成与图片压缩
-app/src/pages/StarryEasterEgg.tsx        # 星空总览页（含同步按钮）
+app/src/pages/StarryEasterEgg.tsx        # 星空总览页
 app/src/pages/StarryMemoir.tsx           # 记忆详情页
 app/src/components/PlutoCharonBadge.tsx  # 首页入口徽章
 app/src/components/starry/DraggableStar.tsx   # 可拖拽星星
-app/src/components/starry/MemoirManager.tsx   # 记忆管理抽屉
 app/src/components/starry/NebulaField.tsx     # 星云背景
 app/src/components/starry/PhotoFrame.tsx      # 照片框
 app/src/index.css                        # starPulse、photo-frame、drop-cap
