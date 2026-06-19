@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, Mail } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
 import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
@@ -32,8 +32,9 @@ function saveClickedIds(ids: Set<string>) {
 
 export default function StarryEasterEgg() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [showText, setShowText] = useState(false)
-  const [showVideo, setShowVideo] = useState(false)
+  const [showVideo, setShowVideo] = useState(location.state?.playVideo === true)
   const [memoirs, setMemoirs] = useState<Memoir[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)

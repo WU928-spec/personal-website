@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type StarrySecret } from '@/data/memoirs'
 
@@ -43,19 +43,31 @@ export default function StarrySecret() {
     })
   }, [navigate])
 
+  const pages = secret?.pages ?? []
+  const total = pages.length
+  const isLastPage = page === total - 1
+  const hasPrev = page > 0
+
+  const goNext = () => {
+    if (isLastPage) {
+      navigate('/starry', { state: { playVideo: true } })
+    } else {
+      setPage((p) => Math.min(total - 1, p + 1))
+    }
+  }
+
+  const goPrev = () => {
+    setPage((p) => Math.max(0, p - 1))
+  }
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') setPage((p) => Math.max(0, p - 1))
-      if (e.key === 'ArrowRight') setPage((p) => Math.min((secret?.pages.length ?? 1) - 1, p + 1))
+      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight') goNext()
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [secret?.pages.length])
-
-  const pages = secret?.pages ?? []
-  const total = pages.length
-  const hasPrev = page > 0
-  const hasNext = page < total - 1
+  }, [isLastPage, total])
 
   if (loading || !verified) {
     return (
@@ -106,21 +118,33 @@ export default function StarrySecret() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    onClick={goPrev}
                     disabled={!hasPrev}
                     className="text-white/80 hover:text-white disabled:text-white/30 transition-colors"
                     aria-label="上一页"
                   >
                     <ChevronLeft size={20} />
                   </button>
-                  <button
-                    onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
-                    disabled={!hasNext}
-                    className="text-white/80 hover:text-white disabled:text-white/30 transition-colors"
-                    aria-label="下一页"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
+
+                  {isLastPage ? (
+                    <motion.button
+                      onClick={goNext}
+                      animate={{ scale: [1, 1.15, 1], opacity: [0.85, 1, 0.85] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="text-white hover:text-yellow-200 transition-colors drop-shadow-[0_0_10px_rgba(255,255,200,0.6)]"
+                      aria-label="点亮星空"
+                    >
+                      <Star size={20} fill="currentColor" />
+                    </motion.button>
+                  ) : (
+                    <button
+                      onClick={goNext}
+                      className="text-white/80 hover:text-white transition-colors"
+                      aria-label="下一页"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
