@@ -9,7 +9,7 @@ interface DraggableStarProps {
   x: string
   y: string
   draggable: boolean
-  onPositionChange?: (id: string, x: number, y: number) => void
+  onClick?: (id: string) => void
 }
 
 function DraggableStar({
@@ -17,7 +17,7 @@ function DraggableStar({
   x,
   y,
   draggable,
-  onPositionChange,
+  onClick,
 }: DraggableStarProps) {
   const navigate = useNavigate()
   const [hovered, setHovered] = useState(false)
@@ -51,19 +51,11 @@ function DraggableStar({
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => {
         setTimeout(() => setIsDragging(false), 50)
-
-        if (!onPositionChange) return
-
-        const finalXPx = motionX.get()
-        const finalYPx = motionY.get()
-
-        const newX = Math.max(5, Math.min(95, (finalXPx / window.innerWidth) * 100))
-        const newY = Math.max(5, Math.min(95, (finalYPx / window.innerHeight) * 100))
-
-        onPositionChange(memoir.id, newX, newY)
       }}
       onClick={() => {
-        if (!isDragging) navigate(`/starry/${memoir.id}`)
+        if (isDragging) return
+        onClick?.(memoir.id)
+        navigate(`/starry/${memoir.id}`)
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

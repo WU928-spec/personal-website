@@ -11,6 +11,7 @@ export interface Memoir {
 }
 
 const STATIC_MEMOIRS_URL = '/memoirs.json'
+const SECRET_URL = '/starry-secret.json'
 
 let cachedMemoirs: Memoir[] | null = null
 let cachePromise: Promise<Memoir[]> | null = null
@@ -71,6 +72,23 @@ export async function getMemoirs(): Promise<Memoir[]> {
   })()
 
   return cachePromise
+}
+
+/**
+ * 读取隐藏告白文字。
+ */
+export async function getStarrySecret(): Promise<string> {
+  try {
+    const res = await fetch(SECRET_URL)
+    if (!res.ok) return ''
+    const data = (await res.json()) as unknown
+    if (data && typeof data === 'object' && 'message' in data) {
+      return String((data as { message?: unknown }).message ?? '')
+    }
+    return ''
+  } catch {
+    return ''
+  }
 }
 
 // 为每颗 memoir 生成固定的随机坐标，避免每次渲染位置变化

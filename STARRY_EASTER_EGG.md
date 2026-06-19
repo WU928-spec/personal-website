@@ -47,13 +47,15 @@ export interface Memoir {
   title: string
   date: string
   content: string
-  brightness: number // 0.1 ~ 1.0，越激动越亮
+  brightness: number // 当前数据为 1.0（最亮）或 0.05（暗星）
   image?: string     // 已弃用，向后兼容
-  images?: string[]  // Base64 图片数组
+  images?: string[]  // 图片路径数组
   x?: number         // 0 ~ 100，屏幕宽度百分比
   y?: number         // 0 ~ 100，屏幕高度百分比
 }
 ```
+
+> **彩蛋判定**：`brightness >= 1.0` 的星星被视为「最亮的星」，玩家需要逐一点亮它们。
 
 ### 4.2 静态数据源
 
@@ -99,7 +101,7 @@ export function getStarPos(
 - 数据源：`app/public/memoirs.json`
 - 读取方式：页面加载时 `fetch('/memoirs.json')`
 - 没有本地缓存，没有云端同步，没有数据库
-- 拖拽星星只是视觉互动，刷新后会回到 JSON 中定义的位置
+- 星星位置由 `memoirs.json` 或伪随机种子固定
 
 ## 六、星空总览页（`/starry`）
 
@@ -116,7 +118,7 @@ export function getStarPos(
 
 - 遍历 `memoirs`，每篇渲染一个 `DraggableStar`
 - 星星大小、发光强度由 `brightness` 决定
-- 支持拖拽（纯视觉，不持久化）
+- 点击跳转记忆详情页，不可拖拽
 
 ### 6.3 控制按钮
 
@@ -125,13 +127,30 @@ export function getStarPos(
 | 返回 | `navigate('/')` 回到首页 |
 | 观看星轨 | 全屏播放 `/starry-video.mp4` |
 
-### 6.4 星星组件
+### 6.4 隐藏告白彩蛋
+
+当用户**点击过所有 `brightness >= 1.0` 的星星**后，会自动触发一个隐藏告白弹窗。
+
+- **数据源**：`app/public/starry-secret.json`
+- **进度持久化**：`localStorage` 键名为 `starry-bright-clicked`
+- **触发条件**：页面加载时检查当前所有高亮星是否都已在 `localStorage` 中
+- **显示方式**：屏幕中央淡入一个半透明毛玻璃卡片，展示 `message` 字段内容
+- **关闭方式**：点击卡片外部或右上角 × 关闭；再次触发条件会重新显示
+
+```json
+{
+  "message": "当你走过所有最亮的星，才发现我一直在这里等你。—— 冥王星"
+}
+```
+
+修改告白文案只需编辑 `app/public/starry-secret.json`，提交并重新部署即可。
+
+### 6.5 星星组件
 
 **文件**：`app/src/components/starry/DraggableStar.tsx`
 
-- 使用 Framer Motion 的 `drag` 实现拖拽
-- 使用 `useMotionValue` 控制位置，避免拖拽后位置跳跃
-- 点击（非拖拽时）跳转 `/starry/${memoir.id}`
+- 使用 Framer Motion 渲染星星
+- 点击跳转 `/starry/${memoir.id}`，并通知父组件记录点击
 - Hover 显示日期 tooltip
 - CSS 动画 `starPulse` 实现呼吸发光效果
 
@@ -191,6 +210,7 @@ export function getStarPos(
 |------|------|----------|
 | L1 | 首页 Pluto-Charon 徽章 | `/starry` 星空世界 |
 | L2 | 点击任意星星 | 单篇记忆详情 |
+| L3 | 点亮所有最亮的星 | 隐藏告白文字（`starry-secret.json`） |
 | L3 | 特定标题「2月26日 凌晨 冬雨」 | `/next-video.mp4` 视频 |
 | L3 | 特定标题「老夏」 | 可拖拽缩放的金丝眼镜 |
 
@@ -198,8 +218,9 @@ export function getStarPos(
 
 ```
 app/public/memoirs.json                  # 星星数据（静态 JSON）
+app/public/starry-secret.json            # 隐藏告白文字
 app/src/App.tsx                          # 路由定义
-app/src/data/memoirs.ts                  # 数据模型与静态文件读取
+app/src/data/memoirs.ts                  # 数据模型、静态文件读取、secret 读取
 app/src/utils/starry.ts                  # 坐标生成与图片压缩
 app/src/pages/StarryEasterEgg.tsx        # 星空总览页
 app/src/pages/StarryMemoir.tsx           # 记忆详情页
