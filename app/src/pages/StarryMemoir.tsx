@@ -158,39 +158,37 @@ export default function StarryMemoir() {
 
                 {/* 老夏页面装饰 — 金丝眼镜 */}
                 {memoir.title === '老夏' && (
-                  <span className="hidden lg:block absolute -right-28 top-10 pointer-events-auto">
-                    <motion.span
-                      drag
-                      dragMomentum={false}
-                      whileHover={{ cursor: 'grab' }}
-                      whileDrag={{ cursor: 'grabbing' }}
-                      style={{ x, y, rotate: -6, scale: glassesPos.scale }}
-                      onWheel={(e) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        const nextScale = Math.max(0.3, Math.min(2.5, glassesPos.scale + (e.deltaY > 0 ? -0.05 : 0.05)))
-                        const next = { ...glassesPos, scale: nextScale }
-                        setGlassesPos(next)
-                        localStorage.setItem('starry-glasses-position', JSON.stringify(next))
-                      }}
-                      onDragEnd={() => {
-                        const next = { x: x.get(), y: y.get(), scale: glassesPos.scale }
-                        setGlassesPos(next)
-                        localStorage.setItem('starry-glasses-position', JSON.stringify(next))
-                      }}
-                      className="block"
-                    >
-                      <motion.img
-                        src="/golden-glasses.png"
-                        alt="金丝眼镜"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.5 }}
-                        transition={{ delay: 1, duration: 0.8 }}
-                        className="w-24"
-                        draggable={false}
-                      />
-                    </motion.span>
-                  </span>
+                  <motion.span
+                    drag
+                    dragMomentum={false}
+                    whileHover={{ cursor: 'grab' }}
+                    whileDrag={{ cursor: 'grabbing' }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.7 }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                    style={{ x, y, rotate: -6, scale: glassesPos.scale }}
+                    onWheel={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      const nextScale = Math.max(0.3, Math.min(2.5, glassesPos.scale + (e.deltaY > 0 ? -0.05 : 0.05)))
+                      const next = { ...glassesPos, scale: nextScale }
+                      setGlassesPos(next)
+                      localStorage.setItem('starry-glasses-position', JSON.stringify(next))
+                    }}
+                    onDragEnd={() => {
+                      const next = { x: x.get(), y: y.get(), scale: glassesPos.scale }
+                      setGlassesPos(next)
+                      localStorage.setItem('starry-glasses-position', JSON.stringify(next))
+                    }}
+                    className="fixed top-20 right-4 lg:top-24 lg:right-12 z-30 pointer-events-auto w-16 lg:w-24"
+                  >
+                    <img
+                      src="/golden-glasses.png"
+                      alt="金丝眼镜"
+                      className="w-full"
+                      draggable={false}
+                    />
+                  </motion.span>
                 )}
               </div>
             </motion.div>
