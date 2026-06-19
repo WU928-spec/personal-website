@@ -107,7 +107,7 @@ export default function StarrySecret() {
                 </h1>
               )}
 
-              <p className="text-white font-body text-[clamp(0.7rem,3vw,0.95rem)] leading-[1.65] md:leading-[1.85] whitespace-pre-line drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              <p className="text-white font-body text-[clamp(0.7rem,3vw,0.95rem)] leading-[1.65] md:leading-[1.85] whitespace-pre drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
                 {pages[page]}
               </p>
 
