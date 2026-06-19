@@ -1,27 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Star, Play } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type StarrySecret } from '@/data/memoirs'
-import { getCachedImage, loadAndCacheImage } from '@/utils/imageCache'
 
 const CLICKED_KEY = 'starry-bright-clicked'
 const COMPLETED_KEY = 'starry-completed'
-const LETTER_BG = '/letter-bg.jpg'
-
-function drawCover(
-  ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  cw: number,
-  ch: number
-) {
-  const ratio = Math.max(cw / img.width, ch / img.height)
-  const w = img.width * ratio
-  const h = img.height * ratio
-  const x = (cw - w) / 2
-  const y = (ch - h) / 2
-  ctx.drawImage(img, x, y, w, h)
-}
 
 function loadClickedIds(): Set<string> {
   try {
@@ -51,8 +35,6 @@ export default function StarrySecret() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
   const [hasCompleted, setHasCompleted] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [bgReady, setBgReady] = useState(false)
 
   useEffect(() => {
     setHasCompleted(loadCompleted())
@@ -98,53 +80,6 @@ export default function StarrySecret() {
     return () => window.removeEventListener('keydown', handleKey)
   }, [isLastPage, total])
 
-  // 背景图：用 Canvas 绘制已缓存并解码完成的图片，确保进入页面后立即呈现
-  useEffect(() => {
-    let cancelled = false
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const render = (img: HTMLImageElement) => {
-      if (cancelled) return
-      const rect = canvas.getBoundingClientRect()
-      const width = Math.max(1, Math.floor(rect.width))
-      const height = Math.max(1, Math.floor(rect.height))
-      const dpr = window.devicePixelRatio || 1
-
-      canvas.width = Math.floor(width * dpr)
-      canvas.height = Math.floor(height * dpr)
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-      ctx.setTransform(1, 0, 0, 1, 0, 0)
-      ctx.scale(dpr, dpr)
-      drawCover(ctx, img, width, height)
-      setBgReady(true)
-    }
-
-    const cached = getCachedImage(LETTER_BG)
-    if (cached && cached.complete && cached.naturalWidth > 0) {
-      render(cached)
-    } else {
-      loadAndCacheImage(LETTER_BG)
-        .then(render)
-        .catch(() => setBgReady(true))
-    }
-
-    const handleResize = () => {
-      const img = getCachedImage(LETTER_BG)
-      if (img && canvas) render(img)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => {
-      cancelled = true
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
   if (loading || !verified) {
     return (
       <div className="relative w-screen h-screen flex items-center justify-center bg-[#2a2320]">
@@ -162,16 +97,10 @@ export default function StarrySecret() {
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#1a1512]">
-      {/* 背景图：用 Canvas 绘制已缓存/解码的图片，进入页面后立即可见，不再依赖 <img> 加载事件 */}
-      <canvas
-        ref={canvasRef}
-        aria-hidden="true"
-        className={`absolute inset-0 z-0 w-full h-full transition-opacity duration-500 ${
-          bgReady ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
-
+    <div
+      className="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: 'url(/letter-bg.jpg)' }}
+    >
       {/* 文字区域：浮在花海左上方 */}
       <div className="absolute inset-0 flex justify-center md:justify-start md:pl-[6vw] lg:pl-[8vw] pt-[4vh] md:pt-[8vh]">
         <div className="relative w-full max-w-[min(90vw,460px)] md:max-w-[360px] lg:max-w-[400px] px-6 md:px-0">
