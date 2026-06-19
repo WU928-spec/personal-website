@@ -35,6 +35,7 @@ export default function StarrySecret() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
   const [hasCompleted, setHasCompleted] = useState(false)
+  const [bgLoaded, setBgLoaded] = useState(false)
 
   useEffect(() => {
     setHasCompleted(loadCompleted())
@@ -97,10 +98,18 @@ export default function StarrySecret() {
   }
 
   return (
-    <div
-      className="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: 'url(/letter-bg.jpg)' }}
-    >
+    <div className="relative w-screen h-screen overflow-hidden bg-[#1a1512]">
+      {/* 背景图：用 img 元素加载，配合预加载缓存可立即显示，并在加载完成后淡入 */}
+      <img
+        src="/letter-bg.jpg"
+        alt=""
+        aria-hidden="true"
+        className={`absolute inset-0 z-0 w-full h-full object-cover transition-opacity duration-700 ${
+          bgLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        onLoad={() => setBgLoaded(true)}
+      />
+
       {/* 文字区域：浮在花海左上方 */}
       <div className="absolute inset-0 flex justify-center md:justify-start md:pl-[6vw] lg:pl-[8vw] pt-[4vh] md:pt-[8vh]">
         <div className="relative w-full max-w-[min(90vw,460px)] md:max-w-[360px] lg:max-w-[400px] px-6 md:px-0">

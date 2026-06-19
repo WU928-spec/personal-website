@@ -28,21 +28,23 @@ function loadAsset(url: string): Promise<HTMLImageElement | HTMLMediaElement | v
     // 图片：用 Image 对象预加载，并等待解码完成，确保进入页面后能立即渲染
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) {
       const img = new Image()
-      img.src = url
 
-      const finish = () => resolve(img)
-      const fallbackFinish = () => {
+      const finish = () => {
         img.onload = null
         img.onerror = null
-        finish()
+        resolve(img)
       }
 
-      if ('decode' in img && typeof img.decode === 'function') {
-        img.decode().then(fallbackFinish).catch(fallbackFinish)
-      } else {
-        img.onload = fallbackFinish
-        img.onerror = fallbackFinish
+      img.onload = () => {
+        // 等待解码完成，避免进入页面后出现黑屏或闪烁
+        if ('decode' in img && typeof img.decode === 'function') {
+          img.decode().then(finish).catch(finish)
+        } else {
+          finish()
+        }
       }
+      img.onerror = finish
+      img.src = url
       return
     }
 
