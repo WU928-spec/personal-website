@@ -15,6 +15,7 @@ export default function StarryEasterEgg() {
   const [draggable, setDraggable] = useState(true)
   const [showManager, setShowManager] = useState(false)
   const [memoirs, setMemoirs] = useState<Memoir[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle')
   const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false)
@@ -23,6 +24,7 @@ export default function StarryEasterEgg() {
   const refreshMemoirs = useCallback(async () => {
     const list = await getMemoirs()
     setMemoirs(list)
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
@@ -132,6 +134,16 @@ export default function StarryEasterEgg() {
       >
         {stars}
       </div>
+
+      {/* 首屏加载指示器 */}
+      {isLoading && (
+        <div className="absolute inset-0 z-[25] flex items-center justify-center bg-[#050508]/80 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3 text-white/50">
+            <Loader2 size={28} className="animate-spin" />
+            <span className="text-sm font-body tracking-widest">正在载入星空...</span>
+          </div>
+        </div>
+      )}
 
       {/* 后台同步指示器 */}
       {isBackgroundSyncing && (

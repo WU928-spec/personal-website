@@ -237,11 +237,15 @@ function memoirToDb(m: Memoir): Record<string, unknown> {
   }
 }
 
-async function fetchFromSupabase(): Promise<Memoir[] | null> {
+async function fetchFromSupabase(timeoutMs = 8000): Promise<Memoir[] | null> {
   if (!isSupabaseReady()) return null
 
   try {
-    const { data, error } = await supabase!.from(SUPABASE_TABLE).select('*')
+    const query = supabase!.from(SUPABASE_TABLE).select('*')
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Supabase timeout')), timeoutMs)
+    )
+    const { data, error } = await Promise.race([query, timeout])
     if (error || !data || !Array.isArray(data)) return null
     if (data.length === 0) return []
     return (data as Record<string, unknown>[]).map(dbToMemoir)
@@ -327,16 +331,30 @@ export async function backgroundSyncMemoirs(): Promise<boolean> {
 
 /**
  * 读取记忆列表。
- * 先立即返回本地缓存（或默认值），保证首屏不阻塞；
- * 同时在后台拉取云端并平滑更新。
+ * - 如果有本地缓存：立即返回本地，后台同步云端（不阻塞）。
+ * - 如果没有本地缓存（新访客）：等待云端数据，避免默认数据跳变；
+ *   云端失败或为空时回退到默认值。
  */
 export async function getMemoirs(): Promise<Memoir[]> {
-  // 立即触发后台同步，但不等待它
-  backgroundSyncMemoirs().catch(() => {})
-
   const local = await loadFromIndexedDB()
-  if (local && local.length > 0) return local
 
+  if (local && local.length > 0) {
+    // 老用户/自己：本地优先，后台同步
+    backgroundSyncMemoirs().catch(() => {})
+    return local
+  }
+
+  // 新访客：本地没有数据，等云端
+  window.dispatchEvent(new CustomEvent('starry-sync-started'))
+  const remote = await fetchFromSupabase(8000)
+  window.dispatchEvent(new CustomEvent('starry-sync-completed'))
+
+  if (remote && remote.length > 0) {
+    await saveToIndexedDB(remote)
+    return remote
+  }
+
+  // 云端为空或失败：使用默认值
   const defaults = DEFAULT_MEMOIRS
   await saveToIndexedDB(defaults)
   return defaults
