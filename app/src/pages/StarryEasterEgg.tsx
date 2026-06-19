@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
 import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
+import { useBackgroundMusic } from '@/hooks/useBackgroundMusic'
 import DraggableStar from '@/components/starry/DraggableStar'
 
 const CLICKED_KEY = 'starry-bright-clicked'
@@ -58,6 +59,7 @@ export default function StarryEasterEgg() {
   }, [])
 
   useAutoPlayVideo(videoRef, showVideo)
+  useBackgroundMusic('/bg-music.mp3')
 
   const brightIds = useMemo(
     () => new Set(memoirs.filter((m) => m.brightness >= 1).map((m) => m.id)),

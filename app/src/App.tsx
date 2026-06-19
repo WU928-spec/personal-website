@@ -10,7 +10,6 @@ import StarryEasterEgg from './pages/StarryEasterEgg.tsx'
 import StarryMemoir from './pages/StarryMemoir.tsx'
 import StarrySecret from './pages/StarrySecret.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
-import MusicPlayer from './components/MusicPlayer.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
 import { seedDemoDataIfEmpty } from './utils/projectSeed.ts'
 
@@ -36,7 +35,6 @@ function App() {
             <Route path="/starry/:id" element={<StarryMemoir />} />
           </Routes>
         </ErrorBoundary>
-        <MusicPlayer />
       </>
     )
   }
@@ -60,7 +58,6 @@ function App() {
           </AnimatePresence>
         </Layout>
       </ErrorBoundary>
-      <MusicPlayer />
     </>
   )
 }
