@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Mail } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
@@ -202,19 +202,6 @@ export default function StarryEasterEgg() {
         >
           还有 {remainingCount} 颗最亮的星等待点亮
         </motion.div>
-      )}
-
-      {/* 已解锁：查看信件入口 */}
-      {remainingCount === 0 && secret && secret.pages.length > 0 && (
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          onClick={() => navigate('/starry/secret')}
-          className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 text-white/80 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/10 px-5 py-2.5 rounded-full border border-white/20 hover:bg-white/15"
-        >
-          <Mail size={16} />
-          <span className="text-sm font-body tracking-widest">查看来信</span>
-        </motion.button>
       )}
 
     </div>
