@@ -39,17 +39,6 @@ const PRELOAD_ASSETS: string[] = [
   '/starry-video.mp4',
 ]
 
-const LOAD_TIMEOUT = 12000 // 单个资源最长等待 12 秒，避免网络卡住
-
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => reject(new Error('timeout')), ms)
-    }),
-  ])
-}
-
 function loadAsset(url: string): Promise<void> {
   return new Promise((resolve) => {
     const ext = url.split('.').pop()?.toLowerCase()
@@ -68,14 +57,6 @@ function loadAsset(url: string): Promise<void> {
       .then(() => resolve())
       .catch(() => resolve())
   })
-}
-
-async function loadAssetSafe(url: string): Promise<void> {
-  try {
-    await withTimeout(loadAsset(url), LOAD_TIMEOUT)
-  } catch {
-    // 超时或失败都不阻塞整体加载
-  }
 }
 
 /** 预先把星空页数据解析进内存缓存，避免进入页面后二次 loading */
@@ -110,11 +91,9 @@ export default function Preloader() {
 
   useEffect(() => {
     let cancelled = false
-    let globalTimer: ReturnType<typeof setTimeout> | null = null
 
     const finish = () => {
       if (cancelled) return
-      if (globalTimer) clearTimeout(globalTimer)
       // 进度条到达 100% 后短暂停顿再进入，视觉更完整
       setTimeout(() => setDone(true), 400)
     }
@@ -124,29 +103,22 @@ export default function Preloader() {
       await Promise.all([
         Promise.all(
           PRELOAD_ASSETS.map(async (url) => {
-            await loadAssetSafe(url)
+            await loadAsset(url)
             if (!cancelled) {
               setLoaded((prev) => Math.min(prev + 1, total))
             }
           })
         ),
-        withTimeout(preloadData(), LOAD_TIMEOUT),
+        preloadData(),
       ])
 
       if (!cancelled) finish()
     }
 
-    // 全局保险：即使 loading 流程自身 hang 住，最多 25 秒后也会退出预加载
-    // 注意：这里不再把进度硬拉到 100%，避免资源实际没加载完就误导用户
-    globalTimer = setTimeout(() => {
-      if (!cancelled) finish()
-    }, 25000)
-
     loadAll()
 
     return () => {
       cancelled = true
-      if (globalTimer) clearTimeout(globalTimer)
     }
   }, [total])
 
