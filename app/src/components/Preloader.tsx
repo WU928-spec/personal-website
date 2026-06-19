@@ -4,6 +4,8 @@ import App from '../App.tsx'
 
 // 需要预加载的站点资源（图片、音频、视频）
 const PRELOAD_ASSETS: string[] = [
+  '/memoirs.json',
+  '/starry-secret.json',
   '/about-hero.jpg',
   '/about-timeline-1.jpg',
   '/about-timeline-2.jpg',
