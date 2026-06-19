@@ -8,6 +8,7 @@ import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import DraggableStar from '@/components/starry/DraggableStar'
 
 const CLICKED_KEY = 'starry-bright-clicked'
+const COMPLETED_KEY = 'starry-completed'
 
 function loadClickedIds(): Set<string> {
   try {
@@ -30,6 +31,14 @@ function saveClickedIds(ids: Set<string>) {
   }
 }
 
+function loadCompleted(): boolean {
+  try {
+    return localStorage.getItem(COMPLETED_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
 export default function StarryEasterEgg() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -40,6 +49,7 @@ export default function StarryEasterEgg() {
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [hasCompleted, setHasCompleted] = useState(loadCompleted)
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -83,6 +93,8 @@ export default function StarryEasterEgg() {
   useEffect(() => {
     // 从信件页点击星星返回并播放视频时，不要再次跳转回信件页
     if (location.state?.playVideo) return
+    // 已经走完全流程的用户可以手动回顾，不再自动跳转
+    if (hasCompleted) return
     if (allBrightClicked && secret && secret.pages.length > 0 && !isTransitioning) {
       setIsTransitioning(true)
       const timer = setTimeout(() => {
@@ -93,7 +105,7 @@ export default function StarryEasterEgg() {
         setIsTransitioning(false)
       }
     }
-  }, [allBrightClicked, secret, navigate, location.state, isTransitioning])
+  }, [allBrightClicked, secret, navigate, location.state, isTransitioning, hasCompleted])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {
@@ -213,7 +225,7 @@ export default function StarryEasterEgg() {
         </motion.div>
       )}
 
-      {/* 剩余高亮星星提示 */}
+      {/* 高亮星星状态提示 */}
       {remainingCount > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -221,6 +233,25 @@ export default function StarryEasterEgg() {
           className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 text-white/40 text-xs font-body tracking-widest pointer-events-none"
         >
           还有 {remainingCount} 颗最亮的星等待点亮
+        </motion.div>
+      )}
+
+      {allBrightClicked && hasCompleted && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3"
+        >
+          <p className="text-white/40 text-xs font-body tracking-widest pointer-events-none">
+            所有亮星已点亮
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/starry/secret')}
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/10 hover:bg-white/15 px-5 py-2.5 rounded-full border border-white/20"
+          >
+            <span className="text-sm font-body tracking-widest">进入信件</span>
+          </button>
         </motion.div>
       )}
 
