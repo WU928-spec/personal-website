@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Home, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Home, ChevronDown, BookOpen, Play } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const sections = [
@@ -91,8 +92,22 @@ const sections = [
   },
 ]
 
+const COMPLETION_KEY = 'starry-completed'
+
+function markCompleted() {
+  try {
+    localStorage.setItem(COMPLETION_KEY, 'true')
+  } catch {
+    // ignore
+  }
+}
+
 export default function StarryEpilogue() {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    markCompleted()
+  }, [])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#050508]">
@@ -258,12 +273,12 @@ export default function StarryEpilogue() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.5 }}
-        className="fixed bottom-8 left-0 right-0 z-30 flex items-center justify-center gap-4"
+        className="fixed bottom-6 left-0 right-0 z-30 flex flex-wrap items-center justify-center gap-3 px-4"
       >
         <button
           type="button"
           onClick={() => navigate('/starry')}
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-5 py-2.5 rounded-full border border-white/10"
+          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
         >
           <ArrowLeft size={16} />
           <span className="text-sm font-body tracking-widest">返回星空</span>
@@ -271,8 +286,26 @@ export default function StarryEpilogue() {
 
         <button
           type="button"
+          onClick={() => navigate('/starry/secret')}
+          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+        >
+          <BookOpen size={16} />
+          <span className="text-sm font-body tracking-widest">再次阅读信件</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/starry', { state: { playVideo: true } })}
+          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+        >
+          <Play size={16} />
+          <span className="text-sm font-body tracking-widest">重新播放星轨</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-5 py-2.5 rounded-full border border-white/10"
+          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
         >
           <Home size={16} />
           <span className="text-sm font-body tracking-widest">回到首页</span>
