@@ -1,19 +1,36 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import { Music, Play, Pause, SkipForward, SkipBack, Shuffle, Volume2, Plus, X, Trash2 } from 'lucide-react'
 import { getTracks, addTrack, removeTrack, fileToBase64, type Track } from '@/data/music'
 
-const DEFAULT_TRACK: Track = {
+const STARRY_TRACK: Track = {
   id: 'default-nuna',
   title: 'NUNA',
   artist: '队长',
   data: '/bg-music.mp3',
 }
 
+const SECRET_TRACK: Track = {
+  id: 'default-secret',
+  title: '想你和我们的以后',
+  artist: '苏运莹',
+  data: '/secret-music.mp3',
+}
+
 export default function MusicPlayer() {
+  const location = useLocation()
+  const isSecretPage = location.pathname === '/starry/secret'
+  const defaultTrack = isSecretPage ? SECRET_TRACK : STARRY_TRACK
+
   const [tracks, setTracks] = useState<Track[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const allTracks = useMemo(() => (tracks.length > 0 ? tracks : [DEFAULT_TRACK]), [tracks])
+  const allTracks = useMemo(() => (tracks.length > 0 ? tracks : [defaultTrack]), [tracks, defaultTrack])
+
+  // 切换页面默认音乐时重置到第一首
+  useEffect(() => {
+    setCurrentIndex(0)
+  }, [defaultTrack])
   const [isPlaying, setIsPlaying] = useState(false)
   const [isShuffled, setIsShuffled] = useState(true)
   const [volume, setVolume] = useState(0.5)
@@ -159,11 +176,11 @@ export default function MusicPlayer() {
   }
 
   const handleDelete = async (id: string) => {
-    if (id === DEFAULT_TRACK.id) return
+    if (id === defaultTrack.id) return
     await removeTrack(id)
     const updated = await getTracks()
     setTracks(updated)
-    const newAllTracks = updated.length > 0 ? updated : [DEFAULT_TRACK]
+    const newAllTracks = updated.length > 0 ? updated : [defaultTrack]
     if (currentIndex >= newAllTracks.length) {
       setCurrentIndex(0)
     }
@@ -295,7 +312,7 @@ export default function MusicPlayer() {
                     className={`flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-sm transition-colors ${i === currentIndex ? 'bg-white/10 text-white' : 'text-white/50 hover:bg-white/5 hover:text-white/80'}`}
                   >
                     <span className="truncate flex-1">{t.title}</span>
-                    {t.id !== DEFAULT_TRACK.id && (
+                    {t.id !== defaultTrack.id && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
