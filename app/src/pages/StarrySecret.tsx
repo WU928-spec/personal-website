@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Star, Play } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type StarrySecret } from '@/data/memoirs'
 
 const CLICKED_KEY = 'starry-bright-clicked'
+const COMPLETED_KEY = 'starry-completed'
 
 function loadClickedIds(): Set<string> {
   try {
@@ -19,14 +20,24 @@ function loadClickedIds(): Set<string> {
   return new Set()
 }
 
+function loadCompleted(): boolean {
+  try {
+    return localStorage.getItem(COMPLETED_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
 export default function StarrySecret() {
   const navigate = useNavigate()
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [verified, setVerified] = useState(false)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
+  const [hasCompleted, setHasCompleted] = useState(false)
 
   useEffect(() => {
+    setHasCompleted(loadCompleted())
     Promise.all([getMemoirs(), getStarrySecret()]).then(([memoirs, secretData]) => {
       const brightIds = memoirs.filter((m) => m.brightness >= 1).map((m) => m.id)
       const clickedIds = loadClickedIds()
@@ -148,6 +159,20 @@ export default function StarrySecret() {
                   )}
                 </div>
               </div>
+
+              {isLastPage && hasCompleted && (
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  onClick={() => navigate('/starry', { state: { playVideo: true } })}
+                  className="mt-5 flex items-center justify-center gap-2 w-full text-white/80 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/10 hover:bg-white/15 py-2.5 rounded-full border border-white/20"
+                >
+                  <Play size={16} />
+                  <span className="text-sm font-body tracking-widest">观看星轨视频</span>
+                </motion.button>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
