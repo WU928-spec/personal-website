@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   preloadMemoirs,
@@ -21,16 +21,28 @@ const PRELOAD_ASSETS: string[] = [
   '/next-video.mp4',
 ]
 
-function loadAsset(url: string): Promise<void> {
+function loadAsset(url: string): Promise<HTMLImageElement | HTMLMediaElement | void> {
   return new Promise((resolve) => {
     const ext = url.split('.').pop()?.toLowerCase()
 
-    // 图片：用 Image 对象预加载
+    // 图片：用 Image 对象预加载，并等待解码完成，确保进入页面后能立即渲染
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) {
       const img = new Image()
-      img.onload = () => resolve()
-      img.onerror = () => resolve()
       img.src = url
+
+      const finish = () => resolve(img)
+      const fallbackFinish = () => {
+        img.onload = null
+        img.onerror = null
+        finish()
+      }
+
+      if ('decode' in img && typeof img.decode === 'function') {
+        img.decode().then(fallbackFinish).catch(fallbackFinish)
+      } else {
+        img.onload = fallbackFinish
+        img.onerror = fallbackFinish
+      }
       return
     }
 
@@ -48,7 +60,7 @@ function loadAsset(url: string): Promise<void> {
       media.oncanplaythrough = null
       media.onerror = null
       media.onstalled = null
-      resolve()
+      resolve(media)
     }
 
     media.oncanplaythrough = finish
@@ -91,6 +103,7 @@ interface PreloaderProps {
 export default function Preloader({ children }: PreloaderProps) {
   const [loaded, setLoaded] = useState(0)
   const [done, setDone] = useState(false)
+  const assetsRef = useRef<(HTMLImageElement | HTMLMediaElement)[]>([])
   const total = PRELOAD_ASSETS.length
   const progress = total > 0 ? Math.round((loaded / total) * 100) : 100
 
@@ -111,7 +124,8 @@ export default function Preloader({ children }: PreloaderProps) {
         while (queue.length > 0) {
           const url = queue.shift()
           if (!url) break
-          await loadAsset(url)
+          const asset = await loadAsset(url)
+          if (asset) assetsRef.current.push(asset)
           if (!cancelled) {
             setLoaded((prev) => Math.min(prev + 1, total))
           }
@@ -127,6 +141,7 @@ export default function Preloader({ children }: PreloaderProps) {
 
     return () => {
       cancelled = true
+      assetsRef.current = []
     }
   }, [total])
 

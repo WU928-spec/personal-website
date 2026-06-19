@@ -50,6 +50,7 @@ export default function StarryEasterEgg() {
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [hasCompleted] = useState(loadCompleted)
+  const [bgLoaded, setBgLoaded] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -140,14 +141,15 @@ export default function StarryEasterEgg() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#050508]">
-      {/* 背景图 */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: 'url(/starry-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+      {/* 背景图：用 img 元素加载，配合预加载缓存可立即显示，并在加载完成后淡入 */}
+      <img
+        src="/starry-bg.jpg"
+        alt=""
+        aria-hidden="true"
+        className={`absolute inset-0 z-0 w-full h-full object-cover transition-opacity duration-700 ${
+          bgLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        onLoad={() => setBgLoaded(true)}
       />
 
       {/* 全屏视频 */}
