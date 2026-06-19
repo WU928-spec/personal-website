@@ -13,6 +13,24 @@ export default function MusicPlayer() {
   const [hasLoaded, setHasLoaded] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const playNextRef = useRef<() => void>(() => {})
+  const hasAutoStartedRef = useRef(false)
+
+  // 首次用户交互后自动播放（浏览器禁止无交互自动发声）
+  useEffect(() => {
+    const startOnInteraction = () => {
+      if (hasAutoStartedRef.current) return
+      hasAutoStartedRef.current = true
+      if (tracks.length > 0 && !isPlaying) {
+        setIsPlaying(true)
+      }
+    }
+    window.addEventListener('pointerdown', startOnInteraction, { once: true })
+    window.addEventListener('keydown', startOnInteraction, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', startOnInteraction)
+      window.removeEventListener('keydown', startOnInteraction)
+    }
+  }, [tracks.length, isPlaying])
 
   // 加载 tracks
   useEffect(() => {
