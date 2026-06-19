@@ -99,40 +99,33 @@ export default function StarrySecret() {
                 {pages[page]}
               </p>
 
-              <div className="mt-6 text-white/70 text-xs font-body tracking-widest drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
-                {page + 1} / {total}
+              <div className="mt-6 flex items-center justify-between">
+                <span className="text-white/70 text-xs font-body tracking-widest drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
+                  {page + 1} / {total}
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={!hasPrev}
+                    className="text-white/80 hover:text-white disabled:text-white/30 transition-colors"
+                    aria-label="上一页"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
+                    disabled={!hasNext}
+                    className="text-white/80 hover:text-white disabled:text-white/30 transition-colors"
+                    aria-label="下一页"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
-      </div>
-
-      {/* 翻页控制 */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-8 bg-black/25 backdrop-blur-sm px-6 py-3 rounded-full">
-        <button
-          onClick={() => setPage((p) => Math.max(0, p - 1))}
-          disabled={!hasPrev}
-          className="flex items-center gap-1 text-white/90 hover:text-white disabled:text-white/40 transition-colors font-body text-sm"
-        >
-          <ChevronLeft size={18} />
-          <span>上一页</span>
-        </button>
-
-        <button
-          onClick={() => navigate('/starry')}
-          className="text-white/80 hover:text-white transition-colors font-body text-sm tracking-widest"
-        >
-          返回星空
-        </button>
-
-        <button
-          onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
-          disabled={!hasNext}
-          className="flex items-center gap-1 text-white/90 hover:text-white disabled:text-white/40 transition-colors font-body text-sm"
-        >
-          <span>下一页</span>
-          <ChevronRight size={18} />
-        </button>
       </div>
     </div>
   )
