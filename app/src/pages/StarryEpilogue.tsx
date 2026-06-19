@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, Home, ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useBackgroundMusic } from '@/hooks/useBackgroundMusic'
 
 const sections = [
   {
@@ -94,7 +93,6 @@ const sections = [
 
 export default function StarryEpilogue() {
   const navigate = useNavigate()
-  useBackgroundMusic('/epilogue-music.mp3')
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#050508]">

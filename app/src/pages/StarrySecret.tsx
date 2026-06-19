@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useBackgroundMusic } from '@/hooks/useBackgroundMusic'
 import { getMemoirs, getStarrySecret, type StarrySecret } from '@/data/memoirs'
 
 const CLICKED_KEY = 'starry-bright-clicked'
@@ -22,7 +21,6 @@ function loadClickedIds(): Set<string> {
 
 export default function StarrySecret() {
   const navigate = useNavigate()
-  useBackgroundMusic('/secret-music.mp3')
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [verified, setVerified] = useState(false)
   const [loading, setLoading] = useState(true)

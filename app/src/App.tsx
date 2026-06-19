@@ -13,6 +13,7 @@ import StarrySecret from './pages/StarrySecret.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
 import Preloader from './components/Preloader.tsx'
+import StarryMusic from './components/StarryMusic.tsx'
 import { seedDemoDataIfEmpty } from './utils/projectSeed.ts'
 
 const Calendar = lazy(() => import('./pages/Calendar.tsx'))
@@ -32,6 +33,7 @@ function App() {
       <>
         <ErrorBoundary>
           <Preloader>
+            <StarryMusic />
             <Routes location={location} key={location.pathname}>
               <Route path="/starry" element={<StarryEasterEgg />} />
               <Route path="/starry/secret" element={<StarrySecret />} />
