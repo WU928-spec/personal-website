@@ -5,7 +5,7 @@ import { useBackgroundMusic } from '@/hooks/useBackgroundMusic'
 
 export default function StarryEpilogue() {
   const navigate = useNavigate()
-  useBackgroundMusic('/bg-music.mp3')
+  useBackgroundMusic('/epilogue-music.mp3')
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#050508]">

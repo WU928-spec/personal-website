@@ -16,6 +16,7 @@ const PRELOAD_ASSETS: string[] = [
   '/about-timeline-3.jpg',
   '/avatar.jpg',
   '/bg-music.mp3',
+  '/epilogue-music.mp3',
   '/blog-hero.jpg',
   '/blog-thumb-1.jpg',
   '/blog-thumb-2.jpg',
