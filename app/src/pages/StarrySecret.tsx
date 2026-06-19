@@ -81,8 +81,11 @@ export default function StarrySecret() {
       {/* 轻微暗角，让信纸更突出 */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_70%_50%,transparent_0%,rgba(0,0,0,0.25)_100%)]" />
 
-      {/* 信件容器：A4 比例 */}
-      <div className="relative z-10 w-full max-w-[min(92vw,520px)] drop-shadow-[0_20px_60px_rgba(0,0,0,0.35)]" style={{ aspectRatio: '210 / 297' }}>
+      {/* 信件容器：A4 比例，限制高度避免顶到上下边缘 */}
+      <div
+        className="relative z-10 w-full max-w-[min(86vw,420px)] max-h-[72vh] drop-shadow-[0_16px_44px_rgba(0,0,0,0.22)]"
+        style={{ aspectRatio: '210 / 297' }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={page}
@@ -90,37 +93,37 @@ export default function StarrySecret() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="absolute inset-0 rounded-sm overflow-hidden"
+            className="absolute inset-0 rounded overflow-hidden"
             style={{
-              backgroundColor: '#fdfbf7',
+              backgroundColor: '#fdfbf5',
               backgroundImage: `
-                linear-gradient(90deg, transparent 47px, rgba(232, 180, 180, 0.45) 47px, rgba(232, 180, 180, 0.45) 48px, transparent 48px),
+                linear-gradient(90deg, transparent 43px, rgba(232, 180, 180, 0.42) 43px, rgba(232, 180, 180, 0.42) 44px, transparent 44px),
                 repeating-linear-gradient(
                   transparent,
                   transparent 31px,
-                  rgba(164, 176, 190, 0.35) 31px,
-                  rgba(164, 176, 190, 0.35) 32px
+                  rgba(164, 176, 190, 0.32) 31px,
+                  rgba(164, 176, 190, 0.32) 32px
                 )
               `,
               backgroundSize: '100% 100%, 100% 32px',
             }}
           >
-            <div className="h-full px-8 sm:px-10 pt-8 pb-16 pl-[56px] sm:pl-[64px]">
+            <div className="h-full px-7 sm:px-9 pt-7 pb-14 pl-[52px] sm:pl-[58px]">
               {/* 称呼 / 标题 */}
               {secret?.title && (
-                <h1 className="text-[#4a443d] font-body text-[clamp(0.9rem,3.6vw,1.1rem)] tracking-[0.2em] leading-[32px] mb-[32px]">
+                <h1 className="text-[#4a443d] font-body text-[clamp(0.85rem,3.4vw,1rem)] tracking-[0.2em] leading-[32px] mb-[32px]">
                   {secret.title}
                 </h1>
               )}
 
               {/* 正文：对齐行线 */}
-              <p className="text-[#3d3832] font-body text-[clamp(0.85rem,3.2vw,1rem)] leading-[32px] whitespace-pre-line">
+              <p className="text-[#3d3832] font-body text-[clamp(0.8rem,3vw,0.95rem)] leading-[32px] whitespace-pre-line">
                 {pages[page]}
               </p>
             </div>
 
             {/* 页码 */}
-            <div className="absolute bottom-6 right-8 text-[#a8a095] text-xs font-body tracking-widest">
+            <div className="absolute bottom-5 right-7 text-[#a8a095] text-xs font-body tracking-widest">
               {page + 1} / {total}
             </div>
           </motion.div>
