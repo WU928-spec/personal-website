@@ -81,6 +81,16 @@ export default function StarryEasterEgg() {
     }
   }, [])
 
+  // 检查背景图是否已缓存，避免缓存命中时 onLoad 不同步触发导致的闪烁
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => setBgLoaded(true)
+    img.src = '/starry-bg.jpg'
+    if (img.complete) {
+      setBgLoaded(true)
+    }
+  }, [])
+
   const brightIds = useMemo(
     () => new Set(memoirs.filter((m) => m.brightness >= 1).map((m) => m.id)),
     [memoirs]
@@ -91,12 +101,13 @@ export default function StarryEasterEgg() {
     return [...brightIds].every((id) => clickedIds.has(id))
   }, [brightIds, clickedIds])
 
+  const isTransitioningRef = useRef(false)
+
   useEffect(() => {
-    // 从信件页点击星星返回并播放视频时，不要再次跳转回信件页
     if (location.state?.playVideo) return
-    // 已经走完全流程的用户可以手动回顾，不再自动跳转
     if (hasCompleted) return
-    if (allBrightClicked && secret && secret.pages.length > 0 && !isTransitioning) {
+    if (allBrightClicked && secret && secret.pages.length > 0 && !isTransitioningRef.current) {
+      isTransitioningRef.current = true
       setIsTransitioning(true)
       const timer = setTimeout(() => {
         navigate('/starry/secret')
@@ -105,7 +116,7 @@ export default function StarryEasterEgg() {
         clearTimeout(timer)
       }
     }
-  }, [allBrightClicked, secret, navigate, location.state, isTransitioning, hasCompleted])
+  }, [allBrightClicked, secret, navigate, location.state, hasCompleted])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {

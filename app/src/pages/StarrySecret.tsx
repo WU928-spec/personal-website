@@ -35,6 +35,7 @@ export default function StarrySecret() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
   const [hasCompleted, setHasCompleted] = useState(false)
+  const [bgLoaded, setBgLoaded] = useState(false)
 
   useEffect(() => {
     setHasCompleted(loadCompleted())
@@ -52,7 +53,16 @@ export default function StarrySecret() {
       setVerified(true)
       setLoading(false)
     })
-  }, [navigate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 预加载背景图并触发淡入
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => setBgLoaded(true)
+    img.onerror = () => setBgLoaded(true)
+    img.src = '/letter-bg.jpg'
+  }, [])
 
   const pages = secret?.pages ?? []
   const total = pages.length
@@ -98,7 +108,7 @@ export default function StarrySecret() {
 
   return (
     <div
-      className="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
+      className={`relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat transition-opacity duration-700 ${bgLoaded ? 'opacity-100' : 'opacity-0'}`}
       style={{ backgroundImage: 'url(/letter-bg.jpg)' }}
     >
       {/* 文字区域：浮在花海左上方 */}

@@ -137,24 +137,45 @@ export default function Preloader({ children }: PreloaderProps) {
     // 数据必须加载完成；失败也由页面自身兜底
     const dataPromise = preloadData().catch(() => {})
 
-    // 资源后台预加载，不阻塞进入页面
-    Promise.all(
-      PRELOAD_ASSETS.map((url) =>
-        withTimeout(loadAsset(url), ASSET_TIMEOUT)
-          .catch(() => {})
-          .finally(() => {
-            if (!cancelled) {
-              setLoaded((prev) => Math.min(prev + 1, total))
-            }
-          })
-      )
-    ).then(() => {
-      // 如果全部资源很快加载完，可以比 MAX_WAIT_MS 更早进入
+    // 关键资源：图片类必须加载完成才能进入页面，避免背景图闪烁
+    const criticalAssets = PRELOAD_ASSETS.filter((url) => {
+      const ext = url.split('.').pop()?.toLowerCase()
+      return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')
+    })
+    const optionalAssets = PRELOAD_ASSETS.filter((url) => !criticalAssets.includes(url))
+
+    const loadCritical = (url: string) =>
+      withTimeout(loadAsset(url), ASSET_TIMEOUT)
+        .catch(() => {})
+        .finally(() => {
+          if (!cancelled) {
+            setLoaded((prev) => Math.min(prev + 1, total))
+          }
+        })
+
+    const loadOptional = (url: string) =>
+      withTimeout(loadAsset(url), ASSET_TIMEOUT)
+        .catch(() => {})
+        .finally(() => {
+          if (!cancelled) {
+            setLoaded((prev) => Math.min(prev + 1, total))
+          }
+        })
+
+    // 关键资源加载（阻塞进入）
+    const criticalPromise = Promise.all(criticalAssets.map(loadCritical))
+
+    // 非关键资源后台加载（不阻塞进入，加载完若尚未进入则触发）
+    Promise.all(optionalAssets.map(loadOptional)).then(() => {
       if (!cancelled) enter()
     })
 
-    // 至少等待数据和最小视觉时间，避免闪烁
-    Promise.all([dataPromise, new Promise<void>((r) => setTimeout(r, MIN_WAIT_MS))]).then(() => {
+    // 进入条件：数据 + 关键资源 + 最小视觉时间
+    Promise.all([
+      dataPromise,
+      criticalPromise,
+      new Promise<void>((r) => setTimeout(r, MIN_WAIT_MS)),
+    ]).then(() => {
       if (!cancelled) enter()
     })
 
