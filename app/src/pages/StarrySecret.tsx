@@ -90,7 +90,7 @@ export default function StarrySecret() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: 'url(/letter-bg.png)' }}
+      style={{ backgroundImage: 'url(/letter-bg.jpg)' }}
     >
       {/* 文字区域：浮在花海左上方 */}
       <div className="absolute inset-0 flex justify-center md:justify-start md:pl-[6vw] lg:pl-[8vw] pt-[4vh] md:pt-[8vh]">

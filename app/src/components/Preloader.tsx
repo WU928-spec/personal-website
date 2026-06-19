@@ -17,21 +17,32 @@ const PRELOAD_ASSETS: string[] = [
   '/blog-thumb-4.jpg',
   '/blog-thumb-5.jpg',
   '/blog-thumb-6.jpg',
-  '/chen_tong_diagnosis_wide.png',
-  '/chen_tong_wide.png',
+  '/chen_tong_diagnosis_wide.jpg',
+  '/chen_tong_wide.jpg',
   '/golden-glasses.png',
   '/hero-bg.jpg',
-  '/letter-bg.png',
+  '/letter-bg.jpg',
   '/meteorite.jpg',
   '/next-video.mp4',
-  '/pluto_crying.png',
+  '/pluto_crying.jpg',
   '/projects-hero.jpg',
   '/secret-music.mp3',
   '/starry-bg.jpg',
-  '/starry-images/1-0.png',
+  '/starry-images/1-0.jpg',
   '/starry-images/1-1.jpg',
   '/starry-video.mp4',
 ]
+
+const LOAD_TIMEOUT = 12000 // 单个资源最长等待 12 秒，避免网络卡住
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error('timeout')), ms)
+    }),
+  ])
+}
 
 function loadAsset(url: string): Promise<void> {
   return new Promise((resolve) => {
@@ -53,6 +64,14 @@ function loadAsset(url: string): Promise<void> {
   })
 }
 
+async function loadAssetSafe(url: string): Promise<void> {
+  try {
+    await withTimeout(loadAsset(url), LOAD_TIMEOUT)
+  } catch {
+    // 超时或失败都不阻塞整体加载
+  }
+}
+
 export default function Preloader() {
   const [loaded, setLoaded] = useState(0)
   const [done, setDone] = useState(false)
@@ -61,28 +80,42 @@ export default function Preloader() {
 
   useEffect(() => {
     let cancelled = false
+    let globalTimer: ReturnType<typeof setTimeout> | null = null
+
+    const finish = () => {
+      if (cancelled) return
+      if (globalTimer) clearTimeout(globalTimer)
+      // 进度条到达 100% 后短暂停顿再进入，视觉更完整
+      setTimeout(() => setDone(true), 400)
+    }
 
     const loadAll = async () => {
       // 并发加载，每完成一个更新进度
       await Promise.all(
         PRELOAD_ASSETS.map(async (url) => {
-          await loadAsset(url)
+          await loadAssetSafe(url)
           if (!cancelled) {
             setLoaded((prev) => Math.min(prev + 1, total))
           }
         })
       )
 
-      if (!cancelled) {
-        // 进度条到达 100% 后短暂停顿再进入，视觉更完整
-        setTimeout(() => setDone(true), 400)
-      }
+      if (!cancelled) finish()
     }
+
+    // 全局保险：即使个别资源一直不返回，最多 25 秒后强制进入
+    globalTimer = setTimeout(() => {
+      if (!cancelled) {
+        setLoaded(total)
+        finish()
+      }
+    }, 25000)
 
     loadAll()
 
     return () => {
       cancelled = true
+      if (globalTimer) clearTimeout(globalTimer)
     }
   }, [total])
 
