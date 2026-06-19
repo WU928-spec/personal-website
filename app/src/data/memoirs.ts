@@ -16,6 +16,11 @@ const SECRET_URL = '/starry-secret.json'
 let cachedMemoirs: Memoir[] | null = null
 let cachePromise: Promise<Memoir[]> | null = null
 
+/** 预加载时直接写入缓存，避免进入页面后再次请求 */
+export function preloadMemoirs(data: Memoir[]) {
+  cachedMemoirs = data.map(migrateMemoir)
+}
+
 export const DEFAULT_MEMOIRS: Memoir[] = [
   {
     id: '1',
@@ -80,10 +85,21 @@ export interface StarrySecret {
   message?: string // 向后兼容：旧版单段文字
 }
 
+let cachedSecret: StarrySecret | null = null
+
+/** 预加载时直接写入缓存，避免进入页面后再次请求 */
+export function preloadStarrySecret(data: StarrySecret) {
+  cachedSecret = {
+    title: data.title,
+    pages: data.pages.filter((p): p is string => typeof p === 'string'),
+  }
+}
+
 /**
  * 读取隐藏告白信内容。
  */
 export async function getStarrySecret(): Promise<StarrySecret> {
+  if (cachedSecret) return cachedSecret
   try {
     const res = await fetch(SECRET_URL)
     if (!res.ok) return { pages: [] }

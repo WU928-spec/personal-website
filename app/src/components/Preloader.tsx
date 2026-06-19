@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import App from '../App.tsx'
+import {
+  preloadMemoirs,
+  preloadStarrySecret,
+  type Memoir,
+  type StarrySecret,
+} from '../data/memoirs.ts'
 
 // 需要预加载的站点资源（图片、音频、视频）
 const PRELOAD_ASSETS: string[] = [
-  '/memoirs.json',
-  '/starry-secret.json',
   '/about-hero.jpg',
   '/about-timeline-1.jpg',
   '/about-timeline-2.jpg',
@@ -74,6 +78,30 @@ async function loadAssetSafe(url: string): Promise<void> {
   }
 }
 
+/** 预先把星空页数据解析进内存缓存，避免进入页面后二次 loading */
+async function preloadData(): Promise<void> {
+  try {
+    const [memoirsRes, secretRes] = await Promise.all([
+      fetch('/memoirs.json', { method: 'GET', cache: 'force-cache' }),
+      fetch('/starry-secret.json', { method: 'GET', cache: 'force-cache' }),
+    ])
+
+    if (memoirsRes.ok) {
+      const data = (await memoirsRes.json()) as unknown
+      if (Array.isArray(data)) preloadMemoirs(data as Memoir[])
+    }
+
+    if (secretRes.ok) {
+      const data = (await secretRes.json()) as unknown
+      if (data && typeof data === 'object') {
+        preloadStarrySecret(data as StarrySecret)
+      }
+    }
+  } catch {
+    // 数据预加载失败由页面自身兜底
+  }
+}
+
 export default function Preloader() {
   const [loaded, setLoaded] = useState(0)
   const [done, setDone] = useState(false)
@@ -92,15 +120,18 @@ export default function Preloader() {
     }
 
     const loadAll = async () => {
-      // 并发加载，每完成一个更新进度
-      await Promise.all(
-        PRELOAD_ASSETS.map(async (url) => {
-          await loadAssetSafe(url)
-          if (!cancelled) {
-            setLoaded((prev) => Math.min(prev + 1, total))
-          }
-        })
-      )
+      // 并发加载媒体资源，每完成一个更新进度；同时预加载页面数据
+      await Promise.all([
+        Promise.all(
+          PRELOAD_ASSETS.map(async (url) => {
+            await loadAssetSafe(url)
+            if (!cancelled) {
+              setLoaded((prev) => Math.min(prev + 1, total))
+            }
+          })
+        ),
+        withTimeout(preloadData(), LOAD_TIMEOUT),
+      ])
 
       if (!cancelled) finish()
     }
