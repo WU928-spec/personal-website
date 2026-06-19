@@ -41,6 +41,7 @@ export default function StarryEasterEgg() {
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const videoEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const refreshMemoirs = useCallback(async () => {
     const list = await getMemoirs()
@@ -59,6 +60,15 @@ export default function StarryEasterEgg() {
   }, [])
 
   useAutoPlayVideo(videoRef, showVideo)
+
+  useEffect(() => {
+    return () => {
+      if (videoEndTimerRef.current) {
+        clearTimeout(videoEndTimerRef.current)
+        videoEndTimerRef.current = null
+      }
+    }
+  }, [])
 
   const brightIds = useMemo(
     () => new Set(memoirs.filter((m) => m.brightness >= 1).map((m) => m.id)),
@@ -136,7 +146,11 @@ export default function StarryEasterEgg() {
         muted
         playsInline
         className={`absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-700 ${showVideo ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onEnded={() => navigate('/starry/epilogue')}
+        onEnded={() => {
+          videoEndTimerRef.current = setTimeout(() => {
+            navigate('/starry/epilogue')
+          }, 2000)
+        }}
         onClick={() => setShowVideo(false)}
       />
 
