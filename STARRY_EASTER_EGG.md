@@ -83,7 +83,8 @@ export function getStarPos(
 
 - 表名：`starry_memoirs`
 - 字段：`id`（PK）, `title`, `date`, `content`, `brightness`, `images`（JSONB）, `x`, `y`, `created_at`, `updated_at`
-- 冲突策略：**云端优先**。`getMemoirs()` 优先拉取 Supabase；成功则覆盖本地缓存。Supabase 不可用时回退 IndexedDB / 默认值。
+- 冲突策略：**云端优先**。`backgroundSyncMemoirs()` 后台拉取 Supabase，有差异时更新 IndexedDB 并派发 `starry-sync-completed` 事件。Supabase 不可用时回退 IndexedDB / 默认值。
+- 读取策略：`getMemoirs()` 先立即返回本地缓存（首屏不阻塞），同时触发后台云端同步。
 - 拖拽位置：`x` / `y` 记录星星在屏幕上的百分比坐标，随 memoir 数据一起被保存和同步。
 - 写入策略：`saveMemoirs()` 先写 IndexedDB，再后台静默 upsert 到 Supabase；失败不阻塞 UI。
 
@@ -98,7 +99,8 @@ export function getStarPos(
 
 | 函数 | 作用 |
 |------|------|
-| `getMemoirs()` | 云端优先读取，失败回退本地 |
+| `getMemoirs()` | 立即返回本地缓存，同时触发后台云端同步 |
+| `backgroundSyncMemoirs()` | 后台拉取云端，有变化时更新本地并派发事件 |
 | `saveMemoirs(memoirs)` | 保存本地并后台同步到云端 |
 | `resetMemoirs()` | 清空本地和云端，回到默认值 |
 | `syncMemoirsToCloud()` | 手动把本地当前数据推送到云端 |

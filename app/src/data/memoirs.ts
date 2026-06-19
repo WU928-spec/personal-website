@@ -276,35 +276,70 @@ async function deleteAllFromSupabase(): Promise<boolean> {
 
 /* ─── Public API ─── */
 
-/**
- * 读取记忆列表。
- * 云端优先：如果 Supabase 可用且有数据，用云端数据覆盖本地缓存；
- * 否则回退到 IndexedDB / 默认值。
- */
-export async function getMemoirs(): Promise<Memoir[]> {
-  const remote = await fetchFromSupabase()
+function memoirsEqual(a: Memoir[], b: Memoir[]): boolean {
+  if (a.length !== b.length) return false
+  return a.every((m, i) => {
+    const n = b[i]
+    if (!n) return false
+    return (
+      m.id === n.id &&
+      m.title === n.title &&
+      m.date === n.date &&
+      m.content === n.content &&
+      m.brightness === n.brightness &&
+      m.x === n.x &&
+      m.y === n.y &&
+      JSON.stringify(m.images || []) === JSON.stringify(n.images || [])
+    )
+  })
+}
 
-  if (remote !== null) {
-    // 云端可用：云端数据作为权威来源
-    if (remote.length > 0) {
-      await saveToIndexedDB(remote)
-      return remote
-    }
-    // 云端为空：回退本地，方便用户后续手动上传
-    const local = await loadFromIndexedDB()
-    if (local && local.length > 0) {
-      return local
-    }
-    // 本地也为空：返回默认值
-    const defaults = DEFAULT_MEMOIRS
-    await saveToIndexedDB(defaults)
-    return defaults
+/**
+ * 后台同步：拉取云端数据，与本地合并，云端优先。
+ * 如果数据有变化，更新 IndexedDB 并派发 `starry-sync-completed` 事件。
+ */
+export async function backgroundSyncMemoirs(): Promise<boolean> {
+  window.dispatchEvent(new CustomEvent('starry-sync-started'))
+  const remote = await fetchFromSupabase()
+  if (remote === null) {
+    window.dispatchEvent(new CustomEvent('starry-sync-completed'))
+    return false
   }
 
-  // Supabase 不可用：完全回退本地
+  let merged: Memoir[]
+  if (remote.length > 0) {
+    merged = remote
+  } else {
+    const local = await loadFromIndexedDB()
+    merged = local && local.length > 0 ? local : DEFAULT_MEMOIRS
+  }
+
+  const local = await loadFromIndexedDB()
+  const current = local && local.length > 0 ? local : DEFAULT_MEMOIRS
+
+  if (!memoirsEqual(current, merged)) {
+    await saveToIndexedDB(merged)
+    window.dispatchEvent(new CustomEvent('starry-sync-completed'))
+  }
+
+  return true
+}
+
+/**
+ * 读取记忆列表。
+ * 先立即返回本地缓存（或默认值），保证首屏不阻塞；
+ * 同时在后台拉取云端并平滑更新。
+ */
+export async function getMemoirs(): Promise<Memoir[]> {
+  // 立即触发后台同步，但不等待它
+  backgroundSyncMemoirs().catch(() => {})
+
   const local = await loadFromIndexedDB()
   if (local && local.length > 0) return local
-  return DEFAULT_MEMOIRS
+
+  const defaults = DEFAULT_MEMOIRS
+  await saveToIndexedDB(defaults)
+  return defaults
 }
 
 /**

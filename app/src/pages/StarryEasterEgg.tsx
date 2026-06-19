@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Play, Move, Pin, Settings, Cloud, CloudOff, CheckCircle2, Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -17,11 +17,32 @@ export default function StarryEasterEgg() {
   const [memoirs, setMemoirs] = useState<Memoir[]>([])
   const [saveError, setSaveError] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle')
+  const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  useEffect(() => {
-    getMemoirs().then(setMemoirs)
+  const refreshMemoirs = useCallback(async () => {
+    const list = await getMemoirs()
+    setMemoirs(list)
   }, [])
+
+  useEffect(() => {
+    refreshMemoirs()
+  }, [refreshMemoirs])
+
+  useEffect(() => {
+    const onSyncStart = () => setIsBackgroundSyncing(true)
+    const onSyncDone = () => {
+      setIsBackgroundSyncing(false)
+      refreshMemoirs()
+    }
+
+    window.addEventListener('starry-sync-started', onSyncStart)
+    window.addEventListener('starry-sync-completed', onSyncDone)
+    return () => {
+      window.removeEventListener('starry-sync-started', onSyncStart)
+      window.removeEventListener('starry-sync-completed', onSyncDone)
+    }
+  }, [refreshMemoirs])
 
   useEffect(() => {
     const timer = setTimeout(() => setShowText(true), 400)
@@ -30,7 +51,7 @@ export default function StarryEasterEgg() {
 
   useAutoPlayVideo(videoRef, showVideo)
 
-  const handleChange = (next: Memoir[]) => {
+  const handleChange = useCallback((next: Memoir[]) => {
     saveMemoirs(next)
       .then(() => {
         setMemoirs(next)
@@ -39,14 +60,48 @@ export default function StarryEasterEgg() {
       .catch(() => {
         setSaveError('保存失败：存储空间已满')
       })
-  }
+  }, [])
 
-  const handleSyncToCloud = async () => {
+  const handlePositionChange = useCallback(
+    (id: string, x: number, y: number) => {
+      setMemoirs((prev) => {
+        const idx = prev.findIndex((item) => item.id === id)
+        if (idx === -1) return prev
+        const item = prev[idx]
+        if (item.x === x && item.y === y) return prev
+        const next = [...prev]
+        next[idx] = { ...item, x, y }
+        saveMemoirs(next).catch(() => {})
+        return next
+      })
+    },
+    []
+  )
+
+  const handleSyncToCloud = useCallback(async () => {
     setSyncStatus('syncing')
     const ok = await syncMemoirsToCloud()
     setSyncStatus(ok ? 'synced' : 'error')
     setTimeout(() => setSyncStatus('idle'), 2500)
-  }
+  }, [])
+
+  const stars = useMemo(
+    () =>
+      memoirs.map((m) => {
+        const pos = getStarPos(m.id, { x: m.x, y: m.y })
+        return (
+          <DraggableStar
+            key={m.id}
+            memoir={m}
+            x={pos.x}
+            y={pos.y}
+            draggable={draggable}
+            onPositionChange={handlePositionChange}
+          />
+        )
+      }),
+    [memoirs, draggable, handlePositionChange]
+  )
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#050508]">
@@ -75,25 +130,21 @@ export default function StarryEasterEgg() {
       <div
         className={`absolute inset-0 z-10 transition-opacity duration-700 ${showVideo ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
-        {memoirs.map((m) => {
-          const pos = getStarPos(m.id, { x: m.x, y: m.y })
-          return (
-            <DraggableStar
-              key={m.id}
-              memoir={m}
-              x={pos.x}
-              y={pos.y}
-              draggable={draggable}
-              onPositionChange={(x, y) => {
-                const next = memoirs.map((item) =>
-                  item.id === m.id ? { ...item, x, y } : item
-                )
-                handleChange(next)
-              }}
-            />
-          )
-        })}
+        {stars}
       </div>
+
+      {/* 后台同步指示器 */}
+      {isBackgroundSyncing && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 text-white/40"
+        >
+          <Loader2 size={12} className="animate-spin" />
+          <span className="text-xs font-body">同步云端位置中...</span>
+        </motion.div>
+      )}
 
       {/* UI 层 */}
       <motion.button
@@ -107,7 +158,7 @@ export default function StarryEasterEgg() {
         <span className="text-sm font-body">返回</span>
       </motion.button>
 
-      {showText && (
+      {showText && !isBackgroundSyncing && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

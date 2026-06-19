@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { seededRandom } from '@/utils/starry'
@@ -9,10 +9,10 @@ interface DraggableStarProps {
   x: string
   y: string
   draggable: boolean
-  onPositionChange?: (x: number, y: number) => void
+  onPositionChange?: (id: string, x: number, y: number) => void
 }
 
-export default function DraggableStar({
+function DraggableStar({
   memoir,
   x,
   y,
@@ -54,7 +54,7 @@ export default function DraggableStar({
           const newX = Math.max(5, Math.min(95, (newXPx / window.innerWidth) * 100))
           const newY = Math.max(5, Math.min(95, (newYPx / window.innerHeight) * 100))
 
-          onPositionChange(newX, newY)
+          onPositionChange(memoir.id, newX, newY)
         }}
         onClick={() => {
           if (!isDragging) navigate(`/starry/${memoir.id}`)
@@ -111,3 +111,6 @@ export default function DraggableStar({
     </div>
   )
 }
+
+export default memo(DraggableStar)
+
