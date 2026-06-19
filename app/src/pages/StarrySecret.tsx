@@ -88,18 +88,19 @@ export default function StarrySecret() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="bg-black/15 backdrop-blur-[2px] rounded-xl p-6 sm:p-8 border border-white/10"
             >
               {secret?.title && page === 0 && (
-                <h1 className="text-white font-body text-[clamp(1rem,4vw,1.35rem)] tracking-[0.25em] mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                <h1 className="text-white/95 font-body text-[clamp(1rem,4vw,1.35rem)] tracking-[0.25em] mb-6">
                   {secret.title}
                 </h1>
               )}
 
-              <p className="text-white font-body text-[clamp(1rem,4vw,1.25rem)] leading-[2.2] whitespace-pre-line drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              <p className="text-white/95 font-body text-[clamp(1rem,4vw,1.25rem)] leading-[2.2] whitespace-pre-line">
                 {pages[page]}
               </p>
 
-              <div className="mt-8 text-white/70 text-xs font-body tracking-widest drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
+              <div className="mt-8 text-white/60 text-xs font-body tracking-widest">
                 {page + 1} / {total}
               </div>
             </motion.div>
