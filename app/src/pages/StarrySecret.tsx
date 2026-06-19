@@ -59,24 +59,30 @@ export default function StarrySecret() {
 
   if (loading || !verified) {
     return (
-      <div className="relative w-screen h-screen flex items-center justify-center bg-[#e8e6e1]">
-        <div className="text-[#8c857c] text-sm font-body tracking-widest">正在展开这封信…</div>
+      <div className="relative w-screen h-screen flex items-center justify-center bg-[#2a2320]">
+        <div className="text-white/50 text-sm font-body tracking-widest">正在展开这封信…</div>
       </div>
     )
   }
 
   if (total === 0) {
     return (
-      <div className="relative w-screen h-screen flex items-center justify-center bg-[#e8e6e1]">
-        <div className="text-[#8c857c] text-sm font-body">信纸是空的</div>
+      <div className="relative w-screen h-screen flex items-center justify-center bg-[#2a2320]">
+        <div className="text-white/50 text-sm font-body">信纸是空的</div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#e8e6e1] flex flex-col items-center justify-center p-4 sm:p-8">
+    <div
+      className="relative w-screen h-screen overflow-hidden bg-cover bg-center bg-no-repeat flex items-center justify-center md:justify-end md:pr-[4vw] lg:pr-[8vw]"
+      style={{ backgroundImage: 'url(/letter-bg.png)' }}
+    >
+      {/* 轻微暗角，让信纸更突出 */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_70%_50%,transparent_0%,rgba(0,0,0,0.25)_100%)]" />
+
       {/* 信件容器：A4 比例 */}
-      <div className="relative w-full max-w-[min(92vw,560px)] drop-shadow-[0_16px_48px_rgba(0,0,0,0.12)]" style={{ aspectRatio: '210 / 297' }}>
+      <div className="relative z-10 w-full max-w-[min(92vw,520px)] drop-shadow-[0_20px_60px_rgba(0,0,0,0.35)]" style={{ aspectRatio: '210 / 297' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={page}
@@ -99,16 +105,16 @@ export default function StarrySecret() {
               backgroundSize: '100% 100%, 100% 32px',
             }}
           >
-            <div className="h-full px-8 sm:px-12 pt-8 pb-16 pl-[56px] sm:pl-[68px]">
+            <div className="h-full px-8 sm:px-10 pt-8 pb-16 pl-[56px] sm:pl-[64px]">
               {/* 称呼 / 标题 */}
               {secret?.title && (
-                <h1 className="text-[#4a443d] font-body text-[clamp(0.95rem,3.8vw,1.15rem)] tracking-[0.2em] leading-[32px] mb-[32px]">
+                <h1 className="text-[#4a443d] font-body text-[clamp(0.9rem,3.6vw,1.1rem)] tracking-[0.2em] leading-[32px] mb-[32px]">
                   {secret.title}
                 </h1>
               )}
 
               {/* 正文：对齐行线 */}
-              <p className="text-[#3d3832] font-body text-[clamp(0.9rem,3.4vw,1.05rem)] leading-[32px] whitespace-pre-line">
+              <p className="text-[#3d3832] font-body text-[clamp(0.85rem,3.2vw,1rem)] leading-[32px] whitespace-pre-line">
                 {pages[page]}
               </p>
             </div>
@@ -122,11 +128,11 @@ export default function StarrySecret() {
       </div>
 
       {/* 翻页控制 */}
-      <div className="mt-8 flex items-center gap-8 z-10">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-8 bg-black/25 backdrop-blur-sm px-6 py-3 rounded-full">
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={!hasPrev}
-          className="flex items-center gap-1 text-[#5c564f] hover:text-[#3d3832] disabled:text-[#a8a095] transition-colors font-body text-sm"
+          className="flex items-center gap-1 text-white/90 hover:text-white disabled:text-white/40 transition-colors font-body text-sm"
         >
           <ChevronLeft size={18} />
           <span>上一页</span>
@@ -134,7 +140,7 @@ export default function StarrySecret() {
 
         <button
           onClick={() => navigate('/starry')}
-          className="text-[#6b655e] hover:text-[#3d3832] transition-colors font-body text-sm tracking-widest"
+          className="text-white/80 hover:text-white transition-colors font-body text-sm tracking-widest"
         >
           返回星空
         </button>
@@ -142,7 +148,7 @@ export default function StarrySecret() {
         <button
           onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
           disabled={!hasNext}
-          className="flex items-center gap-1 text-[#5c564f] hover:text-[#3d3832] disabled:text-[#a8a095] transition-colors font-body text-sm"
+          className="flex items-center gap-1 text-white/90 hover:text-white disabled:text-white/40 transition-colors font-body text-sm"
         >
           <span>下一页</span>
           <ChevronRight size={18} />
