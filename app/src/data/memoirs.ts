@@ -17,6 +17,7 @@ const DB_NAME = 'starry-db'
 const STORE_NAME = 'memoirs'
 const DB_KEY = 'data'
 const SUPABASE_TABLE = 'starry_memoirs'
+const STATIC_MEMOIRS_URL = '/memoirs.json'
 
 export const DEFAULT_MEMOIRS: Memoir[] = [
   {
@@ -329,22 +330,48 @@ export async function backgroundSyncMemoirs(): Promise<boolean> {
   return true
 }
 
+async function fetchStaticMemoirs(): Promise<Memoir[] | null> {
+  try {
+    const res = await fetch(STATIC_MEMOIRS_URL, { cache: 'no-store' })
+    if (!res.ok) return null
+    const data = (await res.json()) as unknown
+    if (!Array.isArray(data)) return null
+    return (data as Record<string, unknown>[]).map((row) =>
+      migrateMemoir({
+        id: String(row.id),
+        title: String(row.title ?? ''),
+        date: String(row.date ?? ''),
+        content: String(row.content ?? ''),
+        brightness: Number(row.brightness ?? 0.5),
+        images: Array.isArray(row.images) ? (row.images as string[]) : undefined,
+        x: row.x !== null && row.x !== undefined ? Number(row.x) : undefined,
+        y: row.y !== null && row.y !== undefined ? Number(row.y) : undefined,
+      })
+    )
+  } catch {
+    return null
+  }
+}
+
 /**
  * 读取记忆列表。
- * - 如果有本地缓存：立即返回本地，后台同步云端（不阻塞）。
- * - 如果没有本地缓存（新访客）：等待云端数据，避免默认数据跳变；
- *   云端失败或为空时回退到默认值。
+ * 优先读取 /memoirs.json 静态文件；不存在时回退到 IndexedDB / Supabase / 默认值。
  */
 export async function getMemoirs(): Promise<Memoir[]> {
+  // 1. 如果存在静态 JSON，直接用它（纯静态部署模式）
+  const staticMemoirs = await fetchStaticMemoirs()
+  if (staticMemoirs && staticMemoirs.length > 0) {
+    return staticMemoirs
+  }
+
+  // 2. 没有静态文件时，走原来的本地/云端逻辑（过渡阶段使用）
   const local = await loadFromIndexedDB()
 
   if (local && local.length > 0) {
-    // 老用户/自己：本地优先，后台同步
     backgroundSyncMemoirs().catch(() => {})
     return local
   }
 
-  // 新访客：本地没有数据，等云端
   window.dispatchEvent(new CustomEvent('starry-sync-started'))
   const remote = await fetchFromSupabase(8000)
   window.dispatchEvent(new CustomEvent('starry-sync-completed'))
@@ -354,10 +381,19 @@ export async function getMemoirs(): Promise<Memoir[]> {
     return remote
   }
 
-  // 云端为空或失败：使用默认值
   const defaults = DEFAULT_MEMOIRS
   await saveToIndexedDB(defaults)
   return defaults
+}
+
+/**
+ * 导出当前本地数据为 JSON 字符串。
+ * 用于从 Chrome 迁移到静态 memoirs.json。
+ */
+export async function exportLocalMemoirs(): Promise<string> {
+  const local = await loadFromIndexedDB()
+  const data = local && local.length > 0 ? local : DEFAULT_MEMOIRS
+  return JSON.stringify(data, null, 2)
 }
 
 /**

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Play, Move, Pin, Settings, Cloud, CloudOff, CheckCircle2, Loader2 } from 'lucide-react'
+import { ArrowLeft, Play, Move, Pin, Settings, Cloud, CloudOff, CheckCircle2, Loader2, Download } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getMemoirs, saveMemoirs, syncMemoirsToCloud, type Memoir } from '@/data/memoirs'
+import { getMemoirs, saveMemoirs, syncMemoirsToCloud, exportLocalMemoirs, type Memoir } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
 import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import DraggableStar from '@/components/starry/DraggableStar'
@@ -85,6 +85,17 @@ export default function StarryEasterEgg() {
     const ok = await syncMemoirsToCloud()
     setSyncStatus(ok ? 'synced' : 'error')
     setTimeout(() => setSyncStatus('idle'), 2500)
+  }, [])
+
+  const handleExport = useCallback(async () => {
+    const json = await exportLocalMemoirs()
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'memoirs.json'
+    a.click()
+    URL.revokeObjectURL(url)
   }, [])
 
   const stars = useMemo(
@@ -240,6 +251,18 @@ export default function StarryEasterEgg() {
           {syncStatus === 'error' && '同步失败'}
           {syncStatus === 'idle' && '同步到云端'}
         </span>
+      </motion.button>
+
+      {/* 导出数据按钮（迁移到静态 JSON 用） */}
+      <motion.button
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.15, duration: 0.8 }}
+        onClick={handleExport}
+        className="absolute bottom-8 left-44 z-30 flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 hover:scale-105"
+      >
+        <Download size={14} />
+        <span className="text-sm font-body">导出 JSON</span>
       </motion.button>
 
       {/* 播放视频按钮 */}
