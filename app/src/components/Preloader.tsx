@@ -90,8 +90,13 @@ function loadAsset(url: string): Promise<HTMLImageElement | HTMLMediaElement | v
   })
 }
 
+interface PreloadDataResult {
+  images: string[]
+}
+
 /** 预先把星空页数据解析进内存缓存，避免进入页面后二次 loading */
-async function preloadData(): Promise<void> {
+async function preloadData(): Promise<PreloadDataResult> {
+  const images: string[] = []
   try {
     const [memoirsRes, secretRes] = await Promise.all([
       fetch('/memoirs.json?v=2', { method: 'GET', cache: 'force-cache' }),
@@ -100,7 +105,17 @@ async function preloadData(): Promise<void> {
 
     if (memoirsRes.ok) {
       const data = (await memoirsRes.json()) as unknown
-      if (Array.isArray(data)) preloadMemoirs(data as Memoir[])
+      if (Array.isArray(data)) {
+        preloadMemoirs(data as Memoir[])
+        // 提取所有星星的详情页图片路径，阻塞预加载
+        for (const m of data as Memoir[]) {
+          if (m.images && Array.isArray(m.images)) {
+            images.push(...m.images)
+          } else if (m.image) {
+            images.push(m.image)
+          }
+        }
+      }
     }
 
     if (secretRes.ok) {
@@ -112,6 +127,7 @@ async function preloadData(): Promise<void> {
   } catch {
     // 数据预加载失败由页面自身兜底
   }
+  return { images }
 }
 
 interface PreloaderProps {
@@ -133,9 +149,6 @@ export default function Preloader({ children }: PreloaderProps) {
       entered = true
       setReady(true)
     }
-
-    // 数据必须加载完成；失败也由页面自身兜底
-    const dataPromise = preloadData().catch(() => {})
 
     // 关键资源：图片类必须加载完成才能进入页面，避免背景图闪烁
     const criticalAssets = PRELOAD_ASSETS.filter((url) => {
@@ -161,6 +174,19 @@ export default function Preloader({ children }: PreloaderProps) {
             setLoaded((prev) => Math.min(prev + 1, total))
           }
         })
+
+    // 先加载数据，提取所有详情页图片，一并加入关键资源阻塞
+    const dataPromise = preloadData()
+      .then(async (result) => {
+        // 去重后阻塞预加载所有星星的详情页图片
+        const uniqueImages = [...new Set(result.images)]
+        await Promise.all(
+          uniqueImages.map((url) =>
+            withTimeout(loadAsset(url), ASSET_TIMEOUT).catch(() => {})
+          )
+        )
+      })
+      .catch(() => {})
 
     // 关键资源加载（阻塞进入）
     const criticalPromise = Promise.all(criticalAssets.map(loadCritical))
