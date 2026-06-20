@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
-import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import DraggableStar from '@/components/starry/DraggableStar'
 
 const CLICKED_KEY = 'starry-bright-clicked'
@@ -51,6 +50,7 @@ export default function StarryEasterEgg() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [hasCompleted] = useState(loadCompleted)
   const [bgLoaded, setBgLoaded] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -70,7 +70,15 @@ export default function StarryEasterEgg() {
     return () => clearTimeout(timer)
   }, [])
 
-  useAutoPlayVideo(videoRef, showVideo)
+  // 检查背景图是否已缓存，避免缓存命中时 onLoad 不同步触发导致的闪烁
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => setBgLoaded(true)
+    img.src = '/starry-bg.jpg'
+    if (img.complete) {
+      setBgLoaded(true)
+    }
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -81,15 +89,37 @@ export default function StarryEasterEgg() {
     }
   }, [])
 
-  // 检查背景图是否已缓存，避免缓存命中时 onLoad 不同步触发导致的闪烁
+  // 视频自动播放：首次显示时尝试播放，并监听 canplay 状态
   useEffect(() => {
-    const img = new Image()
-    img.onload = () => setBgLoaded(true)
-    img.src = '/starry-bg.jpg'
-    if (img.complete) {
-      setBgLoaded(true)
+    const video = videoRef.current
+    if (!video) return
+
+    const handleCanPlay = () => setVideoReady(true)
+    const handleWaiting = () => setVideoReady(false)
+
+    video.addEventListener('canplay', handleCanPlay)
+    video.addEventListener('canplaythrough', handleCanPlay)
+    video.addEventListener('waiting', handleWaiting)
+    video.addEventListener('playing', handleCanPlay)
+
+    if (showVideo) {
+      video.currentTime = 0
+      // 已经就绪则立即播放，否则等待 canplay 事件
+      if (video.readyState >= 3) {
+        setVideoReady(true)
+        video.play().catch(() => {})
+      } else {
+        video.load()
+      }
     }
-  }, [])
+
+    return () => {
+      video.removeEventListener('canplay', handleCanPlay)
+      video.removeEventListener('canplaythrough', handleCanPlay)
+      video.removeEventListener('waiting', handleWaiting)
+      video.removeEventListener('playing', handleCanPlay)
+    }
+  }, [showVideo])
 
   const brightIds = useMemo(
     () => new Set(memoirs.filter((m) => m.brightness >= 1).map((m) => m.id)),
@@ -163,20 +193,60 @@ export default function StarryEasterEgg() {
         onLoad={() => setBgLoaded(true)}
       />
 
-      {/* 全屏视频 */}
-      <video
-        ref={videoRef}
-        src="/starry-video.mp4"
-        muted
-        playsInline
-        className={`absolute inset-0 w-full h-full object-cover z-[1] transition-opacity duration-700 ${showVideo ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onEnded={() => {
-          videoEndTimerRef.current = setTimeout(() => {
-            navigate('/starry/epilogue')
-          }, 2000)
-        }}
-        onClick={() => setShowVideo(false)}
-      />
+      {/* 全屏视频层 */}
+      <div
+        className={`absolute inset-0 z-[1] w-full h-full transition-opacity duration-700 ${showVideo ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      >
+        <video
+          ref={videoRef}
+          src="/starry-video.mp4"
+          muted
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover"
+          onEnded={() => {
+            videoEndTimerRef.current = setTimeout(() => {
+              navigate('/starry/epilogue')
+            }, 2000)
+          }}
+          onClick={() => {
+            const video = videoRef.current
+            if (!video) return
+            if (video.paused && videoReady) {
+              video.play().catch(() => {})
+            } else if (!video.paused) {
+              video.pause()
+            }
+          }}
+        />
+
+        {/* 关闭按钮 */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowVideo(false)
+          }}
+          className="absolute top-6 right-6 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-black/20 px-3 py-2 rounded-full border border-white/10"
+          aria-label="关闭视频"
+        >
+          <X size={18} />
+        </button>
+
+        {/* 缓冲提示 */}
+        {showVideo && !videoReady && (
+          <div className="absolute inset-0 z-[2] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3 text-white/70">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                className="w-6 h-6 border-2 border-white/30 border-t-white/80 rounded-full"
+              />
+              <span className="text-sm font-body tracking-widest">正在加载星轨…</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 星星层 */}
       <div
