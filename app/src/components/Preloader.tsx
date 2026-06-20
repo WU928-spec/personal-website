@@ -22,7 +22,6 @@ const PRELOAD_ASSETS: string[] = [
 ]
 
 const MIN_WAIT_MS = 800
-const MAX_WAIT_MS = 5000
 const ASSET_TIMEOUT = 15000
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | void> {
@@ -198,7 +197,7 @@ export default function Preloader({ children }: PreloaderProps) {
       if (!cancelled) enter()
     })
 
-    // 进入条件：数据 + 关键资源 + 最小视觉时间
+    // 进入条件：数据 + 关键资源 + 最小视觉时间，全部加载完才进入页面
     Promise.all([
       dataPromise,
       criticalPromise,
@@ -207,14 +206,8 @@ export default function Preloader({ children }: PreloaderProps) {
       if (!cancelled) enter()
     })
 
-    // 全局兜底：无论如何最多等 5 秒，必须进入页面，防止任何原因卡死
-    const globalTimer = setTimeout(() => {
-      if (!cancelled) enter()
-    }, MAX_WAIT_MS)
-
     return () => {
       cancelled = true
-      clearTimeout(globalTimer)
     }
   }, [total])
 
