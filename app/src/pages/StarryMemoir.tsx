@@ -51,13 +51,8 @@ export default function StarryMemoir() {
 
   useEffect(() => {
     getMemoirs().then((all) => {
-      const m = all.find((m) => m.id === id) || null
-      setMemoir(m)
+      setMemoir(all.find((m) => m.id === id) || null)
       setLoading(false)
-      // 如果当前记忆包含视频，后台预加载
-      if (m?.title === '2月26日 凌晨 冬雨') {
-        fetch('/next-video.mp4').catch(() => {})
-      }
     })
   }, [id])
 

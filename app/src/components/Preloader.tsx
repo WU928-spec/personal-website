@@ -150,10 +150,12 @@ export default function Preloader({ children }: PreloaderProps) {
       setReady(true)
     }
 
-    // 关键资源：图片类必须加载完成才能进入页面，避免背景图闪烁
+    // 关键资源：图片 + 星轨视频 + 冬雨视频必须加载完成才能进入页面
     const criticalAssets = PRELOAD_ASSETS.filter((url) => {
       const ext = url.split('.').pop()?.toLowerCase()
-      return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')
+      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')
+      const isVideo = url === '/starry-video.mp4' || url === '/next-video.mp4'
+      return isImage || isVideo
     })
     const optionalAssets = PRELOAD_ASSETS.filter((url) => !criticalAssets.includes(url))
 
