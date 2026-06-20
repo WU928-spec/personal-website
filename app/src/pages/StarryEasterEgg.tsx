@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, X } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getMemoirs, getStarrySecret, type Memoir, type StarrySecret } from '@/data/memoirs'
 import { getStarPos } from '@/utils/starry'
@@ -42,7 +42,8 @@ export default function StarryEasterEgg() {
   const navigate = useNavigate()
   const location = useLocation()
   const [showText, setShowText] = useState(false)
-  const [showVideo, setShowVideo] = useState(location.state?.playVideo === true)
+  const [showVideo, _setShowVideo] = useState(location.state?.playVideo === true)
+  // _setShowVideo 保留以便需要时手动切换视频层（视频本身结束后自动跳转，不依赖手动关闭）
   const [memoirs, setMemoirs] = useState<Memoir[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [clickedIds, setClickedIds] = useState<Set<string>>(loadClickedIds)
@@ -205,9 +206,7 @@ export default function StarryEasterEgg() {
           preload="auto"
           className="w-full h-full object-cover"
           onEnded={() => {
-            videoEndTimerRef.current = setTimeout(() => {
-              navigate('/starry/epilogue')
-            }, 2000)
+            navigate('/starry/epilogue')
           }}
           onClick={() => {
             const video = videoRef.current
@@ -219,19 +218,6 @@ export default function StarryEasterEgg() {
             }
           }}
         />
-
-        {/* 关闭按钮 */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            setShowVideo(false)
-          }}
-          className="absolute top-6 right-6 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-black/20 px-3 py-2 rounded-full border border-white/10"
-          aria-label="关闭视频"
-        >
-          <X size={18} />
-        </button>
 
         {/* 缓冲提示 */}
         {showVideo && !videoReady && (
