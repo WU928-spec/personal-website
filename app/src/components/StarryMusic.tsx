@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 
 function getMusicSrc(pathname: string): string {
   if (pathname === '/starry/secret') return '/secret-music.mp3'
-  if (pathname === '/starry/epilogue') return '/epilogue-music.mp3'
+  if (pathname === '/starry/epilogue') return '/epilogue-music.m4a'
   return '/bg-music.mp3'
 }
 

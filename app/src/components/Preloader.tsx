@@ -10,7 +10,7 @@ import {
 // 仅预加载星空彩蛋相关资源（预加载器已限定在 /starry/* 路由）
 const PRELOAD_ASSETS: string[] = [
   '/bg-music.mp3',
-  '/epilogue-music.mp3',
+  '/epilogue-music.m4a',
   '/secret-music.mp3',
   '/starry-bg.jpg',
   '/starry-images/1-0.jpg',
