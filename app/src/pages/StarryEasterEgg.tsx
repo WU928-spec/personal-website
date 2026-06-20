@@ -81,6 +81,15 @@ export default function StarryEasterEgg() {
     }
   }, [])
 
+  // 在星空页后台预加载星轨视频，使用 fetch 确保完整下载到浏览器缓存
+  // 这样用户点击"观看星轨"时，<video> 元素可直接从缓存读取，无需等待
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch('/starry-video.mp4', { signal: controller.signal })
+      .catch(() => {})
+    return () => controller.abort()
+  }, [])
+
   useEffect(() => {
     return () => {
       if (videoEndTimerRef.current) {
