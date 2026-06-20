@@ -35,7 +35,12 @@ export default function StarrySecret() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
   const [hasCompleted, setHasCompleted] = useState(false)
-  const [bgLoaded, setBgLoaded] = useState(false)
+  const [bgLoaded, setBgLoaded] = useState(() => {
+    // 在同步初始化中检测缓存状态，避免首次渲染时 opacity-0 导致的闪烁
+    const img = new Image()
+    img.src = '/letter-bg.jpg'
+    return img.complete || false
+  })
 
   useEffect(() => {
     setHasCompleted(loadCompleted())

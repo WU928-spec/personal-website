@@ -50,7 +50,12 @@ export default function StarryEasterEgg() {
   const [secret, setSecret] = useState<StarrySecret | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [hasCompleted] = useState(loadCompleted)
-  const [bgLoaded, setBgLoaded] = useState(false)
+  const [bgLoaded, setBgLoaded] = useState(() => {
+    // 在同步初始化中检测缓存状态，避免首次渲染时 opacity-0 导致的闪烁
+    const img = new Image()
+    img.src = '/starry-bg.jpg'
+    return img.complete || false
+  })
   const [videoReady, setVideoReady] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const videoEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -71,15 +76,14 @@ export default function StarryEasterEgg() {
     return () => clearTimeout(timer)
   }, [])
 
-  // 检查背景图是否已缓存，避免缓存命中时 onLoad 不同步触发导致的闪烁
+  // 兜底：确保 onLoad 事件也能触发（某些浏览器缓存命中时 onLoad 不同步触发）
   useEffect(() => {
+    if (bgLoaded) return
     const img = new Image()
     img.onload = () => setBgLoaded(true)
+    img.onerror = () => setBgLoaded(true)
     img.src = '/starry-bg.jpg'
-    if (img.complete) {
-      setBgLoaded(true)
-    }
-  }, [])
+  }, [bgLoaded])
 
   // 在星空页后台预加载星轨视频，使用 fetch 确保完整下载到浏览器缓存
   // 这样用户点击"观看星轨"时，<video> 元素可直接从缓存读取，无需等待
