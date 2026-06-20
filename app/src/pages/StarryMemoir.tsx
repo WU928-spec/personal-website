@@ -3,7 +3,6 @@ import { AnimatePresence, motion, useMotionValue } from 'framer-motion'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMemoirs, type Memoir } from '@/data/memoirs'
-import { useAutoPlayVideo } from '@/hooks/useAutoPlayVideo'
 import NebulaField from '@/components/starry/NebulaField'
 import PhotoFrame from '@/components/starry/PhotoFrame'
 
@@ -46,17 +45,52 @@ export default function StarryMemoir() {
   const y = useMotionValue(glassesPos.y)
   const [loading, setLoading] = useState(true)
   const [showVideo, setShowVideo] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const glassesRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     getMemoirs().then((all) => {
-      setMemoir(all.find((m) => m.id === id) || null)
+      const m = all.find((m) => m.id === id) || null
+      setMemoir(m)
       setLoading(false)
+      // 如果当前记忆包含视频，后台预加载
+      if (m?.title === '2月26日 凌晨 冬雨') {
+        fetch('/next-video.mp4').catch(() => {})
+      }
     })
   }, [id])
 
-  useAutoPlayVideo(videoRef, showVideo)
+  // 视频播放控制：替代 useAutoPlayVideo，添加 canplay 状态检测
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const handleCanPlay = () => setVideoReady(true)
+    const handleWaiting = () => setVideoReady(false)
+
+    video.addEventListener('canplay', handleCanPlay)
+    video.addEventListener('canplaythrough', handleCanPlay)
+    video.addEventListener('waiting', handleWaiting)
+    video.addEventListener('playing', handleCanPlay)
+
+    if (showVideo) {
+      video.currentTime = 0
+      if (video.readyState >= 3) {
+        setVideoReady(true)
+        video.play().catch(() => {})
+      } else {
+        video.load()
+      }
+    }
+
+    return () => {
+      video.removeEventListener('canplay', handleCanPlay)
+      video.removeEventListener('canplaythrough', handleCanPlay)
+      video.removeEventListener('waiting', handleWaiting)
+      video.removeEventListener('playing', handleCanPlay)
+    }
+  }, [showVideo])
 
   // 金丝眼镜滚轮缩放：必须使用 { passive: false } 才能阻止默认滚动
   useEffect(() => {
@@ -262,6 +296,7 @@ export default function StarryMemoir() {
               src="/next-video.mp4"
               autoPlay
               playsInline
+              preload="auto"
               className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
               onEnded={() => {
                 if (videoRef.current) {
@@ -269,6 +304,20 @@ export default function StarryMemoir() {
                 }
               }}
             />
+
+            {/* 缓冲提示 */}
+            {showVideo && !videoReady && (
+              <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="flex flex-col items-center gap-3 text-white/70">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="w-6 h-6 border-2 border-white/30 border-t-white/80 rounded-full"
+                  />
+                  <span className="text-sm font-body tracking-widest">正在加载视频…</span>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
