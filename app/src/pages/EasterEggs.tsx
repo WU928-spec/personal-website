@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sparkles, Plus } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
@@ -38,25 +37,8 @@ export default function EasterEggs() {
               transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="group relative rounded-2xl border border-Sand dark:border-white/10 bg-Linen dark:bg-white/5 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
             >
-              <div className="p-1">
-                <div className="rounded-xl overflow-hidden bg-[#1a1a2e]">
-                  <PlutoCharonBadge />
-                </div>
-              </div>
-              <div className="p-6 pt-2">
-                <h2 className="font-display text-xl font-semibold text-Ink dark:text-white mb-2">
-                  星空彩蛋
-                </h2>
-                <p className="font-body text-sm text-Ink/70 dark:text-white/70 leading-relaxed mb-5">
-                  在距离太阳 59 亿公里的地方，有一颗心永远朝向它的伴星。点击最亮的星星，阅读一段光年之外的记忆。
-                </p>
-                <Link
-                  to="/starry"
-                  className="inline-flex items-center gap-2 text-[0.8125rem] font-medium text-Amber hover:text-[#B06A2F] transition-colors duration-300"
-                >
-                  进入星空
-                  <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-                </Link>
+              <div className="p-2">
+                <PlutoCharonBadge />
               </div>
             </motion.article>
 
