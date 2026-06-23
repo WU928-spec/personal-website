@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft, Home, ChevronDown, BookOpen, Play } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useScroll, useSpring } from 'framer-motion'
+import { ArrowLeft, Home, BookOpen, Play, ArrowUp, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const sections = [
@@ -102,11 +102,37 @@ function markCompleted() {
   }
 }
 
+/** 首字下沉段落 */
+function DropCapParagraph({ text }: { text: string }) {
+  const first = text[0] || ''
+  const rest = text.slice(1)
+  return (
+    <p className="text-white/65 font-body text-sm md:text-[15px] leading-[2.2] tracking-wide text-justify">
+      <span className="drop-cap float-left text-4xl md:text-5xl leading-[0.85] mr-2 mt-1 font-display text-white/90">
+        {first}
+      </span>
+      {rest}
+    </p>
+  )
+}
+
 export default function StarryEpilogue() {
   const navigate = useNavigate()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ container: containerRef })
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+  const [showBackTop, setShowBackTop] = useState(false)
 
   useEffect(() => {
     markCompleted()
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackTop(window.scrollY > 600)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
@@ -121,16 +147,51 @@ export default function StarryEpilogue() {
         }}
       />
 
-      {/* 暗角 */}
+      {/* 暗角 + 整体氛围 */}
       <div className="fixed inset-0 z-[1] bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
 
+      {/* 浮动粒子光点（装饰） */}
+      <div className="fixed inset-0 z-[2] pointer-events-none overflow-hidden">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-white/20"
+            style={{
+              left: `${15 + i * 15}%`,
+              top: `${20 + (i % 3) * 25}%`,
+            }}
+            animate={{
+              opacity: [0.2, 0.6, 0.2],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 3 + i * 0.8,
+              repeat: Infinity,
+              delay: i * 1.2,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* 顶部滚动进度条 */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[2px] z-50 bg-gradient-to-r from-white/60 via-white/80 to-white/60 origin-left"
+        style={{ scaleX }}
+      />
+
       {/* 顶部标题 */}
-      <div className="relative z-20 pt-[8vh] pb-8 px-6 text-center">
+      <div className="relative z-20 pt-[10vh] pb-12 px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-8 h-px bg-gradient-to-r from-transparent to-white/30" />
+            <Sparkles size={14} className="text-white/40" />
+            <div className="w-8 h-px bg-gradient-to-l from-transparent to-white/30" />
+          </div>
           <h1 className="text-white/95 font-body text-2xl md:text-3xl tracking-[0.4em] mb-3">
             致漓漓
           </h1>
@@ -139,178 +200,198 @@ export default function StarryEpilogue() {
             彩蛋后记
           </p>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="mt-6 flex justify-center"
-        >
-          <ChevronDown size={18} className="text-white/30 animate-bounce" />
-        </motion.div>
       </div>
 
       {/* 内容层 */}
-      <div className="relative z-10 px-4 pb-32 md:px-6">
-        <div className="max-w-2xl mx-auto space-y-2">
-          {sections.map((section, index) => {
-            const delay = 0.2 + index * 0.12
+      <div className="relative z-10 px-4 pb-40 md:px-6">
+        <div className="max-w-2xl mx-auto">
+          {/* 玻璃拟态内容卡片 */}
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-white/[0.04] p-6 md:p-10">
+            {sections.map((section, index) => {
+              const delay = 0.15 + index * 0.1
 
-            if (section.type === 'heading') {
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 0.8, delay }}
-                  className="pt-10 pb-4"
-                >
-                  <h2 className="text-white/80 font-body text-base md:text-lg tracking-[0.2em]">
-                    {section.text}
-                  </h2>
-                  <div className="mt-2 w-8 h-px bg-gradient-to-r from-white/40 to-transparent" />
-                </motion.div>
-              )
-            }
+              if (section.type === 'heading') {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 0.8, delay }}
+                    className="pt-12 pb-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-white/20 text-xs font-body tracking-widest">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <h2 className="text-white/85 font-body text-base md:text-lg tracking-[0.2em]">
+                        {section.text}
+                      </h2>
+                    </div>
+                    <div className="mt-3 w-16 h-px bg-gradient-to-r from-white/30 via-white/10 to-transparent" />
+                  </motion.div>
+                )
+              }
 
-            if (section.type === 'quote') {
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 1, delay }}
-                  className="my-8 pl-5 pr-4 py-5 border-l-2 border-white/20 bg-white/[0.03] backdrop-blur-sm rounded-r-lg"
-                >
-                  {section.content?.map((text, i) => (
-                    <p
-                      key={i}
-                      className="text-white/75 font-body text-sm md:text-[15px] leading-[2] tracking-wide italic"
-                    >
-                      {text}
-                    </p>
-                  ))}
-                </motion.div>
-              )
-            }
+              if (section.type === 'quote') {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 1, delay }}
+                    className="my-10 relative"
+                  >
+                    <div className="absolute -left-3 top-0 text-white/10 text-4xl font-serif leading-none select-none">
+                      "
+                    </div>
+                    <div className="pl-5 pr-4 py-6 border-l border-white/15 bg-white/[0.02] rounded-r-xl">
+                      {section.content?.map((text, i) => (
+                        <p
+                          key={i}
+                          className="text-white/70 font-body text-sm md:text-[15px] leading-[2.2] tracking-wide italic"
+                        >
+                          {text}
+                        </p>
+                      ))}
+                    </div>
+                  </motion.div>
+                )
+              }
 
-            if (section.type === 'list') {
+              if (section.type === 'list') {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 0.8, delay }}
+                    className="space-y-5 py-4"
+                  >
+                    {section.items?.map((item, i) => (
+                      <div key={i} className="flex gap-4 items-start">
+                        <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-white/50 shrink-0 shadow-[0_0_6px_rgba(255,255,255,0.3)]" />
+                        <p className="text-white/60 font-body text-sm md:text-[15px] leading-[1.95] tracking-wide">
+                          {item}
+                        </p>
+                      </div>
+                    ))}
+                  </motion.div>
+                )
+              }
+
+              if (section.type === 'closing') {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 1.2, delay }}
+                    className="mt-20 mb-8 text-center space-y-6"
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                      <div className="w-6 h-px bg-gradient-to-r from-transparent to-white/20" />
+                      <Sparkles size={12} className="text-white/30" />
+                      <div className="w-6 h-px bg-gradient-to-l from-transparent to-white/20" />
+                    </div>
+                    {section.content?.map((text, i) => (
+                      <p
+                        key={i}
+                        className={`font-body ${
+                          i === 0
+                            ? 'text-white/90 text-base tracking-[0.2em]'
+                            : 'text-white/60 text-sm md:text-[15px] leading-[2.2] tracking-wide'
+                        }`}
+                      >
+                        {text}
+                      </p>
+                    ))}
+                    <div className="pt-8 flex flex-col items-center gap-4">
+                      <div className="w-8 h-px bg-white/10" />
+                      <p className="text-white/40 text-xs font-body tracking-[0.3em]">
+                        —— 作者
+                      </p>
+                      <div className="w-8 h-px bg-white/10" />
+                    </div>
+                  </motion.div>
+                )
+              }
+
               return (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-50px' }}
+                  viewport={{ once: true, margin: '-80px' }}
                   transition={{ duration: 0.8, delay }}
-                  className="space-y-4 py-2"
-                >
-                  {section.items?.map((item, i) => (
-                    <div key={i} className="flex gap-3">
-                      <span className="mt-2 w-1 h-1 rounded-full bg-white/40 shrink-0" />
-                      <p className="text-white/60 font-body text-sm md:text-[15px] leading-[1.85] tracking-wide">
-                        {item}
-                      </p>
-                    </div>
-                  ))}
-                </motion.div>
-              )
-            }
-
-            if (section.type === 'closing') {
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true, margin: '-50px' }}
-                  transition={{ duration: 1.2, delay }}
-                  className="mt-16 mb-8 text-center space-y-5"
+                  className="space-y-5 py-3"
                 >
                   {section.content?.map((text, i) => (
-                    <p
-                      key={i}
-                      className={`font-body ${
-                        i === 0
-                          ? 'text-white/90 text-base tracking-[0.2em]'
-                          : 'text-white/60 text-sm md:text-[15px] leading-[2] tracking-wide'
-                      }`}
-                    >
-                      {text}
-                    </p>
+                    <DropCapParagraph key={i} text={text} />
                   ))}
-                  <div className="pt-6 text-white/40 text-xs font-body tracking-[0.25em]">
-                    —— 作者
-                  </div>
                 </motion.div>
               )
-            }
-
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.8, delay }}
-                className="space-y-4 py-2"
-              >
-                {section.content?.map((text, i) => (
-                  <p
-                    key={i}
-                    className="text-white/65 font-body text-sm md:text-[15px] leading-[1.95] tracking-wide text-justify"
-                  >
-                    {text}
-                  </p>
-                ))}
-              </motion.div>
-            )
-          })}
+            })}
+          </div>
         </div>
       </div>
+
+      {/* 回到顶部按钮 */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showBackTop ? 1 : 0, scale: showBackTop ? 1 : 0.8 }}
+        transition={{ duration: 0.3 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={`fixed bottom-24 right-6 z-40 p-3 rounded-full backdrop-blur-sm bg-white/10 border border-white/10 text-white/60 hover:text-white hover:bg-white/15 transition-all duration-300 ${showBackTop ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        aria-label="回到顶部"
+      >
+        <ArrowUp size={18} />
+      </motion.button>
 
       {/* 导航按钮 */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.5 }}
-        className="fixed bottom-6 left-0 right-0 z-30 flex flex-wrap items-center justify-center gap-3 px-4"
+        className="fixed bottom-6 left-0 right-0 z-30 flex items-center justify-center gap-2 px-4"
       >
         <button
           type="button"
           onClick={() => navigate('/starry')}
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+          className="group flex items-center gap-2 text-white/50 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/[0.03] hover:bg-white/10 px-4 py-2.5 rounded-full border border-white/[0.06] hover:border-white/15 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
         >
-          <ArrowLeft size={16} />
-          <span className="text-sm font-body tracking-widest">返回星空</span>
+          <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
+          <span className="text-xs font-body tracking-widest">返回星空</span>
         </button>
 
         <button
           type="button"
           onClick={() => navigate('/starry/secret')}
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+          className="group flex items-center gap-2 text-white/50 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/[0.03] hover:bg-white/10 px-4 py-2.5 rounded-full border border-white/[0.06] hover:border-white/15 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
         >
-          <BookOpen size={16} />
-          <span className="text-sm font-body tracking-widest">再次阅读信件</span>
+          <BookOpen size={15} />
+          <span className="text-xs font-body tracking-widest">信件</span>
         </button>
 
         <button
           type="button"
           onClick={() => navigate('/starry', { state: { playVideo: true } })}
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+          className="group flex items-center gap-2 text-white/50 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/[0.03] hover:bg-white/10 px-4 py-2.5 rounded-full border border-white/[0.06] hover:border-white/15 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
         >
-          <Play size={16} />
-          <span className="text-sm font-body tracking-widest">重新播放星轨</span>
+          <Play size={15} className="group-hover:scale-110 transition-transform" />
+          <span className="text-xs font-body tracking-widest">星轨</span>
         </button>
 
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/5 px-4 py-2 rounded-full border border-white/10"
+          className="group flex items-center gap-2 text-white/50 hover:text-white transition-all duration-300 backdrop-blur-sm bg-white/[0.03] hover:bg-white/10 px-4 py-2.5 rounded-full border border-white/[0.06] hover:border-white/15 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
         >
-          <Home size={16} />
-          <span className="text-sm font-body tracking-widest">回到首页</span>
+          <Home size={15} />
+          <span className="text-xs font-body tracking-widest">首页</span>
         </button>
       </motion.div>
     </div>
