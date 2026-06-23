@@ -102,19 +102,6 @@ function markCompleted() {
   }
 }
 
-/** 首字下沉段落 */
-function DropCapParagraph({ text }: { text: string }) {
-  const first = text[0] || ''
-  const rest = text.slice(1)
-  return (
-    <p className="text-white/65 font-body text-sm md:text-[15px] leading-[2.2] tracking-wide text-justify">
-      <span className="drop-cap float-left text-4xl md:text-5xl leading-[0.85] mr-2 mt-1 font-display text-white/90">
-        {first}
-      </span>
-      {rest}
-    </p>
-  )
-}
 
 export default function StarryEpilogue() {
   const navigate = useNavigate()
@@ -330,7 +317,12 @@ export default function StarryEpilogue() {
                   className="space-y-5 py-3"
                 >
                   {section.content?.map((text, i) => (
-                    <DropCapParagraph key={i} text={text} />
+                    <p
+                      key={i}
+                      className="text-white/65 font-body text-sm md:text-[15px] leading-[2.2] tracking-wide text-justify"
+                    >
+                      {text}
+                    </p>
                   ))}
                 </motion.div>
               )
