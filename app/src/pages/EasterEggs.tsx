@@ -1,7 +1,12 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sparkles, Star, ArrowRight, Lock, Heart } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
 import PlutoCharonBadge from '@/components/PlutoCharonBadge'
+import EasterEggPasswordModal, {
+  checkPasswordVerified,
+} from '@/components/starry/EasterEggPasswordModal'
 
 const EASTER_EGGS = [
   {
@@ -14,12 +19,35 @@ const EASTER_EGGS = [
 ]
 
 export default function EasterEggs() {
+  const navigate = useNavigate()
+  const [showModal, setShowModal] = useState(false)
+
+  const handleBadgeClick = () => {
+    if (checkPasswordVerified()) {
+      navigate('/starry')
+    } else {
+      setShowModal(true)
+    }
+  }
+
+  const handleVerified = () => {
+    setShowModal(false)
+    navigate('/starry')
+  }
+
   return (
     <>
       <PageSEO
         title="售后彩蛋"
         description="这里存放着藏在网站角落里的小惊喜，会不定期更新新的彩蛋。"
       />
+
+      <EasterEggPasswordModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onVerified={handleVerified}
+      />
+
       <section className="min-h-[calc(100dvh-4rem)] bg-Parchment dark:bg-Graphite px-6 py-20 relative overflow-hidden">
         {/* 背景装饰光点 */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -132,9 +160,9 @@ export default function EasterEggs() {
                       <Star size={14} className="text-Amber/30 dark:text-white/20 group-hover:text-Amber/50 dark:group-hover:text-white/40 transition-colors duration-300" />
                     </div>
 
-                    {/* 组件区域 */}
+                    {/* 组件区域 — 使用 onClick 覆盖默认导航 */}
                     <div className="flex justify-center mb-6">
-                      {egg.component}
+                      <PlutoCharonBadge onClick={handleBadgeClick} />
                     </div>
 
                     {/* 标题和描述 */}

@@ -1,9 +1,21 @@
 import { useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export default function PlutoCharonBadge() {
+interface PlutoCharonBadgeProps {
+  onClick?: () => void
+}
+
+export default function PlutoCharonBadge({ onClick }: PlutoCharonBadgeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const navigate = useNavigate()
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick()
+    } else {
+      navigate('/starry')
+    }
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -116,7 +128,7 @@ export default function PlutoCharonBadge() {
 
   return (
     <button
-      onClick={() => navigate('/starry')}
+      onClick={handleClick}
       className="relative mx-auto mb-6 block cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#1a1a2e] shadow-lg"
       style={{ width: 320, height: 140 }}
       title="✨"
