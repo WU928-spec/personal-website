@@ -136,22 +136,30 @@ export default function StarryEasterEgg() {
     return [...brightIds].every((id) => clickedIds.has(id))
   }, [brightIds, clickedIds])
 
-  const isTransitioningRef = useRef(false)
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const navScheduledRef = useRef(false)
 
   useEffect(() => {
     if (location.state?.playVideo) return
     if (hasCompleted) return
-    if (allBrightClicked && secret && secret.pages.length > 0 && !isTransitioningRef.current) {
-      isTransitioningRef.current = true
+    if (allBrightClicked && secret && secret.pages.length > 0 && !navScheduledRef.current) {
+      navScheduledRef.current = true
       setIsTransitioning(true)
-      const timer = setTimeout(() => {
+      navTimerRef.current = setTimeout(() => {
         navigate('/starry/secret')
       }, 1000)
-      return () => {
-        clearTimeout(timer)
-      }
     }
   }, [allBrightClicked, secret, navigate, location.state, hasCompleted])
+
+  useEffect(() => {
+    return () => {
+      if (navTimerRef.current) {
+        clearTimeout(navTimerRef.current)
+        navTimerRef.current = null
+      }
+      navScheduledRef.current = false
+    }
+  }, [])
 
   const handleStarClick = useCallback((id: string) => {
     setClickedIds((prev) => {

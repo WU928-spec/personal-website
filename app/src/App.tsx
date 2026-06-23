@@ -10,6 +10,7 @@ import StarryEasterEgg from './pages/StarryEasterEgg.tsx'
 import StarryEpilogue from './pages/StarryEpilogue.tsx'
 import StarryMemoir from './pages/StarryMemoir.tsx'
 import StarrySecret from './pages/StarrySecret.tsx'
+import EasterEggs from './pages/EasterEggs.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
 import Preloader from './components/Preloader.tsx'
@@ -58,6 +59,7 @@ function App() {
               <Route path="/calendar" element={<LazyPage component={Calendar} />} />
               <Route path="/projects" element={<LazyPage component={Projects} />} />
               <Route path="/obsidian" element={<LazyPage component={ObsidianBrowser} />} />
+              <Route path="/easter-eggs" element={<PageTransition><EasterEggs /></PageTransition>} />
               <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
               <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
