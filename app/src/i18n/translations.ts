@@ -10,6 +10,7 @@ const translations = {
       projects: '项目',
       obsidian: '笔记',
       internship: '实习决策',
+      tools: '工具',
       easterEggs: '售后彩蛋',
       login: '登录',
       profile: '个人资料',
@@ -287,6 +288,18 @@ const translations = {
       starryTitle: '星空彩蛋',
       starryDescription: '点击冥王星与卡戎，进入一片只为你点亮的星空。每一颗星星都是一段被封存的记忆，点亮全部十四颗最亮的星，会解锁一封隐藏的信。',
     },
+    // Tools
+    tools: {
+      title: '工具箱',
+      description: '实用小工具，解决实际问题。',
+      descriptionLine2: '从实习决策到日常计算，这里存放着为效率而生的工具。',
+      irregularUpdates: '不定期更新',
+      toolsCount: '个工具',
+      internshipTitle: '实习决策助手',
+      internshipDesc: '多维实习Offer对比打分系统，帮你量化选择。输入薪资、通勤、体验、前景，系统自动计算加权总分，雷达图对比一目了然。',
+      clickToUse: '点击使用',
+      moreTools: '更多工具正在开发中...',
+    },
   },
   en: {
     // Navbar
@@ -297,6 +310,7 @@ const translations = {
       projects: 'Projects',
       obsidian: 'Notes',
       internship: 'Internship Decision',
+      tools: 'Tools',
       easterEggs: 'Easter Eggs',
       login: 'Login',
       profile: 'Profile',
@@ -572,6 +586,18 @@ const translations = {
       eggsCount: 'eggs',
       starryTitle: 'Starry Easter Egg',
       starryDescription: 'Click on Pluto and Charon to enter a starry sky lit just for you. Every star is a sealed memory — light up all fourteen brightest stars to unlock a hidden letter.',
+    },
+    // Tools
+    tools: {
+      title: 'Toolkit',
+      description: 'Practical tools for real problems.',
+      descriptionLine2: 'From internship decisions to daily calculations, tools built for efficiency.',
+      irregularUpdates: 'Irregular Updates',
+      toolsCount: 'tools',
+      internshipTitle: 'Internship Decision Assistant',
+      internshipDesc: 'Multi-dimensional internship offer comparison scoring system. Enter salary, commute, experience, and prospects — the system auto-calculates weighted scores with radar chart comparison.',
+      clickToUse: 'Click to Use',
+      moreTools: 'More tools coming soon...',
     },
     // Footer (common)
     common: {
