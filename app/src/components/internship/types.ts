@@ -21,6 +21,7 @@ export interface Offer {
 
 export interface CommuteCache {
   defaultStart: string
+  homeAddress: string
 }
 
 const STORAGE_KEY = 'internship-decision-offers'
@@ -52,14 +53,17 @@ export function loadCommuteCache(): CommuteCache {
     const raw = localStorage.getItem(COMMUTE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as unknown
-      if (parsed && typeof parsed === 'object' && 'defaultStart' in parsed) {
-        return parsed as CommuteCache
+      if (parsed && typeof parsed === 'object') {
+        return {
+          defaultStart: (parsed as Record<string, unknown>).defaultStart as string || '',
+          homeAddress: (parsed as Record<string, unknown>).homeAddress as string || '',
+        }
       }
     }
   } catch {
     // ignore
   }
-  return { defaultStart: '' }
+  return { defaultStart: '', homeAddress: '' }
 }
 
 export function saveCommuteCache(cache: CommuteCache) {

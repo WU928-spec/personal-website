@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Search, MapPin, Clock, Navigation } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
-import { loadCommuteCache, saveCommuteCache } from './types'
 
 const AMAP_KEY = '04ca7c41361cbc7fd6390dd1e6969c2f'
 
@@ -10,6 +9,7 @@ interface MapCommuteModalProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: (minutes: number) => void
+  homeAddress: string
   defaultDestination?: string
 }
 
@@ -33,10 +33,10 @@ export default function MapCommuteModal({
   isOpen,
   onClose,
   onConfirm,
+  homeAddress,
   defaultDestination = '',
 }: MapCommuteModalProps) {
   const { t } = useLang()
-  const [start, setStart] = useState('')
   const [end, setEnd] = useState(defaultDestination)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<number | null>(null)
@@ -47,8 +47,6 @@ export default function MapCommuteModal({
 
   useEffect(() => {
     if (!isOpen) return
-    const cache = loadCommuteCache()
-    if (cache.defaultStart) setStart(cache.defaultStart)
     setEnd(defaultDestination)
     setResult(null)
     setError('')
@@ -81,8 +79,8 @@ export default function MapCommuteModal({
   }
 
   const handleCalc = async () => {
-    if (!start || !end) {
-      setError(t('internship.passwordError'))
+    if (!homeAddress || !end) {
+      setError('请填写出发地和目的地')
       return
     }
     setLoading(true)
@@ -90,7 +88,7 @@ export default function MapCommuteModal({
     setResult(null)
     try {
       const [startCoords, endCoords] = await Promise.all([
-        geocode(start),
+        geocode(homeAddress),
         geocode(end),
       ])
       if (!startCoords || !endCoords) {
@@ -103,8 +101,7 @@ export default function MapCommuteModal({
         setError('未找到可行的公交/地铁路线，请尝试手动输入')
       } else {
         setResult(minutes)
-        setRouteDetail(`${start} → ${end}`)
-        saveCommuteCache({ defaultStart: start })
+        setRouteDetail(`${homeAddress} → ${end}`)
       }
     } catch {
       setError('查询失败，请检查网络或手动输入')
@@ -157,13 +154,11 @@ export default function MapCommuteModal({
                   <Navigation size={12} />
                   {t('internship.origin')}
                 </label>
-                <input
-                  type="text"
-                  value={start}
-                  onChange={(e) => setStart(e.target.value)}
-                  placeholder={t('internship.origin')}
-                  className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
-                />
+                <div className="w-full bg-white/50 dark:bg-white/[0.03] border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-Ink/80 dark:text-white/80 font-body select-none cursor-not-allowed">
+                  {homeAddress || (
+                    <span className="text-Ink/30 dark:text-white/20">{t('internship.origin')}</span>
+                  )}
+                </div>
               </div>
 
               <div>

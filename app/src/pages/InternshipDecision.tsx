@@ -4,7 +4,7 @@ import { Briefcase, Sparkles, TrendingUp, MapPin, Clock } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 import type { Offer } from '@/components/internship/types'
-import { loadOffers, saveOffers, calcTotalScore } from '@/components/internship/types'
+import { loadOffers, saveOffers, calcTotalScore, loadCommuteCache, saveCommuteCache } from '@/components/internship/types'
 import OfferForm from '@/components/internship/OfferForm'
 import ScoreMatrix from '@/components/internship/ScoreMatrix'
 import ResultCharts from '@/components/internship/ResultCharts'
@@ -13,8 +13,14 @@ import MapCommuteModal from '@/components/internship/MapCommuteModal'
 export default function InternshipDecision() {
   const { t } = useLang()
   const [offers, setOffers] = useState<Offer[]>(loadOffers)
+  const [homeAddress, setHomeAddress] = useState(() => loadCommuteCache().homeAddress)
   const [mapOpen, setMapOpen] = useState(false)
   const [mapOffer, setMapOffer] = useState<Offer | null>(null)
+
+  const handleHomeAddressChange = (value: string) => {
+    setHomeAddress(value)
+    saveCommuteCache({ ...loadCommuteCache(), homeAddress: value })
+  }
 
   const handleAdd = useCallback((offer: Offer) => {
     setOffers((prev) => {
@@ -68,6 +74,7 @@ export default function InternshipDecision() {
         isOpen={mapOpen}
         onClose={() => setMapOpen(false)}
         onConfirm={handleMapConfirm}
+        homeAddress={homeAddress}
         defaultDestination={mapOffer?.location || ''}
       />
 
@@ -133,6 +140,25 @@ export default function InternshipDecision() {
                 </span>
               </motion.div>
             )}
+
+            {/* 我的住处 */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="mt-6 max-w-md mx-auto"
+            >
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10">
+                <MapPin size={14} className="text-Amber/60 shrink-0" />
+                <input
+                  type="text"
+                  value={homeAddress}
+                  onChange={(e) => handleHomeAddressChange(e.target.value)}
+                  placeholder={t('internship.origin')}
+                  className="flex-1 bg-transparent text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none"
+                />
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* 权重说明 */}
