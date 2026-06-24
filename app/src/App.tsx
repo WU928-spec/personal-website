@@ -21,6 +21,7 @@ const Calendar = lazy(() => import('./pages/Calendar.tsx'))
 const Projects = lazy(() => import('./pages/Projects.tsx'))
 const ObsidianBrowser = lazy(() => import('./pages/ObsidianBrowser.tsx'))
 const Moments = lazy(() => import('./pages/Moments.tsx'))
+const InternshipDecision = lazy(() => import('./pages/InternshipDecision.tsx'))
 
 function App() {
   const location = useLocation()
@@ -59,6 +60,7 @@ function App() {
               <Route path="/calendar" element={<LazyPage component={Calendar} />} />
               <Route path="/projects" element={<LazyPage component={Projects} />} />
               <Route path="/obsidian" element={<LazyPage component={ObsidianBrowser} />} />
+              <Route path="/internship" element={<LazyPage component={InternshipDecision} />} />
               <Route path="/easter-eggs" element={<PageTransition><EasterEggs /></PageTransition>} />
               <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

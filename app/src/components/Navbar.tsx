@@ -21,6 +21,7 @@ export default function Navbar() {
     { path: '/obsidian', label: t('nav.obsidian') },
     { path: '/calendar', label: t('nav.calendar') },
     { path: '/projects', label: t('nav.projects') },
+    { path: '/internship', label: '实习决策' },
     { path: '/easter-eggs', label: t('nav.easterEggs') },
   ]
 
