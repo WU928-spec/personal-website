@@ -221,6 +221,7 @@ export default function InternshipDecision() {
                 onUpdate={handleUpdate}
                 onMapClick={handleMapClick}
                 mapCommuteResult={mapCommuteResult}
+                homeAddress={homeAddress}
               />
             </motion.div>
 

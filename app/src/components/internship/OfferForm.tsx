@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Trash2, Star, MapPin, Map } from 'lucide-react'
+import { Plus, Trash2, Star, MapPin, Navigation } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import type { Offer } from './types'
-import { defaultOfferTemplate, generateId } from './types'
+import { defaultOfferTemplate, generateId, calcCommuteMinutes } from './types'
 
 interface OfferFormProps {
   offers: Offer[]
@@ -12,6 +12,7 @@ interface OfferFormProps {
   onUpdate: (offer: Offer) => void
   onMapClick: (offer: Offer) => void
   mapCommuteResult?: { minutes: number } | null
+  homeAddress: string
 }
 
 export default function OfferForm({
@@ -21,11 +22,14 @@ export default function OfferForm({
   onUpdate,
   onMapClick,
   mapCommuteResult,
+  homeAddress,
 }: OfferFormProps) {
   const { t } = useLang()
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<Offer>(defaultOfferTemplate())
+  const [calcLoading, setCalcLoading] = useState(false)
+  const [calcError, setCalcError] = useState('')
 
   useEffect(() => {
     if (mapCommuteResult) {
@@ -37,12 +41,14 @@ export default function OfferForm({
     setForm(defaultOfferTemplate())
     setIsAdding(true)
     setEditingId(null)
+    setCalcError('')
   }
 
   const startEdit = (offer: Offer) => {
     setForm({ ...offer })
     setEditingId(offer.id)
     setIsAdding(true)
+    setCalcError('')
   }
 
   const handleSave = () => {
@@ -63,6 +69,30 @@ export default function OfferForm({
 
   const toggleFavorite = (offer: Offer) => {
     onUpdate({ ...offer, isFavorite: !offer.isFavorite })
+  }
+
+  const handleCalcCommute = async () => {
+    if (!homeAddress) {
+      setCalcError('请先在页面顶部填写我的住处')
+      return
+    }
+    if (!form.location) {
+      setCalcError('请填写公司地址')
+      return
+    }
+    setCalcLoading(true)
+    setCalcError('')
+    try {
+      const minutes = await calcCommuteMinutes(homeAddress, form.location)
+      if (minutes === null) {
+        setCalcError('查询失败，请检查地址或手动输入')
+      } else {
+        setForm((prev) => ({ ...prev, commuteMinutes: minutes }))
+      }
+    } catch {
+      setCalcError('查询失败，请检查网络或手动输入')
+    }
+    setCalcLoading(false)
   }
 
   return (
@@ -179,13 +209,25 @@ export default function OfferForm({
                     placeholder={t('internship.companyAddress')}
                   />
                   <button
-                    onClick={() => onMapClick(form)}
-                    className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 text-Ink/50 dark:text-white/40 hover:text-Ink/70 dark:hover:text-white/60 text-xs font-body tracking-wider transition-colors"
+                    onClick={handleCalcCommute}
+                    disabled={calcLoading}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 text-Ink/50 dark:text-white/40 hover:text-Ink/70 dark:hover:text-white/60 text-xs font-body tracking-wider transition-colors disabled:opacity-50"
                   >
-                    <Map size={12} />
-                    {t('internship.map')}
+                    {calcLoading ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        className="w-3 h-3 border-2 border-Ink/30 dark:border-white/30 border-t-Ink/80 dark:border-t-white/80 rounded-full"
+                      />
+                    ) : (
+                      <Navigation size={12} />
+                    )}
+                    {calcLoading ? t('internship.calculating') : t('internship.map')}
                   </button>
                 </div>
+                {calcError && (
+                  <p className="text-red-400/70 text-xs font-body mt-1">{calcError}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">

@@ -121,3 +121,57 @@ export const defaultOfferTemplate = (): Offer => ({
   growthProspect: 5,
   isFavorite: false,
 })
+
+// 高德地图 API
+export const AMAP_KEY = '04ca7c41361cbc7fd6390dd1e6969c2f'
+
+interface GeocodeResult {
+  status: string
+  geocodes?: Array<{
+    location: string
+  }>
+}
+
+interface TransitResult {
+  status: string
+  route?: {
+    transits?: Array<{
+      duration?: string
+    }>
+  }
+}
+
+export async function geocodeAddress(address: string): Promise<[number, number] | null> {
+  if (!AMAP_KEY) return null
+  const url = `https://restapi.amap.com/v3/geocode/geo?address=${encodeURIComponent(address)}&key=${AMAP_KEY}&city=上海`
+  const res = await fetch(url)
+  const data = (await res.json()) as GeocodeResult
+  if (data.status === '1' && data.geocodes && data.geocodes[0]) {
+    const loc = data.geocodes[0].location
+    const [lng, lat] = loc.split(',').map(Number)
+    return [lng, lat]
+  }
+  return null
+}
+
+export async function planTransitRoute(origin: [number, number], destination: [number, number]): Promise<number | null> {
+  if (!AMAP_KEY) return null
+  const url = `https://restapi.amap.com/v3/direction/transit/integrated?origin=${origin[0]},${origin[1]}&destination=${destination[0]},${destination[1]}&city=上海&key=${AMAP_KEY}`
+  const res = await fetch(url)
+  const data = (await res.json()) as TransitResult
+  if (data.status === '1' && data.route?.transits && data.route.transits[0]) {
+    const duration = data.route.transits[0].duration || '0'
+    return Math.round(Number(duration) / 60)
+  }
+  return null
+}
+
+export async function calcCommuteMinutes(homeAddress: string, companyAddress: string): Promise<number | null> {
+  if (!homeAddress || !companyAddress) return null
+  const [startCoords, endCoords] = await Promise.all([
+    geocodeAddress(homeAddress),
+    geocodeAddress(companyAddress),
+  ])
+  if (!startCoords || !endCoords) return null
+  return planTransitRoute(startCoords, endCoords)
+}
