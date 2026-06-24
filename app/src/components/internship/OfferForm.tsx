@@ -191,9 +191,13 @@ export default function OfferForm({
                     max={300}
                     value={form.salary}
                     onChange={(e) =>
-                      setForm({ ...form, salary: Math.min(300, Math.max(50, Number(e.target.value) || 0)) })
+                      setForm({ ...form, salary: Number(e.target.value) || 0 })
                     }
-                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
+                    onBlur={(e) => {
+                      const v = Number(e.target.value) || 0
+                      setForm({ ...form, salary: Math.min(300, Math.max(50, v)) })
+                    }}
+                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
                 <div>
@@ -207,9 +211,13 @@ export default function OfferForm({
                       max={180}
                       value={form.commuteMinutes}
                       onChange={(e) =>
-                        setForm({ ...form, commuteMinutes: Math.min(180, Math.max(0, Number(e.target.value) || 0)) })
+                        setForm({ ...form, commuteMinutes: Number(e.target.value) || 0 })
                       }
-                      className="flex-1 bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
+                      onBlur={(e) => {
+                        const v = Number(e.target.value) || 0
+                        setForm({ ...form, commuteMinutes: Math.min(180, Math.max(0, v)) })
+                      }}
+                      className="flex-1 bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                     <button
                       onClick={() => onMapClick(form)}
