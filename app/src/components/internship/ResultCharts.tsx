@@ -18,7 +18,7 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
     total: { label: t('internship.totalScore'), getValue: (o: Offer) => calcTotalScore(o) },
     salary: { label: t('internship.salary'), getValue: (o: Offer) => calcSalaryScore(o.salary) },
     commute: { label: t('internship.commute'), getValue: (o: Offer) => calcCommuteScore(o.commuteMinutes) },
-    intensity: { label: t('internship.intensity'), getValue: (o: Offer) => (o.workIntensity / 10) * 100 },
+    intensity: { label: t('internship.intensity'), getValue: (o: Offer) => ((11 - o.workIntensity) / 10) * 100 },
     atmosphere: { label: t('internship.atmosphere'), getValue: (o: Offer) => (o.teamAtmosphere / 10) * 100 },
     growth: { label: t('internship.prospect'), getValue: (o: Offer) => (o.growthProspect / 10) * 100 },
   }
@@ -103,7 +103,7 @@ function RadarChart({ offers }: { offers: Offer[] }) {
   const getDimensionValue = (offer: Offer, dim: string) => {
     if (dim === t('internship.salary')) return calcSalaryScore(offer.salary) / 100
     if (dim === t('internship.commute')) return calcCommuteScore(offer.commuteMinutes) / 100
-    if (dim === t('internship.intensity')) return offer.workIntensity / 10
+    if (dim === t('internship.intensity')) return (11 - offer.workIntensity) / 10
     if (dim === t('internship.atmosphere')) return offer.teamAtmosphere / 10
     if (dim === t('internship.prospect')) return offer.growthProspect / 10
     return 0

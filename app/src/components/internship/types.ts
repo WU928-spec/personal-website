@@ -88,7 +88,8 @@ export function calcCommuteScore(minutes: number): number {
 export function calcTotalScore(offer: Offer): number {
   const salaryScore = calcSalaryScore(offer.salary)
   const commuteScore = calcCommuteScore(offer.commuteMinutes)
-  const intensityScore = (offer.workIntensity / 10) * 100
+  // 工作强度越高，分数越低（1-10 映射到 100-10）
+  const intensityScore = ((11 - offer.workIntensity) / 10) * 100
   const atmosphereScore = (offer.teamAtmosphere / 10) * 100
 
   const commuteWeight = 0.4

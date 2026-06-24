@@ -24,7 +24,7 @@ export default function ScoreMatrix({ offers }: ScoreMatrixProps) {
           const score = calcTotalScore(offer)
           const salary = calcSalaryScore(offer.salary)
           const commute = calcCommuteScore(offer.commuteMinutes)
-          const intensity = (offer.workIntensity / 10) * 100
+          const intensity = ((11 - offer.workIntensity) / 10) * 100
           const atmosphere = (offer.teamAtmosphere / 10) * 100
           const growth = (offer.growthProspect / 10) * 100
 
