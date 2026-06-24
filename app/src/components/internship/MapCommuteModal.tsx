@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Search, MapPin, Clock, Navigation } from 'lucide-react'
 import { loadCommuteCache, saveCommuteCache } from './types'
 
-const AMAP_KEY = import.meta.env.VITE_AMAP_KEY as string | undefined
+const AMAP_KEY = '3b746cba74da941b6662ac67f9ec2af6'
 
 interface MapCommuteModalProps {
   isOpen: boolean
