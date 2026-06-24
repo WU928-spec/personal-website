@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLang } from '@/contexts/PreferencesContext'
 import type { Offer } from './types'
 import { calcSalaryScore, calcCommuteScore, calcTotalScore } from './types'
 
@@ -8,17 +9,18 @@ interface ResultChartsProps {
 }
 
 export default function ResultCharts({ offers }: ResultChartsProps) {
+  const { t } = useLang()
   if (offers.length < 2) return null
 
   const [activeDimension, setActiveDimension] = useState<'total' | 'salary' | 'commute' | 'intensity' | 'atmosphere' | 'growth'>('total')
 
   const dimensionConfig = {
-    total: { label: '总分', getValue: (o: Offer) => calcTotalScore(o) },
-    salary: { label: '日薪', getValue: (o: Offer) => calcSalaryScore(o.salary) },
-    commute: { label: '通勤', getValue: (o: Offer) => calcCommuteScore(o.commuteMinutes) },
-    intensity: { label: '强度', getValue: (o: Offer) => (o.workIntensity / 10) * 100 },
-    atmosphere: { label: '氛围', getValue: (o: Offer) => (o.teamAtmosphere / 10) * 100 },
-    growth: { label: '前景', getValue: (o: Offer) => (o.growthProspect / 10) * 100 },
+    total: { label: t('internship.totalScore'), getValue: (o: Offer) => calcTotalScore(o) },
+    salary: { label: t('internship.salary'), getValue: (o: Offer) => calcSalaryScore(o.salary) },
+    commute: { label: t('internship.commute'), getValue: (o: Offer) => calcCommuteScore(o.commuteMinutes) },
+    intensity: { label: t('internship.intensity'), getValue: (o: Offer) => (o.workIntensity / 10) * 100 },
+    atmosphere: { label: t('internship.atmosphere'), getValue: (o: Offer) => (o.teamAtmosphere / 10) * 100 },
+    growth: { label: t('internship.prospect'), getValue: (o: Offer) => (o.growthProspect / 10) * 100 },
   }
 
   const sorted = [...offers].sort((a, b) => dimensionConfig[activeDimension].getValue(b) - dimensionConfig[activeDimension].getValue(a))
@@ -35,7 +37,7 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-white/70 font-body text-sm tracking-wider">可视化对比</h3>
+        <h3 className="text-Ink/70 dark:text-white/70 font-body text-sm tracking-wider">{t('internship.visualComparison')}</h3>
         <div className="flex flex-wrap gap-1.5">
           {(Object.entries(dimensionConfig) as [string, typeof dimensionConfig['total']][]).map(([key, config]) => (
             <button
@@ -43,8 +45,8 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
               onClick={() => setActiveDimension(key as typeof activeDimension)}
               className={`px-2.5 py-1 rounded-full text-xs font-body tracking-wider transition-all border ${
                 activeDimension === key
-                  ? 'bg-white/10 text-white/80 border-white/20'
-                  : 'text-white/30 border-white/5 hover:text-white/50 hover:border-white/10'
+                  ? 'bg-white/70 dark:bg-white/10 text-Ink/80 dark:text-white/80 border-Amber/20 dark:border-white/20'
+                  : 'text-Ink/30 dark:text-white/30 border-Amber/5 dark:border-white/5 hover:text-Ink/50 dark:hover:text-white/50 hover:border-Amber/10 dark:hover:border-white/10'
               }`}
             >
               {config.label}
@@ -67,17 +69,17 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
               transition={{ delay: index * 0.05, duration: 0.3 }}
               className="flex items-center gap-3"
             >
-              <span className="text-white/40 text-xs font-body w-20 truncate shrink-0">
+              <span className="text-Ink/40 dark:text-white/40 text-xs font-body w-20 truncate shrink-0">
                 {offer.companyName}
               </span>
-              <div className="flex-1 h-6 bg-white/5 rounded-md overflow-hidden relative">
+              <div className="flex-1 h-6 bg-white/70 dark:bg-white/5 rounded-md overflow-hidden relative">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                   className={`h-full bg-gradient-to-r ${color} rounded-md`}
                 />
-                <span className="absolute inset-0 flex items-center px-2 text-white/60 text-xs font-body">
+                <span className="absolute inset-0 flex items-center px-2 text-Ink/60 dark:text-white/60 text-xs font-body">
                   {value.toFixed(1)}
                 </span>
               </div>
@@ -96,16 +98,15 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
 }
 
 function RadarChart({ offers }: { offers: Offer[] }) {
-  const dimensions = ['日薪', '通勤', '强度', '氛围', '前景']
+  const { t } = useLang()
+  const dimensions = [t('internship.salary'), t('internship.commute'), t('internship.intensity'), t('internship.atmosphere'), t('internship.prospect')]
   const getDimensionValue = (offer: Offer, dim: string) => {
-    switch (dim) {
-      case '日薪': return calcSalaryScore(offer.salary) / 100
-      case '通勤': return calcCommuteScore(offer.commuteMinutes) / 100
-      case '强度': return offer.workIntensity / 10
-      case '氛围': return offer.teamAtmosphere / 10
-      case '前景': return offer.growthProspect / 10
-      default: return 0
-    }
+    if (dim === t('internship.salary')) return calcSalaryScore(offer.salary) / 100
+    if (dim === t('internship.commute')) return calcCommuteScore(offer.commuteMinutes) / 100
+    if (dim === t('internship.intensity')) return offer.workIntensity / 10
+    if (dim === t('internship.atmosphere')) return offer.teamAtmosphere / 10
+    if (dim === t('internship.prospect')) return offer.growthProspect / 10
+    return 0
   }
 
   const size = 200
@@ -132,8 +133,9 @@ function RadarChart({ offers }: { offers: Offer[] }) {
               return `${p.x},${p.y}`
             }).join(' ')}
             fill="none"
-            stroke="rgba(255,255,255,0.05)"
+            stroke="rgba(128,128,128,0.1)"
             strokeWidth={1}
+            className="dark:stroke-white/5"
           />
         ))}
 
@@ -147,8 +149,9 @@ function RadarChart({ offers }: { offers: Offer[] }) {
               y1={center}
               x2={p.x}
               y2={p.y}
-              stroke="rgba(255,255,255,0.08)"
+              stroke="rgba(128,128,128,0.15)"
               strokeWidth={1}
+              className="dark:stroke-white/8"
             />
           )
         })}
@@ -163,9 +166,10 @@ function RadarChart({ offers }: { offers: Offer[] }) {
               y={p.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="rgba(255,255,255,0.4)"
+              fill="rgba(0,0,0,0.5)"
               fontSize={10}
               fontFamily="ui-sans-serif, system-ui"
+              className="dark:fill-white/40"
             >
               {label}
             </text>
@@ -203,7 +207,7 @@ function RadarChart({ offers }: { offers: Offer[] }) {
         {offers.slice(0, 5).map((offer, idx) => (
           <div key={offer.id} className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[idx % colors.length] }} />
-            <span className="text-white/40 text-xs font-body">{offer.companyName}</span>
+            <span className="text-Ink/40 dark:text-white/40 text-xs font-body">{offer.companyName}</span>
           </div>
         ))}
       </div>
@@ -212,6 +216,7 @@ function RadarChart({ offers }: { offers: Offer[] }) {
 }
 
 function Recommendation({ offers }: { offers: Offer[] }) {
+  const { t } = useLang()
   const top2 = [...offers]
     .sort((a, b) => calcTotalScore(b) - calcTotalScore(a))
     .slice(0, 2)
@@ -226,16 +231,17 @@ function Recommendation({ offers }: { offers: Offer[] }) {
   const growthDiff = (a.growthProspect - b.growthProspect) / 10 * 100
 
   return (
-    <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-      <h4 className="text-white/60 text-sm font-body tracking-wider mb-3">
-        决策建议
+    <div className="p-4 rounded-xl border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
+      <h4 className="text-Ink/60 dark:text-white/60 text-sm font-body tracking-wider mb-3">
+        {t('internship.recommendation')}
       </h4>
-      <p className="text-white/50 text-xs font-body leading-[1.8]">
-        <span className="text-white/70">{a.companyName}</span> 比 <span className="text-white/70">{b.companyName}</span> 高 {diff.toFixed(1)} 分。
-        {salaryDiff > 0 && `日薪领先 ${salaryDiff.toFixed(0)} 分；`}
-        {commuteDiff > 0 && `通勤领先 ${commuteDiff.toFixed(0)} 分；`}
-        {growthDiff > 0 && `前景领先 ${growthDiff.toFixed(0)} 分。`}
-        {salaryDiff <= 0 && commuteDiff <= 0 && growthDiff <= 0 && '综合得分优势明显。'}
+      <p className="text-Ink/50 dark:text-white/50 text-xs font-body leading-[1.8]">
+        <span className="text-Ink/70 dark:text-white/70">{a.companyName}</span> {t('internship.totalScore')}{' '}
+        <span className="text-Ink/70 dark:text-white/70">{b.companyName}</span> {diff.toFixed(1)} {t('internship.points')}。
+        {salaryDiff > 0 && `${t('internship.salary')} ${salaryDiff.toFixed(0)} ${t('internship.points')}；`}
+        {commuteDiff > 0 && `${t('internship.commute')} ${commuteDiff.toFixed(0)} ${t('internship.points')}；`}
+        {growthDiff > 0 && `${t('internship.prospect')} ${growthDiff.toFixed(0)} ${t('internship.points')}。`}
+        {salaryDiff <= 0 && commuteDiff <= 0 && growthDiff <= 0 && t('internship.totalScore')}
       </p>
     </div>
   )

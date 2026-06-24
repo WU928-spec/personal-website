@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sparkles, Star, ArrowRight, Lock, Heart } from 'lucide-react'
+import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 import PlutoCharonBadge from '@/components/PlutoCharonBadge'
 import EasterEggPasswordModal, {
@@ -11,8 +12,6 @@ import EasterEggPasswordModal, {
 const EASTER_EGGS = [
   {
     id: 'starry',
-    title: '星空彩蛋',
-    description: '点击冥王星与卡戎，进入一片只为你点亮的星空。每一颗星星都是一段被封存的记忆，点亮全部十四颗最亮的星，会解锁一封隐藏的信。',
     status: 'available' as const,
     component: <PlutoCharonBadge />,
   },
@@ -20,6 +19,7 @@ const EASTER_EGGS = [
 
 export default function EasterEggs() {
   const navigate = useNavigate()
+  const { t } = useLang()
   const [showModal, setShowModal] = useState(false)
 
   const handleBadgeClick = () => {
@@ -38,8 +38,8 @@ export default function EasterEggs() {
   return (
     <>
       <PageSEO
-        title="售后彩蛋"
-        description="这里存放着藏在网站角落里的小惊喜，会不定期更新新的彩蛋。"
+        title={t('easterEggs.title')}
+        description={t('easterEggs.description')}
       />
 
       <EasterEggPasswordModal
@@ -88,7 +88,7 @@ export default function EasterEggs() {
             </div>
 
             <h1 className="font-display text-[clamp(2.5rem,6vw,4rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-Ink dark:text-white">
-              售后彩蛋
+              {t('easterEggs.title')}
             </h1>
 
             <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 to-transparent rounded-full" />
@@ -99,9 +99,9 @@ export default function EasterEggs() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="mt-6 max-w-md mx-auto text-sm text-Ink/50 dark:text-white/40 font-body leading-relaxed tracking-wide"
             >
-              这里存放着藏在网站角落里的小惊喜。
+              {t('easterEggs.description')}
               <br />
-              有些故事被藏进了星星里，有些温柔被写进了光年里。
+              {t('easterEggs.descriptionLine2')}
             </motion.p>
 
             <motion.div
@@ -111,9 +111,9 @@ export default function EasterEggs() {
               className="mt-4 flex items-center justify-center gap-2 text-xs text-Amber/60 dark:text-white/30 font-body tracking-widest"
             >
               <Heart size={12} className="text-Amber/40" />
-              <span>不定期更新</span>
+              <span>{t('easterEggs.irregularUpdates')}</span>
               <span className="mx-1">·</span>
-              <span>{EASTER_EGGS.length} 个彩蛋</span>
+              <span>{EASTER_EGGS.length} {t('easterEggs.eggsCount')}</span>
             </motion.div>
           </motion.div>
 
@@ -145,14 +145,14 @@ export default function EasterEggs() {
                           <>
                             <span className="w-2 h-2 rounded-full bg-green-400/80 shadow-[0_0_8px_rgba(74,222,128,0.4)]" />
                             <span className="text-xs text-green-500/70 dark:text-green-400/60 font-body tracking-wider">
-                              已解锁
+                              {t('internship.unlocked')}
                             </span>
                           </>
                         ) : (
                           <>
                             <Lock size={12} className="text-white/30" />
                             <span className="text-xs text-white/30 font-body tracking-wider">
-                              未解锁
+                              {t('internship.locked')}
                             </span>
                           </>
                         )}
@@ -167,15 +167,15 @@ export default function EasterEggs() {
 
                     {/* 标题和描述 */}
                     <h3 className="font-display text-lg font-medium text-Ink dark:text-white/90 tracking-wide text-center mb-3">
-                      {egg.title}
+                      {t('easterEggs.starryTitle')}
                     </h3>
                     <p className="text-sm text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
-                      {egg.description}
+                      {t('easterEggs.starryDescription')}
                     </p>
 
                     {/* 底部提示 */}
                     <div className="flex items-center justify-center gap-2 text-xs text-Amber/50 dark:text-white/30 font-body tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span>点击探索</span>
+                      <span>{t('internship.clickExplore')}</span>
                       <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export default function EasterEggs() {
               <div className="w-12 h-px bg-gradient-to-l from-transparent to-Amber/20 dark:to-white/20" />
             </div>
             <p className="text-xs text-Ink/30 dark:text-white/20 font-body tracking-widest">
-              更多彩蛋正在路上...
+              {t('internship.moreEggs')}
             </p>
           </motion.div>
         </div>

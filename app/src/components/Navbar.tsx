@@ -21,7 +21,7 @@ export default function Navbar() {
     { path: '/obsidian', label: t('nav.obsidian') },
     { path: '/calendar', label: t('nav.calendar') },
     { path: '/projects', label: t('nav.projects') },
-    { path: '/internship', label: '实习决策' },
+    { path: '/internship', label: t('nav.internship') },
     { path: '/easter-eggs', label: t('nav.easterEggs') },
   ]
 
@@ -97,7 +97,7 @@ export default function Navbar() {
               onClick={() => setSearchOpen(true)}
               className={`${iconBtnClass} relative`}
               aria-label={t('nav.search')}
-              title="搜索 (Cmd+K)"
+              title={`${t('nav.search')} (Cmd+K)`}
             >
               <Search size={20} />
             </button>
@@ -125,10 +125,10 @@ export default function Navbar() {
                       ? 'bg-Amber text-white border-Amber hover:bg-[#b8863d]'
                       : 'bg-Linen text-Ink border-Sand hover:border-Amber hover:text-Amber dark:bg-white/15 dark:text-white dark:border-white/25 dark:hover:text-Amber dark:hover:border-Amber'
                   }`}
-                  title={isEditMode ? '切换为浏览模式' : '切换为编辑模式'}
+                  title={isEditMode ? t('editor.switchToView') : t('editor.switchToEdit')}
                 >
                   {isEditMode ? <Eye size={13} /> : <Pencil size={13} />}
-                  {isEditMode ? '浏览模式' : '编辑模式'}
+                  {isEditMode ? t('editor.viewMode') : t('editor.editMode')}
                 </button>
                 <Link
                   to="/profile"

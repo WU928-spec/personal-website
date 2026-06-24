@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Search, MapPin, Clock, Navigation } from 'lucide-react'
+import { useLang } from '@/contexts/PreferencesContext'
 import { loadCommuteCache, saveCommuteCache } from './types'
 
 const AMAP_KEY = '04ca7c41361cbc7fd6390dd1e6969c2f'
@@ -34,6 +35,7 @@ export default function MapCommuteModal({
   onConfirm,
   defaultDestination = '',
 }: MapCommuteModalProps) {
+  const { t } = useLang()
   const [start, setStart] = useState('')
   const [end, setEnd] = useState(defaultDestination)
   const [loading, setLoading] = useState(false)
@@ -80,7 +82,7 @@ export default function MapCommuteModal({
 
   const handleCalc = async () => {
     if (!start || !end) {
-      setError('请填写出发地和目的地')
+      setError(t('internship.passwordError'))
       return
     }
     setLoading(true)
@@ -101,7 +103,7 @@ export default function MapCommuteModal({
         setError('未找到可行的公交/地铁路线，请尝试手动输入')
       } else {
         setResult(minutes)
-        setRouteDetail(`起点: ${start} → 终点: ${end}`)
+        setRouteDetail(`${start} → ${end}`)
         saveCommuteCache({ defaultStart: start })
       }
     } catch {
@@ -118,7 +120,7 @@ export default function MapCommuteModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -127,54 +129,54 @@ export default function MapCommuteModal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md mx-4 rounded-2xl border border-white/10 bg-[#0a0a15] backdrop-blur-xl p-6 shadow-2xl"
+            className="relative w-full max-w-md mx-4 rounded-2xl border border-Amber/10 dark:border-white/10 bg-white/90 dark:bg-[#0a0a15] backdrop-blur-xl p-6 shadow-2xl"
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-white/30 hover:text-white/60 transition-colors"
+              className="absolute top-4 right-4 text-Ink/30 dark:text-white/30 hover:text-Ink/60 dark:hover:text-white/60 transition-colors"
             >
               <X size={18} />
             </button>
 
-            <h2 className="font-display text-white/90 text-lg tracking-[0.15em] mb-1">
-              通勤时长计算
+            <h2 className="font-display text-Ink/90 dark:text-white/90 text-lg tracking-[0.15em] mb-1">
+              {t('internship.commuteCalc')}
             </h2>
-            <p className="text-white/30 text-xs font-body tracking-wider mb-6">
-              基于高德地图公交/地铁路线规划
+            <p className="text-Ink/30 dark:text-white/30 text-xs font-body tracking-wider mb-6">
+              {t('internship.commuteBasedOn')}
             </p>
 
             {!hasKey && (
               <div className="mb-4 p-3 rounded-lg bg-Amber/10 border border-Amber/20 text-Amber/70 text-xs font-body">
-                未配置高德地图 Key，请手动输入通勤时长
+                {t('internship.passwordError')}
               </div>
             )}
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="flex items-center gap-2 text-white/50 text-xs font-body tracking-wider mb-2">
+                <label className="flex items-center gap-2 text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider mb-2">
                   <Navigation size={12} />
-                  出发地（你的住处）
+                  {t('internship.origin')}
                 </label>
                 <input
                   type="text"
                   value={start}
                   onChange={(e) => setStart(e.target.value)}
-                  placeholder="如：上海大学宝山校区"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white/80 font-body placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors"
+                  placeholder={t('internship.origin')}
+                  className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-white/50 text-xs font-body tracking-wider mb-2">
+                <label className="flex items-center gap-2 text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider mb-2">
                   <MapPin size={12} />
-                  目的地（公司地址）
+                  {t('internship.destination')}
                 </label>
                 <input
                   type="text"
                   value={end}
                   onChange={(e) => setEnd(e.target.value)}
-                  placeholder="如：浦东新区张江高科"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white/80 font-body placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors"
+                  placeholder={t('internship.destination')}
+                  className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
                 />
               </div>
             </div>
@@ -187,34 +189,34 @@ export default function MapCommuteModal({
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-4 p-4 rounded-xl bg-white/5 border border-white/10"
+                className="mb-4 p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Amber/10 dark:border-white/10"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Clock size={14} className="text-Amber/60" />
-                  <span className="text-white/70 text-sm font-body">
-                    预计通勤时长（单程）
+                  <span className="text-Ink/70 dark:text-white/70 text-sm font-body">
+                    {t('internship.estimatedCommute')}
                   </span>
                 </div>
-                <p className="text-3xl font-display text-white/90 mb-1">
+                <p className="text-3xl font-display text-Ink/90 dark:text-white/90 mb-1">
                   {result}
-                  <span className="text-sm ml-1 text-white/50">分钟</span>
+                  <span className="text-sm ml-1 text-Ink/50 dark:text-white/50">{t('internship.minutes')}</span>
                 </p>
-                <p className="text-white/30 text-xs font-body">{routeDetail}</p>
+                <p className="text-Ink/30 dark:text-white/30 text-xs font-body">{routeDetail}</p>
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => onConfirm(result)}
                     className="flex-1 py-2 rounded-lg bg-Amber/20 hover:bg-Amber/30 text-Amber/80 text-xs font-body tracking-wider transition-colors border border-Amber/20"
                   >
-                    使用此时间
+                    {t('internship.useThisTime')}
                   </button>
                   <button
                     onClick={() => {
                       setResult(null)
                       setRouteDetail('')
                     }}
-                    className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 text-xs font-body tracking-wider transition-colors border border-white/10"
+                    className="px-4 py-2 rounded-lg bg-white/70 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider transition-colors border border-Amber/10 dark:border-white/10"
                   >
-                    重新计算
+                    {t('internship.recalculate')}
                   </button>
                 </div>
               </motion.div>
@@ -223,21 +225,21 @@ export default function MapCommuteModal({
             <button
               onClick={handleCalc}
               disabled={loading || !hasKey}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/15 disabled:bg-white/5 disabled:text-white/20 disabled:cursor-not-allowed text-white/70 hover:text-white transition-all duration-300 border border-white/10 hover:border-white/20 tracking-wider font-body text-sm"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/70 dark:bg-white/10 hover:bg-white/90 dark:hover:bg-white/15 disabled:bg-white/50 dark:disabled:bg-white/5 disabled:text-Ink/30 dark:disabled:text-white/20 disabled:cursor-not-allowed text-Ink/70 dark:text-white/70 hover:text-Ink/90 dark:hover:text-white transition-all duration-300 border border-Amber/10 dark:border-white/10 hover:border-Amber/20 dark:hover:border-white/20 tracking-wider font-body text-sm"
             >
               {loading ? (
                 <>
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-4 h-4 border-2 border-white/30 border-t-white/80 rounded-full"
+                    className="w-4 h-4 border-2 border-Ink/30 dark:border-white/30 border-t-Ink/80 dark:border-t-white/80 rounded-full"
                   />
-                  <span>计算中...</span>
+                  <span>{t('internship.calculating')}</span>
                 </>
               ) : (
                 <>
                   <Search size={14} />
-                  <span>查询路线</span>
+                  <span>{t('internship.calculateRoute')}</span>
                 </>
               )}
             </button>

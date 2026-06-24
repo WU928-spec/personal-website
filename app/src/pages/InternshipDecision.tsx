@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Briefcase, Sparkles, TrendingUp, MapPin, Clock } from 'lucide-react'
+import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 import type { Offer } from '@/components/internship/types'
 import { loadOffers, saveOffers, calcTotalScore } from '@/components/internship/types'
@@ -10,6 +11,7 @@ import ResultCharts from '@/components/internship/ResultCharts'
 import MapCommuteModal from '@/components/internship/MapCommuteModal'
 
 export default function InternshipDecision() {
+  const { t } = useLang()
   const [offers, setOffers] = useState<Offer[]>(loadOffers)
   const [mapOpen, setMapOpen] = useState(false)
   const [mapOffer, setMapOffer] = useState<Offer | null>(null)
@@ -58,8 +60,8 @@ export default function InternshipDecision() {
   return (
     <>
       <PageSEO
-        title="实习决策助手"
-        description="多维实习Offer对比打分系统，帮你量化选择。"
+        title={t('internship.title')}
+        description={t('internship.subtitle')}
       />
 
       <MapCommuteModal
@@ -69,13 +71,13 @@ export default function InternshipDecision() {
         defaultDestination={mapOffer?.location || ''}
       />
 
-      <section className="min-h-[calc(100dvh-4rem)] bg-[#050508] px-4 py-12 md:px-8 relative overflow-hidden">
+      <section className="min-h-[calc(100dvh-4rem)] bg-Parchment dark:bg-[#050508] px-4 py-12 md:px-8 relative overflow-hidden">
         {/* 背景装饰光点 */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 rounded-full bg-white/10"
+              className="absolute w-1 h-1 rounded-full bg-Amber/20 dark:bg-white/10"
               style={{
                 left: `${10 + i * 15}%`,
                 top: `${20 + (i % 3) * 25}%`,
@@ -103,21 +105,19 @@ export default function InternshipDecision() {
             className="text-center mb-12"
           >
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-10 h-px bg-gradient-to-r from-transparent to-white/30" />
-              <Sparkles size={16} className="text-white/40" />
-              <div className="w-10 h-px bg-gradient-to-l from-transparent to-white/30" />
+              <div className="w-10 h-px bg-gradient-to-r from-transparent to-Amber/40 dark:to-white/30" />
+              <Sparkles size={16} className="text-Ink/40 dark:text-white/40" />
+              <div className="w-10 h-px bg-gradient-to-l from-transparent to-Amber/40 dark:to-white/30" />
             </div>
 
-            <h1 className="font-display text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-white/90">
-              实习决策助手
+            <h1 className="font-display text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-Ink dark:text-white/90">
+              {t('internship.title')}
             </h1>
 
-            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full" />
+            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 dark:via-white/30 to-transparent rounded-full" />
 
-            <p className="mt-6 max-w-lg mx-auto text-sm text-white/30 font-body leading-relaxed tracking-wide">
-              用量化帮你打破犹豫。输入薪资、通勤、体验、前景，
-              <br />
-              系统自动计算加权总分，雷达图对比一目了然。
+            <p className="mt-6 max-w-lg mx-auto text-sm text-Ink/50 dark:text-white/30 font-body leading-relaxed tracking-wide">
+              {t('internship.description')}
             </p>
 
             {topOffer && (
@@ -125,11 +125,11 @@ export default function InternshipDecision() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10"
+                className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10"
               >
-                <TrendingUp size={14} className="text-green-400/60" />
-                <span className="text-white/50 text-xs font-body tracking-wider">
-                  当前推荐：<span className="text-white/70">{topOffer.companyName}</span> · {calcTotalScore(topOffer).toFixed(1)}分
+                <TrendingUp size={14} className="text-green-500/60 dark:text-green-400/60" />
+                <span className="text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider">
+                  {t('internship.currentRecommendation')}:<span className="text-Ink/70 dark:text-white/70">{topOffer.companyName}</span> · {calcTotalScore(topOffer).toFixed(1)}{t('internship.points')}
                 </span>
               </motion.div>
             )}
@@ -140,29 +140,29 @@ export default function InternshipDecision() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="mb-10 p-5 rounded-2xl border border-white/5 bg-white/[0.02]"
+            className="mb-10 p-5 rounded-2xl border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
           >
-            <h3 className="text-white/50 text-xs font-body tracking-wider mb-4">
-              评分权重
+            <h3 className="text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider mb-4">
+              {t('internship.scoringWeights')}
             </h3>
             <div className="grid grid-cols-3 gap-4">
               <WeightCard
-                icon={<Briefcase size={14} className="text-green-400/60" />}
-                label="日薪"
+                icon={<Briefcase size={14} className="text-green-500/60 dark:text-green-400/60" />}
+                label={t('internship.dailySalary')}
                 value="25%"
-                description="50-300元/天，线性映射到0-100分"
+                description={t('internship.salaryDesc')}
               />
               <WeightCard
-                icon={<Clock size={14} className="text-blue-400/60" />}
-                label="上班体验"
+                icon={<Clock size={14} className="text-blue-500/60 dark:text-blue-400/60" />}
+                label={t('internship.workExperience')}
                 value="40%"
-                description="通勤40% + 强度30% + 氛围30%"
+                description={t('internship.experienceDesc')}
               />
               <WeightCard
                 icon={<MapPin size={14} className="text-Amber/60" />}
-                label="发展前景"
+                label={t('internship.growthProspect')}
                 value="35%"
-                description="1-10分打分，直接映射到0-100分"
+                description={t('internship.prospectDesc')}
               />
             </div>
           </motion.div>
@@ -172,13 +172,10 @@ export default function InternshipDecision() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="mb-10 p-4 rounded-xl border border-white/5 bg-white/[0.02]"
+            className="mb-10 p-4 rounded-xl border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
           >
-            <p className="text-white/30 text-xs font-body leading-[1.8]">
-              <span className="text-white/50">通勤评分公式：</span>30分钟内满分100，超过后每10分钟减6分。
-              <span className="text-white/50"> 日薪评分：</span>50元=0分，300元=100分，线性映射。
-              <span className="text-white/50"> 工作强度/氛围/前景：</span>1-10分，直接对应10-100分。
-              <span className="text-white/50"> 总分 = 日薪×0.25 + 体验×0.40 + 前景×0.35</span>
+            <p className="text-Ink/40 dark:text-white/30 text-xs font-body leading-[1.8]">
+              {t('internship.formulaText')}
             </p>
           </motion.div>
 
@@ -230,10 +227,10 @@ function WeightCard({
     <div className="flex items-start gap-3">
       <div className="mt-0.5 shrink-0">{icon}</div>
       <div>
-        <p className="text-white/60 text-sm font-body">
-          {label} <span className="text-white/80 ml-1">{value}</span>
+        <p className="text-Ink/60 dark:text-white/60 text-sm font-body">
+          {label} <span className="text-Ink/80 dark:text-white/80 ml-1">{value}</span>
         </p>
-        <p className="text-white/20 text-xs font-body mt-0.5">{description}</p>
+        <p className="text-Ink/30 dark:text-white/20 text-xs font-body mt-0.5">{description}</p>
       </div>
     </div>
   )
