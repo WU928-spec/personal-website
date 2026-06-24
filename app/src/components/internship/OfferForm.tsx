@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Trash2, Star, MapPin, Map } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
@@ -11,6 +11,7 @@ interface OfferFormProps {
   onDelete: (id: string) => void
   onUpdate: (offer: Offer) => void
   onMapClick: (offer: Offer) => void
+  mapCommuteResult?: { minutes: number } | null
 }
 
 export default function OfferForm({
@@ -19,11 +20,18 @@ export default function OfferForm({
   onDelete,
   onUpdate,
   onMapClick,
+  mapCommuteResult,
 }: OfferFormProps) {
   const { t } = useLang()
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<Offer>(defaultOfferTemplate())
+
+  useEffect(() => {
+    if (mapCommuteResult) {
+      setForm((prev) => ({ ...prev, commuteMinutes: mapCommuteResult.minutes }))
+    }
+  }, [mapCommuteResult])
 
   const startAdd = () => {
     setForm(defaultOfferTemplate())

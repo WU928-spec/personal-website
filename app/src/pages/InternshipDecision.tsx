@@ -14,6 +14,7 @@ export default function InternshipDecision() {
   const { t } = useLang()
   const [offers, setOffers] = useState<Offer[]>(loadOffers)
   const [homeAddress, setHomeAddress] = useState(() => loadCommuteCache().homeAddress)
+  const [mapCommuteResult, setMapCommuteResult] = useState<{ minutes: number } | null>(null)
   const [mapOpen, setMapOpen] = useState(false)
   const [mapOffer, setMapOffer] = useState<Offer | null>(null)
 
@@ -55,6 +56,7 @@ export default function InternshipDecision() {
     if (mapOffer) {
       handleUpdate({ ...mapOffer, commuteMinutes: minutes })
     }
+    setMapCommuteResult({ minutes })
     setMapOpen(false)
     setMapOffer(null)
   }, [mapOffer, handleUpdate])
@@ -218,6 +220,7 @@ export default function InternshipDecision() {
                 onDelete={handleDelete}
                 onUpdate={handleUpdate}
                 onMapClick={handleMapClick}
+                mapCommuteResult={mapCommuteResult}
               />
             </motion.div>
 
