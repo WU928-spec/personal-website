@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion'
-import { Camera } from 'lucide-react'
+import { Camera, RefreshCw, CloudOff } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
 import MomentCard from '@/components/MomentCard'
 import MomentUploader from '@/components/MomentUploader'
@@ -17,6 +17,9 @@ export default function Moments() {
     toggleLike,
     addComment,
     deleteMoment,
+    syncError,
+    usingLocal,
+    retrySync,
   } = useMoments()
 
   return (
@@ -26,6 +29,25 @@ export default function Moments() {
         description="分享生活中的每一个瞬间"
         path="/moments"
       />
+
+      {/* Sync error banner */}
+      {syncError && (
+        <div className="max-w-2xl mx-auto mt-4 px-4">
+          <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-Amber/10 border border-Amber/20 text-sm">
+            <div className="flex items-center gap-2 text-Amber/80">
+              <CloudOff size={14} />
+              <span>{usingLocal ? '正在使用本地数据（云端同步失败）' : syncError}</span>
+            </div>
+            <button
+              onClick={retrySync}
+              className="flex items-center gap-1 text-xs text-Amber hover:text-Amber/80 transition-colors"
+            >
+              <RefreshCw size={12} />
+              重试同步
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Cover + Profile Header ── */}
       <div className="relative">
@@ -58,7 +80,7 @@ export default function Moments() {
       {/* ── Publisher (logged-in only) ── */}
       {isLoggedIn && (
         <div className="max-w-2xl mx-auto mt-2">
-          <MomentUploader onSubmit={addMoment} avatarUrl={avatarUrl} userName={displayName} />
+          <MomentUploader onSubmit={addMoment} avatarUrl={avatarUrl} userName={displayName} userId={owner.userId} />
         </div>
       )}
 

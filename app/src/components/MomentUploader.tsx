@@ -1,30 +1,36 @@
 import { useState, useRef } from 'react'
-import { Image, MapPin, Send, Paperclip, BookOpen } from 'lucide-react'
+import { Image, MapPin, Send, Paperclip, BookOpen, Loader2 } from 'lucide-react'
 import type { Moment, MomentAttachment } from '@/types/moment'
 import ImagePreviewStrip from './moment-uploader/ImagePreviewStrip'
 import AttachmentList from './moment-uploader/AttachmentList'
 import NotePicker from './moment-uploader/NotePicker'
 import { slugifyNotePath } from '@/services/obsidianClient'
+import { uploadMomentImage, isBase64Image } from '@/services/momentImageUpload'
 
 interface Props {
   onSubmit: (moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments' | 'authorId'>) => Promise<void>
   userName?: string
   avatarUrl?: string
+  userId?: string
 }
 
-export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUrl }: Props) {
+export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUrl, userId }: Props) {
   const [content, setContent] = useState('')
   const [images, setImages] = useState<string[]>([])
+  const [uploadingImages, setUploadingImages] = useState<Set<number>>(new Set())
   const [attachments, setAttachments] = useState<MomentAttachment[]>([])
   const [location, setLocation] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showNotePicker, setShowNotePicker] = useState(false)
   const [locating, setLocating] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   const fileRef = useRef<HTMLInputElement>(null)
   const attachmentRef = useRef<HTMLInputElement>(null)
 
-  const canSubmit = content.trim().length > 0 || images.length > 0 || attachments.length > 0
+  const canSubmit =
+    content.trim().length > 0 || images.length > 0 || attachments.length > 0
+  const isUploading = uploadingImages.size > 0
 
   const handleLocate = () => {
     if (!navigator.geolocation) {
@@ -63,22 +69,66 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
     )
   }
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const remaining = 9 - images.length
-    files.slice(0, remaining).forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (ev) => {
-        const dataUrl = ev.target?.result as string
-        setImages((prev) => [...prev, dataUrl])
-      }
-      reader.readAsDataURL(file)
-    })
+    const selectedFiles = files.slice(0, remaining)
+    if (selectedFiles.length === 0) return
+
     e.target.value = ''
+
+    // 先展示 base64 预览
+    const base64Urls: string[] = []
+    for (const file of selectedFiles) {
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader()
+        reader.onload = (ev) => resolve(ev.target?.result as string)
+        reader.readAsDataURL(file)
+      })
+      base64Urls.push(dataUrl)
+    }
+
+    const startIdx = images.length
+    setImages((prev) => [...prev, ...base64Urls])
+    setUploadError(null)
+
+    // 后台上传到 Storage
+    if (!userId) return
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const idx = startIdx + i
+      setUploadingImages((prev) => new Set(prev).add(idx))
+      try {
+        const url = await uploadMomentImage(selectedFiles[i], userId)
+        setImages((prev) => {
+          const next = [...prev]
+          next[idx] = url
+          return next
+        })
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : '上传失败'
+        setUploadError(msg)
+      } finally {
+        setUploadingImages((prev) => {
+          const next = new Set(prev)
+          next.delete(idx)
+          return next
+        })
+      }
+    }
   }
 
   const removeImage = (idx: number) => {
     setImages((prev) => prev.filter((_, i) => i !== idx))
+    setUploadingImages((prev) => {
+      const next = new Set(prev)
+      next.delete(idx)
+      // 重新索引：所有大于 idx 的索引减 1
+      const result = new Set<number>()
+      for (const v of next) {
+        result.add(v > idx ? v - 1 : v)
+      }
+      return result
+    })
   }
 
   const handleAttachmentSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +161,35 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
   }
 
   const handleSubmit = async () => {
-    if (!canSubmit || submitting) return
+    if (!canSubmit || submitting || isUploading) return
+
+    // 如果还有未上传成功的 base64 图片，先上传
+    const hasBase64 = images.some(isBase64Image)
+    if (hasBase64 && userId) {
+      setSubmitting(true)
+      try {
+        const { migrateImagesToStorage } = await import('@/services/momentImageUpload')
+        const migrated = await migrateImagesToStorage(images, userId)
+        await onSubmit({
+          content: content.trim(),
+          images: migrated,
+          attachments: attachments.length > 0 ? attachments : undefined,
+          location: location.trim() || undefined,
+        })
+        setContent('')
+        setImages([])
+        setAttachments([])
+        setLocation('')
+        setUploadError(null)
+      } catch (err) {
+        console.error('发布失败:', err)
+        alert('发布失败，请检查网络后重试')
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
+
     setSubmitting(true)
     try {
       await onSubmit({
@@ -124,6 +202,7 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
       setImages([])
       setAttachments([])
       setLocation('')
+      setUploadError(null)
     } catch (err) {
       console.error('发布失败:', err)
       alert('发布失败，请检查网络后重试')
@@ -134,6 +213,11 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
 
   return (
     <div className="bg-white dark:bg-[#111] border-b border-gray-200 dark:border-white/10 px-4 py-4 relative">
+      {uploadError && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-Rose/10 text-Rose text-xs">
+          {uploadError}
+        </div>
+      )}
       <div className="flex gap-3">
         {avatarUrl ? (
           <img
@@ -169,10 +253,12 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
             <div className="flex items-center gap-3">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-Amber transition-colors text-sm"
+                disabled={isUploading}
+                className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-Amber transition-colors text-sm disabled:opacity-50"
               >
                 <Image size={16} />
                 <span>图片</span>
+                {isUploading && <Loader2 size={12} className="animate-spin ml-1" />}
               </button>
               <button
                 onClick={() => attachmentRef.current?.click()}
@@ -210,11 +296,11 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
 
             <button
               onClick={handleSubmit}
-              disabled={!canSubmit || submitting}
+              disabled={!canSubmit || submitting || isUploading}
               className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#07c160] text-white text-sm font-medium hover:bg-[#06ad56] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               <Send size={14} />
-              {submitting ? '发布中' : '发布'}
+              {submitting ? '发布中' : isUploading ? '上传中' : '发布'}
             </button>
           </div>
         </div>

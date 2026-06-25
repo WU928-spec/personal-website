@@ -59,9 +59,9 @@ function sortDesc(list: Moment[]): Moment[] {
 async function fetchFromSupabase(): Promise<Moment[]> {
   if (!isSupabaseReady()) throw new Error('Supabase not configured')
 
-  // 2s timeout — don't block UI if Supabase is unreachable
+  // 5s timeout — longer for potentially large data
   const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('Supabase timeout')), 2000)
+    setTimeout(() => reject(new Error('Supabase timeout')), 5000)
   )
 
   const query = supabase!
@@ -86,25 +86,34 @@ export function useMoments() {
   const [moments, setMoments] = useState<Moment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [syncError, setSyncError] = useState<string | null>(null)
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'failed'>('idle')
   const [usingLocal, setUsingLocal] = useState(false)
 
   const fetchMoments = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setSyncError(null)
     setUsingLocal(false)
 
     // Try Supabase first
     if (isSupabaseReady()) {
+      setSyncStatus('syncing')
       try {
         const list = await fetchFromSupabase()
         // Supabase is source of truth — use it directly
         setMoments(list)
         saveLocal(list)
+        setSyncStatus('synced')
         setLoading(false)
         console.log('[Moments] Synced from Supabase:', list.length, 'moments')
         return
-      } catch {
+      } catch (err) {
         setUsingLocal(true)
+        setSyncStatus('failed')
+        const msg = err instanceof Error ? err.message : '同步失败'
+        setSyncError(msg)
+        console.warn('[Moments] Supabase failed:', msg)
       }
     }
 
@@ -117,6 +126,10 @@ export function useMoments() {
 
   useEffect(() => {
     fetchMoments()
+  }, [fetchMoments])
+
+  const retrySync = useCallback(async () => {
+    await fetchMoments()
   }, [fetchMoments])
 
   const addMoment = useCallback(
@@ -136,6 +149,7 @@ export function useMoments() {
       const next = [newMoment, ...moments]
       setMoments(sortDesc(next))
       saveLocal(next)
+      setSyncError(null)
 
       // 同步到 Supabase（后台，不阻塞 UI）
       if (isSupabaseReady()) {
@@ -144,8 +158,11 @@ export function useMoments() {
             .from('moments')
             .insert(momentToDb(newMoment))
           if (error) throw error
-        } catch {
-          /* ignore sync error */
+          console.log('[Moments] Inserted to Supabase:', newMoment.id)
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : '同步失败'
+          setSyncError(`发布同步失败: ${msg}`)
+          console.error('[Moments] Sync insert failed:', err)
         }
       }
     },
@@ -174,8 +191,8 @@ export function useMoments() {
               .update({ likes: target.likes })
               .eq('id', id)
           }
-        } catch {
-          /* ignore sync error */
+        } catch (err) {
+          console.error('[Moments] Like sync failed:', err)
         }
       }
     },
@@ -207,8 +224,8 @@ export function useMoments() {
               .update({ comments: target.comments })
               .eq('id', id)
           }
-        } catch {
-          /* ignore sync error */
+        } catch (err) {
+          console.error('[Moments] Comment sync failed:', err)
         }
       }
     },
@@ -227,7 +244,8 @@ export function useMoments() {
           setMoments(list)
           saveLocal(list)
           return
-        } catch {
+        } catch (err) {
+          console.error('[Moments] Delete sync failed:', err)
           // Fall through to local-only delete
         }
       }
@@ -244,8 +262,11 @@ export function useMoments() {
     moments,
     loading,
     error,
+    syncError,
+    syncStatus,
     usingLocal,
     fetchMoments,
+    retrySync,
     addMoment,
     toggleLike,
     addComment,
