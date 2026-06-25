@@ -23,8 +23,8 @@ export function createStorageKey<T>(key: string, defaultValue: T): StorageKey<T>
         if (raw) {
           return JSON.parse(raw) as T
         }
-      } catch (error) {
-        console.warn(`Failed to load ${key} from localStorage:`, error)
+      } catch {
+        return defaultValue
       }
       return defaultValue
     },
@@ -32,16 +32,16 @@ export function createStorageKey<T>(key: string, defaultValue: T): StorageKey<T>
     save: (data: T): void => {
       try {
         localStorage.setItem(key, JSON.stringify(data))
-      } catch (error) {
-        console.error(`Failed to save ${key} to localStorage:`, error)
+      } catch {
+        /* ignore localStorage write errors */
       }
     },
 
     remove: (): void => {
       try {
         localStorage.removeItem(key)
-      } catch (error) {
-        console.error(`Failed to remove ${key} from localStorage:`, error)
+      } catch {
+        /* ignore localStorage remove errors */
       }
     }
   }

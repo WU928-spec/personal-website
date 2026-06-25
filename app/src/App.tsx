@@ -3,15 +3,15 @@ import { lazy, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import Layout from './components/Layout.tsx'
 import Home from './pages/Home.tsx'
-import Login from './pages/Login.tsx'
-import Profile from './pages/Profile.tsx'
-import NotFound from './pages/NotFound.tsx'
-import StarryEasterEgg from './pages/StarryEasterEgg.tsx'
-import StarryEpilogue from './pages/StarryEpilogue.tsx'
-import StarryMemoir from './pages/StarryMemoir.tsx'
-import StarrySecret from './pages/StarrySecret.tsx'
-import EasterEggs from './pages/EasterEggs.tsx'
-import Tools from './pages/Tools.tsx'
+const Login = lazy(() => import('./pages/Login.tsx'))
+const Profile = lazy(() => import('./pages/Profile.tsx'))
+const NotFound = lazy(() => import('./pages/NotFound.tsx'))
+const StarryEasterEgg = lazy(() => import('./pages/StarryEasterEgg.tsx'))
+const StarryEpilogue = lazy(() => import('./pages/StarryEpilogue.tsx'))
+const StarryMemoir = lazy(() => import('./pages/StarryMemoir.tsx'))
+const StarrySecret = lazy(() => import('./pages/StarrySecret.tsx'))
+const EasterEggs = lazy(() => import('./pages/EasterEggs.tsx'))
+const Tools = lazy(() => import('./pages/Tools.tsx'))
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
 import Preloader from './components/Preloader.tsx'

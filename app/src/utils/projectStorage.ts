@@ -128,10 +128,6 @@ export function activateProject(projectId: string) {
   }
 }
 
-export function getActiveProjects(): Project[] {
-  return loadProjects().filter((p) => p.status === 'active' && !p.parentId)
-}
-
 export function getSubProjects(parentId: string): Project[] {
   return loadProjects().filter((p) => p.parentId === parentId)
 }

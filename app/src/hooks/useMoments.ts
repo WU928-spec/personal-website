@@ -106,14 +106,12 @@ export function useMoments() {
         saveLocal(list)
         setSyncStatus('synced')
         setLoading(false)
-        console.log('[Moments] Synced from Supabase:', list.length, 'moments')
         return
       } catch (err) {
         setUsingLocal(true)
         setSyncStatus('failed')
         const msg = err instanceof Error ? err.message : '同步失败'
         setSyncError(msg)
-        console.warn('[Moments] Supabase failed:', msg)
       }
     }
 
@@ -121,7 +119,6 @@ export function useMoments() {
     const local = loadLocal()
     setMoments(sortDesc(local))
     setLoading(false)
-    console.log('[Moments] Using local data:', local.length, 'moments')
   }, [])
 
   useEffect(() => {
@@ -158,11 +155,9 @@ export function useMoments() {
             .from('moments')
             .insert(momentToDb(newMoment))
           if (error) throw error
-          console.log('[Moments] Inserted to Supabase:', newMoment.id)
         } catch (err) {
           const msg = err instanceof Error ? err.message : '同步失败'
           setSyncError(`发布同步失败: ${msg}`)
-          console.error('[Moments] Sync insert failed:', err)
         }
       }
     },
@@ -191,8 +186,8 @@ export function useMoments() {
               .update({ likes: target.likes })
               .eq('id', id)
           }
-        } catch (err) {
-          console.error('[Moments] Like sync failed:', err)
+        } catch {
+          /* silently ignore sync errors */
         }
       }
     },
@@ -224,8 +219,8 @@ export function useMoments() {
               .update({ comments: target.comments })
               .eq('id', id)
           }
-        } catch (err) {
-          console.error('[Moments] Comment sync failed:', err)
+        } catch {
+          /* silently ignore sync errors */
         }
       }
     },
@@ -244,9 +239,8 @@ export function useMoments() {
           setMoments(list)
           saveLocal(list)
           return
-        } catch (err) {
-          console.error('[Moments] Delete sync failed:', err)
-          // Fall through to local-only delete
+        } catch {
+          /* fall through to local-only delete */
         }
       }
 

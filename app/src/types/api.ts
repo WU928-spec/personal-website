@@ -71,35 +71,7 @@ export type VaultFileAPI = z.infer<typeof VaultFileSchema>
 export function parseGitHubRepos(data: unknown): GitHubAPIRepo[] {
   try {
     return z.array(GitHubRepoSchema).parse(data)
-  } catch (error) {
-    console.error('GitHub repos validation failed:', error)
-    return []
-  }
-}
-
-export function parseObsidianNotes(data: unknown): ObsidianNoteMetaAPI[] {
-  try {
-    return z.array(ObsidianNoteMetaSchema).parse(data)
-  } catch (error) {
-    console.error('Obsidian notes validation failed:', error)
-    return []
-  }
-}
-
-export function parseObsidianNote(data: unknown): ObsidianNoteAPI | null {
-  try {
-    return ObsidianNoteSchema.parse(data)
-  } catch (error) {
-    console.error('Obsidian note validation failed:', error)
-    return null
-  }
-}
-
-export function parseVaultTree(data: unknown): VaultFileAPI[] {
-  try {
-    return z.array(VaultFileSchema).parse(data)
-  } catch (error) {
-    console.error('Vault tree validation failed:', error)
+  } catch {
     return []
   }
 }

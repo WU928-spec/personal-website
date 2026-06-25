@@ -79,17 +79,6 @@ export function getProjectStats(
   }
 }
 
-export function getAllProjectStats(
-  allProjects?: Project[],
-  allEntries?: Record<string, DayEntry>
-): ProjectStat[] {
-  const projects = allProjects ?? loadProjects()
-  const entries = allEntries ?? loadAllEntries()
-  return projects
-    .map((p) => getProjectStats(p.id, projects, entries))
-    .filter((s): s is ProjectStat => s !== null)
-}
-
 /* ─── Recent N days breakdown ─── */
 
 export function getRecentDaysBreakdown(

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, MessageCircle, MapPin, Trash2, Paperclip, BookOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -16,7 +16,7 @@ interface Props {
   onDelete: (id: string) => void
 }
 
-export default function MomentCard({
+function MomentCard({
   moment,
   index,
   showDelete = true,
@@ -253,3 +253,5 @@ export default function MomentCard({
     </motion.article>
   )
 }
+
+export default memo(MomentCard)
