@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Wrench, Briefcase, ArrowRight, Star, Heart } from 'lucide-react'
+import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 
@@ -12,6 +12,18 @@ const TOOLS = [
     status: 'available' as const,
     icon: <Briefcase size={48} />,
     path: '/internship',
+    titleKey: 'tools.internshipTitle',
+    descKey: 'tools.internshipDesc',
+  },
+  {
+    id: 'text-segmenter',
+    title: '英文分段器',
+    description: '智能英文文本分段工具，自动将连续英文文本按句子换行、段落空行分隔，方便在 Obsidian 中阅读。',
+    status: 'available' as const,
+    icon: <TextQuote size={48} />,
+    path: '/text-segmenter',
+    titleKey: 'tools.textSegmenterTitle',
+    descKey: 'tools.textSegmenterDesc',
   },
 ]
 
@@ -139,10 +151,10 @@ export default function Tools() {
 
                     {/* 标题和描述 */}
                     <h3 className="font-display text-lg font-medium text-Ink dark:text-white/90 tracking-wide text-center mb-3">
-                      {t('tools.internshipTitle')}
+                      {t(tool.titleKey)}
                     </h3>
                     <p className="text-sm text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
-                      {t('tools.internshipDesc')}
+                      {t(tool.descKey)}
                     </p>
 
                     {/* 底部提示 */}
