@@ -1,7 +1,6 @@
-import { useNavigate } from 'react-router-dom'
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Briefcase, Sparkles, TrendingUp, MapPin, Clock, ArrowLeft } from 'lucide-react'
+import { Briefcase, Sparkles, TrendingUp, MapPin, Clock } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 import type { Offer } from '@/components/internship/types'
@@ -10,9 +9,9 @@ import OfferForm from '@/components/internship/OfferForm'
 import ScoreMatrix from '@/components/internship/ScoreMatrix'
 import ResultCharts from '@/components/internship/ResultCharts'
 import MapCommuteModal from '@/components/internship/MapCommuteModal'
+import BackToTools from '@/components/BackToTools'
 
 export default function InternshipDecision() {
-  const navigate = useNavigate()
   const { t } = useLang()
   const [offers, setOffers] = useState<Offer[]>(loadOffers)
   const [homeAddress, setHomeAddress] = useState(() => loadCommuteCache().homeAddress)
@@ -108,14 +107,7 @@ export default function InternshipDecision() {
         </div>
 
         <div className="max-w-5xl mx-auto relative z-10">
-          {/* 返回按钮 */}
-          <button
-            onClick={() => navigate('/tools')}
-            className="flex items-center gap-1.5 text-sm text-Slate hover:text-Amber transition-colors mb-4"
-          >
-            <ArrowLeft size={16} />
-            {t('tools.title')}
-          </button>
+          <BackToTools />
 
           {/* 标题 */}
           <motion.div

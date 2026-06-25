@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Copy, Check, Type, Eraser, TextQuote } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Copy, Check, Type, Eraser, TextQuote } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
+import BackToTools from '@/components/BackToTools'
 
 const COMMON_ABBREVIATIONS = [
   'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.', 'Rev.', 'Sr.', 'Jr.',
@@ -134,7 +134,6 @@ function splitIntoSentences(text: string): string[] {
 }
 
 export default function TextSegmenter() {
-  const navigate = useNavigate()
   const { t } = useLang()
   const [inputText, setInputText] = useState('')
   const [outputText, setOutputText] = useState('')
@@ -190,13 +189,7 @@ export default function TextSegmenter() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <button
-            onClick={() => navigate('/tools')}
-            className="flex items-center gap-1.5 text-sm text-Slate hover:text-Amber transition-colors mb-6"
-          >
-            <ArrowLeft size={16} />
-            {t('tools.title')}
-          </button>
+          <BackToTools label={t('tools.title')} className="mb-6" />
 
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40">
