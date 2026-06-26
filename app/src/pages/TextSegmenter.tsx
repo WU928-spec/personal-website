@@ -41,7 +41,7 @@ function segmentEnglishText(input: string): string {
   let currentParagraphLines: string[] = []
 
   // First, group lines into paragraphs
-  // Blank lines = paragraph break; short title lines (no period) = paragraph break
+  // Blank lines = paragraph break only
   for (const line of lines) {
     const trimmed = line.trim()
     if (trimmed === '') {
@@ -49,13 +49,6 @@ function segmentEnglishText(input: string): string {
         paragraphs.push(currentParagraphLines.join(' '))
         currentParagraphLines = []
       }
-    } else if (isShortTitleLine(trimmed)) {
-      // 短标题行：结束前面的段落，把自己作为独立段落
-      if (currentParagraphLines.length > 0) {
-        paragraphs.push(currentParagraphLines.join(' '))
-      }
-      paragraphs.push(trimmed)
-      currentParagraphLines = []
     } else {
       currentParagraphLines.push(trimmed)
     }
@@ -65,8 +58,8 @@ function segmentEnglishText(input: string): string {
   }
 
   // If no paragraph breaks were found (single block of text), try to detect paragraph boundaries
-  // Paragraph boundary heuristic: end of sentence + capital letter + new topic indicators
-  if (paragraphs.length === 1 && paragraphs[0].length > 300) {
+  // Only auto-split if the input had no line breaks at all (user provided no structure)
+  if (paragraphs.length === 1 && paragraphs[0].length > 300 && lines.length === 1) {
     const splitParagraphs = splitIntoParagraphs(paragraphs[0])
     paragraphs.splice(0, 1, ...splitParagraphs)
   }
@@ -121,9 +114,21 @@ function splitIntoSentences(text: string): string[] {
   let current = ''
   let i = 0
 
+  let titleDetected = false
   while (i < text.length) {
     const char = text[i]
     current += char
+
+    // If current accumulation is short, and next is space + uppercase, it's likely a title
+    // Only detect once per paragraph, and only at the very beginning
+    if (!titleDetected && sentences.length === 0 && char === ' ' && i + 1 < text.length && /[A-Z]/.test(text[i + 1])) {
+      const beforeSpace = current.slice(0, -1).trim()
+      if (isShortTitleLine(beforeSpace)) {
+        sentences.push(beforeSpace)
+        current = ''
+        titleDetected = true
+      }
+    }
 
     if (char === '.' || char === '!' || char === '?') {
       // Check if this is part of an abbreviation
