@@ -34,11 +34,12 @@ function segmentEnglishText(input: string): string {
 
   // First, group lines into paragraphs
   // Blank lines = paragraph break only
+  // Within a paragraph, keep line breaks (don't join with spaces)
   for (const line of lines) {
     const trimmed = line.trim()
     if (trimmed === '') {
       if (currentParagraphLines.length > 0) {
-        paragraphs.push(currentParagraphLines.join(' '))
+        paragraphs.push(currentParagraphLines.join('\n'))
         currentParagraphLines = []
       }
     } else {
@@ -46,7 +47,7 @@ function segmentEnglishText(input: string): string {
     }
   }
   if (currentParagraphLines.length > 0) {
-    paragraphs.push(currentParagraphLines.join(' '))
+    paragraphs.push(currentParagraphLines.join('\n'))
   }
 
   // If no paragraph breaks were found (single block of text), try to detect paragraph boundaries
@@ -57,9 +58,15 @@ function segmentEnglishText(input: string): string {
   }
 
   // Split each paragraph into sentences
+  // Within a paragraph, keep user's line breaks (short lines like titles)
   const resultParagraphs: string[][] = []
   for (const paragraph of paragraphs) {
-    const sentences = splitIntoSentences(paragraph)
+    const paragraphLines = paragraph.split('\n')
+    const sentences: string[] = []
+    for (const line of paragraphLines) {
+      const lineSentences = splitIntoSentences(line)
+      sentences.push(...lineSentences)
+    }
     resultParagraphs.push(sentences)
   }
 
