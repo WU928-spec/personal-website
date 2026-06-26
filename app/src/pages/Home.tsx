@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div>
       <PageSEO
-        title="Vibecoding Garden"
+        title="星尘笔记"
         description="A digital garden of code, thoughts, and slow programming. Explore blog posts, projects, and a Zettelkasten-inspired knowledge base."
       />
       <HeroSection />

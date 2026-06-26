@@ -6,7 +6,7 @@ interface PageSEOProps {
   path?: string
 }
 
-const SITE_NAME = 'Vibecoding Garden'
+const SITE_NAME = '星尘笔记'
 const SITE_URL = 'https://vibecoding.com'
 const DEFAULT_DESC = 'A digital garden of code, thoughts, and slow programming.'
 
