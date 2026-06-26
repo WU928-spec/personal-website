@@ -6,6 +6,7 @@ import AttachmentList from './moment-uploader/AttachmentList'
 import NotePicker from './moment-uploader/NotePicker'
 import { slugifyNotePath } from '@/services/obsidianClient'
 import { uploadMomentImage, isBase64Image } from '@/services/momentImageUpload'
+import { AMAP_KEY } from '@/lib/amap'
 
 interface Props {
   onSubmit: (moment: Omit<Moment, 'id' | 'createdAt' | 'likes' | 'comments' | 'authorId'>) => Promise<void>
@@ -43,15 +44,26 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
         const { latitude, longitude } = pos.coords
         try {
           const res = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=zh`
+            `https://restapi.amap.com/v3/geocode/regeo?key=${AMAP_KEY}&location=${longitude},${latitude}`
           )
-          if (res.ok) {
-            const data = (await res.json()) as {
-              city?: string
-              locality?: string
-              principalSubdivision?: string
+          const data = (await res.json()) as {
+            status?: string
+            info?: string
+            regeocode?: {
+              formatted_address?: string
+              addressComponent?: {
+                district?: string
+                street?: string
+                streetNumber?: string
+                township?: string
+              }
             }
-            const place = data.city || data.locality || data.principalSubdivision || ''
+          }
+          if (data.status === '1' && data.regeocode) {
+            const comp = data.regeocode.addressComponent
+            const place = comp?.district && comp?.street
+              ? `${comp.district}${comp.street}${comp.streetNumber || ''}`
+              : data.regeocode.formatted_address || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`
             setLocation(place)
           } else {
             setLocation(`${latitude.toFixed(2)}, ${longitude.toFixed(2)}`)

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Search, MapPin, Clock, Navigation } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
-
-const AMAP_KEY = '04ca7c41361cbc7fd6390dd1e6969c2f'
+import { AMAP_KEY } from '@/lib/amap'
 
 interface MapCommuteModalProps {
   isOpen: boolean
