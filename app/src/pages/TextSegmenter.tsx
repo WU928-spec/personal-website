@@ -26,14 +26,6 @@ function isAbbreviation(text: string, pos: number): boolean {
   return COMMON_ABBREVIATIONS.some(abbr => abbr.toLowerCase() === word.toLowerCase())
 }
 
-function isShortTitleLine(line: string): boolean {
-  // 短行（<= 25 字符），没有句末标点，且包含字母
-  // 用于识别 PDF/电子书复制中的章节标题
-  if (line.length > 25) return false
-  if (/[.!?]$/.test(line)) return false
-  if (!/[A-Za-z]/.test(line)) return false
-  return true
-}
 
 function segmentEnglishText(input: string): string {
   const lines = input.split('\n')
@@ -114,21 +106,9 @@ function splitIntoSentences(text: string): string[] {
   let current = ''
   let i = 0
 
-  let titleDetected = false
   while (i < text.length) {
     const char = text[i]
     current += char
-
-    // If current accumulation is short, and next is space + uppercase, it's likely a title
-    // Only detect once per paragraph, and only at the very beginning
-    if (!titleDetected && sentences.length === 0 && char === ' ' && i + 1 < text.length && /[A-Z]/.test(text[i + 1])) {
-      const beforeSpace = current.slice(0, -1).trim()
-      if (isShortTitleLine(beforeSpace)) {
-        sentences.push(beforeSpace)
-        current = ''
-        titleDetected = true
-      }
-    }
 
     if (char === '.' || char === '!' || char === '?') {
       // Check if this is part of an abbreviation
