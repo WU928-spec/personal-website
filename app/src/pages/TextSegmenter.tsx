@@ -26,12 +26,22 @@ function isAbbreviation(text: string, pos: number): boolean {
   return COMMON_ABBREVIATIONS.some(abbr => abbr.toLowerCase() === word.toLowerCase())
 }
 
+function isShortTitleLine(line: string): boolean {
+  // 短行（<= 25 字符），没有句末标点，且包含字母
+  // 用于识别 PDF/电子书复制中的章节标题
+  if (line.length > 25) return false
+  if (/[.!?]$/.test(line)) return false
+  if (!/[A-Za-z]/.test(line)) return false
+  return true
+}
+
 function segmentEnglishText(input: string): string {
   const lines = input.split('\n')
   const paragraphs: string[] = []
   let currentParagraphLines: string[] = []
 
-  // First, group lines into paragraphs (blank lines = paragraph break)
+  // First, group lines into paragraphs
+  // Blank lines = paragraph break; short title lines (no period) = paragraph break
   for (const line of lines) {
     const trimmed = line.trim()
     if (trimmed === '') {
@@ -39,6 +49,13 @@ function segmentEnglishText(input: string): string {
         paragraphs.push(currentParagraphLines.join(' '))
         currentParagraphLines = []
       }
+    } else if (isShortTitleLine(trimmed)) {
+      // 短标题行：结束前面的段落，把自己作为独立段落
+      if (currentParagraphLines.length > 0) {
+        paragraphs.push(currentParagraphLines.join(' '))
+      }
+      paragraphs.push(trimmed)
+      currentParagraphLines = []
     } else {
       currentParagraphLines.push(trimmed)
     }
@@ -119,8 +136,16 @@ function splitIntoSentences(text: string): string[] {
       let j = i + 1
       while (j < text.length && text[j] === ' ') j++
 
-      // If next is capital, end of string, or quote
-      if (j >= text.length || /[A-Z]/.test(text[j]) || text[j] === '"' || text[j] === "'") {
+      // If followed by a closing quotation mark, include it in the current sentence
+      if (j < text.length && (text[j] === '"' || text[j] === "'")) {
+        current += text[j]
+        j++
+        // Skip spaces after the quotation mark
+        while (j < text.length && text[j] === ' ') j++
+      }
+
+      // If next is capital letter or end of string, end the sentence
+      if (j >= text.length || /[A-Z]/.test(text[j])) {
         sentences.push(current.trim())
         current = ''
         i = j - 1 // -1 because loop will increment
