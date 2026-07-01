@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Film, Star, Clock, MapPin, Search, ChevronRight, Heart, Shuffle, Calendar, Quote, X, Tag, Clapperboard } from 'lucide-react'
+import { Sparkles, Film, Star, Clock, MapPin, Search, ChevronRight, Heart, Shuffle, Calendar, Quote, X, Tag, Clapperboard, KeyRound, Bot } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
 import BackToTools from '@/components/BackToTools'
 import { MOVIE_LIBRARY, getDailyMovie, getMoviesByMood, searchMovies, getRandomMovies, type Movie } from '@/data/movies'
@@ -66,7 +66,9 @@ function MoviePoster({ movie, size = 'md' }: { movie: Movie; size?: 'sm' | 'md' 
   )
 }
 
-function MovieCard({ movie, index, onSelect }: { movie: Movie; index: number; onSelect: (m: Movie) => void }) {
+/* ─── Components ─── */
+
+function MovieCard({ movie, index, aiReason, onSelect }: { movie: Movie; index: number; aiReason?: string; onSelect: (m: Movie) => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -102,9 +104,21 @@ function MovieCard({ movie, index, onSelect }: { movie: Movie; index: number; on
               </span>
             ))}
           </div>
-          <p className="text-xs text-Slate/50 dark:text-white/30 leading-relaxed line-clamp-2">
-            {movie.synopsis}
-          </p>
+          {aiReason ? (
+            <div className="p-2 rounded-lg bg-Amber/5 dark:bg-white/5 border border-Amber/10 dark:border-white/10">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Bot size={10} className="text-Amber/60" />
+                <span className="text-[0.65rem] text-Amber/60 dark:text-white/40 font-medium">AI 推荐理由</span>
+              </div>
+              <p className="text-xs text-Ink/60 dark:text-white/50 leading-relaxed line-clamp-2">
+                {aiReason}
+              </p>
+            </div>
+          ) : (
+            <p className="text-xs text-Slate/50 dark:text-white/30 leading-relaxed line-clamp-2">
+              {movie.synopsis}
+            </p>
+          )}
         </div>
         <ChevronRight size={16} className="text-Slate/30 dark:text-white/20 group-hover:text-Amber/60 transition-colors shrink-0 self-center" />
       </div>
@@ -201,35 +215,137 @@ function MovieDetail({ movie, onClose }: { movie: Movie; onClose: () => void }) 
   )
 }
 
+/* ─── AI API Call ─── */
+
+const API_KEY_STORAGE = 'movie_recommender_api_key'
+const API_BASE_DEFAULT = 'https://api.siliconflow.cn/v1'
+
+async function callAIForRecommendation(
+  apiKey: string,
+  mood: string,
+  candidates: Movie[],
+  baseUrl: string = API_BASE_DEFAULT
+): Promise<{ movie: Movie; reason: string } | null> {
+  const candidateInfo = candidates.slice(0, 5).map((m, i) =>
+    `${i + 1}. 《${m.title}》(${m.year}) - ${m.genres.join('/')} - ${m.synopsis.slice(0, 80)}...`
+  ).join('\n')
+
+  const prompt = `你是一位专业的电影推荐师。用户今天的心情是「${mood}」。
+
+请从以下候选电影中，推荐一部最适合用户当下心情的电影：
+${candidateInfo}
+
+请返回 JSON 格式：
+{"index": 1, "reason": "推荐理由（50-80字，结合用户心情和电影特点）"}
+
+只返回 JSON，不要其他内容。`
+
+  try {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-ai/DeepSeek-V2.5',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
+    })
+
+    if (!res.ok) return null
+    const data = await res.json()
+    const content = data.choices?.[0]?.message?.content || ''
+
+    // Extract JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return null
+
+    const parsed = JSON.parse(jsonMatch[0])
+    const idx = (parsed.index || 1) - 1
+    const movie = candidates[idx] || candidates[0]
+    return { movie, reason: parsed.reason || '这部电影很符合你的心情。' }
+  } catch {
+    return null
+  }
+}
+
+/* ─── Main Page ─── */
+
 export default function MovieRecommender() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [recommendations, setRecommendations] = useState<Movie[]>([])
+  const [aiRecommendations, setAiRecommendations] = useState<Record<string, string>>({})
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
 
+  // API Key
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem(API_KEY_STORAGE) || '')
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [showApiSettings, setShowApiSettings] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
+
   const dailyMovie = useMemo(() => getDailyMovie(), [])
 
-  const handleMoodSelect = useCallback((mood: string) => {
+  const saveApiKey = useCallback(() => {
+    if (apiKeyInput.trim()) {
+      localStorage.setItem(API_KEY_STORAGE, apiKeyInput.trim())
+      setApiKey(apiKeyInput.trim())
+      setShowApiSettings(false)
+    }
+  }, [apiKeyInput])
+
+  const clearApiKey = useCallback(() => {
+    localStorage.removeItem(API_KEY_STORAGE)
+    setApiKey('')
+    setApiKeyInput('')
+  }, [])
+
+  const handleMoodSelect = useCallback(async (mood: string) => {
     setLoading(true)
     setSelectedMood(mood)
     setHasSearched(true)
     setSearchQuery('')
+    setAiError(null)
+    setAiRecommendations({})
 
-    // Simulate AI processing delay
-    setTimeout(() => {
-      const movies = getMoviesByMood(mood)
-      setRecommendations(movies.length > 0 ? movies : getRandomMovies(5))
-      setLoading(false)
-    }, 600)
-  }, [])
+    // 1. Get local candidates
+    const candidates = getMoviesByMood(mood)
+    const movies = candidates.length > 0 ? candidates : getRandomMovies(5)
+
+    // 2. If API key exists, call AI for top recommendation
+    if (apiKey) {
+      try {
+        const aiResult = await callAIForRecommendation(apiKey, mood, movies)
+        if (aiResult) {
+          // Reorder: put AI recommended movie first
+          const reordered = [aiResult.movie, ...movies.filter((m) => m.id !== aiResult.movie.id)]
+          setRecommendations(reordered.slice(0, 5))
+          setAiRecommendations({ [aiResult.movie.id]: aiResult.reason })
+          setLoading(false)
+          return
+        }
+      } catch {
+        setAiError('AI 推荐失败，使用本地匹配')
+      }
+    }
+
+    // 3. Fallback to local
+    setRecommendations(movies.slice(0, 5))
+    setLoading(false)
+  }, [apiKey])
 
   const handleSearch = useCallback(() => {
     if (!searchQuery.trim()) return
     setLoading(true)
     setSelectedMood(null)
     setHasSearched(true)
+    setAiError(null)
+    setAiRecommendations({})
 
     setTimeout(() => {
       const movies = searchMovies(searchQuery)
@@ -243,6 +359,8 @@ export default function MovieRecommender() {
     setSelectedMood(null)
     setSearchQuery('')
     setHasSearched(true)
+    setAiError(null)
+    setAiRecommendations({})
 
     setTimeout(() => {
       setRecommendations(getRandomMovies(5))
@@ -282,6 +400,78 @@ export default function MovieRecommender() {
               选择心情或输入偏好，发现下一部值得看的电影
             </p>
           </div>
+        </motion.div>
+
+        {/* API Key Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.05 }}
+          className="mt-4"
+        >
+          <button
+            onClick={() => setShowApiSettings(!showApiSettings)}
+            className="flex items-center gap-2 text-xs text-Slate/50 dark:text-white/30 hover:text-Amber/60 transition-colors"
+          >
+            <KeyRound size={12} />
+            {apiKey ? 'AI 已接入' : '接入 AI 获取个性化推荐'}
+            <span className={`transition-transform ${showApiSettings ? 'rotate-180' : ''}`}>▼</span>
+          </button>
+
+          <AnimatePresence>
+            {showApiSettings && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 p-4 rounded-xl bg-white/60 dark:bg-white/[0.03] border border-Sand dark:border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Bot size={14} className="text-Amber/60" />
+                    <span className="text-sm font-medium text-Ink/70 dark:text-white/60">AI 推荐设置</span>
+                  </div>
+                  <p className="text-xs text-Slate/40 dark:text-white/30 mb-3 leading-relaxed">
+                    输入你的 API Key 即可启用 AI 个性化推荐。支持 SiliconFlow、OpenAI 等兼容 OpenAI 格式的 API。
+                    <br />
+                    没有 Key？去 <a href="https://siliconflow.cn" target="_blank" rel="noopener noreferrer" className="text-Amber/60 hover:underline">siliconflow.cn</a> 免费注册获取。
+                  </p>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        type="password"
+                        value={apiKeyInput}
+                        onChange={(e) => setApiKeyInput(e.target.value)}
+                        placeholder={apiKey ? '已保存 · 输入新 Key 覆盖' : 'sk-...'}
+                        className="w-full px-3 py-2 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-sm text-Ink dark:text-white focus:outline-none focus:border-Amber/50 placeholder:text-Slate/40"
+                      />
+                    </div>
+                    <button
+                      onClick={saveApiKey}
+                      disabled={!apiKeyInput.trim()}
+                      className="px-4 py-2 rounded-lg bg-Amber text-white text-sm font-medium hover:bg-Amber/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      保存
+                    </button>
+                    {apiKey && (
+                      <button
+                        onClick={clearApiKey}
+                        className="px-4 py-2 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-Slate hover:text-Rose text-sm transition-colors"
+                      >
+                        清除
+                      </button>
+                    )}
+                  </div>
+                  {apiKey && (
+                    <p className="mt-2 text-xs text-green-500/70 dark:text-green-400/60 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-400/80" />
+                      API Key 已保存（仅存储在本地浏览器）
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Daily Movie Highlight */}
@@ -351,6 +541,12 @@ export default function MovieRecommender() {
           <div className="flex items-center gap-2 mb-4">
             <Sparkles size={14} className="text-Amber/60" />
             <span className="text-sm font-medium text-Ink/70 dark:text-white/60">AI 电影推荐</span>
+            {apiKey && (
+              <span className="flex items-center gap-1 text-xs text-green-500/70 dark:text-green-400/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400/80 animate-pulse" />
+                AI 已接入
+              </span>
+            )}
           </div>
 
           {/* Search Bar */}
@@ -424,6 +620,13 @@ export default function MovieRecommender() {
           </div>
         </motion.div>
 
+        {/* AI Error */}
+        {aiError && (
+          <div className="mb-4 p-3 rounded-lg bg-Amber/10 border border-Amber/20 text-xs text-Amber/80">
+            {aiError}
+          </div>
+        )}
+
         {/* Results */}
         <AnimatePresence mode="wait">
           {loading && (
@@ -435,7 +638,9 @@ export default function MovieRecommender() {
               className="flex flex-col items-center py-12 gap-3"
             >
               <div className="w-8 h-8 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-Slate/50 dark:text-white/40">AI 正在为您挑选电影...</p>
+              <p className="text-sm text-Slate/50 dark:text-white/40">
+                {apiKey ? 'AI 正在为您分析心情并挑选电影...' : '正在为您挑选电影...'}
+              </p>
             </motion.div>
           )}
 
@@ -459,7 +664,13 @@ export default function MovieRecommender() {
                 <span className="text-xs text-Slate/40 dark:text-white/30">{recommendations.length} 部</span>
               </div>
               {recommendations.map((movie, i) => (
-                <MovieCard key={movie.id} movie={movie} index={i} onSelect={setSelectedMovie} />
+                <MovieCard
+                  key={movie.id}
+                  movie={movie}
+                  index={i}
+                  aiReason={aiRecommendations[movie.id]}
+                  onSelect={setSelectedMovie}
+                />
               ))}
             </motion.div>
           )}
