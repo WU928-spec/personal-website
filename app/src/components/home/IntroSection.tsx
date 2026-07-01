@@ -61,21 +61,21 @@ export default function IntroSection() {
             transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="md:col-span-8"
           >
-            <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
+            <p className="font-ui text-label font-medium uppercase tracking-[0.1em] text-Sage mb-4">
               {t('home.aboutMe')}
             </p>
-            <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink dark:text-white">
+            <h2 className="font-display text-heading font-medium text-Ink dark:text-white">
               {about.title}
             </h2>
-            <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4 dark:text-white">
+            <p className="font-body text-subhead text-Ink mt-5 dark:text-white/90 leading-relaxed">
               {about.p1}
             </p>
-            <p className="font-body text-[1.0625rem] leading-[1.75] text-Ink mt-4 dark:text-white">
+            <p className="font-body text-subhead text-Ink mt-4 dark:text-white/90 leading-relaxed">
               {about.p2}
             </p>
             <Link
               to="/projects"
-              className="inline-block mt-6 font-body text-[1rem] font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300"
+              className="inline-block mt-6 font-body text-body font-medium text-Amber hover:underline underline-offset-4 transition-all duration-300"
             >
               {t('home.learnMore')}
             </Link>

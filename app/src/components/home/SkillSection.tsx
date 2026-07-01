@@ -17,18 +17,18 @@ export default function SkillSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage mb-4">
+          <p className="font-ui text-label font-medium uppercase tracking-[0.1em] text-Sage mb-4">
             {t('home.whatIDo')}
           </p>
-          <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-Ink dark:text-white">
+          <h2 className="font-display text-heading font-medium text-Ink dark:text-white">
             {t('home.skillsTitle')}
           </h2>
-          <p className="font-body text-[0.9375rem] leading-[1.65] text-Slate mt-2">
+          <p className="font-body text-body text-Slate mt-3">
             {t('home.skillsDesc')}
           </p>
         </motion.div>
 
-        <div className="mt-12 flex flex-wrap justify-center gap-3 md:gap-4">
+        <div className="mt-16 flex flex-wrap justify-center gap-3 md:gap-4">
           {categories.map((cat, ci) =>
             cat.skills.map((skill, si) => (
               <SkillTag

@@ -106,13 +106,13 @@ export default function GitHubSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="font-ui text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-Sage/80 mb-4">
+          <p className="font-ui text-label font-medium uppercase tracking-[0.1em] text-Sage/80 mb-4">
             {t('home.openSource')}
           </p>
-          <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-medium leading-[1.2] text-white">
+          <h2 className="font-display text-heading font-medium text-white">
             {t('home.buildingTitle')}
           </h2>
-          <p className="font-body text-[0.9375rem] leading-[1.65] text-white/60 mt-2">
+          <p className="font-body text-body text-white/60 mt-3">
             {t('home.buildingDesc')}
           </p>
         </motion.div>
@@ -122,9 +122,9 @@ export default function GitHubSection() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-8"
+          className="mt-10"
         >
-          <p className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-white/50 mb-3">
+          <p className="font-ui text-label font-medium tracking-[0.04em] text-white/50 mb-3">
             {t('home.contributionActivity')}
           </p>
           <div className="flex gap-[3px] overflow-x-auto pb-2">
@@ -162,13 +162,13 @@ export default function GitHubSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="text-center mt-10"
+          className="text-center mt-12"
         >
           <a
             href="https://github.com/WU928-spec"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
+            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
           >
             {t('home.viewFullProfile')}
           </a>

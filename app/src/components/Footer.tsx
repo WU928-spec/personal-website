@@ -47,34 +47,34 @@ function EditorColumn({
 
   return (
     <div className="bg-Graphite rounded-xl border border-white/10 p-5 space-y-4">
-      <p className="font-ui text-[0.8125rem] uppercase tracking-[0.1em] text-Sage/80">{label}</p>
+      <p className="font-ui text-label uppercase tracking-[0.1em] text-Sage/80">{label}</p>
       <div className="space-y-2">
-        <label className="font-ui text-xs text-white/40">{t('editor.brandDesc')}</label>
-        <input value={data.brandDesc} onChange={(e) => updateField('brandDesc', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+        <label className="font-ui text-label text-white/40">{t('editor.brandDesc')}</label>
+        <input value={data.brandDesc} onChange={(e) => updateField('brandDesc', e.target.value)} className="w-full bg-transparent font-body text-body text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
       </div>
       <div className="space-y-2">
-        <label className="font-ui text-xs text-white/40">{t('editor.copyright')}</label>
-        <input value={data.copyright} onChange={(e) => updateField('copyright', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+        <label className="font-ui text-label text-white/40">{t('editor.copyright')}</label>
+        <input value={data.copyright} onChange={(e) => updateField('copyright', e.target.value)} className="w-full bg-transparent font-body text-body text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
       </div>
       <div className="space-y-2">
-        <label className="font-ui text-xs text-white/40">{t('editor.tagline')}</label>
-        <input value={data.tagline} onChange={(e) => updateField('tagline', e.target.value)} className="w-full bg-transparent font-body text-sm text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+        <label className="font-ui text-label text-white/40">{t('editor.tagline')}</label>
+        <input value={data.tagline} onChange={(e) => updateField('tagline', e.target.value)} className="w-full bg-transparent font-body text-body text-white/70 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
       </div>
       <div className="space-y-2">
-        <label className="font-ui text-xs text-white/40">{t('editor.navLinks')}</label>
+        <label className="font-ui text-label text-white/40">{t('editor.navLinks')}</label>
         {data.links.map((link, i) => (
           <div key={`${langKey}-link-${i}`} className="flex gap-2">
-            <input value={link.label} onChange={(e) => updateLink(i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-            <input value={link.path} onChange={(e) => updateLink(i, 'path', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+            <input value={link.label} onChange={(e) => updateLink(i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-label text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+            <input value={link.path} onChange={(e) => updateLink(i, 'path', e.target.value)} className="flex-1 bg-transparent font-ui text-label text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
           </div>
         ))}
       </div>
       <div className="space-y-2">
-        <label className="font-ui text-xs text-white/40">{t('editor.socialLinks')}</label>
+        <label className="font-ui text-label text-white/40">{t('editor.socialLinks')}</label>
         {data.socials.map((social, i) => (
           <div key={`${langKey}-social-${i}`} className="flex gap-2">
-            <input value={social.label} onChange={(e) => updateSocial(i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
-            <input value={social.href} onChange={(e) => updateSocial(i, 'href', e.target.value)} className="flex-1 bg-transparent font-ui text-xs text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+            <input value={social.label} onChange={(e) => updateSocial(i, 'label', e.target.value)} className="flex-1 bg-transparent font-ui text-label text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
+            <input value={social.href} onChange={(e) => updateSocial(i, 'href', e.target.value)} className="flex-1 bg-transparent font-ui text-label text-white/60 focus:outline-none border-b border-white/20 focus:border-Amber pb-1" />
           </div>
         ))}
       </div>
@@ -119,16 +119,16 @@ export default function Footer() {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[0.8125rem] font-medium hover:bg-white/15 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-label font-medium hover:bg-white/15 transition-colors"
               >
-                <Pencil size={14} />
+                <Pencil size={13} />
                 {t('editor.editFooter')}
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                {saved && <span className="text-[0.8125rem] text-Sage">{t('post.saved')}</span>}
-                <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-[0.8125rem] font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={14} />{t('post.save')}</button>
-                <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Graphite border border-white/20 text-white/70 text-[0.8125rem] font-medium hover:border-white/40 hover:text-white transition-colors"><X size={14} />{t('post.cancel')}</button>
+                {saved && <span className="text-label text-Sage">{t('post.saved')}</span>}
+                <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-label font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={13} />{t('post.save')}</button>
+                <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Graphite border border-white/20 text-white/70 text-label font-medium hover:border-white/40 hover:text-white transition-colors"><X size={13} />{t('post.cancel')}</button>
               </div>
             )}
           </div>
@@ -148,7 +148,7 @@ export default function Footer() {
               {/* Brand */}
               <div className="flex flex-col gap-3">
                 <img src="/logo.svg" alt="Logo" className="h-7 w-auto" />
-                <p className="text-[0.9375rem] font-body leading-[1.65] text-[rgba(247,244,239,0.5)]">
+                <p className="font-body text-body text-[rgba(247,244,239,0.5)]">
                   {display.brandDesc}
                 </p>
               </div>
@@ -159,7 +159,7 @@ export default function Footer() {
                   <Link
                     key={`${link.path}-${link.label}`}
                     to={link.path}
-                    className="font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] text-white/60 hover:text-white transition-colors duration-300"
+                    className="font-ui text-label font-medium uppercase tracking-[0.06em] text-white/60 hover:text-white transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -179,7 +179,7 @@ export default function Footer() {
                       className="text-[rgba(247,244,239,0.5)] hover:text-Amber hover:scale-110 transition-all duration-200"
                       aria-label={social.label}
                     >
-                      <Icon size={20} />
+                      <Icon size={18} />
                     </a>
                   )
                 })}
@@ -191,10 +191,10 @@ export default function Footer() {
 
             {/* Bottom Row */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <p className="font-ui text-[0.8125rem] font-medium leading-[1.5] tracking-[0.04em] text-[rgba(247,244,239,0.5)]">
+              <p className="font-ui text-label font-medium leading-[1.5] tracking-[0.04em] text-[rgba(247,244,239,0.5)]">
                 {display.copyright}
               </p>
-              <p className="font-mono text-[0.8125rem] leading-[1.5] text-[rgba(247,244,239,0.4)]">
+              <p className="font-mono text-label leading-[1.5] text-[rgba(247,244,239,0.4)]">
                 {display.tagline}
               </p>
             </div>

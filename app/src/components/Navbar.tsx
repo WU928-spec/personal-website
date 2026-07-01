@@ -47,7 +47,7 @@ export default function Navbar() {
   }, [])
 
   const linkClass = (path: string) =>
-    `relative font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] transition-colors duration-300 group ${
+    `relative font-ui text-label font-medium uppercase tracking-[0.06em] transition-colors duration-300 group ${
       location.pathname === path
         ? 'text-Amber'
         : 'text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber'
@@ -83,7 +83,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <a
               href="https://github.com/WU928-spec"
               target="_blank"
@@ -91,7 +91,7 @@ export default function Navbar() {
               className={iconBtnClass}
               aria-label="GitHub"
             >
-              <Github size={20} />
+              <Github size={18} />
             </a>
             <button
               onClick={() => setSearchOpen(true)}
@@ -99,35 +99,35 @@ export default function Navbar() {
               aria-label={t('nav.search')}
               title={`${t('nav.search')} (Cmd+K)`}
             >
-              <Search size={20} />
+              <Search size={18} />
             </button>
             <button
               onClick={toggleLang}
-              className="flex items-center gap-1 text-[0.75rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 px-2 py-1 rounded-md border border-Sand hover:border-Amber dark:text-white dark:border-white/30 dark:hover:text-Amber dark:hover:border-Amber"
+              className="flex items-center gap-1 text-label font-medium text-Ink hover:text-Amber transition-colors duration-300 px-2 py-1 rounded-md border border-Sand hover:border-Amber dark:text-white dark:border-white/20 dark:hover:text-Amber dark:hover:border-Amber"
               title={t('nav.switchLanguage')}
             >
-              <Globe size={14} />
+              <Globe size={13} />
               {lang === 'zh' ? 'EN' : '中'}
             </button>
             <button
               onClick={toggleTheme}
-              className="flex items-center justify-center w-8 h-8 rounded-md border border-Sand text-Ink hover:text-Amber hover:border-Amber transition-colors duration-300 dark:text-white dark:border-white/30 dark:hover:text-Amber dark:hover:border-Amber"
+              className="flex items-center justify-center w-7 h-7 rounded-md border border-Sand text-Ink hover:text-Amber hover:border-Amber transition-colors duration-300 dark:text-white dark:border-white/20 dark:hover:text-Amber dark:hover:border-Amber"
               title={theme === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')}
             >
-              {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+              {theme === 'light' ? <Moon size={13} /> : <Sun size={13} />}
             </button>
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setEditMode(!isEditMode)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[0.75rem] font-medium border transition-colors ${
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-label font-medium border transition-colors ${
                     isEditMode
                       ? 'bg-Amber text-white border-Amber hover:bg-[#b8863d]'
-                      : 'bg-Linen text-Ink border-Sand hover:border-Amber hover:text-Amber dark:bg-white/15 dark:text-white dark:border-white/25 dark:hover:text-Amber dark:hover:border-Amber'
+                      : 'bg-transparent text-Ink border-Sand hover:border-Amber hover:text-Amber dark:text-white dark:border-white/20 dark:hover:text-Amber dark:hover:border-Amber'
                   }`}
                   title={isEditMode ? t('editor.switchToView') : t('editor.switchToEdit')}
                 >
-                  {isEditMode ? <Eye size={13} /> : <Pencil size={13} />}
+                  {isEditMode ? <Eye size={12} /> : <Pencil size={12} />}
                   {isEditMode ? t('editor.viewMode') : t('editor.editMode')}
                 </button>
                 <Link
@@ -144,9 +144,9 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber"
+                className="flex items-center gap-1.5 text-label font-medium text-Ink hover:text-Amber transition-colors duration-300 dark:text-white dark:hover:text-Amber"
               >
-                <LogIn size={16} />
+                <LogIn size={15} />
                 {t('nav.login')}
               </Link>
             )}

@@ -5,6 +5,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Primary: 主色 (Amber) — CTA, 强调, 交互反馈
+        // Secondary: 辅色 (Sage) — 成功, 正向状态
+        // Accent: 强调色 (Rose) — 删除/警告, 情绪标记
+        // Neutral: 中性色 (Slate) — 辅助文字, 次要信息
+        // Text: 文字色 (Ink) — 主文字
+        // Background: 背景色 (Parchment) — 页面底色
+        // Surface: 表面色 (Linen) — 区块底色
+        // Border: 边框色 (Sand) — 分隔线, 卡片边框
+        // 灰阶: Mist 作为过渡色
         Parchment: 'rgba(var(--color-parchment), <alpha-value>)',
         Ink: 'rgba(var(--color-ink), <alpha-value>)',
         Amber: 'rgba(var(--color-amber), <alpha-value>)',
@@ -73,6 +82,24 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
         xs: "calc(var(--radius) - 6px)",
       },
+      spacing: {
+        'space-1': '4px',
+        'space-2': '8px',
+        'space-3': '16px',
+        'space-4': '24px',
+        'space-5': '32px',
+        'space-6': '48px',
+        'space-7': '64px',
+        'space-8': '96px',
+      },
+      fontSize: {
+        'display': ['clamp(3.5rem, 7vw, 6rem)', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+        'heading': ['clamp(1.75rem, 3vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.01em' }],
+        'subhead': ['1.125rem', { lineHeight: '1.5', letterSpacing: '0' }],
+        'body': ['1rem', { lineHeight: '1.65', letterSpacing: '0' }],
+        'caption': ['0.8125rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
+        'label': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.04em' }],
+      },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         soft: "0 4px 24px rgba(30,28,26,0.06)",
@@ -97,17 +124,12 @@ module.exports = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0" },
         },
-        "scroll-pulse": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(8px)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
         blink: "blink 1s step-end infinite",
-        "scroll-pulse": "scroll-pulse 2s ease-in-out infinite",
       },
     },
   },

@@ -54,7 +54,7 @@
     --color-amber: 232, 158, 90;
     --color-sage: 148, 182, 148;
     --color-slate: 200, 195, 185;
-    --color-graphite: 35, 32, 28;
+    --color-graphite: 28, 26, 24;
     --color-linen: 48, 44, 38;
     --color-sand: 90, 84, 76;
     --color-mist: 42, 38, 34;
@@ -89,11 +89,20 @@
     background: rgba(var(--color-linen), 1);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(var(--color-sand), 1);
+    background: rgba(var(--color-sand), 0.7);
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--color-amber), 1);
+    background: rgba(var(--color-amber), 0.8);
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: rgba(var(--color-graphite), 1);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-sand), 0.4);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-amber), 0.6);
   }
 }
 
