@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Film, Send, User, Bot, KeyRound, Wand2, Star, Sparkles } from 'lucide-react'
+import { Film, Send, User, Bot, KeyRound, Wand2, Star, Sparkles, ArrowLeft } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
 import { MOVIE_LIBRARY, getDailyMovie, type Movie } from '@/data/movies'
 
@@ -190,10 +191,11 @@ function FreeMovieCard({ movie, index }: { movie: FreeMovie; index: number }) {
 function LocalMovieCard({ movie }: { movie: Movie }) {
   const [imgError, setImgError] = useState(false)
   return (
-    <div className="flex gap-3 p-3 rounded-xl bg-white/40 dark:bg-white/[0.02] border border-Sand/50 dark:border-white/5 hover:border-Amber/20 transition-colors">
+    <div className="flex gap-3 p-4 rounded-lg bg-white/40 dark:bg-white/[0.02] border border-Sand/50 dark:border-white/5 hover:border-Amber/20 transition-colors cursor-default">
       {imgError ? (
-        <div className="w-14 h-20 rounded-lg bg-gradient-to-br from-Amber/10 to-rose-400/10 flex items-center justify-center text-Ink/30 text-sm font-bold shrink-0">
-          {movie.title[0]}
+        <div className="w-14 h-20 rounded-lg bg-gradient-to-br from-Amber/15 to-rose-400/10 flex flex-col items-center justify-center text-Ink/30 dark:text-white/20 shrink-0 overflow-hidden">
+          <Film size={20} className="mb-1" />
+          <span className="text-label text-center leading-none px-1">{movie.title[0]}</span>
         </div>
       ) : (
         <img
@@ -205,11 +207,11 @@ function LocalMovieCard({ movie }: { movie: Movie }) {
         />
       )}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <h4 className="text-sm font-medium text-Ink dark:text-white truncate">{movie.title}</h4>
-          <span className="text-[0.65rem] text-Slate/40">{movie.titleEn}</span>
+        <div className="flex items-center gap-1.5 mb-1">
+          <h4 className="text-caption font-medium text-Ink dark:text-white truncate">{movie.title}</h4>
+          <span className="text-label text-Slate/40">{movie.titleEn}</span>
         </div>
-        <div className="flex items-center gap-2 mb-1 text-[0.7rem] text-Slate/50">
+        <div className="flex items-center gap-2 mb-1 text-label text-Slate/50">
           <span className="flex items-center gap-0.5">
             <Star size={9} className="text-Gold" />
             {movie.rating}
@@ -217,7 +219,7 @@ function LocalMovieCard({ movie }: { movie: Movie }) {
           <span>{movie.year}</span>
           <span>{movie.duration}</span>
         </div>
-        <p className="text-[0.7rem] text-Slate/40 leading-relaxed line-clamp-2">{movie.synopsis}</p>
+        <p className="text-caption text-Slate/40 leading-relaxed line-clamp-2">{movie.synopsis}</p>
       </div>
     </div>
   )
@@ -226,6 +228,7 @@ function LocalMovieCard({ movie }: { movie: Movie }) {
 /* ─── Main Page ─── */
 
 export default function MovieAgent() {
+  const navigate = useNavigate()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -384,13 +387,22 @@ export default function MovieAgent() {
       {/* Header */}
       <div className="shrink-0 border-b border-Sand/50 dark:border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shadow-lg shadow-Amber/20">
-              <Film size={16} />
-            </div>
-            <div>
-              <h1 className="font-display text-sm font-semibold text-Ink dark:text-white">光影探索者</h1>
-              <p className="text-[0.65rem] text-Slate/40 dark:text-white/30">AI 电影顾问</p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/tools')}
+              className="flex items-center gap-1 text-caption text-Slate hover:text-Amber transition-colors"
+              title="返回工具箱"
+            >
+              <ArrowLeft size={16} />
+            </button>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shadow-lg shadow-Amber/20">
+                <Film size={16} />
+              </div>
+              <div>
+                <h1 className="font-display text-sm font-semibold text-Ink dark:text-white">光影探索者</h1>
+                <p className="text-[0.65rem] text-Slate/40 dark:text-white/30">AI 电影顾问</p>
+              </div>
             </div>
           </div>
 
