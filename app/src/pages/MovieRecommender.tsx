@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Film, Star, Clock, MapPin, Search, ChevronRight, Heart, Shuffle, Calendar, Quote, X, Tag, Clapperboard, KeyRound, Bot } from 'lucide-react'
+import { Sparkles, Film, Star, Clock, MapPin, Search, ChevronRight, Heart, Shuffle, Calendar, Quote, X, Tag, Clapperboard, KeyRound, Bot, Wand2 } from 'lucide-react'
 import PageSEO from '@/components/PageSEO'
 import BackToTools from '@/components/BackToTools'
 import { MOVIE_LIBRARY, getDailyMovie, getMoviesByMood, searchMovies, getRandomMovies, type Movie } from '@/data/movies'
@@ -39,6 +39,114 @@ function getGenreColor(genre: string): string {
   return GENRE_COLORS[genre] || 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
 }
 
+/* ─── AI Types ─── */
+
+interface FreeAIRecommendation {
+  title: string
+  director: string
+  year: string
+  genre: string
+  reason: string
+}
+
+/* ─── AI API ─── */
+
+const API_KEY_STORAGE = 'movie_recommender_api_key'
+const API_BASE_DEFAULT = 'https://api.siliconflow.cn/v1'
+
+async function callAILocalPick(
+  apiKey: string,
+  mood: string,
+  candidates: Movie[],
+  baseUrl: string = API_BASE_DEFAULT
+): Promise<{ movie: Movie; reason: string } | null> {
+  const candidateInfo = candidates.slice(0, 5).map((m, i) =>
+    `${i + 1}. 《${m.title}》(${m.year}) - ${m.genres.join('/')} - ${m.synopsis.slice(0, 80)}...`
+  ).join('\n')
+
+  const prompt = `你是一位专业的电影推荐师。用户今天的心情是「${mood}」。
+
+请从以下候选电影中，推荐一部最适合用户当下心情的电影：
+${candidateInfo}
+
+请返回 JSON 格式：
+{"index": 1, "reason": "推荐理由（50-80字，结合用户心情和电影特点）"}
+
+只返回 JSON，不要其他内容。`
+
+  try {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-ai/DeepSeek-V2.5',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
+    })
+
+    if (!res.ok) return null
+    const data = await res.json()
+    const content = data.choices?.[0]?.message?.content || ''
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return null
+
+    const parsed = JSON.parse(jsonMatch[0])
+    const idx = (parsed.index || 1) - 1
+    const movie = candidates[idx] || candidates[0]
+    return { movie, reason: parsed.reason || '这部电影很符合你的心情。' }
+  } catch {
+    return null
+  }
+}
+
+async function callAIFreeRecommendation(
+  apiKey: string,
+  mood: string,
+  baseUrl: string = API_BASE_DEFAULT
+): Promise<FreeAIRecommendation | null> {
+  const prompt = `你是一位专业的电影推荐师。用户今天的心情是「${mood}」。
+
+请从你广博的电影知识中，推荐一部最适合这个心情的电影。不要局限于任何片库，推荐任何你认为合适的电影。
+
+请返回 JSON 格式：
+{"title": "电影名", "director": "导演名", "year": "年份", "genre": "类型", "reason": "推荐理由（50-80字，结合用户心情和电影特点）"}
+
+只返回 JSON，不要其他内容。`
+
+  try {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-ai/DeepSeek-V2.5',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
+    })
+
+    if (!res.ok) return null
+    const data = await res.json()
+    const content = data.choices?.[0]?.message?.content || ''
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return null
+
+    return JSON.parse(jsonMatch[0])
+  } catch {
+    return null
+  }
+}
+
+/* ─── Components ─── */
+
 function MoviePoster({ movie, size = 'md' }: { movie: Movie; size?: 'sm' | 'md' | 'lg' }) {
   const [imgError, setImgError] = useState(false)
   const sizeClasses = {
@@ -65,8 +173,6 @@ function MoviePoster({ movie, size = 'md' }: { movie: Movie; size?: 'sm' | 'md' 
     />
   )
 }
-
-/* ─── Components ─── */
 
 function MovieCard({ movie, index, aiReason, onSelect }: { movie: Movie; index: number; aiReason?: string; onSelect: (m: Movie) => void }) {
   return (
@@ -121,6 +227,46 @@ function MovieCard({ movie, index, aiReason, onSelect }: { movie: Movie; index: 
           )}
         </div>
         <ChevronRight size={16} className="text-Slate/30 dark:text-white/20 group-hover:text-Amber/60 transition-colors shrink-0 self-center" />
+      </div>
+    </motion.div>
+  )
+}
+
+function FreeAIRecCard({ rec, index }: { rec: FreeAIRecommendation; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="p-4 rounded-xl bg-gradient-to-br from-purple-500/5 via-Amber/5 to-rose-400/5 dark:from-purple-500/10 dark:via-Amber/5 dark:to-rose-400/10 border border-Amber/20 dark:border-white/15"
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-Amber/20 flex items-center justify-center text-Amber/60 shrink-0">
+          <Wand2 size={20} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-display text-base font-medium text-Ink dark:text-white">
+              {rec.title}
+            </h3>
+            <span className="text-xs text-Slate/60 dark:text-white/40">{rec.year}</span>
+          </div>
+          <div className="flex items-center gap-3 mb-2 text-xs text-Slate/60 dark:text-white/40">
+            <span>导演：{rec.director}</span>
+            <span className="px-2 py-0.5 rounded-full bg-purple-100/50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 text-[0.65rem]">
+              {rec.genre}
+            </span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-white/40 dark:bg-white/[0.03] border border-Amber/10 dark:border-white/10">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Bot size={10} className="text-Amber/60" />
+              <span className="text-[0.65rem] text-Amber/60 dark:text-white/40 font-medium">AI 推荐理由</span>
+            </div>
+            <p className="text-xs text-Ink/60 dark:text-white/50 leading-relaxed">
+              {rec.reason}
+            </p>
+          </div>
+        </div>
       </div>
     </motion.div>
   )
@@ -215,63 +361,6 @@ function MovieDetail({ movie, onClose }: { movie: Movie; onClose: () => void }) 
   )
 }
 
-/* ─── AI API Call ─── */
-
-const API_KEY_STORAGE = 'movie_recommender_api_key'
-const API_BASE_DEFAULT = 'https://api.siliconflow.cn/v1'
-
-async function callAIForRecommendation(
-  apiKey: string,
-  mood: string,
-  candidates: Movie[],
-  baseUrl: string = API_BASE_DEFAULT
-): Promise<{ movie: Movie; reason: string } | null> {
-  const candidateInfo = candidates.slice(0, 5).map((m, i) =>
-    `${i + 1}. 《${m.title}》(${m.year}) - ${m.genres.join('/')} - ${m.synopsis.slice(0, 80)}...`
-  ).join('\n')
-
-  const prompt = `你是一位专业的电影推荐师。用户今天的心情是「${mood}」。
-
-请从以下候选电影中，推荐一部最适合用户当下心情的电影：
-${candidateInfo}
-
-请返回 JSON 格式：
-{"index": 1, "reason": "推荐理由（50-80字，结合用户心情和电影特点）"}
-
-只返回 JSON，不要其他内容。`
-
-  try {
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'deepseek-ai/DeepSeek-V2.5',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 200,
-      }),
-    })
-
-    if (!res.ok) return null
-    const data = await res.json()
-    const content = data.choices?.[0]?.message?.content || ''
-
-    // Extract JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return null
-
-    const parsed = JSON.parse(jsonMatch[0])
-    const idx = (parsed.index || 1) - 1
-    const movie = candidates[idx] || candidates[0]
-    return { movie, reason: parsed.reason || '这部电影很符合你的心情。' }
-  } catch {
-    return null
-  }
-}
-
 /* ─── Main Page ─── */
 
 export default function MovieRecommender() {
@@ -279,6 +368,7 @@ export default function MovieRecommender() {
   const [searchQuery, setSearchQuery] = useState('')
   const [recommendations, setRecommendations] = useState<Movie[]>([])
   const [aiRecommendations, setAiRecommendations] = useState<Record<string, string>>({})
+  const [freeRec, setFreeRec] = useState<FreeAIRecommendation | null>(null)
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
@@ -312,30 +402,40 @@ export default function MovieRecommender() {
     setSearchQuery('')
     setAiError(null)
     setAiRecommendations({})
+    setFreeRec(null)
 
     // 1. Get local candidates
     const candidates = getMoviesByMood(mood)
     const movies = candidates.length > 0 ? candidates : getRandomMovies(5)
 
-    // 2. If API key exists, call AI for top recommendation
+    // 2. If API key exists, call AI for both local pick and free recommendation
     if (apiKey) {
       try {
-        const aiResult = await callAIForRecommendation(apiKey, mood, movies)
-        if (aiResult) {
-          // Reorder: put AI recommended movie first
-          const reordered = [aiResult.movie, ...movies.filter((m) => m.id !== aiResult.movie.id)]
+        const [localResult, freeResult] = await Promise.all([
+          callAILocalPick(apiKey, mood, movies),
+          callAIFreeRecommendation(apiKey, mood),
+        ])
+
+        if (localResult) {
+          const reordered = [localResult.movie, ...movies.filter((m) => m.id !== localResult.movie.id)]
           setRecommendations(reordered.slice(0, 5))
-          setAiRecommendations({ [aiResult.movie.id]: aiResult.reason })
-          setLoading(false)
-          return
+          setAiRecommendations({ [localResult.movie.id]: localResult.reason })
+        } else {
+          setRecommendations(movies.slice(0, 5))
+        }
+
+        if (freeResult) {
+          setFreeRec(freeResult)
         }
       } catch {
         setAiError('AI 推荐失败，使用本地匹配')
+        setRecommendations(movies.slice(0, 5))
       }
+    } else {
+      // 3. Fallback to local
+      setRecommendations(movies.slice(0, 5))
     }
 
-    // 3. Fallback to local
-    setRecommendations(movies.slice(0, 5))
     setLoading(false)
   }, [apiKey])
 
@@ -346,6 +446,7 @@ export default function MovieRecommender() {
     setHasSearched(true)
     setAiError(null)
     setAiRecommendations({})
+    setFreeRec(null)
 
     setTimeout(() => {
       const movies = searchMovies(searchQuery)
@@ -361,6 +462,7 @@ export default function MovieRecommender() {
     setHasSearched(true)
     setAiError(null)
     setAiRecommendations({})
+    setFreeRec(null)
 
     setTimeout(() => {
       setRecommendations(getRandomMovies(5))
@@ -644,7 +746,7 @@ export default function MovieRecommender() {
             </motion.div>
           )}
 
-          {!loading && hasSearched && recommendations.length > 0 && (
+          {!loading && hasSearched && (
             <motion.div
               key="results"
               initial={{ opacity: 0, y: 20 }}
@@ -653,38 +755,50 @@ export default function MovieRecommender() {
               transition={{ duration: 0.4 }}
               className="space-y-3"
             >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-Ink/70 dark:text-white/60">
-                  {selectedMood
-                    ? `「${MOOD_OPTIONS.find((m) => m.key === selectedMood)?.label}」推荐`
-                    : searchQuery
-                    ? `「${searchQuery}」搜索结果`
-                    : '随机推荐'}
-                </h3>
-                <span className="text-xs text-Slate/40 dark:text-white/30">{recommendations.length} 部</span>
-              </div>
-              {recommendations.map((movie, i) => (
-                <MovieCard
-                  key={movie.id}
-                  movie={movie}
-                  index={i}
-                  aiReason={aiRecommendations[movie.id]}
-                  onSelect={setSelectedMovie}
-                />
-              ))}
-            </motion.div>
-          )}
+              {/* Free AI Recommendation */}
+              {freeRec && (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Wand2 size={14} className="text-purple-400" />
+                    <h3 className="text-sm font-medium text-Ink/70 dark:text-white/60">
+                      AI 自由推荐（不限于片库）
+                    </h3>
+                  </div>
+                  <FreeAIRecCard rec={freeRec} index={0} />
+                </>
+              )}
 
-          {!loading && hasSearched && recommendations.length === 0 && (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center py-12"
-            >
-              <Film size={40} className="text-Slate/20 dark:text-white/10 mx-auto mb-3" />
-              <p className="text-sm text-Slate/40 dark:text-white/30">没有找到匹配的电影，试试其他关键词</p>
+              {/* Local Library Recommendations */}
+              {recommendations.length > 0 && (
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-Ink/70 dark:text-white/60">
+                      {selectedMood
+                        ? `「${MOOD_OPTIONS.find((m) => m.key === selectedMood)?.label}」推荐`
+                        : searchQuery
+                        ? `「${searchQuery}」搜索结果`
+                        : '随机推荐'}
+                    </h3>
+                    <span className="text-xs text-Slate/40 dark:text-white/30">{recommendations.length} 部</span>
+                  </div>
+                  {recommendations.map((movie, i) => (
+                    <MovieCard
+                      key={movie.id}
+                      movie={movie}
+                      index={i}
+                      aiReason={aiRecommendations[movie.id]}
+                      onSelect={setSelectedMovie}
+                    />
+                  ))}
+                </>
+              )}
+
+              {recommendations.length === 0 && !freeRec && (
+                <div className="text-center py-12">
+                  <Film size={40} className="text-Slate/20 dark:text-white/10 mx-auto mb-3" />
+                  <p className="text-sm text-Slate/40 dark:text-white/30">没有找到匹配的电影，试试其他关键词</p>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
