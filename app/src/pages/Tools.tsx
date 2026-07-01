@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote } from 'lucide-react'
+import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote, Film } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 
@@ -24,6 +24,16 @@ const TOOLS = [
     path: '/text-segmenter',
     titleKey: 'tools.textSegmenterTitle',
     descKey: 'tools.textSegmenterDesc',
+  },
+  {
+    id: 'movie-recommender',
+    title: '每日电影推荐',
+    description: '根据心情、偏好或关键词，从精选片库中推荐下一部值得看的电影。支持 AI 智能匹配和每日推荐。',
+    status: 'available' as const,
+    icon: <Film size={48} />,
+    path: '/movie-recommender',
+    titleKey: 'tools.movieRecommenderTitle',
+    descKey: 'tools.movieRecommenderDesc',
   },
 ]
 
