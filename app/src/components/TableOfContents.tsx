@@ -100,7 +100,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
         <div className="hidden lg:block fixed right-0 top-1/2 -translate-y-1/2 z-40">
           <button
             onClick={() => setDesktopCollapsed(false)}
-            className="flex items-center justify-center w-8 h-20 rounded-l-lg bg-Parchment/95 backdrop-blur-sm border border-r-0 border-Sand dark:bg-Graphite/95 dark:border-white/10 text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors duration-300 shadow-sm"
+            className="flex items-center justify-center w-8 h-20 rounded-l-lg bg-card border border-r-0 border-border text-primary hover:text-primary transition-colors duration-300"
             title="展开目录"
             aria-label="展开目录"
           >
@@ -123,7 +123,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               {/* Collapse toggle strip */}
               <button
                 onClick={() => setDesktopCollapsed(true)}
-                className="flex items-center justify-center w-7 bg-Parchment/95 backdrop-blur-sm border border-r-0 border-Sand dark:bg-Graphite/95 dark:border-white/10 text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors duration-300 rounded-l-lg shadow-sm shrink-0"
+                className="flex items-center justify-center w-7 bg-card border border-r-0 border-border text-primary hover:text-primary transition-colors duration-300 rounded-l-lg shrink-0"
                 title="收起目录"
                 aria-label="收起目录"
               >
@@ -131,9 +131,9 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               </button>
 
               {/* TOC content */}
-              <div className="w-[220px] max-h-[calc(100dvh-140px)] bg-Parchment/95 backdrop-blur-sm border-y border-r border-Sand dark:bg-Graphite/95 dark:border-white/10 rounded-l-xl shadow-lg overflow-hidden flex flex-col">
+              <div className="w-[220px] max-h-[calc(100dvh-140px)] bg-card border-y border-r border-border rounded-l-lg overflow-hidden flex flex-col">
                 <div className="px-5 pt-4 pb-2 shrink-0">
-                  <h5 className="font-ui text-[0.8125rem] font-semibold leading-[1.4] tracking-[0.06em] text-Slate dark:text-white/60 uppercase">
+                  <h5 className="font-ui text-label font-semibold leading-[1.4] tracking-wider text-muted uppercase">
                     {t('toc.title') || 'Contents'}
                   </h5>
                 </div>
@@ -148,10 +148,10 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
                         <button
                           key={item.id}
                           onClick={() => handleClick(item.id)}
-                          className={`text-left text-[0.875rem] leading-[1.6] py-[5px] transition-all duration-200 border-l-2 ${
+                          className={`text-left text-caption leading-[1.6] py-1 transition-all duration-200 border-l-2 ${
                             isActive
-                              ? 'text-Amber border-Amber pl-3'
-                              : 'text-Slate dark:text-white/60 border-transparent hover:text-Ink dark:hover:text-white pl-0'
+                              ? 'text-primary border-primary pl-3'
+                              : 'text-muted border-transparent hover:text-primary pl-0'
                           } ${item.level === 3 ? 'ml-2' : ''} ${
                             isActive && item.level === 3 ? '!ml-2 !pl-3' : ''
                           }`}
@@ -172,7 +172,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
       <div className="lg:hidden fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setMobileOpen(true)}
-          className="w-12 h-12 rounded-full bg-Ink text-Parchment flex items-center justify-center shadow-deep hover:scale-105 transition-transform duration-200"
+          className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-105 transition-transform duration-200"
           aria-label={t('toc.open')}
         >
           <List size={20} />
@@ -188,7 +188,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-Ink/40 backdrop-blur-sm z-[60] lg:hidden"
+              className="fixed inset-0 bg-Ink/40 z-[60] lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
@@ -196,15 +196,15 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="fixed bottom-0 left-0 right-0 bg-Parchment dark:bg-Graphite rounded-t-2xl z-[70] lg:hidden max-h-[70dvh] flex flex-col"
+              className="fixed bottom-0 left-0 right-0 bg-card rounded-t-2xl z-[70] lg:hidden max-h-[70dvh] flex flex-col"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-Sand dark:border-white/10">
-                <h5 className="font-ui text-[1rem] font-semibold leading-[1.4] tracking-[0.08em] text-Slate dark:text-white/60 uppercase">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                <h5 className="font-ui text-label font-semibold leading-[1.4] tracking-wider text-muted uppercase">
                   {t('toc.title') || 'Contents'}
                 </h5>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="text-Ink hover:text-Amber dark:text-white dark:hover:text-Amber transition-colors"
+                  className="text-primary hover:text-primary transition-colors"
                   aria-label={t('toc.close')}
                 >
                   <X size={20} />
@@ -217,7 +217,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
                     <button
                       key={item.id}
                       onClick={() => handleClick(item.id)}
-                      className={`text-left text-[0.9375rem] leading-[1.65] py-[8px] transition-all duration-200 border-l-2 ${
+                      className={`text-left text-caption leading-[1.65] py-2 transition-all duration-200 border-l-2 ${
                         isActive
                           ? 'text-Amber border-Amber pl-3'
                           : 'text-Slate dark:text-white/60 border-transparent hover:text-Ink dark:hover:text-white pl-0'

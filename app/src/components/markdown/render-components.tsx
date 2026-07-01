@@ -45,7 +45,7 @@ export function buildComponents(
     h4: makeHeading(4) as unknown as Components['h4'],
 
     p: ({ children }) => (
-      <p className="text-[1.0625rem] leading-[1.75] text-Ink mb-[1.25em]">{children}</p>
+      <p className="text-body leading-[1.75] text-primary mb-4">{children}</p>
     ),
 
     a: ({ href, children }) => {
@@ -54,7 +54,7 @@ export function buildComponents(
           <a
             href={href}
             onClick={(e) => handleAnchorClick(e, href)}
-            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200 cursor-pointer"
+            className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200 cursor-pointer"
           >
             {children}
           </a>
@@ -74,7 +74,7 @@ export function buildComponents(
         return (
           <Link
             to={`/obsidian?note=${slug}`}
-            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200"
+            className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
           >
             {children}
           </Link>
@@ -92,7 +92,7 @@ export function buildComponents(
         return (
           <Link
             to={href}
-            className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200"
+            className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
           >
             {children}
           </Link>
@@ -104,7 +104,7 @@ export function buildComponents(
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-Amber border-b border-Amber/30 hover:border-Amber hover:bg-Amber/5 transition-colors duration-200"
+          className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
         >
           {children}
         </a>
@@ -116,39 +116,39 @@ export function buildComponents(
     blockquote: ({ children }) => <Blockquote>{children}</Blockquote>,
 
     ul: ({ children }) => (
-      <ul className="list-disc pl-6 my-4 marker:text-Amber">{children}</ul>
+      <ul className="list-disc pl-6 my-4 marker:text-primary">{children}</ul>
     ),
     ol: ({ children }) => (
-      <ol className="list-decimal pl-6 my-4 marker:text-Ink">{children}</ol>
+      <ol className="list-decimal pl-6 my-4 marker:text-primary">{children}</ol>
     ),
     li: ({ children }) => (
-      <li className="mb-2 text-[1.0625rem] leading-[1.75] text-Ink">{children}</li>
+      <li className="mb-2 text-body leading-[1.75] text-primary">{children}</li>
     ),
 
     table: ({ children }) => (
       <div className="overflow-x-auto my-6">
-        <table className="w-full border-collapse border border-Sand">{children}</table>
+        <table className="w-full border-collapse border border-border">{children}</table>
       </div>
     ),
-    thead: ({ children }) => <thead className="bg-Linen font-semibold">{children}</thead>,
+    thead: ({ children }) => <thead className="bg-muted font-semibold">{children}</thead>,
     tbody: ({ children }) => <tbody>{children}</tbody>,
-    tr: ({ children }) => <tr className="even:bg-Mist/30">{children}</tr>,
+    tr: ({ children }) => <tr className="even:bg-muted/30">{children}</tr>,
     th: ({ children }) => (
-      <th className="border border-Sand px-[14px] py-[10px] text-left text-Ink text-[0.9375rem]">
+      <th className="border border-border px-4 py-2 text-left text-primary text-body">
         {children}
       </th>
     ),
     td: ({ children }) => (
-      <td className="border border-Sand px-[14px] py-[10px] text-Ink text-[0.9375rem]">
+      <td className="border border-border px-4 py-2 text-primary text-body">
         {children}
       </td>
     ),
 
     hr: () => (
       <div className="relative my-8 flex items-center justify-center">
-        <hr className="w-full border-t border-Sand" />
-        <div className="absolute bg-Parchment px-2">
-          <div className="w-2 h-2 rotate-45 bg-Amber" />
+        <hr className="w-full border-t border-border" />
+        <div className="absolute bg-background px-2">
+          <div className="w-2 h-2 rotate-45 bg-primary" />
         </div>
       </div>
     ),
@@ -159,7 +159,7 @@ export function buildComponents(
           <img
             src={src}
             alt={alt || ''}
-            className="rounded-lg shadow-soft w-full"
+            className="rounded-lg w-full"
             loading="lazy"
           />
         )
@@ -175,7 +175,7 @@ export function buildComponents(
               <source src={src} type={`audio/${ext === 'm4a' ? 'mp4' : ext}`} />
             </audio>
             {alt && (
-              <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+              <figcaption className="text-center mt-2 font-ui text-caption font-medium tracking-wider text-muted">
                 {alt}
               </figcaption>
             )}
@@ -186,11 +186,11 @@ export function buildComponents(
       if (videoExts.includes(ext)) {
         return (
           <figure className="my-6">
-            <video controls className="w-full rounded-lg shadow-soft" preload="metadata">
+            <video controls className="w-full rounded-lg" preload="metadata">
               <source src={src} />
             </video>
             {alt && (
-              <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+              <figcaption className="text-center mt-2 font-ui text-caption font-medium tracking-wider text-muted">
                 {alt}
               </figcaption>
             )}
@@ -200,9 +200,9 @@ export function buildComponents(
 
       return (
         <figure className="my-6">
-          <img src={src} alt={alt || ''} className="rounded-lg shadow-soft w-full" loading="lazy" />
+          <img src={src} alt={alt || ''} className="rounded-lg w-full" loading="lazy" />
           {alt && (
-            <figcaption className="text-center mt-2 font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+            <figcaption className="text-center mt-2 font-ui text-caption font-medium tracking-wider text-muted">
               {alt}
             </figcaption>
           )}

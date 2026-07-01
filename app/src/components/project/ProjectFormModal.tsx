@@ -82,8 +82,8 @@ export default function ProjectFormModal({
             transition={{ duration: 0.2 }}
             className="fixed inset-x-4 top-[10vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[480px] max-h-[80vh] overflow-y-auto bg-Parchment dark:bg-Graphite border border-Sand dark:border-white/15 rounded-2xl z-50 shadow-deep p-6"
           >
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-display text-[1.25rem] font-medium text-Ink dark:text-white">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-heading font-medium text-Ink dark:text-white">
                 {editingProject ? '编辑项目' : '新建项目'}
               </h3>
               <button
@@ -96,7 +96,7 @@ export default function ProjectFormModal({
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[0.8125rem] font-medium text-Slate dark:text-white/50 mb-1">
+                <label className="block text-caption font-medium text-Slate dark:text-white/50 mb-2">
                   项目名称 *
                 </label>
                 <input
@@ -105,12 +105,12 @@ export default function ProjectFormModal({
                   onChange={(e) => setName(e.target.value)}
                   placeholder="例如：学习 TypeScript"
                   required
-                  className="w-full px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+                  className="w-full px-4 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
                 />
               </div>
 
               <div>
-                <label className="block text-[0.8125rem] font-medium text-Slate dark:text-white/50 mb-1">
+                <label className="block text-caption font-medium text-Slate dark:text-white/50 mb-2">
                   项目描述
                 </label>
                 <textarea
@@ -118,19 +118,19 @@ export default function ProjectFormModal({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="简单描述这个项目的目标..."
                   rows={3}
-                  className="w-full px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20 resize-none"
+                  className="w-full px-4 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20 resize-none"
                 />
               </div>
 
               {!editingProject && (
                 <div>
-                  <label className="block text-[0.8125rem] font-medium text-Slate dark:text-white/50 mb-1">
+                  <label className="block text-caption font-medium text-Slate dark:text-white/50 mb-2">
                     所属项目（可选）
                   </label>
                   <select
                     value={parentId}
                     onChange={(e) => setParentId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+                    className="w-full px-4 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
                   >
                     <option value="">顶级项目（无父项目）</option>
                     {projects
@@ -145,7 +145,7 @@ export default function ProjectFormModal({
               )}
 
               <div>
-                <label className="block text-[0.8125rem] font-medium text-Slate dark:text-white/50 mb-1">
+                <label className="block text-caption font-medium text-Slate dark:text-white/50 mb-2">
                   预计投入时间（小时）
                 </label>
                 <input
@@ -155,12 +155,12 @@ export default function ProjectFormModal({
                   value={target}
                   onChange={(e) => setTarget(e.target.value)}
                   placeholder="例如：50"
-                  className="w-full px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+                  className="w-full px-4 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
                 />
               </div>
 
               <div>
-                <label className="block text-[0.8125rem] font-medium text-Slate dark:text-white/50 mb-2">
+                <label className="block text-caption font-medium text-Slate dark:text-white/50 mb-2">
                   标签颜色
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -185,13 +185,13 @@ export default function ProjectFormModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-Sand dark:border-white/15 text-Slate dark:text-white/70 text-[0.875rem] font-medium hover:bg-Mist/50 dark:hover:bg-white/5 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-Sand dark:border-white/15 text-Slate dark:text-white/70 text-caption font-medium hover:bg-Mist/50 dark:hover:bg-white/5 transition-colors"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-Amber text-white text-[0.875rem] font-semibold hover:bg-[#B06A2F] transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-Amber text-white text-caption font-semibold hover:bg-Amber/90 transition-colors"
                 >
                   {editingProject ? '保存' : '创建'}
                 </button>

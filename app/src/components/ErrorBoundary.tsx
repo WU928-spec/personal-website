@@ -56,38 +56,38 @@ export default class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle size={32} className="text-Rose" />
             </div>
 
-            <h1 className="font-display text-[2rem] font-semibold text-Ink dark:text-white mb-3">
+            <h1 className="font-display text-heading font-semibold text-Ink dark:text-white mb-4">
               出错了
             </h1>
 
-            <p className="font-body text-[1rem] leading-[1.65] text-Slate mb-6">
+            <p className="font-body text-body leading-[1.65] text-Slate mb-6">
               抱歉，页面遇到了一些问题。请尝试刷新页面或返回首页。
             </p>
 
             {import.meta.env.DEV && this.state.error && (
               <div className="mb-6 p-4 bg-Rose/5 border border-Rose/20 rounded-lg text-left">
-                <p className="font-mono text-[0.75rem] text-Rose mb-2 font-semibold">
+                <p className="font-mono text-label text-Rose mb-2 font-semibold">
                   {this.state.error.name}: {this.state.error.message}
                 </p>
                 {this.state.errorInfo && (
-                  <pre className="font-mono text-[0.6875rem] text-Slate overflow-x-auto">
+                  <pre className="font-mono text-label text-Slate overflow-x-auto">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-4">
               <button
                 onClick={this.handleReset}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-Amber text-Parchment text-[0.875rem] font-semibold hover:bg-[#B06A2F] transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-Amber text-Parchment text-caption font-semibold hover:bg-Amber/90 transition-colors"
               >
                 <RefreshCw size={16} />
                 重新加载
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-Sand text-Ink text-[0.875rem] font-semibold hover:bg-Ink/5 transition-colors dark:border-white/20 dark:text-white dark:hover:bg-white/5"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-Sand text-Ink text-caption font-semibold hover:bg-Ink/5 transition-colors dark:border-white/20 dark:text-white dark:hover:bg-white/5"
               >
                 <Home size={16} />
                 返回首页

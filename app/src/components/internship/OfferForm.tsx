@@ -98,12 +98,12 @@ export default function OfferForm({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-Ink/70 dark:text-white/70 font-body text-sm tracking-wider">
+        <h3 className="text-Ink/70 dark:text-white/70 font-body text-caption tracking-wider">
           {t('internship.offers')}（{offers.length}）
         </h3>
         <button
           onClick={startAdd}
-          className="flex items-center gap-1.5 text-xs text-Amber/60 hover:text-Amber/80 font-body tracking-wider transition-colors px-3 py-1.5 rounded-full border border-Amber/20 hover:border-Amber/40"
+          className="flex items-center gap-1.5 text-label text-Amber/60 hover:text-Amber/80 font-body tracking-wider transition-colors px-4 py-1.5 rounded-lg border border-Amber/20 hover:border-Amber/40"
         >
           <Plus size={12} />
           {t('internship.add')}
@@ -111,7 +111,7 @@ export default function OfferForm({
       </div>
 
       {offers.length === 0 && !isAdding && (
-        <div className="text-center py-12 text-Ink/30 dark:text-white/20 text-xs font-body tracking-wider">
+        <div className="text-center py-12 text-Ink/30 dark:text-white/20 text-label font-body tracking-wider">
           {t('internship.noOffers')}
         </div>
       )}
@@ -121,7 +121,7 @@ export default function OfferForm({
           <div
             key={offer.id}
             onClick={() => startEdit(offer)}
-            className={`group relative flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-300 ${
+            className={`group relative flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-300 ${
               editingId === offer.id
                 ? 'bg-white/50 dark:bg-white/5 border-Amber/20 dark:border-white/20'
                 : 'bg-white/40 dark:bg-white/[0.02] border-Amber/10 dark:border-white/5 hover:border-Amber/20 dark:hover:border-white/10 hover:bg-white/60 dark:hover:bg-white/5'
@@ -139,10 +139,10 @@ export default function OfferForm({
               <Star size={14} fill={offer.isFavorite ? 'currentColor' : 'none'} />
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-Ink/70 dark:text-white/70 text-sm font-body truncate">
+              <p className="text-Ink/70 dark:text-white/70 text-caption font-body truncate">
                 {offer.companyName} · {offer.position}
               </p>
-              <p className="text-Ink/40 dark:text-white/30 text-xs font-body mt-0.5">
+              <p className="text-Ink/40 dark:text-white/30 text-label font-body mt-0.5">
                 {offer.salary}{t('internship.dailySalaryUnit')} · {offer.commuteMinutes}min{t('internship.commute')}
               </p>
             </div>
@@ -168,36 +168,36 @@ export default function OfferForm({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="p-4 rounded-xl border border-Amber/10 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-xl border border-Amber/10 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.companyName')}
                   </label>
                   <input
                     type="text"
                     value={form.companyName}
                     onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
+                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-4 py-2 text-caption text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
                     placeholder={t('internship.companyName')}
                   />
                 </div>
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.position')}
                   </label>
                   <input
                     type="text"
                     value={form.position}
                     onChange={(e) => setForm({ ...form, position: e.target.value })}
-                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
+                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-4 py-2 text-caption text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
                     placeholder={t('internship.position')}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                   {t('internship.companyAddress')}
                 </label>
                 <div className="flex gap-2">
@@ -205,13 +205,13 @@ export default function OfferForm({
                     type="text"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    className="flex-1 bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
+                    className="flex-1 bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-4 py-2 text-caption text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors"
                     placeholder={t('internship.companyAddress')}
                   />
                   <button
                     onClick={handleCalcCommute}
                     disabled={calcLoading}
-                    className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 text-Ink/50 dark:text-white/40 hover:text-Ink/70 dark:hover:text-white/60 text-xs font-body tracking-wider transition-colors disabled:opacity-50"
+                    className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 text-Ink/50 dark:text-white/40 hover:text-Ink/70 dark:hover:text-white/60 text-label font-body tracking-wider transition-colors disabled:opacity-50"
                   >
                     {calcLoading ? (
                       <motion.div
@@ -226,13 +226,13 @@ export default function OfferForm({
                   </button>
                 </div>
                 {calcError && (
-                  <p className="text-red-400/70 text-xs font-body mt-1">{calcError}</p>
+                  <p className="text-red-400/70 text-label font-body mt-1">{calcError}</p>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.dailySalaryUnit')}
                   </label>
                   <input
@@ -247,11 +247,11 @@ export default function OfferForm({
                       const v = Number(e.target.value) || 0
                       setForm({ ...form, salary: Math.min(300, Math.max(50, v)) })
                     }}
-                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-4 py-2 text-caption text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.commuteDuration')}
                   </label>
                   <div className="flex gap-2">
@@ -267,7 +267,7 @@ export default function OfferForm({
                         const v = Number(e.target.value) || 0
                         setForm({ ...form, commuteMinutes: Math.min(180, Math.max(0, v)) })
                       }}
-                      className="flex-1 bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="flex-1 bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10 rounded-lg px-4 py-2 text-caption text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none focus:border-Amber/30 dark:focus:border-white/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                     <button
                       onClick={() => onMapClick(form)}
@@ -279,9 +279,9 @@ export default function OfferForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.workIntensity')}（1-10）
                   </label>
                   <input
@@ -292,12 +292,12 @@ export default function OfferForm({
                     onChange={(e) => setForm({ ...form, workIntensity: Number(e.target.value) })}
                     className="w-full accent-Amber"
                   />
-                  <div className="text-center text-Ink/50 dark:text-white/50 text-xs font-body mt-1">
+                  <div className="text-center text-Ink/50 dark:text-white/50 text-label font-body mt-1">
                     {form.workIntensity}/10
                   </div>
                 </div>
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.teamAtmosphere')}（1-10）
                   </label>
                   <input
@@ -308,12 +308,12 @@ export default function OfferForm({
                     onChange={(e) => setForm({ ...form, teamAtmosphere: Number(e.target.value) })}
                     className="w-full accent-Amber"
                   />
-                  <div className="text-center text-Ink/50 dark:text-white/50 text-xs font-body mt-1">
+                  <div className="text-center text-Ink/50 dark:text-white/50 text-label font-body mt-1">
                     {form.teamAtmosphere}/10
                   </div>
                 </div>
                 <div>
-                  <label className="text-Ink/50 dark:text-white/40 text-xs font-body tracking-wider block mb-1">
+                  <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">
                     {t('internship.developmentProspect')}（1-10）
                   </label>
                   <input
@@ -324,7 +324,7 @@ export default function OfferForm({
                     onChange={(e) => setForm({ ...form, growthProspect: Number(e.target.value) })}
                     className="w-full accent-Amber"
                   />
-                  <div className="text-center text-Ink/50 dark:text-white/50 text-xs font-body mt-1">
+                  <div className="text-center text-Ink/50 dark:text-white/50 text-label font-body mt-1">
                     {form.growthProspect}/10
                   </div>
                 </div>
@@ -333,14 +333,14 @@ export default function OfferForm({
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={handleCancel}
-                  className="flex-1 py-2.5 rounded-lg bg-white/70 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider transition-colors border border-Amber/10 dark:border-white/10"
+                  className="flex-1 py-2.5 rounded-lg bg-white/70 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 text-Ink/50 dark:text-white/50 text-label font-body tracking-wider transition-colors border border-Amber/10 dark:border-white/10"
                 >
                   {t('internship.cancel')}
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={!form.companyName.trim()}
-                  className="flex-1 py-2.5 rounded-lg bg-Amber/20 hover:bg-Amber/30 disabled:bg-white/50 dark:disabled:bg-white/5 disabled:text-Ink/30 dark:disabled:text-white/20 text-Amber/80 text-xs font-body tracking-wider transition-colors border border-Amber/20"
+                  className="flex-1 py-2.5 rounded-lg bg-Amber/20 hover:bg-Amber/30 disabled:bg-white/50 dark:disabled:bg-white/5 disabled:text-Ink/30 dark:disabled:text-white/20 text-Amber/80 text-label font-body tracking-wider transition-colors border border-Amber/20"
                 >
                   {editingId ? t('internship.update') : t('internship.save')}
                 </button>

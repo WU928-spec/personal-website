@@ -21,10 +21,10 @@ export default function Profile() {
           path="/profile"
         />
         <div className="text-center">
-          <p className="text-Slate font-body text-lg">{t('profile.pleaseLogin')}</p>
+          <p className="text-Slate font-body text-subhead">{t('profile.pleaseLogin')}</p>
           <button
             onClick={() => navigate('/login')}
-            className="mt-4 inline-flex items-center bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] transition-all duration-300"
+            className="mt-4 inline-flex items-center bg-Amber text-Parchment font-ui text-caption font-semibold uppercase tracking-[0.05em] px-7 py-2 rounded-md hover:bg-primary transition-all duration-300"
           >
             {t('profile.goLogin')}
           </button>
@@ -47,7 +47,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-[clamp(2rem,4vw,3rem)] font-medium text-Ink dark:text-white"
+            className="font-display text-display font-medium text-Ink dark:text-white"
           >
             {t('profile.title')}
           </motion.h1>
@@ -55,7 +55,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-3 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
+            className="mt-3 text-subhead leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
           >
             {t('profile.subtitle')}
           </motion.p>
@@ -81,7 +81,7 @@ export default function Profile() {
           >
             <button
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 text-Slate hover:text-Ink text-[0.875rem] font-medium transition-colors dark:hover:text-white"
+              className="inline-flex items-center gap-2 text-Slate hover:text-Ink text-caption font-medium transition-colors dark:hover:text-white"
             >
               <ArrowLeft size={16} />
               {t('profile.back')}
@@ -91,7 +91,7 @@ export default function Profile() {
                 logout()
                 navigate('/')
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-Rose/30 text-Rose hover:bg-Rose/10 text-[0.875rem] font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-Rose/30 text-Rose hover:bg-Rose/10 text-caption font-medium transition-colors"
             >
               <LogOut size={16} />
               {t('profile.logout')}

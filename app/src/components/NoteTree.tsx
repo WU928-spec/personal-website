@@ -47,8 +47,8 @@ function NoteTreeItem({
     return (
       <div>
         <div
-          className={`flex items-center text-left py-[3px] pr-2 cursor-pointer transition-colors ${
-            isDropTarget ? 'bg-[#094771]/30' : 'hover:bg-[#2a2d2e]'
+          className={`flex items-center text-left py-1 pr-2 cursor-pointer transition-colors ${
+            isDropTarget ? 'bg-accent/30' : 'hover:bg-muted'
           }`}
           style={{ paddingLeft: `${depth * 16 + 4}px` }}
           onClick={() => setExpanded(!expanded)}
@@ -62,12 +62,12 @@ function NoteTreeItem({
         >
           <span className="w-4 flex items-center justify-center shrink-0">
             {expanded ? (
-              <ChevronRight size={11} className="text-[#858585] rotate-90" />
+              <ChevronRight size={11} className="text-muted rotate-90" />
             ) : (
-              <ChevronRight size={11} className="text-[#858585]" />
+              <ChevronRight size={11} className="text-muted" />
             )}
           </span>
-          <span className="text-[0.8125rem] text-[#cccccc] truncate">{item.name}</span>
+          <span className="text-caption text-card-foreground truncate">{item.name}</span>
         </div>
         <AnimatePresence initial={false}>
           {expanded && item.children && (
@@ -108,14 +108,14 @@ function NoteTreeItem({
       draggable={isLoggedIn}
       onDragStart={() => setDraggedPath(item.path)}
       onDragEnd={() => setDraggedPath(null)}
-      className="flex items-center text-left py-[3px] pr-2 cursor-pointer transition-colors"
+      className="flex items-center text-left py-1 pr-2 cursor-pointer transition-colors"
       style={{ paddingLeft: `${depth * 16 + 20}px` }}
       onClick={() => onSelect(slug)}
       onContextMenu={(e) => onContextMenu(item.path, false, e)}
     >
       <span
-        className={`text-[0.8125rem] truncate ${
-          isSelected ? 'text-white bg-[#37373d]' : 'text-[#cccccc] hover:bg-[#2a2d2e]'
+        className={`text-caption truncate ${
+          isSelected ? 'text-primary-foreground bg-accent' : 'text-card-foreground hover:bg-muted'
         }`}
       >
         {item.name}

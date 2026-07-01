@@ -186,7 +186,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
-        className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[20vh] px-4"
+        className="fixed inset-0 z-[70] bg-black/60 flex items-start justify-center pt-[20vh] px-4"
         onClick={onClose}
       >
         <motion.div
@@ -197,7 +197,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           className="w-full max-w-lg bg-Parchment dark:bg-[#1a1a1a] rounded-xl shadow-2xl border border-Sand dark:border-white/10 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-Sand dark:border-white/10">
+          <div className="flex items-center gap-4 px-4 py-2 border-b border-Sand dark:border-white/10">
             <Search size={18} className="text-Slate shrink-0" />
             <input
               ref={searchInputRef}
@@ -206,14 +206,14 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="搜索笔记..."
-              className="flex-1 bg-transparent text-Ink dark:text-white placeholder:text-Slate/60 text-[0.9375rem] focus:outline-none"
+              className="flex-1 bg-transparent text-Ink dark:text-white placeholder:text-Slate/60 text-caption focus:outline-none"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="text-Slate hover:text-Ink dark:hover:text-white">
                 <X size={16} />
               </button>
             )}
-            <span className="text-[0.6875rem] text-Slate border border-Sand dark:border-white/20 rounded px-1.5 py-0.5">
+            <span className="text-label text-Slate border border-Sand dark:border-white/20 rounded px-1.5 py-0.5">
               ESC
             </span>
           </div>
@@ -224,9 +224,9 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
               </div>
             ) : !searchQuery.trim() ? (
-              <div className="py-6 text-center text-sm text-Slate">输入关键词搜索笔记</div>
+              <div className="py-6 text-center text-caption text-Slate">输入关键词搜索笔记</div>
             ) : filtered.length === 0 ? (
-              <div className="py-6 text-center text-sm text-Slate">未找到相关笔记</div>
+              <div className="py-6 text-center text-caption text-Slate">未找到相关笔记</div>
             ) : (
               <div className="py-1">
                 {filtered.map((item, idx) => (
@@ -249,28 +249,28 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       {item.type === 'note' ? (
                         <FileText size={14} className={idx === highlightedIndex ? 'text-Amber shrink-0' : 'text-Slate shrink-0'} />
                       ) : (
-                        <span className="text-[0.625rem] font-bold px-1 py-0.5 rounded bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300 shrink-0">
+                        <span className="text-label font-bold px-1 py-0.5 rounded bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300 shrink-0">
                           碎片
                         </span>
                       )}
-                      <span className="text-sm font-medium text-Ink dark:text-white truncate">{item.title}</span>
+                      <span className="text-caption font-medium text-Ink dark:text-white truncate">{item.title}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1 ml-5">
                       {item.type === 'note' ? (
                         <>
-                          <span className="text-[0.6875rem] text-Amber">{item.category}</span>
+                          <span className="text-label text-Amber">{item.category}</span>
                           {item.tags && item.tags.length > 0 && (
-                            <span className="flex items-center gap-1 text-[0.6875rem] text-Slate">
+                            <span className="flex items-center gap-1 text-label text-Slate">
                               <Tag size={10} />
                               {item.tags.slice(0, 3).join(', ')}
                             </span>
                           )}
-                          <span className="text-[0.6875rem] text-Slate truncate">{item.excerpt.slice(0, 40)}...</span>
+                          <span className="text-label text-Slate truncate">{item.excerpt.slice(0, 40)}...</span>
                         </>
                       ) : (
                         <>
-                          {item.location && <span className="text-[0.6875rem] text-Slate">📍 {item.location}</span>}
-                          <span className="text-[0.6875rem] text-Slate truncate">{item.excerpt.slice(0, 50)}...</span>
+                          {item.location && <span className="text-label text-Slate">📍 {item.location}</span>}
+                          <span className="text-label text-Slate truncate">{item.excerpt.slice(0, 50)}...</span>
                         </>
                       )}
                     </div>
@@ -281,8 +281,8 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           </div>
 
           <div className="flex items-center justify-between px-4 py-2 border-t border-Sand dark:border-white/10 bg-gray-50/50 dark:bg-white/5">
-            <span className="text-[0.6875rem] text-Slate">{filtered.length > 0 ? `${filtered.length} 条结果` : ''}</span>
-            <div className="flex items-center gap-2 text-[0.6875rem] text-Slate">
+            <span className="text-label text-Slate">{filtered.length > 0 ? `${filtered.length} 条结果` : ''}</span>
+            <div className="flex items-center gap-2 text-label text-Slate">
               <span>↑↓ 选择</span>
               <span>↵ 打开</span>
             </div>

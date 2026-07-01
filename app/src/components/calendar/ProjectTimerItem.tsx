@@ -29,10 +29,10 @@ export default function ProjectTimerItem({
         className="w-2 h-2 rounded-full shrink-0"
         style={{ backgroundColor: project.color }}
       />
-      <span className="flex-1 text-[0.8125rem] truncate text-Ink dark:text-white/80">
+      <span className="flex-1 text-caption truncate text-Ink dark:text-white/80">
         {project.name}
       </span>
-      <span className="text-[0.625rem] font-mono text-Slate/60 dark:text-white/40 shrink-0">
+      <span className="text-label font-mono text-Slate/60 dark:text-white/40 shrink-0">
         {formatDurationShort(displayTime)}
       </span>
       <button

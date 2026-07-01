@@ -74,7 +74,7 @@ export default function DayCell({
       {/* Date number */}
       <span
         className={`
-          font-display text-[0.875rem] sm:text-[1rem] font-semibold leading-none
+          font-display text-caption sm:text-body font-semibold leading-none
           ${isToday
             ? 'text-Amber'
             : isCurrentMonth
@@ -91,7 +91,7 @@ export default function DayCell({
       {/* Lunar / Holiday */}
       <span
         className={`
-          mt-0.5 text-[0.625rem] sm:text-[0.6875rem] leading-tight truncate max-w-[90%]
+          mt-0.5 text-label leading-tight truncate max-w-[90%]
           ${holiday
             ? 'text-Rose font-medium'
             : term
@@ -120,12 +120,12 @@ export default function DayCell({
 
       {/* Work/Rest badge */}
       {isCurrentMonth && holiday && (
-        <span className="absolute top-0.5 right-0.5 text-[0.5625rem] font-bold text-Rose bg-Rose/10 px-0.5 rounded leading-none">
+        <span className="absolute top-0.5 right-0.5 text-label font-bold text-Rose bg-Rose/10 px-0.5 rounded leading-none">
           休
         </span>
       )}
       {isCurrentMonth && !holiday && workday && isWeekend && (
-        <span className="absolute top-0.5 right-0.5 text-[0.5625rem] font-bold text-Ink bg-Ink/10 px-0.5 rounded leading-none dark:text-white dark:bg-white/10">
+        <span className="absolute top-0.5 right-0.5 text-label font-bold text-Ink bg-Ink/10 px-0.5 rounded leading-none dark:text-white dark:bg-white/10">
           班
         </span>
       )}

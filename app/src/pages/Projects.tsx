@@ -168,17 +168,17 @@ export default function Projects() {
       />
 
       {/* ── Hero ── */}
-      <section className="relative pt-20 pb-10 px-6">
+      <section className="relative pt-16 pb-8 px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="font-display text-[clamp(2rem,4vw,3rem)] font-medium text-Ink dark:text-white">
+            <h1 className="font-display text-display font-medium text-Ink dark:text-white">
               项目追踪
             </h1>
-            <p className="mt-2 text-[1rem] text-Ink/60 dark:text-white/50 max-w-lg">
+            <p className="mt-2 text-body text-Ink/60 dark:text-white/50 max-w-lg">
               管理中长期目标，实时追踪来自日历的投入时间与进度。
             </p>
           </motion.div>
@@ -186,8 +186,8 @@ export default function Projects() {
       </section>
 
       {/* ── Content ── */}
-      <section className="px-6 pb-20">
-        <div className="max-w-4xl mx-auto space-y-4">
+      <section className="px-6 pb-16">
+        <div className="max-w-4xl mx-auto space-y-6">
           {/* Add button */}
           {isLoggedIn && (
             <motion.button
@@ -195,18 +195,18 @@ export default function Projects() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
               onClick={() => openForm()}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-Sand dark:border-white/15 text-Slate dark:text-white/50 hover:border-Amber hover:text-Amber transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-Sand dark:border-white/15 text-Slate dark:text-white/50 hover:border-Amber hover:text-Amber transition-all duration-200"
             >
               <Plus size={18} />
-              <span className="text-[0.9375rem] font-medium">新建项目</span>
+              <span className="text-body font-medium">新建项目</span>
             </motion.button>
           )}
 
           {/* Project list */}
           {sortedProjects.length === 0 ? (
             <div className="text-center py-16">
-              <FolderOpen size={40} className="mx-auto text-Slate/30 dark:text-white/10 mb-3" />
-              <p className="text-Slate/50 dark:text-white/30 text-[0.9375rem]">
+              <FolderOpen size={40} className="mx-auto text-Slate/30 dark:text-white/10 mb-4" />
+              <p className="text-Slate/50 dark:text-white/30 text-caption">
                 还没有项目，点击上方创建第一个项目
               </p>
             </div>

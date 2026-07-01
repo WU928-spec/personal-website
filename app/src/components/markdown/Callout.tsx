@@ -49,11 +49,11 @@ export default function Callout({
         borderLeft: `3px solid ${borderMap[lowerType] || borderMap.note}`,
       }}
     >
-      <div className="flex items-center gap-2 mb-2 font-semibold text-sm text-Ink">
+      <div className="flex items-center gap-2 mb-2 font-semibold text-subhead text-primary">
         {iconMap[lowerType] || iconMap.note}
         <span>{title}</span>
       </div>
-      <div className="text-Ink">{children}</div>
+      <div className="text-primary">{children}</div>
     </div>
   )
 }

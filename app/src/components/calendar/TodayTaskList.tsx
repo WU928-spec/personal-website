@@ -247,7 +247,7 @@ export default function TodayTaskList() {
       <div className="flex items-center justify-between mb-2 shrink-0">
         <div className="flex items-center gap-1.5">
           <Clock size={14} className="text-Amber" />
-          <h3 className="text-[0.75rem] font-semibold text-Ink dark:text-white">今日待办</h3>
+          <h3 className="text-label font-semibold text-Ink dark:text-white">今日待办</h3>
         </div>
         <span className="text-[0.625rem] text-Slate dark:text-white/40 font-mono">
           {formatDurationShort(totalTrackedToday)}
@@ -257,7 +257,7 @@ export default function TodayTaskList() {
       {/* Upper: Todo list */}
       <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
         {displayTodos.length === 0 && (
-          <p className="text-[0.6875rem] text-Slate/40 dark:text-white/20 text-center py-4">
+          <p className="text-label text-Slate/40 dark:text-white/20 text-center py-4">
             暂无今日待办
           </p>
         )}
@@ -277,12 +277,12 @@ export default function TodayTaskList() {
 
       {/* Lower: Project Timer */}
       <div className="flex-1 overflow-y-auto min-h-0 border-t border-Sand dark:border-white/10 pt-2 mt-2">
-        <h4 className="text-[0.75rem] font-medium text-Slate/60 dark:text-white/40 mb-2 flex items-center gap-1.5">
+        <h4 className="text-label font-medium text-Slate/60 dark:text-white/40 mb-2 flex items-center gap-1.5">
           <Play size={12} />
           项目计时
         </h4>
         {activeProjects.length === 0 ? (
-          <p className="text-[0.6875rem] text-Slate/40 dark:text-white/20 text-center py-2">
+          <p className="text-label text-Slate/40 dark:text-white/20 text-center py-2">
             暂无活跃项目
           </p>
         ) : (
@@ -312,10 +312,10 @@ export default function TodayTaskList() {
       {activeTodo && (
         <div className="mt-2 shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-Amber/5 border border-Amber/20">
           <div className="w-1.5 h-1.5 rounded-full bg-Amber animate-pulse shrink-0" />
-          <span className="text-[0.6875rem] text-Amber truncate flex-1">
+          <span className="text-label text-Amber truncate flex-1">
             {activeTodo.text}
           </span>
-          <span className="text-[0.75rem] font-mono text-Amber font-semibold shrink-0">
+          <span className="text-label font-mono text-Amber font-semibold shrink-0">
             {formatDurationShort(
               getTotalDuration(activeTodo) + getCurrentElapsed(activeTodo)
             )}
@@ -325,10 +325,10 @@ export default function TodayTaskList() {
       {activeProjectTimer && !activeTodo && (
         <div className="mt-2 shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-Amber/5 border border-Amber/20">
           <div className="w-1.5 h-1.5 rounded-full bg-Amber animate-pulse shrink-0" />
-          <span className="text-[0.6875rem] text-Amber truncate flex-1">
+          <span className="text-label text-Amber truncate flex-1">
             {projects.find((p) => p.id === activeProjectTimer.projectId)?.name || ''}
           </span>
-          <span className="text-[0.75rem] font-mono text-Amber font-semibold shrink-0">
+          <span className="text-label font-mono text-Amber font-semibold shrink-0">
             {formatDurationShort(projectTimerElapsed)}
           </span>
         </div>

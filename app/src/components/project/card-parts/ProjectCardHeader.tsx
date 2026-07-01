@@ -28,7 +28,7 @@ export default function ProjectCardHeader({
   return (
     <button
       onClick={onToggle}
-      className="w-full flex items-center gap-3 px-5 py-4 text-left"
+      className="w-full flex items-center gap-3 px-6 py-4 text-left"
     >
       <div
         className={`w-3 h-3 rounded-full shrink-0 ${isCompleted ? 'opacity-40' : ''}`}
@@ -38,7 +38,7 @@ export default function ProjectCardHeader({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <h3
-            className={`text-[1rem] font-medium truncate ${
+            className={`text-body font-medium truncate ${
               isCompleted
                 ? 'text-Slate/50 dark:text-white/30 line-through'
                 : 'text-Ink dark:text-white'
@@ -47,13 +47,13 @@ export default function ProjectCardHeader({
             {project.name}
           </h3>
           {isCompleted && (
-            <span className="shrink-0 text-[0.625rem] px-1.5 py-0.5 rounded bg-Sage/10 text-Sage font-medium">
+            <span className="shrink-0 text-label px-2 py-1 rounded bg-Sage/10 text-Sage font-medium">
               已完成
             </span>
           )}
         </div>
         {project.description && (
-          <p className="text-[0.75rem] text-Slate/60 dark:text-white/30 truncate mt-0.5">
+          <p className="text-label text-Slate/60 dark:text-white/30 truncate mt-1">
             {project.description}
           </p>
         )}
@@ -85,14 +85,14 @@ export default function ProjectCardHeader({
           </div>
         )}
         <div className="text-right">
-          <p className="text-[0.6875rem] text-Slate/50 dark:text-white/30">已投入</p>
-          <p className="text-[0.8125rem] font-medium text-Ink dark:text-white/80">
+          <p className="text-label text-Slate/50 dark:text-white/30">已投入</p>
+          <p className="text-caption font-medium text-Ink dark:text-white/80">
             {formatDuration(totalSeconds)}
           </p>
         </div>
         {project.targetHours > 0 && (
           <div className="w-24">
-            <div className="flex justify-between text-[0.625rem] text-Slate/50 dark:text-white/30 mb-1">
+            <div className="flex justify-between text-label text-Slate/50 dark:text-white/30 mb-2">
               <span>进度</span>
               <span>{Math.round(progress * 100)}%</span>
             </div>

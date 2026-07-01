@@ -208,15 +208,15 @@ export default function TextSegmenter() {
         >
           <BackToTools label={t('tools.title')} className="mb-6" />
 
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-4 mb-2">
             <div className="w-10 h-10 rounded-xl bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40">
               <TextQuote size={20} />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-semibold text-Ink dark:text-white">
+              <h1 className="font-display text-heading font-semibold text-Ink dark:text-white">
                 英文分段器
               </h1>
-              <p className="text-sm text-Slate dark:text-white/40">
+              <p className="text-caption text-Slate dark:text-white/40">
                 输入连续英文文本，自动按句子换行、段落空行分隔，方便在 Obsidian 中阅读
               </p>
             </div>
@@ -233,11 +233,11 @@ export default function TextSegmenter() {
           {/* Input panel */}
           <div className="flex flex-col">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-Ink/70 dark:text-white/60">输入文本</span>
+              <span className="text-caption font-medium text-Ink/70 dark:text-white/60">输入文本</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePaste}
-                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-Slate hover:text-Amber border border-Sand dark:border-white/10 rounded-md hover:border-Amber/30 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 text-label text-Slate hover:text-Amber border border-Sand dark:border-white/10 rounded-md hover:border-Amber/30 transition-colors"
                   title="从剪贴板粘贴"
                 >
                   <Type size={12} />
@@ -245,7 +245,7 @@ export default function TextSegmenter() {
                 </button>
                 <button
                   onClick={handleClear}
-                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-Slate hover:text-Rose border border-Sand dark:border-white/10 rounded-md hover:border-Rose/30 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 text-label text-Slate hover:text-Rose border border-Sand dark:border-white/10 rounded-md hover:border-Rose/30 transition-colors"
                   title="清空"
                 >
                   <Eraser size={12} />
@@ -257,10 +257,10 @@ export default function TextSegmenter() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="将没有换行的英文文本粘贴到这里..."
-              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-[0.9375rem] text-Ink dark:text-white leading-relaxed font-body focus:outline-none focus:border-Amber/50 resize-y placeholder:text-Slate/40"
+              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-caption text-Ink dark:text-white leading-relaxed font-body focus:outline-none focus:border-Amber/50 resize-y placeholder:text-Slate/40"
               spellCheck={false}
             />
-            <div className="mt-2 text-xs text-Slate/50 text-right">
+            <div className="mt-2 text-label text-Slate/50 text-right">
               {inputText.length} 字符
             </div>
           </div>
@@ -268,11 +268,11 @@ export default function TextSegmenter() {
           {/* Output panel */}
           <div className="flex flex-col">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-Ink/70 dark:text-white/60">分段结果</span>
+              <span className="text-caption font-medium text-Ink/70 dark:text-white/60">分段结果</span>
               <button
                 onClick={handleCopy}
                 disabled={!outputText}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs border rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-2.5 py-1 text-label border rounded-md transition-colors ${
                   outputText
                     ? 'text-Slate hover:text-Amber border-Sand dark:border-white/10 hover:border-Amber/30'
                     : 'text-Slate/30 border-transparent cursor-not-allowed'
@@ -286,10 +286,10 @@ export default function TextSegmenter() {
               value={outputText}
               readOnly
               placeholder="分段后的文本会显示在这里..."
-              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-[0.9375rem] text-Ink dark:text-white leading-relaxed font-body focus:outline-none resize-y placeholder:text-Slate/40"
+              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-caption text-Ink dark:text-white leading-relaxed font-body focus:outline-none resize-y placeholder:text-Slate/40"
               spellCheck={false}
             />
-            <div className="mt-2 text-xs text-Slate/50 text-right">
+            <div className="mt-2 text-label text-Slate/50 text-right">
               {outputText.length} 字符
             </div>
           </div>
@@ -305,9 +305,9 @@ export default function TextSegmenter() {
           <button
             onClick={handleSegment}
             disabled={!inputText.trim()}
-            className={`px-8 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+            className={`px-8 py-3 rounded-xl text-caption font-medium transition-all duration-300 ${
               inputText.trim()
-                ? 'bg-Amber text-white shadow-lg shadow-Amber/25 hover:bg-Amber/90 hover:shadow-Amber/30 hover:scale-[1.02]'
+                ? 'bg-Amber text-white hover:bg-Amber/90 hover:scale-[1.02]'
                 : 'bg-Sand/50 text-Slate/40 cursor-not-allowed'
             }`}
           >
@@ -322,8 +322,8 @@ export default function TextSegmenter() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-12 p-6 rounded-xl bg-white/40 dark:bg-white/[0.03] border border-Sand dark:border-white/10"
         >
-          <h3 className="text-sm font-medium text-Ink dark:text-white/80 mb-3">分段规则</h3>
-          <ul className="space-y-2 text-sm text-Slate dark:text-white/50">
+          <h3 className="text-caption font-medium text-Ink dark:text-white/80 mb-4">分段规则</h3>
+          <ul className="space-y-2 text-caption text-Slate dark:text-white/50">
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-Amber/60 mt-1.5 shrink-0" />
               <span>段落之间保留空行（双击换行），保持原有段落结构</span>

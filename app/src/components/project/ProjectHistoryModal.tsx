@@ -49,15 +49,15 @@ export default function ProjectHistoryModal({ projectId, isOpen, onClose }: Proj
         className="fixed inset-x-3 top-[5vh] bottom-[5vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[640px] bg-Parchment dark:bg-Graphite border border-Sand dark:border-white/10 rounded-2xl z-50 shadow-deep flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-Sand dark:border-white/10 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-Sand dark:border-white/10 shrink-0">
           <div className="flex items-center gap-2">
             {project && (
               <>
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: project.color }} />
-                <h3 className="font-display text-[1.125rem] font-medium text-Ink dark:text-white">
+                <h3 className="font-display text-subhead font-medium text-Ink dark:text-white">
                   {project.name}
                 </h3>
-                <span className="text-[0.625rem] text-Slate/50 dark:text-white/30">
+                <span className="text-label text-Slate/50 dark:text-white/30">
                   全部历史 · 共 {formatDuration(totalSeconds)}
                 </span>
               </>
@@ -72,7 +72,7 @@ export default function ProjectHistoryModal({ projectId, isOpen, onClose }: Proj
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
           {/* Full bar chart */}
           <ProjectBarChart
             data={allData}
@@ -88,10 +88,10 @@ export default function ProjectHistoryModal({ projectId, isOpen, onClose }: Proj
                 .reverse()
                 .map((day) => (
                   <div key={day.date} className="border-b border-Sand/30 dark:border-white/5 pb-2 last:border-0">
-                    <p className="text-[0.6875rem] font-medium text-Slate/60 dark:text-white/40 mb-1.5">
+                    <p className="text-label font-medium text-Slate/60 dark:text-white/40 mb-2">
                       {day.date} · {formatDuration(day.seconds)}
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       {day.todos.map((todo) => (
                         <TaskItem key={todo.id} todo={todo} />
                       ))}

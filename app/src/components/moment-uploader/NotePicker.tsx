@@ -36,20 +36,20 @@ function TreeNode({
           data-nav-item
           data-path={item.path}
           onClick={() => onToggle(item.path)}
-          className={`flex items-center gap-1.5 w-full text-left py-2 px-3 rounded-md transition-colors ${
+          className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-md transition-colors ${
             isHighlighted
-              ? 'bg-gray-100 dark:bg-white/10'
-              : 'hover:bg-gray-50 dark:hover:bg-white/5'
+              ? 'bg-muted'
+              : 'hover:bg-muted/50'
           }`}
           style={{ paddingLeft: `${depth * 14 + 12}px` }}
         >
           {isExpanded ? (
-            <ChevronDown size={14} className="text-gray-400 shrink-0" />
+            <ChevronDown size={14} className="text-muted-foreground shrink-0" />
           ) : (
-            <ChevronRight size={14} className="text-gray-400 shrink-0" />
+            <ChevronRight size={14} className="text-muted-foreground shrink-0" />
           )}
           <Folder size={14} className="text-amber-500 shrink-0" />
-          <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+          <span className="text-caption font-medium text-foreground truncate">
             {item.name}
           </span>
         </button>
@@ -85,18 +85,18 @@ function TreeNode({
       data-nav-item
       data-path={item.path}
       onClick={() => onSelect(item)}
-      className={`flex items-center gap-2 w-full text-left py-2 px-3 rounded-md transition-colors ${
+      className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-md transition-colors ${
         isHighlighted
           ? 'bg-Amber/10 text-Amber'
-          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+          : 'text-foreground hover:bg-muted/50'
       }`}
       style={{ paddingLeft: `${depth * 14 + 30}px` }}
     >
       <FileText
         size={14}
-        className={isHighlighted ? 'text-Amber shrink-0' : 'text-gray-400 shrink-0'}
+        className={isHighlighted ? 'text-Amber shrink-0' : 'text-muted-foreground shrink-0'}
       />
-      <span className="text-sm truncate">{item.name}</span>
+      <span className="text-caption truncate">{item.name}</span>
     </button>
   )
 }
@@ -119,18 +119,18 @@ function RootFilesGroup({
           data-nav-item
           data-path={item.path}
           onClick={() => onSelect(item)}
-          className={`flex items-center gap-2 w-full text-left py-2 px-3 rounded-md transition-colors ${
+          className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-md transition-colors ${
             highlightedPath === item.path
               ? 'bg-Amber/10 text-Amber'
-              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+              : 'text-foreground hover:bg-muted/50'
           }`}
           style={{ paddingLeft: '30px' }}
         >
           <FileText
             size={14}
-            className={highlightedPath === item.path ? 'text-Amber shrink-0' : 'text-gray-400 shrink-0'}
+            className={highlightedPath === item.path ? 'text-Amber shrink-0' : 'text-muted-foreground shrink-0'}
           />
-          <span className="text-sm truncate">{item.name}</span>
+          <span className="text-caption truncate">{item.name}</span>
         </button>
       ))}
     </div>
@@ -276,13 +276,13 @@ export default function NotePicker({ open, onSelect, onClose }: Props) {
             ref={pickerRef}
             tabIndex={-1}
             onKeyDown={handleKeyDown}
-            className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden outline-none"
+            className="bg-card border border-border rounded-xl shadow-xl overflow-hidden outline-none"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">选择笔记</span>
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+              <span className="text-caption font-medium text-foreground">选择笔记</span>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X size={16} />
               </button>
@@ -297,7 +297,7 @@ export default function NotePicker({ open, onSelect, onClose }: Props) {
                   <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : tree.length === 0 ? (
-                <div className="py-6 text-center text-sm text-gray-400">暂无笔记</div>
+                <div className="py-6 text-center text-caption text-muted-foreground">暂无笔记</div>
               ) : (
                 <>
                   {folderNodes.map((item) => (

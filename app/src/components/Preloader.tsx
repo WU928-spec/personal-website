@@ -219,7 +219,7 @@ export default function Preloader({ children }: PreloaderProps) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: 'easeInOut' }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050508] text-white"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background text-white"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -228,8 +228,8 @@ export default function Preloader({ children }: PreloaderProps) {
             className="flex flex-col items-center gap-6 w-full max-w-md px-8"
           >
             <div className="text-center space-y-2">
-              <h1 className="text-xl font-body tracking-[0.3em] text-white/90">正在装载星光</h1>
-              <p className="text-xs text-white/40 font-body tracking-widest">{progress}%</p>
+              <h1 className="text-heading font-body tracking-[0.3em] text-white/90">正在装载星光</h1>
+              <p className="text-label text-white/40 font-body tracking-widest">{progress}%</p>
             </div>
 
             <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
@@ -241,7 +241,7 @@ export default function Preloader({ children }: PreloaderProps) {
               />
             </div>
 
-            <p className="text-xs text-white/30 font-body tracking-widest">
+            <p className="text-label text-white/30 font-body tracking-widest">
               请稍候，所有记忆即将呈现
             </p>
           </motion.div>

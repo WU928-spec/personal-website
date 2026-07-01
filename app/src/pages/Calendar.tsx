@@ -77,17 +77,17 @@ export default function Calendar() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="flex-1 max-w-[1400px] w-full mx-auto px-3 sm:px-4 py-3 flex flex-col min-h-0"
+        className="flex-1 max-w-[1400px] w-full mx-auto px-4 py-4 flex flex-col min-h-0"
       >
         {/* 2:8:2 Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_4fr_1fr] gap-3 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_4fr_1fr] gap-4 flex-1 min-h-0">
           {/* Left sidebar: Stats */}
           <aside className="hidden lg:flex flex-col min-h-0">
             <TodayStatsPanel />
           </aside>
 
           {/* Main calendar */}
-          <main className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-2xl p-3 sm:p-4 flex flex-col min-h-0">
+          <main className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-2xl p-4 sm:p-4 flex flex-col min-h-0">
             <CalendarHeader
               year={year}
               month={month}
@@ -104,7 +104,7 @@ export default function Calendar() {
             />
 
             {/* Legend */}
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-[0.6875rem] text-Slate dark:text-white/50 shrink-0">
+            <div className="mt-2 flex flex-wrap items-center gap-4 text-label text-Slate dark:text-white/50 shrink-0">
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-Amber" />
                 <span>有记录</span>

@@ -42,10 +42,10 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-Amber/10 mb-6">
             <LogIn size={28} className="text-Amber" />
           </div>
-          <h1 className="font-display text-[clamp(1.75rem,3vw,2.25rem)] font-medium text-Ink">
+          <h1 className="font-display text-heading font-medium text-Ink">
             {t('login.welcomeBack')}
           </h1>
-          <p className="mt-2 text-[0.9375rem] leading-[1.65] text-Slate font-body">
+          <p className="mt-2 text-caption leading-[1.65] text-Slate font-body">
             {t('login.loginDesc')}
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email */}
           <div>
-            <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
+            <label className="block font-ui text-caption font-medium tracking-[0.04em] text-Slate mb-2">
               {t('login.email')}
             </label>
             <div className="relative">
@@ -64,14 +64,14 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('login.emailPlaceholder')}
-                className="w-full bg-Linen border border-Sand rounded-xl py-3 pl-11 pr-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
+                className="w-full bg-Linen border border-Sand rounded-xl py-2 pl-11 pr-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate mb-2">
+            <label className="block font-ui text-caption font-medium tracking-[0.04em] text-Slate mb-2">
               {t('login.password')}
             </label>
             <div className="relative">
@@ -81,7 +81,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('login.passwordPlaceholder')}
-                className="w-full bg-Linen border border-Sand rounded-xl py-3 pl-11 pr-12 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
+                className="w-full bg-Linen border border-Sand rounded-xl py-2 pl-11 pr-12 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
               <button
                 type="button"
@@ -98,7 +98,7 @@ export default function Login() {
             <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-red-600 font-medium text-center"
+              className="text-caption text-red-600 font-medium text-center"
             >
               {error}
             </motion.p>
@@ -107,7 +107,7 @@ export default function Login() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-Amber text-Parchment font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] py-3.5 rounded-xl hover:bg-[#B06A2F] hover:shadow-amber hover:-translate-y-px transition-all duration-300"
+            className="w-full bg-Amber text-Parchment font-ui text-caption font-semibold uppercase tracking-[0.05em] py-3.5 rounded-xl hover:bg-primary hover:-translate-y-px transition-all duration-300"
           >
             {t('login.submit')}
           </button>

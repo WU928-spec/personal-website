@@ -78,7 +78,7 @@ export default function TodoItem({
         </button>
 
         <span
-          className={`flex-1 text-[0.8125rem] truncate ${
+          className={`flex-1 text-caption truncate ${
             todo.done
               ? 'line-through text-Slate/40 dark:text-white/30'
               : 'text-Ink dark:text-white/80'
@@ -89,7 +89,7 @@ export default function TodoItem({
         </span>
 
         {totalSec > 0 && (
-          <span className="text-[0.625rem] font-mono text-Slate/60 dark:text-white/40 shrink-0">
+          <span className="text-label font-mono text-Slate/60 dark:text-white/40 shrink-0">
             {formatDurationShort(totalSec)}
           </span>
         )}
@@ -125,7 +125,7 @@ export default function TodoItem({
         <div className="mt-1.5 rounded-lg bg-Mist/30 dark:bg-white/[0.03] p-2 space-y-1">
           {draftRecords.map((record, idx) => (
             <div key={record.id} className="flex items-center gap-2">
-              <span className="text-[0.625rem] text-Slate/40 w-4">{idx + 1}.</span>
+              <span className="text-label text-Slate/40 w-4">{idx + 1}.</span>
               <input
                 type="number"
                 min={0}
@@ -136,9 +136,9 @@ export default function TodoItem({
                     prev.map((r, i) => (i === idx ? { ...r, duration: minutes * 60 } : r))
                   )
                 }}
-                className="w-16 px-1 py-0.5 text-[0.75rem] bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 rounded text-Ink dark:text-white text-center"
+                className="w-16 px-1 py-0.5 text-label bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 rounded text-Ink dark:text-white text-center"
               />
-              <span className="text-[0.625rem] text-Slate/40">分钟</span>
+              <span className="text-label text-Slate/40">分钟</span>
               <button
                 onClick={() => setDraftRecords((prev) => prev.filter((_, i) => i !== idx))}
                 className="text-Slate/30 hover:text-Rose transition-colors"
@@ -151,13 +151,13 @@ export default function TodoItem({
           <div className="flex justify-end gap-2 pt-1">
             <button
               onClick={cancelEdit}
-              className="px-2 py-0.5 text-[0.75rem] text-Slate hover:text-Ink dark:hover:text-white transition-colors"
+              className="px-2 py-0.5 text-label text-Slate hover:text-Ink dark:hover:text-white transition-colors"
             >
               取消
             </button>
             <button
               onClick={saveEdit}
-              className="px-2 py-0.5 text-[0.75rem] bg-Sage text-white rounded-md hover:bg-[#5a7a5a] transition-colors"
+              className="px-2 py-0.5 text-label bg-Sage text-white rounded-md hover:bg-[#5a7a5a] transition-colors"
             >
               保存
             </button>

@@ -23,7 +23,7 @@ export default function Moments() {
   } = useMoments()
 
   return (
-    <div className="min-h-screen bg-[#ededed] dark:bg-[#111]">
+    <div className="min-h-screen bg-background">
       <PageSEO
         title="动态墙"
         description="分享生活中的每一个瞬间"
@@ -33,14 +33,14 @@ export default function Moments() {
       {/* Sync error banner */}
       {syncError && (
         <div className="max-w-2xl mx-auto mt-4 px-4">
-          <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-Amber/10 border border-Amber/20 text-sm">
+          <div className="flex items-center justify-between px-4 py-2 rounded-lg bg-Amber/10 border border-Amber/20 text-caption">
             <div className="flex items-center gap-2 text-Amber/80">
               <CloudOff size={14} />
               <span>{usingLocal ? '正在使用本地数据（云端同步失败）' : syncError}</span>
             </div>
             <button
               onClick={retrySync}
-              className="flex items-center gap-1 text-xs text-Amber hover:text-Amber/80 transition-colors"
+              className="flex items-center gap-1 text-label text-Amber hover:text-Amber/80 transition-colors"
             >
               <RefreshCw size={12} />
               重试同步
@@ -64,14 +64,14 @@ export default function Moments() {
         <div className="max-w-2xl mx-auto px-4 relative">
           <div className="flex items-end justify-end gap-3 -mt-10 pb-4">
             <div className="text-right pb-2">
-              <h1 className="text-white text-[1.125rem] font-medium drop-shadow-md">
+              <h1 className="text-white text-subhead font-medium drop-shadow-md">
                 {displayName}
               </h1>
             </div>
             <img
               src={avatarUrl}
               alt={displayName}
-              className="w-20 h-20 rounded-[4px] object-cover border-4 border-white dark:border-[#111] shadow-lg shrink-0"
+              className="w-20 h-20 rounded object-cover border-4 border-white dark:border-background shadow-lg shrink-0"
             />
           </div>
         </div>
@@ -92,11 +92,11 @@ export default function Moments() {
           </div>
         ) : moments.length === 0 ? (
           <div className="flex flex-col items-center py-20 text-center">
-            <Camera size={40} className="text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 text-[0.9375rem]">
+            <Camera size={40} className="text-muted-foreground mb-3" />
+            <p className="text-muted-foreground text-body">
               还没有动态
             </p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
+            <p className="text-muted-foreground text-caption mt-1">
               在上方发布第一条吧
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function Moments() {
                     onDelete={deleteMoment}
                   />
                   {i < moments.length - 1 && (
-                    <div className="h-[1px] bg-gray-200 dark:bg-white/5 mx-4" />
+                    <div className="h-[1px] bg-border mx-4" />
                   )}
                 </div>
               ))}

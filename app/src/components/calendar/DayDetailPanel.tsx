@@ -172,14 +172,14 @@ function DayDetailPanelContent({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <h2 className="font-display text-[1.25rem] font-semibold text-Ink dark:text-white">
+                    <h2 className="font-display text-heading font-semibold text-Ink dark:text-white">
                       {dateTitle}
                     </h2>
-                    <span className="text-[0.8125rem] text-Slate dark:text-white/50">
+                    <span className="text-caption text-Slate dark:text-white/50">
                       {weekday}
                     </span>
                   </div>
-                  <p className="text-[0.75rem] text-Slate/70 dark:text-white/40 mt-0.5">
+                  <p className="text-label text-Slate/70 dark:text-white/40 mt-0.5">
                     {lunarText}
                   </p>
                 </div>
@@ -195,7 +195,7 @@ function DayDetailPanelContent({
               <div className="flex items-center gap-1 mt-4 bg-Mist/50 dark:bg-white/5 rounded-lg p-1">
                 <button
                   onClick={() => setActiveTab('plan')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-[0.8125rem] font-medium transition-all duration-200 ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-caption font-medium transition-all duration-200 ${
                     activeTab === 'plan'
                       ? 'bg-white dark:bg-white/10 text-Amber shadow-sm'
                       : 'text-Slate dark:text-white/50 hover:text-Ink dark:hover:text-white'
@@ -206,7 +206,7 @@ function DayDetailPanelContent({
                 </button>
                 <button
                   onClick={() => setActiveTab('diary')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-[0.8125rem] font-medium transition-all duration-200 ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-caption font-medium transition-all duration-200 ${
                     activeTab === 'diary'
                       ? 'bg-white dark:bg-white/10 text-Amber shadow-sm'
                       : 'text-Slate dark:text-white/50 hover:text-Ink dark:hover:text-white'
@@ -267,7 +267,7 @@ function DayDetailPanelContent({
 
             {isLoggedIn && saved && (
               <div className="px-6 py-2 border-t border-Sand dark:border-white/10">
-                <span className="flex items-center justify-center gap-1.5 text-[0.8125rem] text-Sage">
+                <span className="flex items-center justify-center gap-1.5 text-caption text-Sage">
                   <CheckCircle2 size={14} />
                   已自动保存
                 </span>

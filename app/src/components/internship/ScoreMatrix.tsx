@@ -15,11 +15,11 @@ export default function ScoreMatrix({ offers }: ScoreMatrixProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-Ink/70 dark:text-white/70 font-body text-sm tracking-wider">
+      <h3 className="text-Ink/70 dark:text-white/70 font-body text-caption tracking-wider">
         {t('internship.scoreRanking')}
       </h3>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {sorted.map((offer, index) => {
           const score = calcTotalScore(offer)
           const salary = calcSalaryScore(offer.salary)
@@ -38,25 +38,25 @@ export default function ScoreMatrix({ offers }: ScoreMatrixProps) {
               transition={{ delay: index * 0.08, duration: 0.4 }}
               className="relative rounded-xl border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] p-4 overflow-hidden"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-white/70 dark:bg-white/5 flex items-center justify-center text-Ink/50 dark:text-white/40 text-xs font-body">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <span className="w-6 h-6 rounded-full bg-white/70 dark:bg-white/5 flex items-center justify-center text-Ink/50 dark:text-white/40 text-label font-body">
                     {index + 1}
                   </span>
                   <div>
-                    <p className="text-Ink/70 dark:text-white/70 text-sm font-body">
+                    <p className="text-Ink/70 dark:text-white/70 text-caption font-body">
                       {offer.companyName} · {offer.position}
                     </p>
-                    <p className="text-Ink/40 dark:text-white/30 text-xs font-body mt-0.5">
+                    <p className="text-Ink/40 dark:text-white/30 text-label font-body mt-0.5">
                       {offer.salary}{t('internship.dailySalaryUnit')} · {offer.commuteMinutes}min{t('internship.commute')}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-Ink/80 dark:text-white/90 text-xl font-display">
+                  <p className="text-Ink/80 dark:text-white/90 text-heading font-display">
                     {score.toFixed(1)}
                   </p>
-                  <p className="text-Ink/30 dark:text-white/20 text-xs font-body">{t('internship.totalScore')}</p>
+                  <p className="text-Ink/30 dark:text-white/20 text-label font-body">{t('internship.totalScore')}</p>
                 </div>
               </div>
 
@@ -68,18 +68,18 @@ export default function ScoreMatrix({ offers }: ScoreMatrixProps) {
                 <ScoreBar label={t('internship.prospect')} score={growth} color="bg-Amber/50" />
               </div>
 
-              <div className="mt-3 pt-3 border-t border-Amber/10 dark:border-white/5 grid grid-cols-3 gap-2 text-center">
+              <div className="mt-4 pt-3 border-t border-Amber/10 dark:border-white/5 grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-Ink/40 dark:text-white/40 text-xs font-body">{t('internship.dailySalary')}</p>
-                  <p className="text-Ink/60 dark:text-white/60 text-xs font-body">{(salary * 0.25).toFixed(1)}</p>
+                  <p className="text-Ink/40 dark:text-white/40 text-label font-body">{t('internship.dailySalary')}</p>
+                  <p className="text-Ink/60 dark:text-white/60 text-label font-body">{(salary * 0.25).toFixed(1)}</p>
                 </div>
                 <div>
-                  <p className="text-Ink/40 dark:text-white/40 text-xs font-body">{t('internship.workExperience')}</p>
-                  <p className="text-Ink/60 dark:text-white/60 text-xs font-body">{(workExp * 0.40).toFixed(1)}</p>
+                  <p className="text-Ink/40 dark:text-white/40 text-label font-body">{t('internship.workExperience')}</p>
+                  <p className="text-Ink/60 dark:text-white/60 text-label font-body">{(workExp * 0.40).toFixed(1)}</p>
                 </div>
                 <div>
-                  <p className="text-Ink/40 dark:text-white/40 text-xs font-body">{t('internship.growthProspect')}</p>
-                  <p className="text-Ink/60 dark:text-white/60 text-xs font-body">{(growth * 0.35).toFixed(1)}</p>
+                  <p className="text-Ink/40 dark:text-white/40 text-label font-body">{t('internship.growthProspect')}</p>
+                  <p className="text-Ink/60 dark:text-white/60 text-label font-body">{(growth * 0.35).toFixed(1)}</p>
                 </div>
               </div>
             </motion.div>
@@ -101,7 +101,7 @@ function ScoreBar({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-Ink/40 dark:text-white/30 text-xs font-body w-8 shrink-0">{label}</span>
+      <span className="text-Ink/40 dark:text-white/30 text-label font-body w-8 shrink-0">{label}</span>
       <div className="flex-1 h-1.5 bg-white/70 dark:bg-white/5 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
@@ -110,7 +110,7 @@ function ScoreBar({
           className={`h-full rounded-full ${color}`}
         />
       </div>
-      <span className="text-Ink/40 dark:text-white/40 text-xs font-body w-8 text-right">{score.toFixed(0)}</span>
+      <span className="text-Ink/40 dark:text-white/40 text-label font-body w-8 text-right">{score.toFixed(0)}</span>
     </div>
   )
 }

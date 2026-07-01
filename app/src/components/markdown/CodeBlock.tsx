@@ -27,7 +27,7 @@ export default function CodeBlock({
   if (inline) {
     return (
       <code
-        className="rounded px-[6px] py-[2px] font-mono text-[0.875em] bg-Mist text-Slate"
+        className="rounded px-2 py-0.5 font-mono text-caption bg-muted text-muted"
         style={{ fontFamily: '"JetBrains Mono", monospace' }}
       >
         {children}
@@ -38,17 +38,15 @@ export default function CodeBlock({
   return (
     <div className="relative group my-6 rounded-lg overflow-hidden">
       {lang !== 'text' && (
-        <div className="absolute top-0 left-0 z-10 flex items-center gap-2 px-3 py-1.5 rounded-br-md bg-white/8 backdrop-blur-sm">
-          <span className="text-[0.6875rem] font-mono font-medium uppercase tracking-[0.06em] text-white/50">
+        <div className="absolute top-0 left-0 z-10 flex items-center gap-2 px-4 py-2 rounded-br-md bg-primary/10">
+          <span className="text-label font-mono font-medium uppercase tracking-wider text-muted">
             {lang}
           </span>
         </div>
       )}
       <div
-        className="overflow-x-auto"
+        className="overflow-x-auto bg-card rounded-lg"
         style={{
-          background: '#1E1C1A',
-          borderRadius: '8px',
           padding: '20px 24px',
           paddingTop: lang !== 'text' ? '36px' : '20px',
         }}

@@ -129,7 +129,7 @@ export default function PlutoCharonBadge({ onClick }: PlutoCharonBadgeProps) {
   return (
     <button
       onClick={handleClick}
-      className="relative mx-auto mb-6 block cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#1a1a2e] shadow-lg"
+      className="relative mx-auto mb-6 block cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-background shadow-lg"
       style={{ width: 320, height: 140 }}
       title="✨"
     >

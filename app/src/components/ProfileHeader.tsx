@@ -65,13 +65,13 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
       className="bg-Linen/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-8 text-center"
     >
       <div className="relative inline-block">
-        <div className="w-32 h-32 rounded-full overflow-hidden border-[3px] border-Amber shadow-medium">
+        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-Amber">
           <img src={previewAvatar} alt={user.username} className="w-full h-full object-cover" />
         </div>
         <button
           onClick={() => !uploading && fileInputRef.current?.click()}
           disabled={uploading}
-          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-Amber text-Parchment flex items-center justify-center shadow-md hover:bg-[#B06A2F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="absolute bottom-0 right-0 w-10 h-10 rounded-lg bg-Amber text-Parchment flex items-center justify-center hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={t('profile.changeAvatar')}
         >
           {uploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
@@ -87,7 +87,7 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
 
       {saved && (
         <div className="mt-4 flex items-center justify-center gap-2">
-          <span className="text-[0.8125rem] text-Sage">{t('profile.saved')}</span>
+          <span className="text-caption text-Sage">{t('profile.saved')}</span>
         </div>
       )}
 
@@ -98,12 +98,12 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
               type="text"
               value={editUsername}
               onChange={(e) => setEditUsername(e.target.value)}
-              className="px-3 py-1.5 text-center text-[1.25rem] font-semibold text-Ink dark:text-white bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+              className="px-4 py-1.5 text-center text-subhead font-semibold text-Ink dark:text-white bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
               autoFocus
             />
             <button
               onClick={handleSaveUsername}
-              className="p-2 rounded-md bg-Sage text-Parchment hover:bg-[#5a7a5a] transition-colors"
+              className="p-2 rounded-md bg-Sage text-Parchment hover:bg-primary transition-colors"
               title={t('profile.save')}
             >
               <Save size={16} />
@@ -118,7 +118,7 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
           </div>
         ) : (
           <div className="flex items-center justify-center gap-2">
-            <h2 className="text-[1.5rem] font-semibold text-Ink dark:text-white">{user.username}</h2>
+            <h2 className="text-heading font-semibold text-Ink dark:text-white">{user.username}</h2>
             <button
               onClick={() => setIsEditingUsername(true)}
               className="p-1.5 rounded-md text-Slate hover:text-Amber hover:bg-Amber/10 transition-colors"
@@ -129,11 +129,11 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
           </div>
         )}
         {savedUsername && (
-          <p className="text-[0.8125rem] text-Sage mt-2">{t('profile.usernameSaved')}</p>
+          <p className="text-caption text-Sage mt-2">{t('profile.usernameSaved')}</p>
         )}
       </div>
 
-      <p className="text-[0.9375rem] text-Slate mt-2">{user.userId}</p>
+      <p className="text-body text-Slate mt-2">{user.userId}</p>
     </motion.div>
   )
 }

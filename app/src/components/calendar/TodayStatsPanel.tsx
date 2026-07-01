@@ -89,15 +89,15 @@ export default function TodayStatsPanel() {
       <div className="text-center py-1 shrink-0">
         <div className="flex items-center justify-center gap-1.5 mb-0.5">
           <Clock size={14} className="text-Amber" />
-          <span className="text-[0.6875rem] font-medium text-Slate dark:text-white/50 uppercase tracking-wider">今日专注</span>
+          <span className="text-label font-medium text-Slate dark:text-white/50 uppercase tracking-wider">今日专注</span>
         </div>
-        <div className="font-display text-[1.75rem] font-bold text-Ink dark:text-white leading-tight">
+        <div className="font-display text-heading font-bold text-Ink dark:text-white leading-tight">
           {formatDuration(totalTrackedToday)}
         </div>
         {activeTodo && (
           <div className="flex items-center justify-center gap-1 mt-0.5">
             <div className="w-1 h-1 rounded-full bg-Amber animate-pulse" />
-            <span className="text-[0.625rem] text-Amber">
+            <span className="text-label text-Amber">
               {activeTodo.text} · {formatDurationShort(getTotalDuration(activeTodo) + getCurrentElapsed(activeTodo))}
             </span>
           </div>
@@ -109,7 +109,7 @@ export default function TodayStatsPanel() {
         <div className="shrink-0">
           <div className="flex items-center gap-1 mb-1.5">
             <TrendingUp size={12} className="text-Slate dark:text-white/40" />
-            <span className="text-[0.625rem] font-medium text-Slate dark:text-white/40">7天趋势</span>
+            <span className="text-label font-medium text-Slate dark:text-white/40">7天趋势</span>
           </div>
           <div className="flex items-end gap-1 h-14 px-1">
             {weekData.map((d, i) => {
@@ -139,12 +139,12 @@ export default function TodayStatsPanel() {
               <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#C4783A" strokeWidth="4" strokeDasharray={`${completionRate * 100}, 100`} strokeLinecap="round" className="transition-all duration-700" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[0.625rem] font-bold text-Ink dark:text-white">{Math.round(completionRate * 100)}%</span>
+              <span className="text-label font-bold text-Ink dark:text-white">{Math.round(completionRate * 100)}%</span>
             </div>
           </div>
           <div>
             <p className="text-[0.75rem] font-medium text-Ink dark:text-white">今日完成 {doneCount}/{totalCount}</p>
-            <p className="text-[0.625rem] text-Slate/60 dark:text-white/30">{doneCount === totalCount ? '全部完成 🎉' : `还剩 ${totalCount - doneCount} 项`}</p>
+            <p className="text-label text-Slate/60 dark:text-white/30">{doneCount === totalCount ? '全部完成 🎉' : `还剩 ${totalCount - doneCount} 项`}</p>
           </div>
         </div>
       )}
@@ -154,7 +154,7 @@ export default function TodayStatsPanel() {
         <div className="shrink-0">
           <div className="flex items-center gap-1 mb-1.5">
             <Sun size={12} className="text-Slate dark:text-white/40" />
-            <span className="text-[0.625rem] font-medium text-Slate dark:text-white/40">时段分布</span>
+            <span className="text-label font-medium text-Slate dark:text-white/40">时段分布</span>
           </div>
           <div className="space-y-1">
             {timeSlots.map((slot) => (
@@ -164,7 +164,7 @@ export default function TodayStatsPanel() {
                 <div className="flex-1 h-2 bg-Mist/50 dark:bg-white/5 rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min((slot.hours / maxSlotHours) * 100, 100)}%`, backgroundColor: slot.color }} />
                 </div>
-                <span className="text-[0.625rem] font-mono text-Slate/60 dark:text-white/40 w-10 text-right shrink-0">
+                <span className="text-label font-mono text-Slate/60 dark:text-white/40 w-10 text-right shrink-0">
                   {slot.hours >= 1 ? `${slot.hours.toFixed(1)}h` : `${Math.round(slot.hours * 60)}m`}
                 </span>
               </div>

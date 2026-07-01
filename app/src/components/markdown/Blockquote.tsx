@@ -64,7 +64,7 @@ export default function Blockquote({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <blockquote className="border-l-[3px] border-Amber pl-6 my-6 italic text-Slate bg-Amber/[0.05] py-4 pr-4 rounded-r-lg">
+    <blockquote className="border-l-[3px] border-primary pl-6 my-6 italic text-muted bg-primary/5 py-4 pr-4 rounded-r-lg">
       {children}
     </blockquote>
   )

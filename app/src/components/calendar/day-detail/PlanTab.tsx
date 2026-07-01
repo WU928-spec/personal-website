@@ -58,7 +58,7 @@ export default function PlanTab({
             </button>
             <div className="flex-1 min-w-0">
               <span
-                className={`text-[0.9375rem] ${
+                className={`text-body ${
                   todo.done
                     ? 'line-through text-Slate/40 dark:text-white/30'
                     : 'text-Ink dark:text-white'
@@ -84,7 +84,7 @@ export default function PlanTab({
       </div>
 
       {todos.length === 0 && (
-        <p className="text-center text-[0.8125rem] text-Slate/40 dark:text-white/20 py-8">
+        <p className="text-center text-caption text-Slate/40 dark:text-white/20 py-8">
           {isPast ? '当天没有计划' : '添加今天的计划...'}
         </p>
       )}
@@ -98,7 +98,7 @@ export default function PlanTab({
               onChange={(e) => onNewTodoChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="添加待办..."
-              className="flex-1 px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+              className="flex-1 px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
             />
             <button
               onClick={onAddTodo}
@@ -115,7 +115,7 @@ export default function PlanTab({
               <select
                 value={selectedProjectId}
                 onChange={(e) => onProjectChange(e.target.value)}
-                className="flex-1 text-[0.8125rem] px-2 py-1.5 rounded-md border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white focus:outline-none focus:border-Amber/50"
+                className="flex-1 text-caption px-2 py-1.5 rounded-md border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white focus:outline-none focus:border-Amber/50"
               >
                 <option value="">无项目标签</option>
                 {projects

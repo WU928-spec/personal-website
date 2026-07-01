@@ -34,7 +34,7 @@ export default function CalendarHeader({
           <ChevronLeft size={20} />
         </button>
 
-        <h2 className="font-display text-[1.375rem] sm:text-[1.5rem] font-semibold text-Ink dark:text-white min-w-[140px] text-center select-none">
+        <h2 className="font-display text-heading font-semibold text-Ink dark:text-white min-w-[140px] text-center select-none">
           {year}年 {monthNames[month - 1]}
         </h2>
 

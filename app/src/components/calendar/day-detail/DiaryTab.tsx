@@ -14,14 +14,14 @@ export default function DiaryTab({ todos, diary, onDiaryChange, isToday, isPast,
     <div className="space-y-4">
       {todos.length > 0 && (
         <div className="bg-white dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg px-4 py-3">
-          <p className="text-[0.75rem] font-medium text-Slate dark:text-white/50 mb-2">
+          <p className="text-label font-medium text-Slate dark:text-white/50 mb-2">
             当日任务回顾
           </p>
           <div className="space-y-1.5">
             {todos.map((t) => (
               <p
                 key={t.id}
-                className={`text-[0.875rem] ${
+                className={`text-caption ${
                   t.done
                     ? 'text-Ink/50 dark:text-white/40 line-through'
                     : 'text-Ink dark:text-white/80'
@@ -35,7 +35,7 @@ export default function DiaryTab({ todos, diary, onDiaryChange, isToday, isPast,
       )}
 
       <div>
-        <label className="block text-[0.8125rem] font-medium text-Slate dark:text-white/50 mb-1.5">
+        <label className="block text-caption font-medium text-Slate dark:text-white/50 mb-1.5">
           {isToday
             ? '今天还有什么想记录的？'
             : isPast
@@ -54,10 +54,10 @@ export default function DiaryTab({ todos, diary, onDiaryChange, isToday, isPast,
                   : '对这一天有什么期待...'
             }
             rows={10}
-            className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20 resize-none leading-relaxed"
+            className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20 resize-none leading-relaxed"
           />
         ) : (
-          <div className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-[0.9375rem] min-h-[120px]">
+          <div className="w-full px-3 py-2.5 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body min-h-[120px]">
             {diary.trim() || (
               <span className="text-Slate/40 dark:text-white/20">
                 {isToday

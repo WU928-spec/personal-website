@@ -183,7 +183,7 @@ function PreviewOverlay({
           />
 
           {/* Counter */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70 text-sm">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70 text-caption">
             {index + 1} / {images.length}
           </div>
         </motion.div>

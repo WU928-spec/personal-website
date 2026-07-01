@@ -10,7 +10,7 @@ export default function TaskItem({ todo }: TaskItemProps) {
 
   return (
     <div
-      className={`flex items-center gap-2 text-[0.8125rem] ${
+      className={`flex items-center gap-2 text-caption ${
         todo.done
           ? 'text-Slate/40 dark:text-white/25 line-through'
           : 'text-Ink/70 dark:text-white/60'
@@ -18,7 +18,7 @@ export default function TaskItem({ todo }: TaskItemProps) {
     >
       <span className="shrink-0">{todo.done ? '·' : '○'}</span>
       <span className="flex-1 truncate">{todo.text}</span>
-      <span className="text-[0.625rem] font-mono text-Slate/40 dark:text-white/25 shrink-0">
+      <span className="text-label font-mono text-Slate/40 dark:text-white/25 shrink-0">
         {formatDuration(duration)}
       </span>
     </div>

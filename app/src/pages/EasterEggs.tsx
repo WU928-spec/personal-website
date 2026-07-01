@@ -48,9 +48,9 @@ export default function EasterEggs() {
         onVerified={handleVerified}
       />
 
-      <section className="min-h-[calc(100dvh-4rem)] bg-Parchment dark:bg-Graphite px-6 py-20 relative overflow-hidden">
+      <section className="min-h-[calc(100dvh-4rem)] bg-Parchment dark:bg-Graphite px-6 py-16 relative overflow-hidden">
         {/* 背景装饰光点 */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 hidden">
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
@@ -79,15 +79,15 @@ export default function EasterEggs() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-10 h-px bg-gradient-to-r from-transparent to-Amber/40 dark:to-white/30" />
               <Sparkles size={16} className="text-Amber/60 dark:text-white/40" />
               <div className="w-10 h-px bg-gradient-to-l from-transparent to-Amber/40 dark:to-white/30" />
             </div>
 
-            <h1 className="font-display text-[clamp(2.5rem,6vw,4rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-Ink dark:text-white">
+            <h1 className="font-display text-display font-semibold leading-[1.1] tracking-[-0.02em] text-Ink dark:text-white">
               {t('easterEggs.title')}
             </h1>
 
@@ -97,7 +97,7 @@ export default function EasterEggs() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="mt-6 max-w-md mx-auto text-sm text-Ink/50 dark:text-white/40 font-body leading-relaxed tracking-wide"
+              className="mt-6 max-w-md mx-auto text-caption text-Ink/50 dark:text-white/40 font-body leading-relaxed tracking-wide"
             >
               {t('easterEggs.description')}
               <br />
@@ -108,7 +108,7 @@ export default function EasterEggs() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="mt-4 flex items-center justify-center gap-2 text-xs text-Amber/60 dark:text-white/30 font-body tracking-widest"
+              className="mt-4 flex items-center justify-center gap-2 text-label text-Amber/60 dark:text-white/30 font-body tracking-widest"
             >
               <Heart size={12} className="text-Amber/40" />
               <span>{t('easterEggs.irregularUpdates')}</span>
@@ -132,26 +132,26 @@ export default function EasterEggs() {
               >
                 <div className="group relative">
                   {/* 悬停光晕 */}
-                  <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-Amber/5 to-transparent opacity-0 blur-2xl transition-all duration-500 group-hover:opacity-100 group-hover:-inset-6" />
+                  <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-Amber/5 to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:-inset-6" />
 
                   {/* 卡片边框光效 */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-Amber/10 via-transparent to-Amber/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-white/10 dark:to-white/5" />
+                  <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-Amber/10 via-transparent to-Amber/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-white/10 dark:to-white/5" />
 
-                  <div className="relative rounded-2xl border border-Amber/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm p-8 transition-all duration-500 hover:border-Amber/20 dark:hover:border-white/20 hover:shadow-[0_8px_40px_-12px_rgba(251,191,36,0.15)] dark:hover:shadow-[0_8px_40px_-12px_rgba(255,255,255,0.08)]">
+                  <div className="relative rounded-lg border border-Amber/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] p-8 transition-all duration-500 hover:border-Amber/20 dark:hover:border-white/20">
                     {/* 状态标签 */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-2">
                         {egg.status === 'available' ? (
                           <>
-                            <span className="w-2 h-2 rounded-full bg-green-400/80 shadow-[0_0_8px_rgba(74,222,128,0.4)]" />
-                            <span className="text-xs text-green-500/70 dark:text-green-400/60 font-body tracking-wider">
+                            <span className="w-2 h-2 rounded-full bg-green-400/80" />
+                            <span className="text-label text-green-500/70 dark:text-green-400/60 font-body tracking-wider">
                               {t('internship.unlocked')}
                             </span>
                           </>
                         ) : (
                           <>
                             <Lock size={12} className="text-white/30" />
-                            <span className="text-xs text-white/30 font-body tracking-wider">
+                            <span className="text-label text-white/30 font-body tracking-wider">
                               {t('internship.locked')}
                             </span>
                           </>
@@ -166,15 +166,15 @@ export default function EasterEggs() {
                     </div>
 
                     {/* 标题和描述 */}
-                    <h3 className="font-display text-lg font-medium text-Ink dark:text-white/90 tracking-wide text-center mb-3">
+                    <h3 className="font-display text-subhead font-medium text-Ink dark:text-white/90 tracking-wide text-center mb-4">
                       {t('easterEggs.starryTitle')}
                     </h3>
-                    <p className="text-sm text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
+                    <p className="text-caption text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
                       {t('easterEggs.starryDescription')}
                     </p>
 
                     {/* 底部提示 */}
-                    <div className="flex items-center justify-center gap-2 text-xs text-Amber/50 dark:text-white/30 font-body tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="flex items-center justify-center gap-2 text-label text-Amber/50 dark:text-white/30 font-body tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span>{t('internship.clickExplore')}</span>
                       <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
@@ -189,14 +189,14 @@ export default function EasterEggs() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.8 }}
-            className="mt-20 text-center"
+            className="mt-16 text-center"
           >
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="w-12 h-px bg-gradient-to-r from-transparent to-Amber/20 dark:to-white/20" />
               <Lock size={14} className="text-Amber/30 dark:text-white/20" />
               <div className="w-12 h-px bg-gradient-to-l from-transparent to-Amber/20 dark:to-white/20" />
             </div>
-            <p className="text-xs text-Ink/30 dark:text-white/20 font-body tracking-widest">
+            <p className="text-label text-Ink/30 dark:text-white/20 font-body tracking-widest">
               {t('internship.moreEggs')}
             </p>
           </motion.div>

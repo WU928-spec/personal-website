@@ -76,22 +76,22 @@ export default function ProjectDetail({
   const hasHistory = stats && stats.dailyBreakdown.length > 0
 
   return (
-    <div className="space-y-4 mt-3">
+    <div className="space-y-4 mt-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Clock size={12} className="text-Slate/50 dark:text-white/30" />
-          <span className="text-[0.75rem] text-Slate dark:text-white/50">
+          <span className="text-label text-Slate dark:text-white/50">
             {headerLabel}
           </span>
-          <span className="text-[0.625rem] text-Slate/40 dark:text-white/30">
+          <span className="text-label text-Slate/40 dark:text-white/30">
             共 {formatDuration(totalSeconds)}
           </span>
         </div>
         {!showAllHistory && hasHistory && (
           <button
             onClick={onOpenHistory}
-            className="text-[0.6875rem] text-Amber hover:text-Amber/80 transition-colors"
+            className="text-label text-Amber hover:text-Amber/80 transition-colors"
           >
             查看全部历史 →
           </button>
@@ -100,16 +100,16 @@ export default function ProjectDetail({
 
       {/* Task list */}
       {hasHistory && (
-        <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
+        <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
           {[...stats.dailyBreakdown]
             .reverse()
             .filter((day) => showAllHistory || day.date >= cutoffDateStr)
             .map((day) => (
               <div key={day.date}>
-                <p className="text-[0.625rem] text-Slate/40 dark:text-white/25 mb-1 sticky top-0 bg-Parchment dark:bg-Graphite py-0.5">
+                <p className="text-label text-Slate/40 dark:text-white/25 mb-2 sticky top-0 bg-Parchment dark:bg-Graphite py-1">
                   {day.date}
                 </p>
-                <div className="space-y-1 pl-1">
+                <div className="space-y-2 pl-2">
                   {day.todos.filter((t) => !!t.text && t.projectId === projectId).map((todo) => (
                     <TaskItem key={todo.id} todo={todo} />
                   ))}

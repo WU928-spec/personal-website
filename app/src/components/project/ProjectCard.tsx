@@ -109,8 +109,8 @@ export default function ProjectCard({
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 pt-1 border-t border-Sand/50 dark:border-white/5">
-              <div className="sm:hidden flex items-center gap-4 mb-4 mt-3">
+            <div className="px-6 pb-6 pt-2 border-t border-Sand/50 dark:border-white/5">
+              <div className="sm:hidden flex items-center gap-4 mb-4 mt-4">
                 <ProjectStatBadge icon={<Clock size={12} />} label="已投入" value={formatDuration(totalSeconds)} />
                 <ProjectStatBadge icon={<ListChecks size={12} />} label="任务" value={`${doneTodos}/${totalTodos}`} />
                 {project.targetHours > 0 && (
@@ -127,7 +127,7 @@ export default function ProjectCard({
 
               {subProjects.length > 0 && (
                 <div className="mt-4 space-y-2">
-                  <p className="text-[0.75rem] font-medium text-Slate/60 dark:text-white/40 mb-1.5">
+                  <p className="text-label font-medium text-Slate/60 dark:text-white/40 mb-2">
                     子项目
                   </p>
                   {subProjects.map((sub) => (

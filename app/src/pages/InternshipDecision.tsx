@@ -81,31 +81,7 @@ export default function InternshipDecision() {
         defaultDestination={mapOffer?.location || ''}
       />
 
-      <section className="min-h-[calc(100dvh-4rem)] bg-Parchment dark:bg-[#050508] px-4 py-12 md:px-8 relative overflow-hidden">
-        {/* 背景装饰光点 */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-Amber/20 dark:bg-white/10"
-              style={{
-                left: `${10 + i * 15}%`,
-                top: `${20 + (i % 3) * 25}%`,
-              }}
-              animate={{
-                opacity: [0.1, 0.3, 0.1],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 4 + i * 0.6,
-                repeat: Infinity,
-                delay: i * 0.8,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
-
+      <section className="min-h-[calc(100dvh-4rem)] bg-Parchment dark:bg-background px-4 py-12 md:px-8 relative overflow-hidden">
         <div className="max-w-5xl mx-auto relative z-10">
           <BackToTools />
 
@@ -116,19 +92,19 @@ export default function InternshipDecision() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-12"
           >
-            <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-10 h-px bg-gradient-to-r from-transparent to-Amber/40 dark:to-white/30" />
               <Sparkles size={16} className="text-Ink/40 dark:text-white/40" />
               <div className="w-10 h-px bg-gradient-to-l from-transparent to-Amber/40 dark:to-white/30" />
             </div>
 
-            <h1 className="font-display text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-Ink dark:text-white/90">
+            <h1 className="font-display text-display font-semibold leading-[1.1] tracking-[-0.02em] text-Ink dark:text-white/90">
               {t('internship.title')}
             </h1>
 
             <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 dark:via-white/30 to-transparent rounded-full" />
 
-            <p className="mt-6 max-w-lg mx-auto text-sm text-Ink/50 dark:text-white/30 font-body leading-relaxed tracking-wide">
+            <p className="mt-6 max-w-lg mx-auto text-caption text-Ink/50 dark:text-white/30 font-body leading-relaxed tracking-wide">
               {t('internship.description')}
             </p>
 
@@ -137,10 +113,10 @@ export default function InternshipDecision() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10"
+                className="mt-6 inline-flex items-center gap-4 px-5 py-2.5 rounded-lg bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10"
               >
                 <TrendingUp size={14} className="text-green-500/60 dark:text-green-400/60" />
-                <span className="text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider">
+                <span className="text-Ink/50 dark:text-white/50 text-label font-body tracking-wider">
                   {t('internship.currentRecommendation')}:<span className="text-Ink/70 dark:text-white/70">{topOffer.companyName}</span> · {calcTotalScore(topOffer).toFixed(1)}{t('internship.points')}
                 </span>
               </motion.div>
@@ -160,7 +136,7 @@ export default function InternshipDecision() {
                   value={homeAddress}
                   onChange={(e) => handleHomeAddressChange(e.target.value)}
                   placeholder={t('internship.origin')}
-                  className="flex-1 bg-transparent text-sm text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none"
+                  className="flex-1 bg-transparent text-caption text-Ink/80 dark:text-white/80 font-body placeholder:text-Ink/30 dark:placeholder:text-white/20 focus:outline-none"
                 />
               </div>
             </motion.div>
@@ -173,7 +149,7 @@ export default function InternshipDecision() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="mb-10 p-5 rounded-2xl border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
           >
-            <h3 className="text-Ink/50 dark:text-white/50 text-xs font-body tracking-wider mb-4">
+            <h3 className="text-Ink/50 dark:text-white/50 text-label font-body tracking-wider mb-4">
               {t('internship.scoringWeights')}
             </h3>
             <div className="grid grid-cols-3 gap-4">
@@ -205,7 +181,7 @@ export default function InternshipDecision() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="mb-10 p-4 rounded-xl border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
           >
-            <p className="text-Ink/40 dark:text-white/30 text-xs font-body leading-[1.8]">
+            <p className="text-Ink/40 dark:text-white/30 text-label font-body leading-[1.8]">
               {t('internship.formulaText')}
             </p>
           </motion.div>
@@ -257,13 +233,13 @@ function WeightCard({
   description: string
 }) {
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex items-start gap-4">
       <div className="mt-0.5 shrink-0">{icon}</div>
       <div>
-        <p className="text-Ink/60 dark:text-white/60 text-sm font-body">
+        <p className="text-Ink/60 dark:text-white/60 text-caption font-body">
           {label} <span className="text-Ink/80 dark:text-white/80 ml-1">{value}</span>
         </p>
-        <p className="text-Ink/30 dark:text-white/20 text-xs font-body mt-0.5">{description}</p>
+        <p className="text-Ink/30 dark:text-white/20 text-caption font-body mt-0.5">{description}</p>
       </div>
     </div>
   )

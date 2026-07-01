@@ -22,7 +22,7 @@ export default function ImagePreviewStrip({ images, onRemove, onAdd }: Props) {
               <img src={img} alt="" className="w-full h-full rounded-lg object-cover" />
               <button
                 onClick={() => onRemove(i)}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center"
+                className="absolute -top-2 -right-2 w-5 h-5 rounded-md bg-black/70 text-white flex items-center justify-center"
               >
                 <X size={12} />
               </button>
@@ -31,10 +31,10 @@ export default function ImagePreviewStrip({ images, onRemove, onAdd }: Props) {
           {images.length < 9 && (
             <button
               onClick={onAdd}
-              className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 dark:border-white/15 flex flex-col items-center justify-center text-gray-400 hover:border-Amber hover:text-Amber transition-colors"
+              className="w-20 h-20 rounded-lg border-2 border-dashed border-muted-foreground flex flex-col items-center justify-center text-muted-foreground hover:border-Amber hover:text-Amber transition-colors"
             >
               <Image size={18} />
-              <span className="text-[0.625rem] mt-0.5">图片</span>
+              <span className="text-label mt-1">图片</span>
             </button>
           )}
         </motion.div>

@@ -13,7 +13,7 @@ export default function About() {
       />
       {/* ── Hero ── */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -21,7 +21,7 @@ export default function About() {
               duration: 0.8,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="font-display text-[clamp(2rem,4vw,3.5rem)] font-medium text-Ink dark:text-white"
+            className="font-display text-display font-medium text-Ink dark:text-white"
           >
             {t('about.title')}
           </motion.h1>
@@ -33,7 +33,7 @@ export default function About() {
               delay: 0.3,
               ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
             }}
-            className="mt-4 text-[1.0625rem] leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
+            className="mt-4 text-body leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
           >
             {t('about.comingSoon')}
           </motion.p>

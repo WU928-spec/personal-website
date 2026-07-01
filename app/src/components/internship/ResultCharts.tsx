@@ -37,13 +37,13 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-Ink/70 dark:text-white/70 font-body text-sm tracking-wider">{t('internship.visualComparison')}</h3>
+        <h3 className="text-Ink/70 dark:text-white/70 font-body text-caption tracking-wider">{t('internship.visualComparison')}</h3>
         <div className="flex flex-wrap gap-1.5">
           {(Object.entries(dimensionConfig) as [string, typeof dimensionConfig['total']][]).map(([key, config]) => (
             <button
               key={key}
               onClick={() => setActiveDimension(key as typeof activeDimension)}
-              className={`px-2.5 py-1 rounded-full text-xs font-body tracking-wider transition-all border ${
+              className={`px-2.5 py-1 rounded-lg text-label font-body tracking-wider transition-all border ${
                 activeDimension === key
                   ? 'bg-white/70 dark:bg-white/10 text-Ink/80 dark:text-white/80 border-Amber/20 dark:border-white/20'
                   : 'text-Ink/30 dark:text-white/30 border-Amber/5 dark:border-white/5 hover:text-Ink/50 dark:hover:text-white/50 hover:border-Amber/10 dark:hover:border-white/10'
@@ -67,9 +67,9 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05, duration: 0.3 }}
-              className="flex items-center gap-3"
+              className="flex items-center gap-4"
             >
-              <span className="text-Ink/40 dark:text-white/40 text-xs font-body w-20 truncate shrink-0">
+              <span className="text-Ink/40 dark:text-white/40 text-label font-body w-20 truncate shrink-0">
                 {offer.companyName}
               </span>
               <div className="flex-1 h-6 bg-white/70 dark:bg-white/5 rounded-md overflow-hidden relative">
@@ -79,7 +79,7 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                   className={`h-full bg-gradient-to-r ${color} rounded-md`}
                 />
-                <span className="absolute inset-0 flex items-center px-2 text-Ink/60 dark:text-white/60 text-xs font-body">
+                <span className="absolute inset-0 flex items-center px-2 text-Ink/60 dark:text-white/60 text-label font-body">
                   {value.toFixed(1)}
                 </span>
               </div>
@@ -203,11 +203,11 @@ function RadarChart({ offers }: { offers: Offer[] }) {
       </svg>
 
       {/* 图例 */}
-      <div className="flex flex-wrap gap-3 mt-3">
+      <div className="flex flex-wrap gap-4 mt-4">
         {offers.slice(0, 5).map((offer, idx) => (
           <div key={offer.id} className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[idx % colors.length] }} />
-            <span className="text-Ink/40 dark:text-white/40 text-xs font-body">{offer.companyName}</span>
+            <span className="text-Ink/40 dark:text-white/40 text-label font-body">{offer.companyName}</span>
           </div>
         ))}
       </div>
@@ -232,10 +232,10 @@ function Recommendation({ offers }: { offers: Offer[] }) {
 
   return (
     <div className="p-4 rounded-xl border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
-      <h4 className="text-Ink/60 dark:text-white/60 text-sm font-body tracking-wider mb-3">
+      <h4 className="text-Ink/60 dark:text-white/60 text-caption font-body tracking-wider mb-4">
         {t('internship.recommendation')}
       </h4>
-      <p className="text-Ink/50 dark:text-white/50 text-xs font-body leading-[1.8]">
+      <p className="text-Ink/50 dark:text-white/50 text-label font-body leading-[1.8]">
         <span className="text-Ink/70 dark:text-white/70">{a.companyName}</span> {t('internship.totalScore')}{' '}
         <span className="text-Ink/70 dark:text-white/70">{b.companyName}</span> {diff.toFixed(1)} {t('internship.points')}。
         {salaryDiff > 0 && `${t('internship.salary')} ${salaryDiff.toFixed(0)} ${t('internship.points')}；`}

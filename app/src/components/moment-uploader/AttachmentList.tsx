@@ -20,7 +20,7 @@ export default function AttachmentList({ attachments, onRemove }: Props) {
           {attachments.map((att, i) => (
             <div
               key={i}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 dark:bg-white/5 text-[0.75rem] text-gray-700 dark:text-gray-300"
+              className="flex items-center gap-2 px-2 py-1 rounded-full bg-muted text-label text-foreground"
             >
               {att.type === 'md-link' ? (
                 <BookOpen size={12} className="text-Amber" />
@@ -28,7 +28,7 @@ export default function AttachmentList({ attachments, onRemove }: Props) {
                 <Paperclip size={12} className="text-Slate" />
               )}
               <span className="truncate max-w-[120px]">{att.name}</span>
-              <button onClick={() => onRemove(i)} className="text-gray-400 hover:text-red-500">
+              <button onClick={() => onRemove(i)} className="text-muted-foreground hover:text-red-500">
                 <X size={12} />
               </button>
             </div>

@@ -67,7 +67,7 @@ function MomentCard({
         delay: index * 0.06,
         ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
       }}
-      className="flex gap-3 px-4 py-4 bg-white dark:bg-[#111]"
+      className="flex gap-4 px-4 py-4 bg-card"
     >
       {/* Avatar */}
       <div className="shrink-0">
@@ -78,7 +78,7 @@ function MomentCard({
             className="w-12 h-12 rounded-full object-cover"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-base font-bold">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-body font-bold">
             {author.username[0] || '?'}
           </div>
         )}
@@ -87,18 +87,18 @@ function MomentCard({
       {/* Content */}
       <div className="flex-1 min-w-0">
         {/* Nickname */}
-        <div className="font-semibold text-[0.9375rem] text-Amber">
+        <div className="font-semibold text-body text-Amber">
           {author.username}
         </div>
 
         {/* Time */}
-        <div className="text-[0.75rem] text-gray-500 dark:text-gray-400 mt-0.5">
+        <div className="text-label text-muted-foreground mt-1">
           {formatRelativeTime(moment.createdAt)}
         </div>
 
         {/* Text content */}
         {moment.content && (
-          <p className="mt-2 text-[0.9375rem] leading-relaxed text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+          <p className="mt-2 text-body leading-relaxed text-foreground whitespace-pre-wrap">
             {moment.content}
           </p>
         )}
@@ -108,19 +108,19 @@ function MomentCard({
 
         {/* Attachments */}
         {moment.attachments && moment.attachments.length > 0 && (
-          <div className="mt-2 flex flex-col gap-1.5">
+          <div className="mt-2 flex flex-col gap-2">
             {moment.attachments.map((att, i) => (
               <button
                 key={i}
                 onClick={() => handleAttachmentClick(att)}
-                className="flex items-center gap-2 self-start px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors text-left"
+                className="flex items-center gap-2 self-start px-2 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-left"
               >
                 {att.type === 'md-link' ? (
                   <BookOpen size={14} className="text-Amber shrink-0" />
                 ) : (
                   <Paperclip size={14} className="text-Slate shrink-0" />
                 )}
-                <span className="text-[0.8125rem] text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
+                <span className="text-caption text-foreground truncate max-w-[200px]">
                   {att.name}
                 </span>
               </button>
@@ -130,7 +130,7 @@ function MomentCard({
 
         {/* Location */}
         {moment.location && (
-          <div className="mt-2 flex items-center gap-1 text-[0.75rem] text-gray-500 dark:text-gray-400">
+          <div className="mt-2 flex items-center gap-1 text-label text-muted-foreground">
             <MapPin size={12} />
             <span>{moment.location}</span>
           </div>
@@ -142,7 +142,7 @@ function MomentCard({
             <button
               onClick={() => isLoggedIn && onLike(moment.id)}
               disabled={!isLoggedIn}
-              className={`flex items-center gap-1 text-sm transition-colors ${
+              className={`flex items-center gap-1 text-caption transition-colors ${
                 !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
               }`}
             >
@@ -151,17 +151,17 @@ function MomentCard({
                 className={
                   isLiked
                     ? 'text-red-500 fill-red-500'
-                    : 'text-gray-400 dark:text-gray-500 hover:text-red-400'
+                    : 'text-muted-foreground hover:text-red-400'
                 }
               />
-              <span className={isLiked ? 'text-red-500' : 'text-gray-400 dark:text-gray-500'}>
+              <span className={isLiked ? 'text-red-500' : 'text-muted-foreground'}>
                 {moment.likes.length > 0 ? moment.likes.length : '赞'}
               </span>
             </button>
             <button
               onClick={() => isLoggedIn && setShowCommentInput((v) => !v)}
               disabled={!isLoggedIn}
-              className={`flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-Amber transition-colors ${
+              className={`flex items-center gap-1 text-caption text-muted-foreground hover:text-Amber transition-colors ${
                 !isLoggedIn ? 'cursor-not-allowed opacity-40' : ''
               }`}
             >
@@ -178,7 +178,7 @@ function MomentCard({
                   onDelete(moment.id)
                 }
               }}
-              className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors"
+              className="flex items-center gap-1 text-caption text-muted-foreground hover:text-red-500 transition-colors"
               title="删除"
             >
               <Trash2 size={16} />
@@ -188,11 +188,11 @@ function MomentCard({
 
         {/* Likes & Comments area */}
         {(moment.likes.length > 0 || moment.comments.length > 0) && (
-          <div className="mt-3 bg-gray-100 dark:bg-slate-800 rounded-lg px-3 py-2.5">
+          <div className="mt-3 bg-muted rounded-lg px-4 py-2">
             {/* Likes */}
             {moment.likes.length > 0 && (
-              <div className="flex items-start gap-1.5 text-sm">
-                <Heart size={14} className="text-red-500 fill-red-500 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-2 text-caption">
+                <Heart size={14} className="text-red-500 fill-red-500 mt-1 shrink-0" />
                 <span className="text-Amber">
                   {likeNames}
                 </span>
@@ -201,18 +201,18 @@ function MomentCard({
 
             {/* Divider */}
             {moment.likes.length > 0 && moment.comments.length > 0 && (
-              <div className="h-px bg-gray-200 dark:bg-white/10 my-1.5" />
+              <div className="h-px bg-border my-2" />
             )}
 
             {/* Comments */}
             {moment.comments.length > 0 && (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {moment.comments.map((c) => {
                   const commenter = getUserDisplay(c.userId)
                   return (
-                    <div key={c.id} className="text-sm">
+                    <div key={c.id} className="text-caption">
                       <span className="font-semibold text-Amber">{commenter.username || c.name}</span>
-                      <span className="text-gray-700 dark:text-gray-300">：{c.text}</span>
+                      <span className="text-foreground">：{c.text}</span>
                     </div>
                   )
                 })}
@@ -237,12 +237,12 @@ function MomentCard({
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="写评论..."
                 autoFocus
-                className="flex-1 bg-gray-100 dark:bg-slate-800 rounded-full px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none"
+                className="flex-1 bg-muted rounded-full px-4 py-2 text-caption text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={!commentText.trim()}
-                className="px-3 py-1.5 text-sm text-[#07c160] font-medium disabled:opacity-40"
+                className="px-2 py-2 text-caption text-green-600 font-medium disabled:opacity-40"
               >
                 发送
               </button>

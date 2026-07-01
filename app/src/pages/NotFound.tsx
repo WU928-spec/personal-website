@@ -7,14 +7,14 @@ export default function NotFound() {
   return (
     <div className="min-h-[80dvh] bg-Parchment dark:bg-Graphite flex items-center justify-center">
       <PageSEO title="404 — Page Not Found" />
-      <div className="text-center px-6 max-w-lg">
+      <div className="text-center px-4 max-w-lg">
         {/* 404 large number */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h1 className="font-display text-[clamp(6rem,15vw,10rem)] font-bold leading-none text-Amber/20 dark:text-Amber/15 select-none">
+          <h1 className="font-display text-display font-bold leading-none text-Amber/20 dark:text-Amber/15 select-none">
             404
           </h1>
         </motion.div>
@@ -25,10 +25,10 @@ export default function NotFound() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="font-display text-[1.5rem] md:text-[2rem] font-medium text-Ink dark:text-white mt-2">
+          <h2 className="font-display text-heading md:text-heading font-medium text-Ink dark:text-white mt-2">
             Page Not Found
           </h2>
-          <p className="mt-3 text-[1.0625rem] leading-[1.75] text-Slate dark:text-white/60 font-body max-w-sm mx-auto">
+          <p className="mt-4 text-body leading-[1.75] text-Slate dark:text-white/60 font-body max-w-sm mx-auto">
             This note has not been planted in the garden yet — or it never will be.
           </p>
         </motion.div>
@@ -42,14 +42,14 @@ export default function NotFound() {
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-Amber text-Parchment rounded-lg font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] hover:bg-[#B06A2F] hover:-translate-y-px transition-all duration-200"
+            className="inline-flex items-center gap-2 px-6 py-2 bg-Amber text-Parchment rounded-lg font-ui text-caption font-semibold uppercase tracking-[0.05em] hover:bg-primary hover:-translate-y-px transition-all duration-200"
           >
             <Home size={16} />
             Home
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="inline-flex items-center gap-2 px-6 py-3 border-[1.5px] border-Sand dark:border-white/25 text-Ink dark:text-white rounded-lg font-ui text-[0.875rem] font-semibold uppercase tracking-[0.05em] hover:border-Ink dark:hover:border-white/50 hover:-translate-y-px transition-all duration-200"
+            className="inline-flex items-center gap-2 px-6 py-2 border-[1.5px] border-Sand dark:border-white/25 text-Ink dark:text-white rounded-lg font-ui text-caption font-semibold uppercase tracking-[0.05em] hover:border-Ink dark:hover:border-white/50 hover:-translate-y-px transition-all duration-200"
           >
             <ArrowLeft size={16} />
             Go Back

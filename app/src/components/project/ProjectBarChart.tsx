@@ -28,7 +28,7 @@ export default function ProjectBarChart({
 
   if (data.length === 0 || !data.some((d) => d.seconds > 0)) {
     return (
-      <p className="text-center text-[0.75rem] text-Slate/40 dark:text-white/20 py-4">
+      <p className="text-center text-label text-Slate/40 dark:text-white/20 py-4">
         暂无时间记录
       </p>
     )
@@ -68,12 +68,12 @@ export default function ProjectBarChart({
                 >
                   {/* Tooltip */}
                   {hasData && (
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap text-Ink dark:text-white text-[0.625rem]">
-                      <div className="text-[0.6875rem] font-medium">
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap text-Ink dark:text-white text-label">
+                      <div className="text-label font-medium">
                         {formatDuration(d.seconds)}
                       </div>
                       {totalSeconds > 0 && (
-                        <div className="text-[0.6875rem]">
+                        <div className="text-label">
                           占比: {((d.seconds / totalSeconds) * 100).toFixed(1)}%
                         </div>
                       )}
@@ -86,17 +86,17 @@ export default function ProjectBarChart({
             {/* Label */}
             {isCompact ? (
               <span
-                className={`text-[0.5625rem] truncate ${isToday ? 'font-medium' : ''}`}
+                className={`text-label truncate ${isToday ? 'font-medium' : ''}`}
                 style={{ color: isToday ? color : undefined }}
               >
                 {label}
               </span>
             ) : showDateLabel ? (
-              <span className="text-[0.5rem] text-Slate/40 dark:text-white/25 truncate">
+              <span className="text-label text-Slate/40 dark:text-white/25 truncate">
                 {d.date.slice(5).replace('-', '/')}
               </span>
             ) : (
-              <span className="text-[0.5rem] text-transparent">·</span>
+              <span className="text-label text-transparent">·</span>
             )}
           </div>
         )

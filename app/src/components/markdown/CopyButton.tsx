@@ -15,7 +15,7 @@ export default function CopyButton({ code }: { code: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="absolute top-3 right-3 flex items-center gap-1 rounded px-2 py-1 text-xs font-mono text-white/70 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white/20"
+      className="absolute top-3 right-3 flex items-center gap-1 rounded px-2 py-1 text-label font-mono text-primary/70 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-primary/20"
       aria-label="Copy code"
     >
       {copied ? <Check size={14} /> : <Copy size={14} />}

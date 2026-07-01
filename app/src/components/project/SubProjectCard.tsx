@@ -24,13 +24,13 @@ export default function SubProjectCard({ subProject, parentColor }: SubProjectCa
     <div className="rounded-lg border border-Sand/50 dark:border-white/5 bg-white/40 dark:bg-white/[0.03] overflow-hidden">
       <button
         onClick={() => setIsExpanded((v) => !v)}
-        className="w-full flex items-center gap-2 px-3 py-2.5 text-left"
+        className="w-full flex items-center gap-2 px-4 py-2 text-left"
       >
         <div
           className="w-2 h-2 rounded-full shrink-0"
           style={{ backgroundColor: color }}
         />
-        <span className="flex-1 text-[0.875rem] text-Ink dark:text-white truncate">
+        <span className="flex-1 text-caption text-Ink dark:text-white truncate">
           {subProject.name}
         </span>
         {subProject.targetHours > 0 && (
@@ -41,12 +41,12 @@ export default function SubProjectCard({ subProject, parentColor }: SubProjectCa
                 style={{ width: `${progress * 100}%`, backgroundColor: color }}
               />
             </div>
-            <span className="text-[0.625rem] text-Slate/50 dark:text-white/30">
+            <span className="text-label text-Slate/50 dark:text-white/30">
               {Math.round(progress * 100)}%
             </span>
           </div>
         )}
-        <span className="text-[0.625rem] font-mono text-Slate/50 dark:text-white/30 shrink-0">
+        <span className="text-label font-mono text-Slate/50 dark:text-white/30 shrink-0">
           {formatDuration(stats?.totalSeconds || 0)}
         </span>
         {isExpanded ? (
@@ -65,7 +65,7 @@ export default function SubProjectCard({ subProject, parentColor }: SubProjectCa
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-3 pb-3">
+            <div className="px-4 pb-4">
               <ProjectDetail
                 projectId={subProject.id}
                 color={color}
