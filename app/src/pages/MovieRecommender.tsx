@@ -98,13 +98,26 @@ async function chatWithAI(
     const content = data.choices?.[0]?.message?.content || ''
 
     // Try to extract JSON block
-    const jsonMatch = content.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      // Fallback: treat entire response as plain text
+    let parsed: any = null
+    try {
+      // Try code block first: ```json ... ```
+      const codeBlock = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
+      if (codeBlock) {
+        parsed = JSON.parse(codeBlock[1])
+      } else {
+        // Fallback: find first JSON object (non-greedy)
+        const jsonMatch = content.match(/\{[\s\S]*?\}/)
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0])
+        }
+      }
+    } catch {
+      // JSON malformed or not found, treat as plain text
       return { reply: content, movies: [] }
     }
 
-    const parsed = JSON.parse(jsonMatch[0])
+    if (!parsed) return { reply: content, movies: [] }
+
     return {
       reply: parsed.reply || content,
       movies: (parsed.movies || []).map((m: Record<string, string>) => ({
@@ -142,20 +155,20 @@ function FreeMovieCard({ movie, index }: { movie: FreeMovie; index: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="p-4 rounded-2xl bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-Amber/5 dark:from-indigo-500/10 dark:via-purple-500/5 dark:to-Amber/5 border border-indigo-200/30 dark:border-white/10 backdrop-blur-sm"
+      className="p-4 rounded-lg bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-Amber/5 dark:from-indigo-500/10 dark:via-purple-500/5 dark:to-Amber/5 border border-indigo-200/30 dark:border-white/10"
     >
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400/70 shrink-0">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400/70 shrink-0">
           <Wand2 size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-            <h3 className="font-display text-sm font-semibold text-Ink dark:text-white">{movie.title}</h3>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <h3 className="font-display text-caption font-semibold text-Ink dark:text-white">{movie.title}</h3>
             {movie.originalTitle && (
-              <span className="text-[0.65rem] text-Slate/40">{movie.originalTitle}</span>
+              <span className="text-label text-Slate/40">{movie.originalTitle}</span>
             )}
           </div>
-          <div className="flex items-center gap-2 mb-2 text-[0.7rem] text-Slate/50 dark:text-white/35">
+          <div className="flex items-center gap-2 mb-2 text-label text-Slate/50 dark:text-white/35">
             {movie.rating && (
               <span className="flex items-center gap-0.5">
                 <Star size={9} className="text-Gold" />
@@ -165,19 +178,19 @@ function FreeMovieCard({ movie, index }: { movie: FreeMovie; index: number }) {
             <span>{movie.year}</span>
             <span>{movie.director}</span>
             {movie.runtime && <span>{movie.runtime}</span>}
-            <span className="px-1.5 py-0.5 rounded-full bg-indigo-100/40 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300 text-[0.6rem]">
+            <span className="px-2 py-1 rounded bg-indigo-100/40 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300 text-label">
               {movie.genre}
             </span>
           </div>
-          <div className="p-3 rounded-xl bg-white/40 dark:bg-white/[0.02] border border-indigo-100/30 dark:border-white/5">
+          <div className="p-4 rounded-lg bg-white/40 dark:bg-white/[0.02] border border-indigo-100/30 dark:border-white/5">
             <div className="flex items-center gap-1.5 mb-1">
               <Sparkles size={10} className="text-indigo-400/70" />
-              <span className="text-[0.65rem] text-indigo-400/70 font-medium">推荐理由</span>
+              <span className="text-label text-indigo-400/70 font-medium">推荐理由</span>
             </div>
-            <p className="text-xs text-Ink/60 dark:text-white/50 leading-relaxed">{movie.reason}</p>
+            <p className="text-caption text-Ink/60 dark:text-white/50 leading-relaxed">{movie.reason}</p>
           </div>
           {movie.whereToWatch && (
-            <p className="mt-2 text-[0.65rem] text-Slate/40 dark:text-white/25 flex items-center gap-1">
+            <p className="mt-2 text-label text-Slate/40 dark:text-white/25 flex items-center gap-1">
               <Sparkles size={9} />
               观看渠道：{movie.whereToWatch}
             </p>
@@ -229,18 +242,27 @@ function LocalMovieCard({ movie }: { movie: Movie }) {
 
 export default function MovieAgent() {
   const navigate = useNavigate()
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem('movie_chat_history')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [apiKey, setApiKey] = useState(() => localStorage.getItem(API_KEY_STORAGE) || '')
   const [apiKeyInput, setApiKeyInput] = useState('')
   const [showApiSettings, setShowApiSettings] = useState(false)
+  const [selectedMovie, setSelectedMovie] = useState<FreeMovie | Movie | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const dailyMovie = getDailyMovie()
 
-  // Initialize greeting
+  // Initialize greeting (only if no history)
   useEffect(() => {
     if (messages.length === 0) {
       const greeting: ChatMessage = {
@@ -253,16 +275,29 @@ export default function MovieAgent() {
     }
   }, [])
 
+  // Persist chat history
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('movie_chat_history', JSON.stringify(messages))
+    }
+  }, [messages])
+
   // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Auto focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
 
   const saveApiKey = useCallback(() => {
     if (apiKeyInput.trim()) {
       localStorage.setItem(API_KEY_STORAGE, apiKeyInput.trim())
       setApiKey(apiKeyInput.trim())
       setShowApiSettings(false)
+      setError(null)
     }
   }, [apiKeyInput])
 
@@ -272,14 +307,22 @@ export default function MovieAgent() {
     setApiKeyInput('')
   }, [])
 
-  const handleSend = useCallback(async () => {
-    const text = input.trim()
-    if (!text || loading) return
+  const clearChat = useCallback(() => {
+    localStorage.removeItem('movie_chat_history')
+    setMessages([])
+    setError(null)
+    setTimeout(() => inputRef.current?.focus(), 100)
+  }, [])
+
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || loading) return
+
+    setError(null)
 
     const userMsg: ChatMessage = {
       id: 'u-' + Date.now(),
       role: 'user',
-      content: text,
+      content: text.trim(),
       timestamp: Date.now(),
     }
 
@@ -289,7 +332,7 @@ export default function MovieAgent() {
 
     const history = messages
       .map((m) => ({ role: m.role, content: m.content }))
-    history.push({ role: 'user', content: text })
+    history.push({ role: 'user', content: text.trim() })
 
     if (apiKey) {
       const aiResult = await chatWithAI(apiKey, history)
@@ -311,16 +354,19 @@ export default function MovieAgent() {
         }
         setMessages((prev) => [...prev, aiMsg])
       } else {
-        // AI call failed
-        fallback(text)
+        setError('AI 服务暂时不可用，已切换为本地推荐。')
+        fallback(text.trim())
       }
     } else {
-      // No API key: local search
-      fallback(text)
+      fallback(text.trim())
     }
 
     setLoading(false)
-  }, [input, loading, apiKey, messages])
+  }, [loading, apiKey, messages])
+
+  const handleSend = useCallback(() => {
+    sendMessage(input)
+  }, [input, sendMessage])
 
   function fallback(text: string) {
     const searchWords = text.toLowerCase().split(/[\s,，.。!！?？]+/)
@@ -338,7 +384,7 @@ export default function MovieAgent() {
     const pick = matches.length > 0 ? matches[0] : dailyMovie
 
     const moodKeywords: Record<string, string[]> = {
-      '治愈': ['治愈', '低落', '难过', '伤心', '失恋', '失恋', '分手'],
+      '治愈': ['治愈', '低落', '难过', '伤心', '失恋', '分手'],
       '悬疑': ['悬疑', '烧脑', '推理', '刺激', '紧张'],
       '喜剧': ['搞笑', '轻松', '喜剧', '开心', '笑'],
       '爱情': ['爱情', '浪漫', '恋爱', '前任', '想谈恋爱'],
@@ -381,7 +427,8 @@ export default function MovieAgent() {
   const isEmpty = messages.length <= 1 && !loading
 
   return (
-    <div className="h-[calc(100dvh-4rem)] bg-gradient-to-b from-Parchment to-white dark:from-Graphite dark:to-[#0a0a0a] flex flex-col">
+    <>
+      <div className="h-[calc(100dvh-4rem)] bg-gradient-to-b from-Parchment to-white dark:from-Graphite dark:to-[#0a0a0a] flex flex-col">
       <PageSEO title="光影探索者 — AI 电影顾问" description="你的专属电影品味顾问" />
 
       {/* Header */}
@@ -396,26 +443,35 @@ export default function MovieAgent() {
               <ArrowLeft size={16} />
             </button>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shadow-lg shadow-Amber/20">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white">
                 <Film size={16} />
               </div>
               <div>
-                <h1 className="font-display text-sm font-semibold text-Ink dark:text-white">光影探索者</h1>
-                <p className="text-[0.65rem] text-Slate/40 dark:text-white/30">AI 电影顾问</p>
+                <h1 className="font-display text-caption font-semibold text-Ink dark:text-white">光影探索者</h1>
+                <p className="text-label text-Slate/40 dark:text-white/30">AI 电影顾问</p>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            {messages.length > 1 && (
+              <button
+                onClick={clearChat}
+                className="text-label text-Slate/40 hover:text-Rose transition-colors"
+                title="清空对话"
+              >
+                清空
+              </button>
+            )}
             {apiKey ? (
-              <span className="flex items-center gap-1 text-[0.65rem] text-green-500/70">
+              <span className="flex items-center gap-1 text-label text-green-500/70">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400/80 animate-pulse" />
                 AI 在线
               </span>
             ) : (
               <button
                 onClick={() => setShowApiSettings(!showApiSettings)}
-                className="flex items-center gap-1 text-[0.65rem] text-Slate/40 hover:text-Amber/60 transition-colors"
+                className="flex items-center gap-1 text-label text-Slate/40 hover:text-Amber/60 transition-colors"
               >
                 <KeyRound size={11} />
                 接入 AI
@@ -424,6 +480,31 @@ export default function MovieAgent() {
           </div>
         </div>
       </div>
+
+      {/* Error Banner */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden shrink-0 border-b border-Rose/20 dark:border-Rose/10"
+          >
+            <div className="max-w-2xl mx-auto px-4 py-2">
+              <div className="flex items-center gap-2 text-label text-Rose/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-Rose/60 shrink-0" />
+                {error}
+                <button
+                  onClick={() => setError(null)}
+                  className="ml-auto text-Slate/40 hover:text-Ink transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* API Key Settings */}
       <AnimatePresence>
@@ -435,8 +516,8 @@ export default function MovieAgent() {
             className="overflow-hidden shrink-0 border-b border-Sand/30 dark:border-white/5"
           >
             <div className="max-w-2xl mx-auto px-4 py-3">
-              <div className="p-3 rounded-xl bg-white/60 dark:bg-white/[0.03] border border-Sand/50 dark:border-white/10">
-                <p className="text-[0.7rem] text-Slate/40 mb-2 leading-relaxed">
+              <div className="p-4 rounded-lg bg-white/60 dark:bg-white/[0.03] border border-Sand/50 dark:border-white/10">
+                <p className="text-caption text-Slate/40 mb-2 leading-relaxed">
                   输入 SiliconFlow / OpenAI 兼容 API Key，启用真正的 AI 电影顾问。
                   没有 Key？<a href="https://siliconflow.cn" target="_blank" rel="noopener noreferrer" className="text-Amber/60 hover:underline">免费获取</a>
                 </p>
@@ -446,10 +527,10 @@ export default function MovieAgent() {
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     placeholder={apiKey ? '已保存' : 'sk-...'}
-                    className="flex-1 px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand/50 dark:border-white/10 text-xs text-Ink dark:text-white focus:outline-none focus:border-Amber/50 placeholder:text-Slate/40"
+                    className="flex-1 px-4 py-2 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand/50 dark:border-white/10 text-caption text-Ink dark:text-white focus:outline-none focus:border-Amber/50 placeholder:text-Slate/40"
                   />
-                  <button onClick={saveApiKey} disabled={!apiKeyInput.trim()} className="px-3 py-1.5 rounded-lg bg-Amber text-white text-xs font-medium hover:bg-Amber/90 disabled:opacity-40 transition-colors">保存</button>
-                  {apiKey && <button onClick={clearApiKey} className="px-3 py-1.5 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand/50 dark:border-white/10 text-xs text-Slate hover:text-Rose transition-colors">清除</button>}
+                  <button onClick={saveApiKey} disabled={!apiKeyInput.trim()} className="px-4 py-2 rounded-lg bg-Amber text-white text-caption font-medium hover:bg-Amber/90 disabled:opacity-40 transition-colors">保存</button>
+                  {apiKey && <button onClick={clearApiKey} className="px-4 py-2 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand/50 dark:border-white/10 text-caption text-Slate hover:text-Rose transition-colors">清除</button>}
                 </div>
               </div>
             </div>
@@ -475,10 +556,10 @@ export default function MovieAgent() {
               )}
 
               <div className={`max-w-[85%] ${msg.role === 'user' ? 'order-1' : ''}`}>
-                <div className={`p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                <div className={`p-4 rounded-lg text-body leading-relaxed whitespace-pre-wrap ${
                   msg.role === 'user'
-                    ? 'bg-Amber text-white rounded-br-md shadow-sm'
-                    : 'bg-white/70 dark:bg-white/[0.04] border border-Sand/30 dark:border-white/5 text-Ink dark:text-white/90 rounded-bl-md shadow-sm'
+                    ? 'bg-Amber text-white rounded-br-md'
+                    : 'bg-white/70 dark:bg-white/[0.04] border border-Sand/30 dark:border-white/5 text-Ink dark:text-white/90 rounded-bl-md'
                 }`}>
                   {msg.content.split('**').map((part, i) =>
                     i % 2 === 1 ? (
@@ -493,7 +574,9 @@ export default function MovieAgent() {
                 {msg.freeMovies && msg.freeMovies.length > 0 && (
                   <div className="mt-2 space-y-2">
                     {msg.freeMovies.map((m, i) => (
-                      <FreeMovieCard key={i} movie={m} index={i} />
+                      <div key={i} onClick={() => setSelectedMovie(m)} className="cursor-pointer">
+                        <FreeMovieCard movie={m} index={i} />
+                      </div>
                     ))}
                   </div>
                 )}
@@ -502,14 +585,16 @@ export default function MovieAgent() {
                 {msg.movies && msg.movies.length > 0 && (
                   <div className="mt-2 space-y-2">
                     {msg.movies.map((m) => (
-                      <LocalMovieCard key={m.id} movie={m} />
+                      <div key={m.id} onClick={() => setSelectedMovie(m)} className="cursor-pointer">
+                        <LocalMovieCard movie={m} />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
               {msg.role === 'user' && (
-                <div className="w-7 h-7 rounded-full bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40 shrink-0 mt-0.5">
+                <div className="w-7 h-7 rounded-lg bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40 shrink-0 mt-1">
                   <User size={13} />
                 </div>
               )}
@@ -519,10 +604,10 @@ export default function MovieAgent() {
           {/* Loading */}
           {loading && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shrink-0">
                 <Bot size={13} />
               </div>
-              <div className="p-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-Sand/30 dark:border-white/5 rounded-bl-md">
+              <div className="p-4 rounded-lg bg-white/70 dark:bg-white/[0.04] border border-Sand/30 dark:border-white/5 rounded-bl-md">
                 <div className="flex items-center gap-1.5 h-5">
                   {[0, 1, 2].map((i) => (
                     <motion.div
@@ -532,7 +617,7 @@ export default function MovieAgent() {
                       className="w-1.5 h-1.5 rounded-full bg-Amber/60"
                     />
                   ))}
-                  <span className="text-xs text-Slate/30 ml-1">
+                  <span className="text-label text-Slate/30 ml-1">
                     {apiKey ? '正在思考...' : '正在搜索...'}
                   </span>
                 </div>
@@ -545,16 +630,16 @@ export default function MovieAgent() {
       </div>
 
       {/* Input Area */}
-      <div className="shrink-0 border-t border-Sand/50 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm">
+      <div className="shrink-0 border-t border-Sand/50 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
         <div className="max-w-2xl mx-auto px-4 py-3">
           {/* Quick replies (only when idle) */}
           {isEmpty && !loading && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
+            <div className="flex flex-wrap gap-2 mb-3">
               {quickReplies.map((text) => (
                 <button
                   key={text}
-                  onClick={() => { setInput(text); inputRef.current?.focus() }}
-                  className="px-3 py-1.5 rounded-full text-[0.7rem] bg-white/60 dark:bg-white/[0.03] border border-Sand/40 dark:border-white/10 text-Slate/60 hover:text-Amber hover:border-Amber/30 transition-colors"
+                  onClick={() => sendMessage(text)}
+                  className="px-3 py-2 rounded-lg text-label bg-white/60 dark:bg-white/[0.03] border border-Sand/40 dark:border-white/10 text-Slate/60 hover:text-Amber hover:border-Amber/30 transition-colors"
                 >
                   {text}
                 </button>
@@ -570,12 +655,12 @@ export default function MovieAgent() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={apiKey ? '和光影探索者聊聊...' : '输入关键词获取本地推荐...'}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-white/80 dark:bg-white/[0.05] border border-Sand/50 dark:border-white/10 text-sm text-Ink dark:text-white focus:outline-none focus:border-Amber/50 placeholder:text-Slate/40 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-white/80 dark:bg-white/[0.05] border border-Sand/50 dark:border-white/10 text-body text-Ink dark:text-white focus:outline-none focus:border-Amber/50 placeholder:text-Slate/40 transition-colors"
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || loading}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-Amber to-rose-400 text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity shadow-lg shadow-Amber/20"
+              className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-Amber to-rose-400 text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
             >
               <Send size={16} />
             </button>
@@ -583,5 +668,101 @@ export default function MovieAgent() {
         </div>
       </div>
     </div>
+
+    {/* Movie Detail Modal */}
+    <AnimatePresence>
+      {selectedMovie && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setSelectedMovie(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-lg bg-white dark:bg-[#1c1a18] border border-Sand/50 dark:border-white/10 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-heading font-semibold text-Ink dark:text-white">{'title' in selectedMovie ? selectedMovie.title : (selectedMovie as Movie).title}</h2>
+                {'originalTitle' in selectedMovie && selectedMovie.originalTitle && (
+                  <p className="text-caption text-Slate/40 mt-0.5">{selectedMovie.originalTitle}</p>
+                )}
+                {'titleEn' in selectedMovie && (
+                  <p className="text-caption text-Slate/40 mt-0.5">{(selectedMovie as Movie).titleEn}</p>
+                )}
+              </div>
+              <button
+                onClick={() => setSelectedMovie(null)}
+                className="text-caption text-Slate/40 hover:text-Ink transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+              {'rating' in selectedMovie && selectedMovie.rating && (
+                <span className="flex items-center gap-1 text-label text-Gold">
+                  <Star size={10} />
+                  {selectedMovie.rating}
+                </span>
+              )}
+              <span className="text-label text-Slate/50">{selectedMovie.year}</span>
+              {'runtime' in selectedMovie && selectedMovie.runtime && (
+                <span className="text-label text-Slate/50">{selectedMovie.runtime}</span>
+              )}
+              {'duration' in selectedMovie && (
+                <span className="text-label text-Slate/50">{(selectedMovie as Movie).duration}</span>
+              )}
+              {'genre' in selectedMovie && selectedMovie.genre && (
+                <span className="px-2 py-1 rounded bg-Amber/10 text-label text-Amber">{selectedMovie.genre}</span>
+              )}
+              {'genres' in selectedMovie && (selectedMovie as Movie).genres && (
+                <span className="px-2 py-1 rounded bg-Amber/10 text-label text-Amber">{(selectedMovie as Movie).genres.join('、')}</span>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <p className="text-caption text-Slate/40 mb-1">导演</p>
+              <p className="text-body text-Ink dark:text-white/90">{selectedMovie.director}</p>
+            </div>
+
+            {'reason' in selectedMovie && (selectedMovie as FreeMovie).reason && (
+              <div className="mb-4 p-4 rounded-lg bg-Amber/5 dark:bg-Amber/10 border border-Amber/10">
+                <p className="text-caption text-Amber/70 mb-1">推荐理由</p>
+                <p className="text-body text-Ink dark:text-white/80">{(selectedMovie as FreeMovie).reason}</p>
+              </div>
+            )}
+
+            {'synopsis' in selectedMovie && (selectedMovie as Movie).synopsis && (
+              <div className="mb-4">
+                <p className="text-caption text-Slate/40 mb-1">简介</p>
+                <p className="text-body text-Ink dark:text-white/80 leading-relaxed">{(selectedMovie as Movie).synopsis}</p>
+              </div>
+            )}
+
+            {'whereToWatch' in selectedMovie && (selectedMovie as FreeMovie).whereToWatch && (
+              <div className="mb-4">
+                <p className="text-caption text-Slate/40 mb-1">观看渠道</p>
+                <p className="text-body text-Ink dark:text-white/80">{(selectedMovie as FreeMovie).whereToWatch}</p>
+              </div>
+            )}
+
+            {'quote' in selectedMovie && (selectedMovie as Movie).quote && (
+              <div className="p-4 rounded-lg bg-white/50 dark:bg-white/[0.03] border border-Sand/30 dark:border-white/5">
+                <p className="text-caption text-Slate/40 mb-1">经典台词</p>
+                <p className="text-body italic text-Ink/70 dark:text-white/60">"{(selectedMovie as Movie).quote}"</p>
+              </div>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </>
   )
 }
