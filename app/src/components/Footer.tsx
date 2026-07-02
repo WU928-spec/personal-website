@@ -46,7 +46,7 @@ function EditorColumn({
   }
 
   return (
-    <div className="bg-Graphite rounded-xl border border-white/10 p-5 space-y-4">
+    <div className="bg-Graphite rounded-lg border border-white/10 p-5 space-y-4">
       <p className="font-ui text-label uppercase tracking-[0.1em] text-Sage/80">{label}</p>
       <div className="space-y-2">
         <label className="font-ui text-label text-white/40">{t('editor.brandDesc')}</label>
@@ -111,7 +111,7 @@ export default function Footer() {
   const display = isEditing ? (lang === 'zh' ? editZh : editEn) : data
 
   return (
-    <footer className="bg-[#3D3A37] py-16 md:py-20 relative">
+    <footer className="bg-card py-16 md:py-20 relative">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         {/* Edit controls */}
         {isLoggedIn && isEditMode && (
@@ -119,7 +119,7 @@ export default function Footer() {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-label font-medium hover:bg-white/15 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-label font-medium hover:bg-white/15 transition-colors"
               >
                 <Pencil size={13} />
                 {t('editor.editFooter')}
@@ -127,8 +127,8 @@ export default function Footer() {
             ) : (
               <div className="flex items-center gap-2">
                 {saved && <span className="text-label text-Sage">{t('post.saved')}</span>}
-                <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Sage text-Parchment text-label font-medium hover:bg-[#5a7a5a] transition-colors"><Save size={13} />{t('post.save')}</button>
-                <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-Graphite border border-white/20 text-white/70 text-label font-medium hover:border-white/40 hover:text-white transition-colors"><X size={13} />{t('post.cancel')}</button>
+                <button onClick={handleSave} className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-Sage text-Parchment text-label font-medium hover:bg-primary transition-colors"><Save size={13} />{t('post.save')}</button>
+                <button onClick={handleCancel} className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-Graphite border border-white/20 text-white/70 text-label font-medium hover:border-white/40 hover:text-white transition-colors"><X size={13} />{t('post.cancel')}</button>
               </div>
             )}
           </div>
@@ -148,13 +148,13 @@ export default function Footer() {
               {/* Brand */}
               <div className="flex flex-col gap-3">
                 <img src="/logo.svg" alt="Logo" className="h-7 w-auto" />
-                <p className="font-body text-body text-[rgba(247,244,239,0.5)]">
+                <p className="font-body text-body text-muted">
                   {display.brandDesc}
                 </p>
               </div>
 
               {/* Navigation */}
-              <div className="flex flex-wrap gap-x-6 gap-y-3">
+              <div className="flex flex-wrap gap-x-6 gap-y-4">
                 {display.links.map((link) => (
                   <Link
                     key={`${link.path}-${link.label}`}
@@ -176,7 +176,7 @@ export default function Footer() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[rgba(247,244,239,0.5)] hover:text-Amber hover:scale-110 transition-all duration-200"
+                      className="text-muted hover:text-Amber hover:scale-110 transition-all duration-200"
                       aria-label={social.label}
                     >
                       <Icon size={18} />
@@ -187,14 +187,14 @@ export default function Footer() {
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-[rgba(247,244,239,0.1)] my-10" />
+            <div className="h-px bg-border my-10" />
 
             {/* Bottom Row */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <p className="font-ui text-label font-medium leading-[1.5] tracking-[0.04em] text-[rgba(247,244,239,0.5)]">
+              <p className="font-ui text-label font-medium leading-[1.5] tracking-[0.04em] text-muted">
                 {display.copyright}
               </p>
-              <p className="font-mono text-label leading-[1.5] text-[rgba(247,244,239,0.4)]">
+              <p className="font-mono text-label leading-[1.5] text-muted">
                 {display.tagline}
               </p>
             </div>

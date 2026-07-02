@@ -226,7 +226,7 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
   return (
     <div className="bg-card border-b border-border px-4 py-4 relative">
       {uploadError && (
-        <div className="mb-3 px-4 py-2 rounded-lg bg-Rose/10 text-Rose text-label">
+        <div className="mb-4 px-4 py-2 rounded-lg bg-Rose/10 text-Rose text-label">
           {uploadError}
         </div>
       )}
@@ -235,10 +235,10 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
           <img
             src={avatarUrl}
             alt={userName}
-            className="w-10 h-10 rounded-full object-cover shrink-0"
+            className="w-10 h-10 rounded-lg object-cover shrink-0"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-caption font-bold shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-caption font-bold shrink-0">
             {userName[0]}
           </div>
         )}

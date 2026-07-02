@@ -84,7 +84,7 @@ export default function TodayStatsPanel() {
   const maxSlotHours = Math.max(...timeSlots.map((s) => s.hours), 1)
 
   return (
-    <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-3 flex flex-col h-full overflow-y-auto gap-3">
+    <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-4 flex flex-col h-full overflow-y-auto gap-4">
       {/* ── 1. Today's Focus ── */}
       <div className="text-center py-1 shrink-0">
         <div className="flex items-center justify-center gap-1.5 mb-0.5">
@@ -96,7 +96,7 @@ export default function TodayStatsPanel() {
         </div>
         {activeTodo && (
           <div className="flex items-center justify-center gap-1 mt-0.5">
-            <div className="w-1 h-1 rounded-full bg-Amber animate-pulse" />
+            <div className="w-1 h-1 rounded bg-Amber animate-pulse" />
             <span className="text-label text-Amber">
               {activeTodo.text} · {formatDurationShort(getTotalDuration(activeTodo) + getCurrentElapsed(activeTodo))}
             </span>
@@ -143,7 +143,7 @@ export default function TodayStatsPanel() {
             </div>
           </div>
           <div>
-            <p className="text-[0.75rem] font-medium text-Ink dark:text-white">今日完成 {doneCount}/{totalCount}</p>
+            <p className="text-label font-medium text-Ink dark:text-white">今日完成 {doneCount}/{totalCount}</p>
             <p className="text-label text-Slate/60 dark:text-white/30">{doneCount === totalCount ? '全部完成 🎉' : `还剩 ${totalCount - doneCount} 项`}</p>
           </div>
         </div>
@@ -161,8 +161,8 @@ export default function TodayStatsPanel() {
               <div key={slot.name} className="flex items-center gap-2">
                 <span className="text-Slate/60 dark:text-white/40 shrink-0">{slot.icon}</span>
                 <span className="text-[0.6875rem] text-Slate dark:text-white/60 w-8 shrink-0">{slot.name}</span>
-                <div className="flex-1 h-2 bg-Mist/50 dark:bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min((slot.hours / maxSlotHours) * 100, 100)}%`, backgroundColor: slot.color }} />
+                <div className="flex-1 h-2 bg-Mist/50 dark:bg-white/5 rounded-lg overflow-hidden">
+                  <div className="h-full rounded-lg transition-all duration-500" style={{ width: `${Math.min((slot.hours / maxSlotHours) * 100, 100)}%`, backgroundColor: slot.color }} />
                 </div>
                 <span className="text-label font-mono text-Slate/60 dark:text-white/40 w-10 text-right shrink-0">
                   {slot.hours >= 1 ? `${slot.hours.toFixed(1)}h` : `${Math.round(slot.hours * 60)}m`}

@@ -75,10 +75,10 @@ function MomentCard({
           <img
             src={author.avatar}
             alt={author.username}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-12 h-12 rounded-lg object-cover"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-body font-bold">
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white text-body font-bold">
             {author.username[0] || '?'}
           </div>
         )}
@@ -137,7 +137,7 @@ function MomentCard({
         )}
 
         {/* Action bar */}
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => isLoggedIn && onLike(moment.id)}
@@ -188,7 +188,7 @@ function MomentCard({
 
         {/* Likes & Comments area */}
         {(moment.likes.length > 0 || moment.comments.length > 0) && (
-          <div className="mt-3 bg-muted rounded-lg px-4 py-2">
+          <div className="mt-4 bg-muted rounded-lg px-4 py-2">
             {/* Likes */}
             {moment.likes.length > 0 && (
               <div className="flex items-start gap-2 text-caption">

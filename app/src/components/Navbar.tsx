@@ -60,8 +60,8 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-Parchment/95 backdrop-blur-xl border-b border-Sand shadow-sm dark:bg-Graphite/95 dark:border-white/10'
-            : 'bg-Parchment/30 backdrop-blur-sm dark:bg-Graphite/90 dark:backdrop-blur-md'
+            ? 'bg-Parchment/95 border-b border-Sand shadow-sm dark:bg-Graphite/95 dark:border-white/10'
+            : 'bg-Parchment/30 dark:bg-Graphite/90'
         }`}
       >
         <div className="max-w-6xl mx-auto px-6 md:px-12 flex items-center justify-between h-16">
@@ -83,7 +83,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <a
               href="https://github.com/WU928-spec"
               target="_blank"
@@ -117,7 +117,7 @@ export default function Navbar() {
               {theme === 'light' ? <Moon size={13} /> : <Sun size={13} />}
             </button>
             {isLoggedIn ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <button
                   onClick={() => setEditMode(!isEditMode)}
                   className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-label font-medium border transition-colors ${
@@ -137,7 +137,7 @@ export default function Navbar() {
                   <img
                     src={user?.avatar}
                     alt={user?.username}
-                    className="w-8 h-8 rounded-full object-cover border border-Sand dark:border-white/25"
+                    className="w-8 h-8 rounded-lg object-cover border border-Sand dark:border-white/25"
                   />
                 </Link>
               </div>
@@ -185,7 +185,7 @@ export default function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`font-ui text-[0.875rem] font-medium uppercase tracking-[0.06em] ${
+                  className={`font-ui text-caption font-medium uppercase tracking-[0.06em] ${
                     location.pathname === link.path ? 'text-Amber' : 'text-Ink dark:text-white'
                   }`}
                 >
@@ -222,7 +222,7 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <User size={18} />
-                  <span className="font-ui text-[0.875rem] font-medium">{t('nav.profile')}</span>
+                  <span className="font-ui text-caption font-medium">{t('nav.profile')}</span>
                 </Link>
               ) : (
                 <Link
@@ -231,7 +231,7 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <LogIn size={18} />
-                  <span className="font-ui text-[0.875rem] font-medium">{t('nav.login')}</span>
+                  <span className="font-ui text-caption font-medium">{t('nav.login')}</span>
                 </Link>
               )}
             </div>

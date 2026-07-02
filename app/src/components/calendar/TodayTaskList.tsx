@@ -242,7 +242,7 @@ export default function TodayTaskList() {
     : 0
 
   return (
-    <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-3 flex flex-col h-full">
+    <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-4 flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-2 shrink-0">
         <div className="flex items-center gap-1.5">
@@ -311,7 +311,7 @@ export default function TodayTaskList() {
       {/* Active tracker indicator */}
       {activeTodo && (
         <div className="mt-2 shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-Amber/5 border border-Amber/20">
-          <div className="w-1.5 h-1.5 rounded-full bg-Amber animate-pulse shrink-0" />
+          <div className="w-1.5 h-1.5 rounded-md bg-Amber animate-pulse shrink-0" />
           <span className="text-label text-Amber truncate flex-1">
             {activeTodo.text}
           </span>
@@ -324,7 +324,7 @@ export default function TodayTaskList() {
       )}
       {activeProjectTimer && !activeTodo && (
         <div className="mt-2 shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-Amber/5 border border-Amber/20">
-          <div className="w-1.5 h-1.5 rounded-full bg-Amber animate-pulse shrink-0" />
+          <div className="w-1.5 h-1.5 rounded-md bg-Amber animate-pulse shrink-0" />
           <span className="text-label text-Amber truncate flex-1">
             {projects.find((p) => p.id === activeProjectTimer.projectId)?.name || ''}
           </span>

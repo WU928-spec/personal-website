@@ -29,10 +29,10 @@ export default function IntroSection() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="md:col-span-4 flex flex-col items-center"
           >
-            <div className="w-[200px] h-[200px] rounded-full overflow-hidden border-[3px] border-Amber shadow-medium">
+            <div className="w-[200px] h-[200px] rounded-lg overflow-hidden border-[3px] border-Amber shadow-medium">
               <LazyImage src={avatar} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
             </div>
-            <div className="flex flex-col gap-3 mt-6 w-full max-w-[280px]">
+            <div className="flex flex-col gap-4 mt-6 w-full max-w-[280px]">
               {about.fields.map((field, i) => {
                 const IconComp = iconMap[field.icon] || MapPin
                 return (
@@ -42,10 +42,10 @@ export default function IntroSection() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.1 * i, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex items-center gap-2 bg-Linen border border-Sand rounded-lg px-3 py-2 dark:bg-Graphite/50 dark:border-white/10"
+                    className="flex items-center gap-2 bg-Linen border border-Sand rounded-lg px-4 py-2 dark:bg-Graphite/50 dark:border-white/10"
                   >
                     <IconComp size={14} className="text-Slate shrink-0" />
-                    <span className="font-ui text-[0.8125rem] font-medium tracking-[0.04em] text-Slate">
+                    <span className="font-ui text-caption font-medium tracking-[0.04em] text-Slate">
                       {field.value}
                     </span>
                   </motion.div>
@@ -67,7 +67,7 @@ export default function IntroSection() {
             <h2 className="font-display text-heading font-medium text-Ink dark:text-white">
               {about.title}
             </h2>
-            <p className="font-body text-subhead text-Ink mt-5 dark:text-white/90 leading-relaxed">
+            <p className="font-body text-subhead text-Ink mt-6 dark:text-white/90 leading-relaxed">
               {about.p1}
             </p>
             <p className="font-body text-subhead text-Ink mt-4 dark:text-white/90 leading-relaxed">

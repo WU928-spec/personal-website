@@ -29,7 +29,7 @@ function RepoCard({ repo, index }: RepoCardProps) {
       </p>
       <div className="flex items-center gap-4 mt-4">
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full" style={{ backgroundColor: repo.languageColor }} />
+          <span className="w-3 h-3 rounded-lg" style={{ backgroundColor: repo.languageColor }} />
           <span className="font-ui text-caption tracking-[0.04em] text-white/60">{repo.language}</span>
         </span>
         <span className="flex items-center gap-1 text-white/60">

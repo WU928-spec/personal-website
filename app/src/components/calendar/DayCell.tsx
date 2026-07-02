@@ -66,7 +66,7 @@ export default function DayCell({
           : ''
         }
         ${showEntryDot
-          ? 'after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:rounded-full after:bg-Amber'
+          ? 'after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:rounded after:bg-Amber'
           : ''
         }
       `}
@@ -111,7 +111,7 @@ export default function DayCell({
           {projectColors.map((c, i) => (
             <span
               key={i}
-              className="w-1.5 h-1.5 rounded-full"
+              className="w-1.5 h-1.5 rounded-md"
               style={{ backgroundColor: c }}
             />
           ))}

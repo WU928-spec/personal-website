@@ -172,7 +172,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
       <div className="lg:hidden fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setMobileOpen(true)}
-          className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-105 transition-transform duration-200"
+          className="w-12 h-12 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:scale-105 transition-transform duration-200"
           aria-label={t('toc.open')}
         >
           <List size={20} />
@@ -196,7 +196,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="fixed bottom-0 left-0 right-0 bg-card rounded-t-2xl z-[70] lg:hidden max-h-[70dvh] flex flex-col"
+              className="fixed bottom-0 left-0 right-0 bg-card rounded-t-lg z-[70] lg:hidden max-h-[70dvh] flex flex-col"
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h5 className="font-ui text-label font-semibold leading-[1.4] tracking-wider text-muted uppercase">

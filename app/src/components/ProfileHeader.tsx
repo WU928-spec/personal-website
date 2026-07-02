@@ -62,10 +62,10 @@ export default function ProfileHeader({ user, onAvatarUpdate, onUsernameUpdate, 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-Linen/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-8 text-center"
+      className="bg-Linen/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg p-8 text-center"
     >
       <div className="relative inline-block">
-        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-Amber">
+        <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-Amber">
           <img src={previewAvatar} alt={user.username} className="w-full h-full object-cover" />
         </div>
         <button

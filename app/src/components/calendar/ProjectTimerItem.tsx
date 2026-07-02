@@ -26,7 +26,7 @@ export default function ProjectTimerItem({
       }`}
     >
       <div
-        className="w-2 h-2 rounded-full shrink-0"
+        className="w-2 h-2 rounded-lg shrink-0"
         style={{ backgroundColor: project.color }}
       />
       <span className="flex-1 text-caption truncate text-Ink dark:text-white/80">

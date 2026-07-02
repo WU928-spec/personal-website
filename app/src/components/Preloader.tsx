@@ -232,9 +232,9 @@ export default function Preloader({ children }: PreloaderProps) {
               <p className="text-label text-white/40 font-body tracking-widest">{progress}%</p>
             </div>
 
-            <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+            <div className="w-full h-1 bg-white/10 rounded-lg overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-white/60 to-white/90 rounded-full"
+                className="h-full bg-gradient-to-r from-white/60 to-white/90 rounded-lg"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}

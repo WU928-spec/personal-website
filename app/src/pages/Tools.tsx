@@ -58,7 +58,7 @@ export default function Tools() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-20"
           >
-            <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-10 h-px bg-gradient-to-r from-transparent to-Amber/40 dark:to-white/30" />
               <Wrench size={16} className="text-Amber/60 dark:text-white/40" />
               <div className="w-10 h-px bg-gradient-to-l from-transparent to-Amber/40 dark:to-white/30" />
@@ -68,7 +68,7 @@ export default function Tools() {
               {t('tools.title')}
             </h1>
 
-            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 to-transparent rounded-full" />
+            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 to-transparent rounded-lg" />
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -111,11 +111,11 @@ export default function Tools() {
                   className="group relative cursor-pointer"
                   onClick={() => navigate(tool.path)}
                 >
-                  <div className="relative rounded-2xl border border-Sand dark:border-white/10 bg-white/50 dark:bg-white/[0.03] backdrop-blur-sm p-8 transition-all duration-500 hover:border-Amber/20 dark:hover:border-white/20 hover:shadow-soft">
+                  <div className="relative rounded-lg border border-Sand dark:border-white/10 bg-white/50 dark:bg-white/[0.03] p-8 transition-all duration-500 hover:border-Amber/20 dark:hover:border-white/20 hover:shadow-soft">
                     {/* 状态标签 */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-green-400/80" />
+                        <span className="w-2 h-2 rounded-lg bg-green-400/80" />
                         <span className="text-label text-green-500/70 dark:text-green-400/60 font-body tracking-wider">
                           {t('internship.unlocked')}
                         </span>
@@ -125,13 +125,13 @@ export default function Tools() {
 
                     {/* 图标区域 */}
                     <div className="flex justify-center mb-6">
-                      <div className="w-20 h-20 rounded-2xl bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40 transition-all duration-300 group-hover:scale-110 group-hover:bg-Amber/15 dark:group-hover:bg-white/15">
+                      <div className="w-20 h-20 rounded-lg bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40 transition-all duration-300 group-hover:scale-110 group-hover:bg-Amber/15 dark:group-hover:bg-white/15">
                         {tool.icon}
                       </div>
                     </div>
 
                     {/* 标题和描述 */}
-                    <h3 className="font-display text-heading text-Ink dark:text-white/90 tracking-wide text-center mb-3">
+                    <h3 className="font-display text-heading text-Ink dark:text-white/90 tracking-wide text-center mb-4">
                       {t(tool.titleKey)}
                     </h3>
                     <p className="text-body text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
@@ -161,7 +161,7 @@ export default function Tools() {
               <Wrench size={14} className="text-Amber/30 dark:text-white/20" />
               <div className="w-12 h-px bg-gradient-to-l from-transparent to-Amber/20 dark:to-white/20" />
             </div>
-            <p className="text-xs text-Ink/30 dark:text-white/20 font-body tracking-widest">
+            <p className="text-label text-Ink/30 dark:text-white/20 font-body tracking-widest">
               {t('tools.moreTools')}
             </p>
           </motion.div>

@@ -28,7 +28,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={done ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="font-body text-subhead text-Ink/85 mt-5 dark:text-white/85"
+          className="font-body text-subhead text-Ink/85 mt-6 dark:text-white/85"
         >
           {hero.subtitle}
         </motion.p>
@@ -50,13 +50,13 @@ export default function HeroSection() {
         >
           <Link
             to="/moments"
-            className="inline-flex items-center bg-Amber text-Parchment font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-[#B06A2F] hover:-translate-y-px transition-all duration-300"
+            className="inline-flex items-center bg-Amber text-Parchment font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-2 rounded-md hover:bg-primary hover:-translate-y-px transition-all duration-300"
           >
             记忆碎片
           </Link>
           <Link
             to="/projects"
-            className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-Ink/5 hover:-translate-y-px transition-all duration-300 dark:border-white/40 dark:text-white dark:hover:bg-white/5"
+            className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-2 rounded-md hover:bg-Ink/5 hover:-translate-y-px transition-all duration-300 dark:border-white/40 dark:text-white dark:hover:bg-white/5"
           >
             {t('home.viewProjects')}
           </Link>

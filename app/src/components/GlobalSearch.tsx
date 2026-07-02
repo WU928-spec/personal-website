@@ -194,7 +194,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.96 }}
           transition={{ duration: 0.2 }}
-          className="w-full max-w-lg bg-Parchment dark:bg-[#1a1a1a] rounded-xl shadow-2xl border border-Sand dark:border-white/10 overflow-hidden"
+          className="w-full max-w-lg bg-Parchment dark:bg-card rounded-lg shadow-2xl border border-Sand dark:border-white/10 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center gap-4 px-4 py-2 border-b border-Sand dark:border-white/10">
@@ -221,7 +221,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           <div className="max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y" onWheel={(e) => e.stopPropagation()}>
             {searchLoading ? (
               <div className="flex justify-center py-6">
-                <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-lg animate-spin" />
               </div>
             ) : !searchQuery.trim() ? (
               <div className="py-6 text-center text-caption text-Slate">输入关键词搜索笔记</div>

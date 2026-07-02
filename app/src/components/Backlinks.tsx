@@ -74,7 +74,7 @@ export default function Backlinks({ currentSlug }: BacklinksProps) {
         <h3 className="font-display text-subhead font-semibold text-Ink dark:text-white">
           {t('obsidian.backlinks')}
         </h3>
-        <span className="text-label text-Slate bg-Linen px-2 py-0.5 rounded-full dark:bg-white/10">
+        <span className="text-label text-Slate bg-Linen px-2 py-0.5 rounded-lg dark:bg-white/10">
           {backlinks.length}
         </span>
       </div>
