@@ -60,25 +60,34 @@
 | `hover:shadow-[0_0_...]` | 删除 | hover glow |
 | `blur` | 删除 | 模糊装饰 |
 
-## 圆角替换
+## 圆角替换（按大小判断）
 
-| 旧写法 | 新写法 | 说明 |
-|-------|-------|------|
-| `rounded-full` | `rounded-lg` (8px) | 按钮、头像改为 8px |
-| `rounded-full` | `rounded-md` (6px) | 小元素改为 6px |
-| `rounded-2xl` | `rounded-lg` (8px) | 卡片圆角统一 8px |
-| `rounded-[4px]` | `rounded` (4px) | 小元素 4px |
+| 旧写法 | 新写法 | 适用场景 |
+|-------|-------|---------|
+| `rounded-full` | `rounded` (4px) | 1×1 或 2×2 的小点（状态指示器、小圆点） |
+| `rounded-full` | `rounded-md` (6px) | 小图标、小徽章（< 24px） |
+| `rounded-full` | `rounded-lg` (8px) | 按钮、头像、卡片（≥ 24px） |
+| `rounded-2xl` | `rounded-lg` (8px) | 卡片容器 |
+| `rounded-[4px]` | `rounded` (4px) | 小元素 |
 | `rounded-xl` | `rounded-lg` (8px) | 统一为 8px |
 
-## 特殊替换（保留）
+**判断规则**：
+- 元素尺寸 ≤ 4px（如 1×1 或 2×2 的 dot）→ `rounded`（方形变圆角小方块）
+- 元素尺寸 8-20px（小图标、徽章）→ `rounded-md`
+- 元素尺寸 ≥ 24px（按钮、头像、卡片）→ `rounded-lg`
 
-| 写法 | 保留原因 |
-|------|---------|
-| `uppercase tracking-wider` | 标签大写风格，但要配合 `text-label` |
-| `font-medium` | 字重，保留 |
-| `font-semibold` | 字重，保留 |
-| `font-display` | 自定义字体，保留 |
-| `line-clamp-2` | 行数限制，保留 |
-| `animate-pulse` | 状态指示，保留 |
-| `transition-colors` | 颜色过渡，保留 |
-| `hover:opacity-90` | 透明度变化，保留 |
+## 边界说明（不要误改）
+
+**不是 className 的，不要动**：
+- Framer Motion `whileHover={{ boxShadow: '...' }}` — 这是 JS prop，不是 className
+- Framer Motion `whileHover={{ borderColor: '...' }}` — 同上
+- 内联样式 `style={{ boxShadow: '...' }}` — 不是 className
+- CSS 变量 `--var-name: value` — 不是 className
+
+**需要保留的**：
+- `uppercase tracking-wider` — 标签大写风格，配合 `text-label`
+- `font-medium` / `font-semibold` — 字重
+- `line-clamp-2` — 行数限制
+- `animate-pulse` — 状态指示（但检查是否必要）
+- `transition-colors` / `hover:opacity-90` — 过渡动画
+- `shadcn/ui` 组件中通过 `cn()` 合并的 className — 只改内部默认值，不改 props 传递

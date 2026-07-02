@@ -34,32 +34,41 @@ tags: [webapp, aesthetic, frontend, refactoring, design-system, audit]
 
 **进度汇报（至少每 30 分钟一次）**：
 
-Agent 必须主动向用户汇报：
+Agent 必须主动向用户汇报，但**不要复制粘贴复杂模板**。简洁即可：
 
 ```markdown
-## 进度汇报 — [时间]
+## 进度汇报 — 已完成 X 批次 / 共 Y 批次
 
-### 已完成
-- [x] 任务 A（涉及 X 个文件）
-- [x] 任务 B（构建验证通过）
+批次1 ✅：Navbar, Footer, GlobalSearch, Tools（tsc 通过）
+批次2 ✅：IntroSection, HeroSection, SkillTag, RepoCard（tsc 通过）
+批次3 ⏳：calendar 子组件（5 文件）
 
-### 进行中
-- [ ] 任务 C（当前处理 Y 个文件中的第 Z 个）
-
-### 下一步
-- [ ] 任务 D（预计涉及 W 个文件）
-- [ ] 最终验证（tsc + build）
-
-### 当前状态
-- 总进度：X/Y 批次完成
-- 构建状态：✅ / ⚠️ / ❌
-- 是否继续：用户确认后继续下一批次
+**下一批**：MomentCard, MomentUploader, ProfileHeader, ...
+**是否继续**：等确认 / 已授权继续
 ```
 
-**用户可以随时中断**：
-- 用户说"停"、"先到这里"、"够了" → 立即停止，提交已完成部分
-- 用户说"继续" → 按原计划继续下一批次
+**用户授权与自主执行**：
+- 用户明确说"试试"、"开始吧"、"改吧" → 视为已授权，按批次自主执行，每 30 分钟汇报一次
+- 用户说"停"、"先到这里" → 立即停止，提交已完成部分
+- 用户不在但已授权 → 继续执行，汇报时说明"用户已授权，继续执行"
 - 用户说"改方向" → 重新评估剩余任务，调整计划后汇报
+
+**工具可用性检查**：
+- 扫描脚本优先用 `rg` (ripgrep)，如果不可用降级到 `grep -r`
+- 参考 `references/audit-checklist.md` 中的 grep 降级方案
+
+**边界说明（不要误改）**：
+- Framer Motion `whileHover={{ boxShadow: '...' }}` — 这是 JS prop，不是 className，不要动
+- 内联样式 `style={{ ... }}` — 不是 className，不要动
+- CSS 变量 `--var-name` — 不是 className，不要动
+- `shadcn/ui` 组件的 `cn()` 合并 — 只改内部默认值，不改 props 传递逻辑
+- 星空彩蛋（Starry* 文件）— 按文件名排除，不修改
+- 工具页面返回按钮 — 检查是否使用 `<BackToTools />`，未使用则添加
+
+**圆角大小判断**（参考 `references/classname-replacement-table.md`）：
+- 1×1 或 2×2 小点 → `rounded`（4px）
+- 小图标/徽章（< 24px）→ `rounded-md`（6px）
+- 按钮/头像/卡片（≥ 24px）→ `rounded-lg`（8px）
 
 ---
 
