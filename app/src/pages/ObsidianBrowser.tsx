@@ -485,7 +485,7 @@ export default function ObsidianBrowser() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-3 text-subhead leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
+            className="mt-4 text-subhead leading-[1.75] text-Ink/80 max-w-xl mx-auto font-body dark:text-white"
           >
             {t('obsidian.subtitle')}
           </motion.p>

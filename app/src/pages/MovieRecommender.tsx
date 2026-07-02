@@ -652,7 +652,7 @@ export default function MovieAgent() {
                 <button
                   key={text}
                   onClick={() => sendMessage(text)}
-                  className="px-3 py-2 rounded-lg text-label bg-white/60 dark:bg-white/[0.03] border border-Sand/40 dark:border-white/10 text-Slate/60 hover:text-Amber hover:border-Amber/30 transition-colors"
+                  className="px-4 py-2 rounded-lg text-label bg-white/60 dark:bg-white/[0.03] border border-Sand/40 dark:border-white/10 text-Slate/60 hover:text-Amber hover:border-Amber/30 transition-colors"
                 >
                   {text}
                 </button>
