@@ -282,11 +282,29 @@ export default function MovieAgent() {
     }
   }, [messages])
 
-  // Auto scroll: only when AI reply finishes (loading goes from true → false)
+  // Auto scroll: only when AI reply finishes, and only if user is near bottom
   const prevLoadingRef = useRef(false)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!loading && prevLoadingRef.current && messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      const container = chatContainerRef.current
+      if (container) {
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120
+        if (isNearBottom) {
+          // Scroll to the LAST MESSAGE (not messagesEndRef), so user sees the TOP of AI reply
+          const innerDiv = container.querySelector(':scope > div')
+          if (innerDiv) {
+            const children = innerDiv.children
+            // Exclude the final messagesEndRef empty div
+            const lastMsg = children.length >= 2 ? children[children.length - 2] : null
+            if (lastMsg) {
+              (lastMsg as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' })
+            } else {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
+          }
+        }
+      }
     }
     prevLoadingRef.current = loading
   }, [loading, messages.length])
@@ -543,7 +561,7 @@ export default function MovieAgent() {
       </AnimatePresence>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
           {messages.map((msg) => (
             <motion.div
