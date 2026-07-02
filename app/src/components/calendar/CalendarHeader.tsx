@@ -23,7 +23,7 @@ export default function CalendarHeader({
   return (
     <div className="flex items-center justify-between mb-2 shrink-0">
       {/* Left: icon + month navigation */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <CalendarDays size={22} className="text-Amber shrink-0" />
 
         <button

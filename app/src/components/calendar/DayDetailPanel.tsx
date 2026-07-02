@@ -195,7 +195,7 @@ function DayDetailPanelContent({
               <div className="flex items-center gap-1 mt-4 bg-Mist/50 dark:bg-white/5 rounded-lg p-1">
                 <button
                   onClick={() => setActiveTab('plan')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-caption font-medium transition-all duration-200 ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-caption font-medium transition-all duration-200 ${
                     activeTab === 'plan'
                       ? 'bg-white dark:bg-white/10 text-Amber shadow-sm'
                       : 'text-Slate dark:text-white/50 hover:text-Ink dark:hover:text-white'
@@ -206,7 +206,7 @@ function DayDetailPanelContent({
                 </button>
                 <button
                   onClick={() => setActiveTab('diary')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-caption font-medium transition-all duration-200 ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-caption font-medium transition-all duration-200 ${
                     activeTab === 'diary'
                       ? 'bg-white dark:bg-white/10 text-Amber shadow-sm'
                       : 'text-Slate dark:text-white/50 hover:text-Ink dark:hover:text-white'

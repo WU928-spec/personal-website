@@ -27,7 +27,7 @@ export default function SubProjectCard({ subProject, parentColor }: SubProjectCa
         className="w-full flex items-center gap-2 px-4 py-2 text-left"
       >
         <div
-          className="w-2 h-2 rounded-full shrink-0"
+          className="w-2 h-2 rounded shrink-0"
           style={{ backgroundColor: color }}
         />
         <span className="flex-1 text-caption text-Ink dark:text-white truncate">

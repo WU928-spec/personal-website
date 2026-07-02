@@ -72,12 +72,12 @@ export default function ResultCharts({ offers }: ResultChartsProps) {
               <span className="text-Ink/40 dark:text-white/40 text-label font-body w-20 truncate shrink-0">
                 {offer.companyName}
               </span>
-              <div className="flex-1 h-6 bg-white/70 dark:bg-white/5 rounded-md overflow-hidden relative">
+              <div className="flex-1 h-6 bg-white/70 dark:bg-white/5 rounded-lg overflow-hidden relative">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className={`h-full bg-gradient-to-r ${color} rounded-md`}
+                  className={`h-full bg-gradient-to-r ${color} rounded-lg`}
                 />
                 <span className="absolute inset-0 flex items-center px-2 text-Ink/60 dark:text-white/60 text-label font-body">
                   {value.toFixed(1)}
@@ -231,7 +231,7 @@ function Recommendation({ offers }: { offers: Offer[] }) {
   const growthDiff = (a.growthProspect - b.growthProspect) / 10 * 100
 
   return (
-    <div className="p-4 rounded-xl border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
+    <div className="p-4 rounded-lg border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
       <h4 className="text-Ink/60 dark:text-white/60 text-caption font-body tracking-wider mb-4">
         {t('internship.recommendation')}
       </h4>

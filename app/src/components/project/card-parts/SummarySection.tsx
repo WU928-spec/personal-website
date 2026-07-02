@@ -86,13 +86,13 @@ export default function SummarySection({
             <div className="flex justify-end gap-2">
               <button
                 onClick={onCancel}
-                className="px-3 py-1 text-label text-Slate hover:text-Ink dark:hover:text-white transition-colors"
+                className="px-4 py-1 text-label text-Slate hover:text-Ink dark:hover:text-white transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={onSave}
-                className="px-3 py-1 text-label bg-Sage text-white rounded-md hover:bg-Sage/90 transition-colors"
+                className="px-4 py-1 text-label bg-Sage text-white rounded-md hover:bg-Sage/90 transition-colors"
               >
                 保存
               </button>

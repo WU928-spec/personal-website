@@ -46,7 +46,7 @@ export default function ProjectHistoryModal({ projectId, isOpen, onClose }: Proj
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 30 }}
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-x-3 top-[5vh] bottom-[5vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[640px] bg-Parchment dark:bg-Graphite border border-Sand dark:border-white/10 rounded-2xl z-50 shadow-deep flex flex-col"
+        className="fixed inset-x-3 top-[5vh] bottom-[5vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[640px] bg-Parchment dark:bg-Graphite border border-Sand dark:border-white/10 rounded-lg z-50 shadow-deep flex flex-col"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-Sand dark:border-white/10 shrink-0">

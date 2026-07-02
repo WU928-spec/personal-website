@@ -188,7 +188,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-Ink/40 z-[60] lg:hidden"
+              className="fixed inset-0 bg-black/40 z-[60] lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
@@ -219,8 +219,8 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
                       onClick={() => handleClick(item.id)}
                       className={`text-left text-caption leading-[1.65] py-2 transition-all duration-200 border-l-2 ${
                         isActive
-                          ? 'text-Amber border-Amber pl-3'
-                          : 'text-Slate dark:text-white/60 border-transparent hover:text-Ink dark:hover:text-white pl-0'
+                          ? 'text-primary border-primary pl-3'
+                          : 'text-muted border-transparent hover:text-primary pl-0'
                       } ${item.level === 3 ? 'pl-4' : ''} ${
                         isActive && item.level === 3 ? '!pl-7' : ''
                       }`}

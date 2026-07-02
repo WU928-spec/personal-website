@@ -23,12 +23,12 @@ export default function SkillSection() {
           <h2 className="font-display text-heading font-medium text-Ink dark:text-white">
             {t('home.skillsTitle')}
           </h2>
-          <p className="font-body text-body text-Slate mt-3">
+          <p className="font-body text-body text-Slate mt-4">
             {t('home.skillsDesc')}
           </p>
         </motion.div>
 
-        <div className="mt-16 flex flex-wrap justify-center gap-3 md:gap-4">
+        <div className="mt-16 flex flex-wrap justify-center gap-4 md:gap-4">
           {categories.map((cat, ci) =>
             cat.skills.map((skill, si) => (
               <SkillTag

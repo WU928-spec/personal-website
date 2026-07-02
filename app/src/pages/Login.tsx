@@ -39,7 +39,7 @@ export default function Login() {
       >
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-Amber/10 mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-Amber/10 mb-6">
             <LogIn size={28} className="text-Amber" />
           </div>
           <h1 className="font-display text-heading font-medium text-Ink">
@@ -64,7 +64,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('login.emailPlaceholder')}
-                className="w-full bg-Linen border border-Sand rounded-xl py-2 pl-11 pr-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
+                className="w-full bg-Linen border border-Sand rounded-lg py-2 pl-11 pr-4 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('login.passwordPlaceholder')}
-                className="w-full bg-Linen border border-Sand rounded-xl py-2 pl-11 pr-12 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
+                className="w-full bg-Linen border border-Sand rounded-lg py-2 pl-11 pr-12 text-Ink placeholder:text-Slate/40 focus:outline-none focus:border-Amber focus:ring-1 focus:ring-Amber/20 transition-all duration-200 font-body"
               />
               <button
                 type="button"
@@ -107,7 +107,7 @@ export default function Login() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-Amber text-Parchment font-ui text-caption font-semibold uppercase tracking-[0.05em] py-3.5 rounded-xl hover:bg-primary hover:-translate-y-px transition-all duration-300"
+            className="w-full bg-Amber text-Parchment font-ui text-caption font-semibold uppercase tracking-[0.05em] py-3.5 rounded-lg hover:bg-primary hover:-translate-y-px transition-all duration-300"
           >
             {t('login.submit')}
           </button>

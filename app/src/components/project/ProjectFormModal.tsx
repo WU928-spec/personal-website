@@ -80,7 +80,7 @@ export default function ProjectFormModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-4 top-[10vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[480px] max-h-[80vh] overflow-y-auto bg-Parchment dark:bg-Graphite border border-Sand dark:border-white/15 rounded-2xl z-50 shadow-deep p-6"
+            className="fixed inset-x-4 top-[10vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[480px] max-h-[80vh] overflow-y-auto bg-Parchment dark:bg-Graphite border border-Sand dark:border-white/15 rounded-lg z-50 shadow-deep p-6"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-display text-heading font-medium text-Ink dark:text-white">
@@ -169,7 +169,7 @@ export default function ProjectFormModal({
                       key={c.value}
                       type="button"
                       onClick={() => setColor(c.value)}
-                      className={`w-8 h-8 rounded-full transition-all duration-200 ${
+                      className={`w-8 h-8 rounded-lg transition-all duration-200 ${
                         color === c.value
                           ? 'ring-2 ring-offset-2 ring-Amber scale-110'
                           : 'hover:scale-105'

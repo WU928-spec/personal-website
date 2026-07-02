@@ -87,7 +87,7 @@ export default function Calendar() {
           </aside>
 
           {/* Main calendar */}
-          <main className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-2xl p-4 sm:p-4 flex flex-col min-h-0">
+          <main className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg p-4 sm:p-4 flex flex-col min-h-0">
             <CalendarHeader
               year={year}
               month={month}

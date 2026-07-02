@@ -60,7 +60,7 @@ export default function ProfileSettings({ lang, t }: ProfileSettingsProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="bg-Linen/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-8"
+      className="bg-Linen/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg p-8"
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-subhead font-semibold text-Ink dark:text-white">{t('profile.aboutInfo')}</h3>
@@ -77,8 +77,8 @@ export default function ProfileSettings({ lang, t }: ProfileSettingsProps) {
 
       {isEditing ? (
         <div className="space-y-6">
-          <div className="bg-Linen rounded-xl border border-Sand p-5 dark:bg-white/5 dark:border-white/10">
-            <p className="font-ui text-caption font-medium uppercase tracking-[0.1em] text-Sage mb-3">中文</p>
+          <div className="bg-Linen rounded-lg border border-Sand p-5 dark:bg-white/5 dark:border-white/10">
+            <p className="font-ui text-caption font-medium uppercase tracking-[0.1em] text-Sage mb-4">中文</p>
             {editZh.fields.map((field, i) => {
               const IconComp = iconMap[field.icon] || MapPin
               return (
@@ -100,13 +100,13 @@ export default function ProfileSettings({ lang, t }: ProfileSettingsProps) {
             <input
               value={editZh.title}
               onChange={(e) => setEditZh({ ...editZh, title: e.target.value })}
-              className="w-full bg-transparent font-display text-subhead font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 mt-2 dark:text-white dark:border-white/10"
+              className="w-full bg-transparent font-display text-subhead font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 mt-2 dark:text-white dark:border-white/10"
             />
             <textarea
               value={editZh.p1}
               onChange={(e) => setEditZh({ ...editZh, p1: e.target.value })}
               rows={2}
-              className="w-full bg-transparent font-body text-body leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 resize-y dark:text-white dark:border-white/10"
+              className="w-full bg-transparent font-body text-body leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 resize-y dark:text-white dark:border-white/10"
             />
             <textarea
               value={editZh.p2}
@@ -116,8 +116,8 @@ export default function ProfileSettings({ lang, t }: ProfileSettingsProps) {
             />
           </div>
 
-          <div className="bg-Linen rounded-xl border border-Sand p-5 dark:bg-white/5 dark:border-white/10">
-            <p className="font-ui text-caption font-medium uppercase tracking-[0.1em] text-Sage mb-3">English</p>
+          <div className="bg-Linen rounded-lg border border-Sand p-5 dark:bg-white/5 dark:border-white/10">
+            <p className="font-ui text-caption font-medium uppercase tracking-[0.1em] text-Sage mb-4">English</p>
             {editEn.fields.map((field, i) => {
               const IconComp = iconMap[field.icon] || MapPin
               return (
@@ -139,13 +139,13 @@ export default function ProfileSettings({ lang, t }: ProfileSettingsProps) {
             <input
               value={editEn.title}
               onChange={(e) => setEditEn({ ...editEn, title: e.target.value })}
-              className="w-full bg-transparent font-display text-subhead font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 mt-2 dark:text-white dark:border-white/10"
+              className="w-full bg-transparent font-display text-subhead font-medium leading-[1.3] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 mt-2 dark:text-white dark:border-white/10"
             />
             <textarea
               value={editEn.p1}
               onChange={(e) => setEditEn({ ...editEn, p1: e.target.value })}
               rows={2}
-              className="w-full bg-transparent font-body text-body leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-3 resize-y dark:text-white dark:border-white/10"
+              className="w-full bg-transparent font-body text-body leading-[1.65] text-Ink focus:outline-none border-b border-Sand focus:border-Amber pb-1 mb-4 resize-y dark:text-white dark:border-white/10"
             />
             <textarea
               value={editEn.p2}
@@ -191,7 +191,7 @@ export default function ProfileSettings({ lang, t }: ProfileSettingsProps) {
           <div className="mt-6">
             <h4 className="font-display text-subhead font-medium text-Ink mb-2 dark:text-white">{about.title}</h4>
             <p className="font-body text-body leading-[1.65] text-Ink dark:text-white">{about.p1}</p>
-            <p className="font-body text-body leading-[1.65] text-Ink mt-3 dark:text-white">{about.p2}</p>
+            <p className="font-body text-body leading-[1.65] text-Ink mt-4 dark:text-white">{about.p2}</p>
           </div>
         </div>
       )}

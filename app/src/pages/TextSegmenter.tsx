@@ -209,7 +209,7 @@ export default function TextSegmenter() {
           <BackToTools label={t('tools.title')} className="mb-6" />
 
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40">
+            <div className="w-10 h-10 rounded-lg bg-Amber/10 dark:bg-white/10 flex items-center justify-center text-Amber/60 dark:text-white/40">
               <TextQuote size={20} />
             </div>
             <div>
@@ -257,7 +257,7 @@ export default function TextSegmenter() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="将没有换行的英文文本粘贴到这里..."
-              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-caption text-Ink dark:text-white leading-relaxed font-body focus:outline-none focus:border-Amber/50 resize-y placeholder:text-Slate/40"
+              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-caption text-Ink dark:text-white leading-relaxed font-body focus:outline-none focus:border-Amber/50 resize-y placeholder:text-Slate/40"
               spellCheck={false}
             />
             <div className="mt-2 text-label text-Slate/50 text-right">
@@ -286,7 +286,7 @@ export default function TextSegmenter() {
               value={outputText}
               readOnly
               placeholder="分段后的文本会显示在这里..."
-              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-caption text-Ink dark:text-white leading-relaxed font-body focus:outline-none resize-y placeholder:text-Slate/40"
+              className="flex-1 min-h-[300px] lg:min-h-[500px] p-4 rounded-lg bg-white/60 dark:bg-white/5 border border-Sand dark:border-white/10 text-caption text-Ink dark:text-white leading-relaxed font-body focus:outline-none resize-y placeholder:text-Slate/40"
               spellCheck={false}
             />
             <div className="mt-2 text-label text-Slate/50 text-right">
@@ -305,7 +305,7 @@ export default function TextSegmenter() {
           <button
             onClick={handleSegment}
             disabled={!inputText.trim()}
-            className={`px-8 py-3 rounded-xl text-caption font-medium transition-all duration-300 ${
+            className={`px-8 py-3 rounded-lg text-caption font-medium transition-all duration-300 ${
               inputText.trim()
                 ? 'bg-Amber text-white hover:bg-Amber/90 hover:scale-[1.02]'
                 : 'bg-Sand/50 text-Slate/40 cursor-not-allowed'
@@ -320,24 +320,24 @@ export default function TextSegmenter() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-12 p-6 rounded-xl bg-white/40 dark:bg-white/[0.03] border border-Sand dark:border-white/10"
+          className="mt-12 p-6 rounded-lg bg-white/40 dark:bg-white/[0.03] border border-Sand dark:border-white/10"
         >
           <h3 className="text-caption font-medium text-Ink dark:text-white/80 mb-4">分段规则</h3>
           <ul className="space-y-2 text-caption text-Slate dark:text-white/50">
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-Amber/60 mt-1.5 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-md bg-Amber/60 mt-1.5 shrink-0" />
               <span>段落之间保留空行（双击换行），保持原有段落结构</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-Amber/60 mt-1.5 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-md bg-Amber/60 mt-1.5 shrink-0" />
               <span>每个句子单独一行，句末标点（. ! ?）后换行</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-Amber/60 mt-1.5 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-md bg-Amber/60 mt-1.5 shrink-0" />
               <span>自动识别常见缩写（Mr. / Dr. / e.g. / U.S. 等），避免误分段</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-Amber/60 mt-1.5 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-md bg-Amber/60 mt-1.5 shrink-0" />
               <span>粘贴文本后自动分段，也可手动点击「一键分段」按钮</span>
             </li>
           </ul>

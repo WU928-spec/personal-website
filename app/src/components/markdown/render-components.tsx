@@ -148,7 +148,7 @@ export function buildComponents(
       <div className="relative my-8 flex items-center justify-center">
         <hr className="w-full border-t border-border" />
         <div className="absolute bg-background px-2">
-          <div className="w-2 h-2 rotate-45 bg-primary" />
+          <div className="w-2 h-2 rounded rotate-45 bg-primary" />
         </div>
       </div>
     ),

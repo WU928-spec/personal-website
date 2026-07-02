@@ -354,13 +354,13 @@ export default function ObsidianBrowser() {
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}
                     placeholder="笔记名"
-                    className="w-full px-3 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-3"
+                    className="w-full px-4 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-3"
                     autoFocus
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateNote()}
                   />
                   <div className="flex justify-end gap-2 mb-3">
-                    <button onClick={() => setDialog('none')} className="px-3 py-1.5 text-label text-Slate hover:text-Ink dark:hover:text-white">取消</button>
-                    <button onClick={handleCreateNote} className="px-3 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">创建</button>
+                    <button onClick={() => setDialog('none')} className="px-4 py-1.5 text-label text-Slate hover:text-Ink dark:hover:text-white">取消</button>
+                    <button onClick={handleCreateNote} className="px-4 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">创建</button>
                   </div>
                   <div className="border-t border-Sand dark:border-white/10 pt-3">
                     <button
@@ -388,13 +388,13 @@ export default function ObsidianBrowser() {
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}
                     placeholder="文件夹名"
-                    className="w-full px-3 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-4"
+                    className="w-full px-4 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-4"
                     autoFocus
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
                   />
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => setDialog('none')} className="px-3 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
-                    <button onClick={handleCreateFolder} className="px-3 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">创建</button>
+                    <button onClick={() => setDialog('none')} className="px-4 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
+                    <button onClick={handleCreateFolder} className="px-4 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">创建</button>
                   </div>
                 </>
               )}
@@ -405,13 +405,13 @@ export default function ObsidianBrowser() {
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}
                     placeholder="新名称"
-                    className="w-full px-3 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-4"
+                    className="w-full px-4 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-4"
                     autoFocus
                     onKeyDown={(e) => e.key === 'Enter' && handleRename()}
                   />
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => setDialog('none')} className="px-3 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
-                    <button onClick={handleRename} className="px-3 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">保存</button>
+                    <button onClick={() => setDialog('none')} className="px-4 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
+                    <button onClick={handleRename} className="px-4 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">保存</button>
                   </div>
                 </>
               )}
@@ -420,8 +420,8 @@ export default function ObsidianBrowser() {
                   <h3 className="text-body font-semibold text-Ink dark:text-white mb-3">确认删除</h3>
                   <p className="text-caption text-Slate mb-4">确定要删除吗？此操作不可撤销。</p>
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => setDialog('none')} className="px-3 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
-                    <button onClick={handleDelete} className="px-3 py-1.5 text-caption bg-Rose text-white rounded-md hover:bg-Rose/80">删除</button>
+                    <button onClick={() => setDialog('none')} className="px-4 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
+                    <button onClick={handleDelete} className="px-4 py-1.5 text-caption bg-Rose text-white rounded-md hover:bg-Rose/80">删除</button>
                   </div>
                 </>
               )}
@@ -439,7 +439,7 @@ export default function ObsidianBrowser() {
         >
           {contextMenu.isFolder && (
             <button
-              className="w-full text-left px-3 py-1.5 text-caption text-primary hover:bg-accent hover:text-primary-foreground transition-colors"
+              className="w-full text-left px-4 py-1.5 text-caption text-primary hover:bg-accent hover:text-primary-foreground transition-colors"
               onClick={() => {
                 setDialogPath('')
                 setDialogTarget(contextMenu.path)
@@ -451,7 +451,7 @@ export default function ObsidianBrowser() {
             </button>
           )}
           <button
-            className="w-full text-left px-3 py-1.5 text-caption text-primary hover:bg-accent hover:text-primary-foreground transition-colors"
+            className="w-full text-left px-4 py-1.5 text-caption text-primary hover:bg-accent hover:text-primary-foreground transition-colors"
             onClick={() => {
               openRenameDialog(contextMenu.path)
               setContextMenu(null)
@@ -460,7 +460,7 @@ export default function ObsidianBrowser() {
             重命名
           </button>
           <button
-            className="w-full text-left px-3 py-1.5 text-caption text-primary hover:bg-accent hover:text-primary-foreground transition-colors"
+            className="w-full text-left px-4 py-1.5 text-caption text-primary hover:bg-accent hover:text-primary-foreground transition-colors"
             onClick={() => {
               openDeleteDialog(contextMenu.path)
               setContextMenu(null)
@@ -517,7 +517,7 @@ export default function ObsidianBrowser() {
                   <div className="w-[260px]">
                     <div className="bg-card text-primary rounded-lg overflow-hidden select-none">
                       {/* Header */}
-                      <div className="flex items-center justify-between px-3 py-2">
+                      <div className="flex items-center justify-between px-4 py-2">
                         <h3 className="text-label font-semibold uppercase tracking-[0.08em] text-muted">
                           {t('obsidian.vault')}
                         </h3>
@@ -526,14 +526,14 @@ export default function ObsidianBrowser() {
                             <>
                               <button
                                 onClick={() => { setDialog('newFolder'); setDialogPath('') }}
-                                className="p-1 rounded text-muted hover:text-primary hover:bg-muted transition-colors"
+                                className="p-1 rounded-md text-muted hover:text-primary hover:bg-muted transition-colors"
                                 title="新建文件夹"
                               >
                                 <FolderPlus size={14} />
                               </button>
                               <button
                                 onClick={() => { setDialog('newNote'); setDialogPath('') }}
-                                className="p-1 rounded text-muted hover:text-primary hover:bg-muted transition-colors"
+                                className="p-1 rounded-md text-muted hover:text-primary hover:bg-muted transition-colors"
                                 title="新建笔记"
                               >
                                 <FileText size={14} />
@@ -543,7 +543,7 @@ export default function ObsidianBrowser() {
                           )}
                           <button
                             onClick={() => setSidebarCollapsed(true)}
-                            className="p-1 rounded text-muted hover:text-primary hover:bg-muted transition-colors"
+                            className="p-1 rounded-md text-muted hover:text-primary hover:bg-muted transition-colors"
                             aria-label="收起侧边栏"
                           >
                             <ChevronLeft size={14} />
@@ -552,7 +552,7 @@ export default function ObsidianBrowser() {
                       </div>
 
                       {/* Search */}
-                      <div className="px-3 pb-2">
+                      <div className="px-4 pb-2">
                         <div className="relative">
                           <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted" />
                           <input
@@ -580,14 +580,14 @@ export default function ObsidianBrowser() {
                       >
                         {searchQuery.trim() ? (
                           filteredNotes.length === 0 ? (
-                            <p className="text-label text-muted px-3 py-4 text-center">无结果</p>
+                            <p className="text-label text-muted px-4 py-4 text-center">无结果</p>
                           ) : (
                             <div>
                               {filteredNotes.map((note) => (
                                 <button
                                   key={note.slug}
                                   onClick={() => handleSelectNote(note.slug)}
-                                  className={`w-full text-left px-3 py-1 text-caption transition-colors ${
+                                  className={`w-full text-left px-4 py-1 text-caption transition-colors ${
                                     selectedSlug === note.slug
                                       ? 'bg-accent text-primary-foreground'
                                       : 'text-primary hover:bg-muted'
@@ -599,7 +599,7 @@ export default function ObsidianBrowser() {
                             </div>
                           )
                         ) : tree.length === 0 ? (
-                          <p className="text-label text-muted px-3 py-2">{t('obsidian.emptyVault')}</p>
+                          <p className="text-label text-muted px-4 py-2">{t('obsidian.emptyVault')}</p>
                         ) : (
                           <NoteTree
                             tree={tree}
@@ -657,7 +657,7 @@ export default function ObsidianBrowser() {
                     {isLoggedIn && (
                       <button
                         onClick={() => setEditorOpen(!editorOpen)}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-label font-medium border transition-colors ${
+                        className={`flex items-center gap-1 px-4 py-1.5 rounded-md text-label font-medium border transition-colors ${
                           editorOpen
                             ? 'bg-Sage/10 text-Sage border-Sage/30 hover:bg-Sage/20'
                             : 'bg-Ink/5 text-Ink border-Ink/20 hover:bg-Ink/10 dark:bg-white/10 dark:text-white dark:border-white/20'

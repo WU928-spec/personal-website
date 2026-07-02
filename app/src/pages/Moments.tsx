@@ -62,7 +62,7 @@ export default function Moments() {
 
         {/* Profile Info */}
         <div className="max-w-2xl mx-auto px-4 relative">
-          <div className="flex items-end justify-end gap-3 -mt-10 pb-4">
+          <div className="flex items-end justify-end gap-4 -mt-10 pb-4">
             <div className="text-right pb-2">
               <h1 className="text-white text-subhead font-medium drop-shadow-md">
                 {displayName}
@@ -71,7 +71,7 @@ export default function Moments() {
             <img
               src={avatarUrl}
               alt={displayName}
-              className="w-20 h-20 rounded object-cover border-4 border-white dark:border-background shadow-lg shrink-0"
+              className="w-20 h-20 rounded-lg object-cover border-4 border-white dark:border-background shadow-lg shrink-0"
             />
           </div>
         </div>

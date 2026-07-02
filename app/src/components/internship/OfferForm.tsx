@@ -121,7 +121,7 @@ export default function OfferForm({
           <div
             key={offer.id}
             onClick={() => startEdit(offer)}
-            className={`group relative flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-300 ${
+            className={`group relative flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all duration-300 ${
               editingId === offer.id
                 ? 'bg-white/50 dark:bg-white/5 border-Amber/20 dark:border-white/20'
                 : 'bg-white/40 dark:bg-white/[0.02] border-Amber/10 dark:border-white/5 hover:border-Amber/20 dark:hover:border-white/10 hover:bg-white/60 dark:hover:bg-white/5'
@@ -168,7 +168,7 @@ export default function OfferForm({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="p-4 rounded-xl border border-Amber/10 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] space-y-4">
+            <div className="p-4 rounded-lg border border-Amber/10 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-Ink/50 dark:text-white/40 text-label font-body tracking-wider block mb-1">

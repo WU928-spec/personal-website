@@ -129,7 +129,7 @@ export default function InternshipDecision() {
               transition={{ delay: 0.5, duration: 0.6 }}
               className="mt-6 max-w-md mx-auto"
             >
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10">
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/70 dark:bg-white/5 border border-Amber/10 dark:border-white/10">
                 <MapPin size={14} className="text-Amber/60 shrink-0" />
                 <input
                   type="text"
@@ -147,7 +147,7 @@ export default function InternshipDecision() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="mb-10 p-5 rounded-2xl border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
+            className="mb-8 p-4 rounded-lg border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
           >
             <h3 className="text-Ink/50 dark:text-white/50 text-label font-body tracking-wider mb-4">
               {t('internship.scoringWeights')}
@@ -179,7 +179,7 @@ export default function InternshipDecision() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="mb-10 p-4 rounded-xl border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
+            className="mb-8 p-4 rounded-lg border border-Amber/10 dark:border-white/5 bg-white/70 dark:bg-white/[0.02]"
           >
             <p className="text-Ink/40 dark:text-white/30 text-label font-body leading-[1.8]">
               {t('internship.formulaText')}

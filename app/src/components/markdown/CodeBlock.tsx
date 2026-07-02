@@ -27,7 +27,7 @@ export default function CodeBlock({
   if (inline) {
     return (
       <code
-        className="rounded px-2 py-0.5 font-mono text-caption bg-muted text-muted"
+        className="rounded-md px-2 py-0.5 font-mono text-caption bg-muted text-muted"
         style={{ fontFamily: '"JetBrains Mono", monospace' }}
       >
         {children}

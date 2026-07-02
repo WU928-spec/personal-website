@@ -42,7 +42,7 @@ export default function PlanTab({
         {todos.map((todo) => (
           <div
             key={todo.id}
-            className="flex items-center gap-2 bg-white dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg px-3 py-2.5 group"
+            className="flex items-center gap-2 bg-white dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg px-4 py-2.5 group"
           >
             <button
               onClick={() => isLoggedIn && onToggleTodo(todo.id)}
@@ -98,12 +98,12 @@ export default function PlanTab({
               onChange={(e) => onNewTodoChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="添加待办..."
-              className="flex-1 px-3 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
+              className="flex-1 px-4 py-2 rounded-lg border border-Sand dark:border-white/15 bg-white dark:bg-white/5 text-Ink dark:text-white text-body placeholder:text-Slate/40 focus:outline-none focus:border-Amber/50 focus:ring-1 focus:ring-Amber/20"
             />
             <button
               onClick={onAddTodo}
               disabled={!newTodo.trim()}
-              className="flex items-center justify-center w-10 h-10 rounded-lg bg-Amber text-white hover:bg-[#B06A2F] disabled:opacity-30 disabled:hover:bg-Amber transition-colors duration-200 shrink-0"
+              className="flex items-center justify-center w-10 h-10 rounded-lg bg-Amber text-white hover:bg-Amber/80 disabled:opacity-30 disabled:hover:bg-Amber transition-colors duration-200 shrink-0"
               aria-label="添加"
             >
               <Plus size={18} />

@@ -36,11 +36,11 @@ export default function ScoreMatrix({ offers }: ScoreMatrixProps) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.08, duration: 0.4 }}
-              className="relative rounded-xl border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] p-4 overflow-hidden"
+              className="relative rounded-lg border border-Amber/10 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] p-4 overflow-hidden"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <span className="w-6 h-6 rounded-full bg-white/70 dark:bg-white/5 flex items-center justify-center text-Ink/50 dark:text-white/40 text-label font-body">
+                  <span className="w-6 h-6 rounded-lg bg-white/70 dark:bg-white/5 flex items-center justify-center text-Ink/50 dark:text-white/40 text-label font-body">
                     {index + 1}
                   </span>
                   <div>
@@ -102,12 +102,12 @@ function ScoreBar({
   return (
     <div className="flex items-center gap-2">
       <span className="text-Ink/40 dark:text-white/30 text-label font-body w-8 shrink-0">{label}</span>
-      <div className="flex-1 h-1.5 bg-white/70 dark:bg-white/5 rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-white/70 dark:bg-white/5 rounded-md overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className={`h-full rounded-full ${color}`}
+          className={`h-full rounded-md ${color}`}
         />
       </div>
       <span className="text-Ink/40 dark:text-white/40 text-label font-body w-8 text-right">{score.toFixed(0)}</span>

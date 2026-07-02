@@ -276,7 +276,7 @@ export default function NotePicker({ open, onSelect, onClose }: Props) {
             ref={pickerRef}
             tabIndex={-1}
             onKeyDown={handleKeyDown}
-            className="bg-card border border-border rounded-xl shadow-xl overflow-hidden outline-none"
+            className="bg-card border border-border rounded-lg shadow-xl overflow-hidden outline-none"
           >
             <div className="flex items-center justify-between px-4 py-2 border-b border-border">
               <span className="text-caption font-medium text-foreground">选择笔记</span>

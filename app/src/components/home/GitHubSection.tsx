@@ -112,7 +112,7 @@ export default function GitHubSection() {
           <h2 className="font-display text-heading font-medium text-white">
             {t('home.buildingTitle')}
           </h2>
-          <p className="font-body text-body text-white/60 mt-3">
+          <p className="font-body text-body text-white/60 mt-4">
             {t('home.buildingDesc')}
           </p>
         </motion.div>
@@ -124,7 +124,7 @@ export default function GitHubSection() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mt-10"
         >
-          <p className="font-ui text-label font-medium tracking-[0.04em] text-white/50 mb-3">
+          <p className="font-ui text-label font-medium tracking-[0.04em] text-white/50 mb-4">
             {t('home.contributionActivity')}
           </p>
           <div className="flex gap-[3px] overflow-x-auto pb-2">
@@ -141,7 +141,7 @@ export default function GitHubSection() {
                       delay: 0.005 * (wi * 7 + di),
                       ease: [0.25, 0.1, 0.25, 1],
                     }}
-                    className="w-[10px] h-[10px] rounded-sm shrink-0"
+                    className="w-[10px] h-[10px] rounded-md shrink-0"
                     style={{ backgroundColor: contributionColors[level] }}
                     title={`${level} ${t('github.contributions')}`}
                   />
@@ -168,7 +168,7 @@ export default function GitHubSection() {
             href="https://github.com/WU928-spec"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-3 rounded-md hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
+            className="inline-flex items-center border-[1.5px] border-white/50 text-white font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-2 rounded-lg hover:bg-white hover:text-Graphite hover:border-white hover:-translate-y-px transition-all duration-300"
           >
             {t('home.viewFullProfile')}
           </a>

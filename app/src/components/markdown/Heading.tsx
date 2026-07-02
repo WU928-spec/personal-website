@@ -13,7 +13,7 @@ const iconSizes = { 1: 22, 2: 20, 3: 18, 4: 16 }
 
 const margins = {
   1: 'mt-8 mb-4',
-  2: 'mt-8 mb-3',
+  2: 'mt-8 mb-4',
   3: 'mt-8 mb-2',
   4: 'mt-6 mb-2',
 }
