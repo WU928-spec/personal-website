@@ -33,7 +33,7 @@ const MarkdownRenderer = lazy(() => import('@/components/MarkdownRenderer.tsx'))
 
 const markdownFallback = (
   <div className="py-8 flex items-center justify-center">
-    <div className="w-6 h-6 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+    <div className="w-6 h-6 border-2 border-Amber border-t-transparent rounded animate-spin" />
   </div>
 )
 

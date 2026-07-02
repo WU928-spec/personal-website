@@ -122,7 +122,7 @@ export default function Navbar() {
                   onClick={() => setEditMode(!isEditMode)}
                   className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-label font-medium border transition-colors ${
                     isEditMode
-                      ? 'bg-Amber text-white border-Amber hover:bg-[#b8863d]'
+                      ? 'bg-Amber text-white border-Amber hover:bg-primary/90'
                       : 'bg-transparent text-Ink border-Sand hover:border-Amber hover:text-Amber dark:text-white dark:border-white/20 dark:hover:text-Amber dark:hover:border-Amber'
                   }`}
                   title={isEditMode ? t('editor.switchToView') : t('editor.switchToEdit')}

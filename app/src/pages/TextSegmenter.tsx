@@ -305,7 +305,7 @@ export default function TextSegmenter() {
           <button
             onClick={handleSegment}
             disabled={!inputText.trim()}
-            className={`px-8 py-3 rounded-lg text-caption font-medium transition-all duration-300 ${
+            className={`px-8 py-2 rounded-lg text-caption font-medium transition-all duration-300 ${
               inputText.trim()
                 ? 'bg-Amber text-white hover:bg-Amber/90 hover:scale-[1.02]'
                 : 'bg-Sand/50 text-Slate/40 cursor-not-allowed'

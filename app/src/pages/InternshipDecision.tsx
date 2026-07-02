@@ -102,7 +102,7 @@ export default function InternshipDecision() {
               {t('internship.title')}
             </h1>
 
-            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 dark:via-white/30 to-transparent rounded-full" />
+            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 dark:via-white/30 to-transparent rounded" />
 
             <p className="mt-6 max-w-lg mx-auto text-caption text-Ink/50 dark:text-white/30 font-body leading-relaxed tracking-wide">
               {t('internship.description')}
