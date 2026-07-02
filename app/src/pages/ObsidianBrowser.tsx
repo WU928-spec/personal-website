@@ -383,7 +383,7 @@ export default function ObsidianBrowser() {
               )}
               {dialog === 'newFolder' && (
                 <>
-                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-3">新建文件夹</h3>
+                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-4">新建文件夹</h3>
                   <input
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}

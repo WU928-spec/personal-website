@@ -196,7 +196,7 @@ export default function MapCommuteModal({
                   <span className="text-caption ml-1 text-Ink/50 dark:text-white/50">{t('internship.minutes')}</span>
                 </p>
                 <p className="text-Ink/30 dark:text-white/30 text-caption font-body">{routeDetail}</p>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-4 flex gap-2">
                   <button
                     onClick={() => onConfirm(result)}
                     className="flex-1 py-2 rounded-lg bg-Amber/20 hover:bg-Amber/30 text-Amber/80 text-label font-body tracking-wider transition-colors border border-Amber/20"
