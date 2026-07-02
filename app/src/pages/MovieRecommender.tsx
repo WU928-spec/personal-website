@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Film, Send, User, Bot, KeyRound, Wand2, Star, Sparkles, ArrowLeft } from 'lucide-react'
+import { Film, Send, User, Bot, KeyRound, Wand2, Star, Sparkles } from 'lucide-react'
+import BackToTools from '@/components/BackToTools'
 import PageSEO from '@/components/PageSEO'
 import { MOVIE_LIBRARY, getDailyMovie, type Movie } from '@/data/movies'
 
@@ -241,7 +241,6 @@ function LocalMovieCard({ movie }: { movie: Movie }) {
 /* ─── Main Page ─── */
 
 export default function MovieAgent() {
-  const navigate = useNavigate()
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
       const saved = localStorage.getItem('movie_chat_history')
@@ -456,22 +455,13 @@ export default function MovieAgent() {
       {/* Header */}
       <div className="shrink-0 border-b border-Sand/50 dark:border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/tools')}
-              className="flex items-center gap-1 text-caption text-Slate hover:text-Amber transition-colors"
-              title="返回工具箱"
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white">
-                <Film size={16} />
-              </div>
-              <div>
-                <h1 className="font-display text-caption font-semibold text-Ink dark:text-white">光影探索者</h1>
-                <p className="text-label text-Slate/40 dark:text-white/30">AI 电影顾问</p>
-              </div>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white">
+              <Film size={16} />
+            </div>
+            <div>
+              <h1 className="font-display text-caption font-semibold text-Ink dark:text-white">光影探索者</h1>
+              <p className="text-label text-Slate/40 dark:text-white/30">AI 电影顾问</p>
             </div>
           </div>
 
@@ -563,6 +553,7 @@ export default function MovieAgent() {
       {/* Chat Messages */}
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+          <BackToTools />
           {messages.map((msg) => (
             <motion.div
               key={msg.id}
