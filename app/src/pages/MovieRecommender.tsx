@@ -282,10 +282,14 @@ export default function MovieAgent() {
     }
   }, [messages])
 
-  // Auto scroll
+  // Auto scroll: only when AI reply finishes (loading goes from true → false)
+  const prevLoadingRef = useRef(false)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (!loading && prevLoadingRef.current && messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+    prevLoadingRef.current = loading
+  }, [loading, messages.length])
 
   // Auto focus input on mount
   useEffect(() => {
