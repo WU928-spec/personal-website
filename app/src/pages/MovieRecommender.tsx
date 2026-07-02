@@ -281,32 +281,39 @@ export default function MovieAgent() {
     }
   }, [messages])
 
-  // Auto scroll: only when AI reply finishes, and only if user is near bottom
-  const prevLoadingRef = useRef(false)
+  // Auto scroll: scroll to latest message whenever messages change, unless user scrolled away
   const chatContainerRef = useRef<HTMLDivElement>(null)
+  const shouldAutoScrollRef = useRef(true)
+  
+  // Track user scroll to disable auto-scroll when they scroll up to read history
   useEffect(() => {
-    if (!loading && prevLoadingRef.current && messages.length > 0) {
-      const container = chatContainerRef.current
-      if (container) {
-        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120
-        if (isNearBottom) {
-          // Scroll to the LAST MESSAGE (not messagesEndRef), so user sees the TOP of AI reply
-          const innerDiv = container.querySelector(':scope > div')
-          if (innerDiv) {
-            const children = innerDiv.children
-            // Exclude the final messagesEndRef empty div
-            const lastMsg = children.length >= 2 ? children[children.length - 2] : null
-            if (lastMsg) {
-              (lastMsg as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' })
-            } else {
-              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            }
-          }
-        }
-      }
+    const container = chatContainerRef.current
+    if (!container) return
+    const handleScroll = () => {
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150
+      shouldAutoScrollRef.current = isNearBottom
     }
-    prevLoadingRef.current = loading
-  }, [loading, messages.length])
+    container.addEventListener('scroll', handleScroll)
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Scroll to latest message top whenever messages change
+  useEffect(() => {
+    if (!shouldAutoScrollRef.current || messages.length === 0) return
+    const container = chatContainerRef.current
+    if (!container) return
+
+    const innerDiv = container.querySelector(':scope > div')
+    if (!innerDiv) return
+
+    const children = Array.from(innerDiv.children).filter((c) => c !== messagesEndRef.current)
+    const lastMsg = children[children.length - 1]
+    if (!lastMsg) return
+
+    requestAnimationFrame(() => {
+      (lastMsg as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }, [messages])
 
   // Auto focus input on mount
   useEffect(() => {
