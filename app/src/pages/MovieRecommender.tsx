@@ -456,7 +456,7 @@ export default function MovieAgent() {
 
   return (
     <>
-      <div className="h-[calc(100dvh-4rem)] bg-gradient-to-b from-Parchment to-white dark:from-Graphite dark:to-background flex flex-col">
+      <div className="h-[calc(100dvh-4rem)] overflow-hidden bg-gradient-to-b from-Parchment to-white dark:from-Graphite dark:to-background flex flex-col">
       <PageSEO title="光影探索者 — AI 电影顾问" description="你的专属电影品味顾问" />
 
       {/* Header */}
