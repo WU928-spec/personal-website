@@ -146,7 +146,7 @@ export default function Footer() {
             {/* Top Row */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-8">
               {/* Brand */}
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 <img src="/logo.svg" alt="Logo" className="h-7 w-auto" />
                 <p className="font-body text-body text-muted">
                   {display.brandDesc}

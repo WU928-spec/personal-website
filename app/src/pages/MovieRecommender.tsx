@@ -449,12 +449,12 @@ export default function MovieAgent() {
 
   return (
     <>
-      <div className="h-[calc(100dvh-4rem)] bg-gradient-to-b from-Parchment to-white dark:from-Graphite dark:to-[#0a0a0a] flex flex-col">
+      <div className="h-[calc(100dvh-4rem)] bg-gradient-to-b from-Parchment to-white dark:from-Graphite dark:to-background flex flex-col">
       <PageSEO title="光影探索者 — AI 电影顾问" description="你的专属电影品味顾问" />
 
       {/* Header */}
       <div className="shrink-0 border-b border-Sand/50 dark:border-white/5">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white">
               <Film size={16} />
@@ -527,7 +527,7 @@ export default function MovieAgent() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden shrink-0 border-b border-Sand/30 dark:border-white/5"
           >
-            <div className="max-w-2xl mx-auto px-4 py-3">
+            <div className="max-w-2xl mx-auto px-4 py-2">
               <div className="p-4 rounded-lg bg-white/60 dark:bg-white/[0.03] border border-Sand/50 dark:border-white/10">
                 <p className="text-caption text-Slate/40 mb-2 leading-relaxed">
                   输入 SiliconFlow / OpenAI 兼容 API Key，启用真正的 AI 电影顾问。
@@ -616,7 +616,7 @@ export default function MovieAgent() {
 
           {/* Loading */}
           {loading && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shrink-0">
                 <Bot size={13} />
               </div>
@@ -644,10 +644,10 @@ export default function MovieAgent() {
 
       {/* Input Area */}
       <div className="shrink-0 border-t border-Sand/50 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
-        <div className="max-w-2xl mx-auto px-4 py-3">
+        <div className="max-w-2xl mx-auto px-4 py-2">
           {/* Quick replies (only when idle) */}
           {isEmpty && !loading && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-2 mb-4">
               {quickReplies.map((text) => (
                 <button
                   key={text}
