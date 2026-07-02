@@ -14,7 +14,7 @@ export default function BackToTools({ label, className = '' }: BackToToolsProps)
   return (
     <button
       onClick={() => navigate('/tools')}
-      className={`flex items-center gap-1.5 text-caption text-muted hover:text-primary transition-colors mb-4 ${className}`}
+      className={`flex items-center gap-1.5 text-caption text-muted-foreground hover:text-foreground transition-colors mb-4 ${className}`}
     >
       <ArrowLeft size={16} />
       {label ?? t('tools.title')}
