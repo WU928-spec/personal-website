@@ -132,7 +132,7 @@ export default function TodayStatsPanel() {
 
       {/* ── 3. Completion Rate ── */}
       {totalCount > 0 && (
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-4 shrink-0">
           <div className="relative w-12 h-12 shrink-0">
             <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
               <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(var(--color-sand), 0.5)" strokeWidth="4" />

@@ -157,7 +157,7 @@ function FreeMovieCard({ movie, index }: { movie: FreeMovie; index: number }) {
       transition={{ duration: 0.4, delay: index * 0.1 }}
       className="p-4 rounded-lg bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-Amber/5 dark:from-indigo-500/10 dark:via-purple-500/5 dark:to-Amber/5 border border-indigo-200/30 dark:border-white/10"
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400/70 shrink-0">
           <Wand2 size={18} />
         </div>
@@ -204,7 +204,7 @@ function FreeMovieCard({ movie, index }: { movie: FreeMovie; index: number }) {
 function LocalMovieCard({ movie }: { movie: Movie }) {
   const [imgError, setImgError] = useState(false)
   return (
-    <div className="flex gap-3 p-4 rounded-lg bg-white/40 dark:bg-white/[0.02] border border-Sand/50 dark:border-white/5 hover:border-Amber/20 transition-colors cursor-default">
+    <div className="flex gap-4 p-4 rounded-lg bg-white/40 dark:bg-white/[0.02] border border-Sand/50 dark:border-white/5 hover:border-Amber/20 transition-colors cursor-default">
       {imgError ? (
         <div className="w-14 h-20 rounded-lg bg-gradient-to-br from-Amber/15 to-rose-400/10 flex flex-col items-center justify-center text-Ink/30 dark:text-white/20 shrink-0 overflow-hidden">
           <Film size={20} className="mb-1" />
@@ -560,7 +560,7 @@ export default function MovieAgent() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'assistant' && (
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shrink-0 mt-0.5">
@@ -697,7 +697,7 @@ export default function MovieAgent() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-lg bg-white dark:bg-[#1c1a18] border border-Sand/50 dark:border-white/10 p-6"
+            className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-lg bg-white dark:bg-card border border-Sand/50 dark:border-white/10 p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">

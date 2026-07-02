@@ -106,15 +106,15 @@ export default function Calendar() {
             {/* Legend */}
             <div className="mt-2 flex flex-wrap items-center gap-4 text-label text-Slate dark:text-white/50 shrink-0">
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-Amber" />
+                <span className="w-1.5 h-1.5 rounded bg-Amber" />
                 <span>有记录</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-Rose" />
+                <span className="w-1.5 h-1.5 rounded bg-Rose" />
                 <span>节假日</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-Sage" />
+                <span className="w-1.5 h-1.5 rounded bg-Sage" />
                 <span>节气</span>
               </div>
               <div className="flex items-center gap-1">

@@ -217,7 +217,7 @@ export default function OfferForm({
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-3 h-3 border-2 border-Ink/30 dark:border-white/30 border-t-Ink/80 dark:border-t-white/80 rounded-full"
+                        className="w-3 h-3 border-2 border-Ink/30 dark:border-white/30 border-t-Ink/80 dark:border-t-white/80 rounded-md"
                       />
                     ) : (
                       <Navigation size={12} />

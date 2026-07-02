@@ -226,7 +226,7 @@ export default function MapCommuteModal({
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-4 h-4 border-2 border-Ink/30 dark:border-white/30 border-t-Ink/80 dark:border-t-white/80 rounded-full"
+                    className="w-4 h-4 border-2 border-Ink/30 dark:border-white/30 border-t-Ink/80 dark:border-t-white/80 rounded-md"
                   />
                   <span>{t('internship.calculating')}</span>
                 </>

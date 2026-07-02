@@ -294,7 +294,7 @@ export default function NotePicker({ open, onSelect, onClose }: Props) {
             >
               {treeLoading ? (
                 <div className="flex justify-center py-6">
-                  <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-md animate-spin" />
                 </div>
               ) : tree.length === 0 ? (
                 <div className="py-6 text-center text-caption text-muted-foreground">暂无笔记</div>

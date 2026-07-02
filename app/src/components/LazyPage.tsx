@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 
 const fallback = (
   <div className="min-h-[60dvh] flex items-center justify-center">
-    <div className="w-6 h-6 border-2 border-Amber border-t-transparent rounded-full animate-spin" />
+    <div className="w-6 h-6 border-2 border-Amber border-t-transparent rounded-lg animate-spin" />
   </div>
 )
 

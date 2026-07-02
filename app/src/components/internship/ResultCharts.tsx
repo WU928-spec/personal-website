@@ -206,7 +206,7 @@ function RadarChart({ offers }: { offers: Offer[] }) {
       <div className="flex flex-wrap gap-4 mt-4">
         {offers.slice(0, 5).map((offer, idx) => (
           <div key={offer.id} className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[idx % colors.length] }} />
+            <div className="w-2 h-2 rounded" style={{ backgroundColor: colors[idx % colors.length] }} />
             <span className="text-Ink/40 dark:text-white/40 text-label font-body">{offer.companyName}</span>
           </div>
         ))}

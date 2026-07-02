@@ -92,7 +92,7 @@ export default function Moments() {
           </div>
         ) : moments.length === 0 ? (
           <div className="flex flex-col items-center py-20 text-center">
-            <Camera size={40} className="text-muted-foreground mb-3" />
+            <Camera size={40} className="text-muted-foreground mb-4" />
             <p className="text-muted-foreground text-body">
               还没有动态
             </p>

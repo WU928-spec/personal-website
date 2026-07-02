@@ -54,7 +54,7 @@ export default function EasterEggs() {
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 rounded-full bg-Amber/20 dark:bg-white/10"
+              className="absolute w-1 h-1 rounded bg-Amber/20 dark:bg-white/10"
               style={{
                 left: `${10 + i * 12}%`,
                 top: `${15 + (i % 3) * 30}%`,
@@ -91,7 +91,7 @@ export default function EasterEggs() {
               {t('easterEggs.title')}
             </h1>
 
-            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 to-transparent rounded-full" />
+            <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 to-transparent rounded" />
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -132,7 +132,7 @@ export default function EasterEggs() {
               >
                 <div className="group relative">
                   {/* 悬停光晕 */}
-                  <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-Amber/5 to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:-inset-6" />
+                  <div className="absolute -inset-4 rounded-lg bg-gradient-to-br from-Amber/5 to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:-inset-6" />
 
                   {/* 卡片边框光效 */}
                   <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-Amber/10 via-transparent to-Amber/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-white/10 dark:to-white/5" />
@@ -143,7 +143,7 @@ export default function EasterEggs() {
                       <div className="flex items-center gap-2">
                         {egg.status === 'available' ? (
                           <>
-                            <span className="w-2 h-2 rounded-full bg-green-400/80" />
+                            <span className="w-2 h-2 rounded bg-green-400/80" />
                             <span className="text-label text-green-500/70 dark:text-green-400/60 font-body tracking-wider">
                               {t('internship.unlocked')}
                             </span>

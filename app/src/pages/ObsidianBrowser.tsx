@@ -349,16 +349,16 @@ export default function ObsidianBrowser() {
             >
               {dialog === 'newNote' && (
                 <>
-                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-3">新建笔记</h3>
+                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-4">新建笔记</h3>
                   <input
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}
                     placeholder="笔记名"
-                    className="w-full px-4 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-3"
+                    className="w-full px-4 py-2 text-caption bg-white/50 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-md text-Ink dark:text-white placeholder:text-Slate/60 focus:outline-none focus:border-Amber/50 mb-4"
                     autoFocus
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateNote()}
                   />
-                  <div className="flex justify-end gap-2 mb-3">
+                  <div className="flex justify-end gap-2 mb-4">
                     <button onClick={() => setDialog('none')} className="px-4 py-1.5 text-label text-Slate hover:text-Ink dark:hover:text-white">取消</button>
                     <button onClick={handleCreateNote} className="px-4 py-1.5 text-caption bg-Sage text-white rounded-md hover:bg-Sage/80">创建</button>
                   </div>
@@ -400,7 +400,7 @@ export default function ObsidianBrowser() {
               )}
               {dialog === 'rename' && (
                 <>
-                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-3">重命名</h3>
+                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-4">重命名</h3>
                   <input
                     value={dialogPath}
                     onChange={(e) => setDialogPath(e.target.value)}
@@ -417,7 +417,7 @@ export default function ObsidianBrowser() {
               )}
               {dialog === 'delete' && (
                 <>
-                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-3">确认删除</h3>
+                  <h3 className="text-body font-semibold text-Ink dark:text-white mb-4">确认删除</h3>
                   <p className="text-caption text-Slate mb-4">确定要删除吗？此操作不可撤销。</p>
                   <div className="flex justify-end gap-2">
                     <button onClick={() => setDialog('none')} className="px-4 py-1.5 text-caption text-Slate hover:text-Ink dark:hover:text-white">取消</button>
@@ -645,7 +645,7 @@ export default function ObsidianBrowser() {
               >
                 <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full text-label font-medium text-Amber border border-Amber/30 bg-Amber/5">
+                    <span className="px-2 py-0.5 rounded-md text-label font-medium text-Amber border border-Amber/30 bg-Amber/5">
                       {selectedNote.category}
                     </span>
                     <span className="text-label text-Slate">{selectedNote.date}</span>
@@ -670,7 +670,7 @@ export default function ObsidianBrowser() {
                     <button
                       onClick={() => canGoBack && navigate(-1)}
                       disabled={!canGoBack}
-                      className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-200 ${
+                      className={`flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-200 ${
                         canGoBack
                           ? 'border-Sand text-Ink hover:text-Amber hover:border-Amber hover:bg-Amber/10 dark:border-white/25 dark:text-white/80'
                           : 'border-transparent text-Slate/30 cursor-not-allowed'
@@ -682,7 +682,7 @@ export default function ObsidianBrowser() {
                     <button
                       onClick={() => canGoForward && navigate(1)}
                       disabled={!canGoForward}
-                      className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-200 ${
+                      className={`flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-200 ${
                         canGoForward
                           ? 'border-Sand text-Ink hover:text-Amber hover:border-Amber hover:bg-Amber/10 dark:border-white/25 dark:text-white/80'
                           : 'border-transparent text-Slate/30 cursor-not-allowed'
@@ -719,7 +719,7 @@ export default function ObsidianBrowser() {
                   {selectedNote.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2.5 py-1 rounded-full text-label font-medium text-Slate bg-Mist/60 dark:bg-white/5"
+                      className="px-2.5 py-1 rounded-md text-label font-medium text-Slate bg-Mist/60 dark:bg-white/5"
                     >
                       #{tag}
                     </span>

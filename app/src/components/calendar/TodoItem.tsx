@@ -157,7 +157,7 @@ export default function TodoItem({
             </button>
             <button
               onClick={saveEdit}
-              className="px-2 py-0.5 text-label bg-Sage text-white rounded-md hover:bg-[#5a7a5a] transition-colors"
+              className="px-2 py-0.5 text-label bg-Sage text-white rounded-md hover:bg-Sage/80 transition-colors"
             >
               保存
             </button>
@@ -173,7 +173,7 @@ function ProjectDot({ projectId, projects }: { projectId: string; projects: Proj
   if (!project) return null
   return (
     <span
-      className="inline-block w-2 h-2 rounded-full ml-1.5 align-middle"
+      className="inline-block w-2 h-2 rounded ml-1.5 align-middle"
       style={{ backgroundColor: project.color }}
       title={project.name}
     />
