@@ -477,7 +477,7 @@ export default function MovieAgent() {
             )}
             {apiKey ? (
               <span className="flex items-center gap-1 text-label text-green-500/70">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400/80 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded bg-green-400/80 animate-pulse" />
                 AI 在线
               </span>
             ) : (
@@ -504,7 +504,7 @@ export default function MovieAgent() {
           >
             <div className="max-w-2xl mx-auto px-4 py-2">
               <div className="flex items-center gap-2 text-label text-Rose/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-Rose/60 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded bg-Rose/60 shrink-0" />
                 {error}
                 <button
                   onClick={() => setError(null)}
@@ -563,7 +563,7 @@ export default function MovieAgent() {
               className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shrink-0 mt-0.5">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-Amber to-rose-400 flex items-center justify-center text-white shrink-0 mt-0.5">
                   <Bot size={13} />
                 </div>
               )}
@@ -627,7 +627,7 @@ export default function MovieAgent() {
                       key={i}
                       animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
                       transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-                      className="w-1.5 h-1.5 rounded-full bg-Amber/60"
+                      className="w-1.5 h-1.5 rounded bg-Amber/60"
                     />
                   ))}
                   <span className="text-label text-Slate/30 ml-1">

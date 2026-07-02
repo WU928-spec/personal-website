@@ -20,7 +20,7 @@ export default function AttachmentList({ attachments, onRemove }: Props) {
           {attachments.map((att, i) => (
             <div
               key={i}
-              className="flex items-center gap-2 px-2 py-1 rounded-full bg-muted text-label text-foreground"
+              className="flex items-center gap-2 px-2 py-1 rounded-md bg-muted text-label text-foreground"
             >
               {att.type === 'md-link' ? (
                 <BookOpen size={12} className="text-Amber" />

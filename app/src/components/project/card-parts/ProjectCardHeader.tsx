@@ -31,7 +31,7 @@ export default function ProjectCardHeader({
       className="w-full flex items-center gap-4 px-6 py-4 text-left"
     >
       <div
-        className={`w-3 h-3 rounded-full shrink-0 ${isCompleted ? 'opacity-40' : ''}`}
+        className={`w-3 h-3 rounded shrink-0 ${isCompleted ? 'opacity-40' : ''}`}
         style={{ backgroundColor: project.color }}
       />
 
@@ -96,9 +96,9 @@ export default function ProjectCardHeader({
               <span>进度</span>
               <span>{Math.round(progress * 100)}%</span>
             </div>
-            <div className="h-1.5 bg-Mist/50 dark:bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-Mist/50 dark:bg-white/5 rounded overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-700"
+                className="h-full rounded transition-all duration-700"
                 style={{
                   width: `${progress * 100}%`,
                   backgroundColor: isCompleted ? '#6B8E6B' : project.color,

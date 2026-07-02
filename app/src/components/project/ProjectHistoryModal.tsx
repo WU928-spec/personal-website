@@ -53,7 +53,7 @@ export default function ProjectHistoryModal({ projectId, isOpen, onClose }: Proj
           <div className="flex items-center gap-2">
             {project && (
               <>
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: project.color }} />
+                <div className="w-3 h-3 rounded" style={{ backgroundColor: project.color }} />
                 <h3 className="font-display text-subhead font-medium text-Ink dark:text-white">
                   {project.name}
                 </h3>

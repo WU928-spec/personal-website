@@ -84,7 +84,7 @@ export default function TodayStatsPanel() {
   const maxSlotHours = Math.max(...timeSlots.map((s) => s.hours), 1)
 
   return (
-    <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-xl p-4 flex flex-col h-full overflow-y-auto gap-4">
+    <div className="bg-white/70 dark:bg-white/5 border border-Sand dark:border-white/10 rounded-lg p-4 flex flex-col h-full overflow-y-auto gap-4">
       {/* ── 1. Today's Focus ── */}
       <div className="text-center py-1 shrink-0">
         <div className="flex items-center justify-center gap-1.5 mb-0.5">

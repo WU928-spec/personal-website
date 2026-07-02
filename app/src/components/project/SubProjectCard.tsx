@@ -35,9 +35,9 @@ export default function SubProjectCard({ subProject, parentColor }: SubProjectCa
         </span>
         {subProject.targetHours > 0 && (
           <div className="hidden sm:flex items-center gap-2 w-20">
-            <div className="flex-1 h-1 bg-Mist/50 dark:bg-white/5 rounded-full overflow-hidden">
+            <div className="flex-1 h-1 bg-Mist/50 dark:bg-white/5 rounded overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-500"
+                className="h-full rounded transition-all duration-500"
                 style={{ width: `${progress * 100}%`, backgroundColor: color }}
               />
             </div>

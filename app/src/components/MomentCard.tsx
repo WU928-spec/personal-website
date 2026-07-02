@@ -237,7 +237,7 @@ function MomentCard({
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="写评论..."
                 autoFocus
-                className="flex-1 bg-muted rounded-full px-4 py-2 text-caption text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="flex-1 bg-muted rounded-lg px-4 py-2 text-caption text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
               <button
                 type="submit"
