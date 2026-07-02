@@ -119,7 +119,7 @@ export default function Footer() {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-label font-medium hover:bg-white/15 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-white/10 border border-white/20 text-foreground/80 text-label font-medium hover:bg-white/15 transition-colors"
               >
                 <Pencil size={13} />
                 {t('editor.editFooter')}
@@ -159,7 +159,7 @@ export default function Footer() {
                   <Link
                     key={`${link.path}-${link.label}`}
                     to={link.path}
-                    className="font-ui text-label font-medium uppercase tracking-[0.06em] text-white/60 hover:text-white transition-colors duration-300"
+                    className="font-ui text-label font-medium uppercase tracking-[0.06em] text-muted hover:text-foreground transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
