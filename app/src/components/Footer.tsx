@@ -148,7 +148,7 @@ export default function Footer() {
               {/* Brand */}
               <div className="flex flex-col gap-4">
                 <img src="/logo.svg" alt="Logo" className="h-7 w-auto" />
-                <p className="font-body text-body text-muted">
+                <p className="font-body text-body text-muted-foreground">
                   {display.brandDesc}
                 </p>
               </div>
@@ -159,7 +159,7 @@ export default function Footer() {
                   <Link
                     key={`${link.path}-${link.label}`}
                     to={link.path}
-                    className="font-ui text-label font-medium uppercase tracking-[0.06em] text-muted hover:text-foreground transition-colors duration-300"
+                    className="font-ui text-label font-medium uppercase tracking-[0.06em] text-muted-foreground hover:text-foreground transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -176,7 +176,7 @@ export default function Footer() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted hover:text-Amber hover:scale-110 transition-all duration-200"
+                      className="text-muted-foreground hover:text-Amber hover:scale-110 transition-all duration-200"
                       aria-label={social.label}
                     >
                       <Icon size={18} />
@@ -191,10 +191,10 @@ export default function Footer() {
 
             {/* Bottom Row */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <p className="font-ui text-label font-medium leading-[1.5] tracking-[0.04em] text-muted">
+              <p className="font-ui text-label font-medium leading-[1.5] tracking-[0.04em] text-muted-foreground">
                 {display.copyright}
               </p>
-              <p className="font-mono text-label leading-[1.5] text-muted">
+              <p className="font-mono text-label leading-[1.5] text-muted-foreground">
                 {display.tagline}
               </p>
             </div>
