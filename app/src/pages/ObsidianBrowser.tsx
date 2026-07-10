@@ -518,7 +518,7 @@ export default function ObsidianBrowser() {
                     <div className="bg-card text-primary rounded-lg overflow-hidden select-none">
                       {/* Header */}
                       <div className="flex items-center justify-between px-4 py-2">
-                        <h3 className="text-label font-semibold uppercase tracking-[0.08em] text-muted">
+                        <h3 className="text-label font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                           {t('obsidian.vault')}
                         </h3>
                         <div className="flex items-center gap-0.5">
@@ -526,14 +526,14 @@ export default function ObsidianBrowser() {
                             <>
                               <button
                                 onClick={() => { setDialog('newFolder'); setDialogPath('') }}
-                                className="p-1 rounded-md text-muted hover:text-primary hover:bg-muted transition-colors"
+                                className="p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
                                 title="新建文件夹"
                               >
                                 <FolderPlus size={14} />
                               </button>
                               <button
                                 onClick={() => { setDialog('newNote'); setDialogPath('') }}
-                                className="p-1 rounded-md text-muted hover:text-primary hover:bg-muted transition-colors"
+                                className="p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
                                 title="新建笔记"
                               >
                                 <FileText size={14} />
@@ -543,7 +543,7 @@ export default function ObsidianBrowser() {
                           )}
                           <button
                             onClick={() => setSidebarCollapsed(true)}
-                            className="p-1 rounded-md text-muted hover:text-primary hover:bg-muted transition-colors"
+                            className="p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
                             aria-label="收起侧边栏"
                           >
                             <ChevronLeft size={14} />
@@ -554,18 +554,18 @@ export default function ObsidianBrowser() {
                       {/* Search */}
                       <div className="px-4 pb-2">
                         <div className="relative">
-                          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted" />
+                          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                           <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={t('obsidian.search')}
-                            className="w-full pl-6 pr-6 py-1 text-label bg-muted rounded text-primary placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-primary"
+                            className="w-full pl-6 pr-6 py-1 text-label bg-muted rounded text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                           />
                           {searchQuery && (
                             <button
                               onClick={() => setSearchQuery('')}
-                              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
                             >
                               <X size={12} />
                             </button>
@@ -580,7 +580,7 @@ export default function ObsidianBrowser() {
                       >
                         {searchQuery.trim() ? (
                           filteredNotes.length === 0 ? (
-                            <p className="text-label text-muted px-4 py-4 text-center">无结果</p>
+                            <p className="text-label text-muted-foreground px-4 py-4 text-center">无结果</p>
                           ) : (
                             <div>
                               {filteredNotes.map((note) => (
@@ -599,7 +599,7 @@ export default function ObsidianBrowser() {
                             </div>
                           )
                         ) : tree.length === 0 ? (
-                          <p className="text-label text-muted px-4 py-2">{t('obsidian.emptyVault')}</p>
+                          <p className="text-label text-muted-foreground px-4 py-2">{t('obsidian.emptyVault')}</p>
                         ) : (
                           <NoteTree
                             tree={tree}
