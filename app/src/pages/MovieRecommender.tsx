@@ -297,21 +297,13 @@ export default function MovieAgent() {
     return () => container.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Scroll to latest message top whenever messages change
+  // Scroll to bottom when new messages arrive, unless user scrolled up
   useEffect(() => {
     if (!shouldAutoScrollRef.current || messages.length === 0) return
     const container = chatContainerRef.current
     if (!container) return
-
-    const innerDiv = container.querySelector(':scope > div')
-    if (!innerDiv) return
-
-    const children = Array.from(innerDiv.children).filter((c) => c !== messagesEndRef.current)
-    const lastMsg = children[children.length - 1]
-    if (!lastMsg) return
-
     requestAnimationFrame(() => {
-      (lastMsg as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' })
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant', block: 'end' })
     })
   }, [messages])
 
