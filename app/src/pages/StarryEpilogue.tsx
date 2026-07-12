@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import { ArrowUp, Sparkles } from 'lucide-react'
 import { sections, markCompleted } from '@/starry/epilogue-data'
@@ -7,8 +7,7 @@ import EpilogueSection from '@/starry/EpilogueSection'
 import StarryNavBar from '@/starry/StarryNavBar'
 
 export default function StarryEpilogue() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ container: containerRef })
+  const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
   const [showBackTop, setShowBackTop] = useState(false)
 

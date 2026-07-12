@@ -403,6 +403,18 @@ export default function MovieAgent() {
     )
     const pick = matches.length > 0 ? matches[0] : dailyMovie
 
+    // 兜底：如果片库为空，给出友好提示
+    if (!pick) {
+      const emptyMsg: ChatMessage = {
+        id: 'f-' + Date.now(),
+        role: 'assistant',
+        content: '抱歉，当前片库为空。💡 **接入 AI** 后我可以推荐世界上任何电影。',
+        timestamp: Date.now(),
+      }
+      setMessages((prev) => [...prev, emptyMsg])
+      return
+    }
+
     const moodKeywords: Record<string, string[]> = {
       '治愈': ['治愈', '低落', '难过', '伤心', '失恋', '分手'],
       '悬疑': ['悬疑', '烧脑', '推理', '刺激', '紧张'],

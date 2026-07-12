@@ -145,14 +145,14 @@ export default function EasterEggs() {
                           <>
                             <span className="w-2 h-2 rounded bg-green-400/80" />
                             <span className="text-label text-green-500/70 dark:text-green-400/60 font-body tracking-wider">
-                              {t('internship.unlocked')}
+                              {t('easterEggs.unlocked')}
                             </span>
                           </>
                         ) : (
                           <>
                             <Lock size={12} className="text-white/30" />
                             <span className="text-label text-white/30 font-body tracking-wider">
-                              {t('internship.locked')}
+                              {t('easterEggs.locked')}
                             </span>
                           </>
                         )}
@@ -175,7 +175,7 @@ export default function EasterEggs() {
 
                     {/* 底部提示 */}
                     <div className="flex items-center justify-center gap-2 text-label text-Amber/50 dark:text-white/30 font-body tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span>{t('internship.clickExplore')}</span>
+                      <span>{t('easterEggs.clickExplore')}</span>
                       <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export default function EasterEggs() {
               <div className="w-12 h-px bg-gradient-to-l from-transparent to-Amber/20 dark:to-white/20" />
             </div>
             <p className="text-label text-Ink/30 dark:text-white/20 font-body tracking-widest">
-              {t('internship.moreEggs')}
+              {t('easterEggs.moreEggs')}
             </p>
           </motion.div>
         </div>

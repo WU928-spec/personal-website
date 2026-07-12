@@ -287,6 +287,10 @@ const translations = {
       eggsCount: '个彩蛋',
       starryTitle: '星空彩蛋',
       starryDescription: '点击冥王星与卡戎，进入一片只为你点亮的星空。每一颗星星都是一段被封存的记忆，点亮全部十四颗最亮的星，会解锁一封隐藏的信。',
+      unlocked: '已解锁',
+      locked: '待解锁',
+      clickExplore: '点击探索',
+      moreEggs: '更多彩蛋正在筹备中...',
     },
     // Tools
     tools: {
@@ -303,6 +307,10 @@ const translations = {
       movieRecommenderDesc: '根据心情、偏好或关键词，从精选片库中推荐下一部值得看的电影。支持 AI 智能匹配和每日推荐。',
       clickToUse: '点击使用',
       moreTools: '更多工具正在开发中...',
+    },
+    // Footer (common)
+    common: {
+      loading: '加载中...',
     },
   },
   en: {
@@ -590,6 +598,10 @@ const translations = {
       eggsCount: 'eggs',
       starryTitle: 'Starry Easter Egg',
       starryDescription: 'Click on Pluto and Charon to enter a starry sky lit just for you. Every star is a sealed memory — light up all fourteen brightest stars to unlock a hidden letter.',
+      unlocked: 'Unlocked',
+      locked: 'Locked',
+      clickExplore: 'Click to Explore',
+      moreEggs: 'More eggs coming soon...',
     },
     // Tools
     tools: {

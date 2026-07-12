@@ -192,10 +192,8 @@ export default function Preloader({ children }: PreloaderProps) {
     // 关键资源加载（阻塞进入）
     const criticalPromise = Promise.all(criticalAssets.map(loadCritical))
 
-    // 非关键资源后台加载（不阻塞进入，加载完若尚未进入则触发）
-    Promise.all(optionalAssets.map(loadOptional)).then(() => {
-      if (!cancelled) enter()
-    })
+    // 非关键资源后台加载（仅预加载，不参与进入决策）
+    Promise.all(optionalAssets.map(loadOptional))
 
     // 进入条件：数据 + 关键资源 + 最小视觉时间，全部加载完才进入页面
     Promise.all([

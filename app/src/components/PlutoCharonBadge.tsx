@@ -20,111 +20,126 @@ export default function PlutoCharonBadge({ onClick }: PlutoCharonBadgeProps) {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const dpr = window.devicePixelRatio || 1
-    const rect = canvas.getBoundingClientRect()
-    canvas.width = rect.width * dpr
-    canvas.height = rect.height * dpr
-    ctx.scale(dpr, dpr)
-
-    const w = rect.width
-    const h = rect.height
-    const cx = w / 2
-    const cy = h / 2
-
-    const stars = Array.from({ length: 40 }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.2 + 0.3,
-      alpha: Math.random(),
-      speed: Math.random() * 0.02 + 0.005,
-    }))
-
-    let angle = 0
-    const pluto = { r: 10, orbitR: 18, color: '#7BA7BC' }
-    const charon = { r: 6, orbitR: 50, color: '#9AA8B8' }
 
     let animId: number
-    const draw = () => {
-      ctx.fillStyle = '#1a1a2e'
-      ctx.fillRect(0, 0, w, h)
+    let resizeObserver: ResizeObserver | null = null
 
-      // 星星
-      stars.forEach((s) => {
-        s.alpha += s.speed
-        const a = 0.3 + Math.sin(s.alpha) * 0.3 + 0.4
-        ctx.fillStyle = `rgba(255,255,255,${a})`
+    const setupCanvas = () => {
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      const dpr = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      const w = rect.width
+      const h = rect.height
+      const cx = w / 2
+      const cy = h / 2
+
+      const stars = Array.from({ length: 40 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.2 + 0.3,
+        alpha: Math.random(),
+        speed: Math.random() * 0.02 + 0.005,
+      }))
+
+      let angle = 0
+      const pluto = { r: 10, orbitR: 18, color: '#7BA7BC' }
+      const charon = { r: 6, orbitR: 50, color: '#9AA8B8' }
+
+      const draw = () => {
+        ctx.fillStyle = '#1a1a2e'
+        ctx.fillRect(0, 0, w, h)
+
+        // 星星
+        stars.forEach((s) => {
+          s.alpha += s.speed
+          const a = 0.3 + Math.sin(s.alpha) * 0.3 + 0.4
+          ctx.fillStyle = `rgba(255,255,255,${a})`
+          ctx.beginPath()
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+          ctx.fill()
+        })
+
+        angle += 0.003
+
+        const px = cx + Math.cos(angle) * pluto.orbitR
+        const py = cy + Math.sin(angle) * pluto.orbitR
+        const cx_ = cx + Math.cos(angle + Math.PI) * charon.orbitR
+        const cy_ = cy + Math.sin(angle + Math.PI) * charon.orbitR
+
+        // 轨道线
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+        ctx.lineWidth = 1
         ctx.beginPath()
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+        ctx.arc(cx, cy, pluto.orbitR, 0, Math.PI * 2)
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(cx, cy, charon.orbitR, 0, Math.PI * 2)
+        ctx.stroke()
+
+        // 连接线
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+        ctx.beginPath()
+        ctx.moveTo(px, py)
+        ctx.lineTo(cx_, cy_)
+        ctx.stroke()
+
+        // 冥王星
+        ctx.fillStyle = pluto.color
+        ctx.beginPath()
+        ctx.arc(px, py, pluto.r, 0, Math.PI * 2)
         ctx.fill()
-      })
+        // 心形
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+        ctx.lineWidth = 1
+        const hs = 6
+        ctx.beginPath()
+        ctx.moveTo(px, py - 2)
+        ctx.bezierCurveTo(px, py - 4, px - hs / 2, py - 4, px - hs / 2, py - 2)
+        ctx.bezierCurveTo(px - hs / 2, py, px, py + 2, px, py + 3)
+        ctx.bezierCurveTo(px, py + 2, px + hs / 2, py, px + hs / 2, py - 2)
+        ctx.bezierCurveTo(px + hs / 2, py - 4, px, py - 4, px, py - 2)
+        ctx.stroke()
 
-      angle += 0.003
+        // 卡戎
+        ctx.fillStyle = charon.color
+        ctx.beginPath()
+        ctx.arc(cx_, cy_, charon.r, 0, Math.PI * 2)
+        ctx.fill()
+        // 北极红点
+        ctx.fillStyle = '#C44536'
+        ctx.beginPath()
+        ctx.arc(
+          cx_ + Math.cos(angle + Math.PI) * charon.r * 0.5,
+          cy_ + Math.sin(angle + Math.PI) * charon.r * 0.5,
+          2,
+          0,
+          Math.PI * 2,
+        )
+        ctx.fill()
 
-      const px = cx + Math.cos(angle) * pluto.orbitR
-      const py = cy + Math.sin(angle) * pluto.orbitR
-      const cx_ = cx + Math.cos(angle + Math.PI) * charon.orbitR
-      const cy_ = cy + Math.sin(angle + Math.PI) * charon.orbitR
+        animId = requestAnimationFrame(draw)
+      }
 
-      // 轨道线
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)'
-      ctx.lineWidth = 1
-      ctx.beginPath()
-      ctx.arc(cx, cy, pluto.orbitR, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.arc(cx, cy, charon.orbitR, 0, Math.PI * 2)
-      ctx.stroke()
-
-      // 连接线
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-      ctx.beginPath()
-      ctx.moveTo(px, py)
-      ctx.lineTo(cx_, cy_)
-      ctx.stroke()
-
-      // 冥王星
-      ctx.fillStyle = pluto.color
-      ctx.beginPath()
-      ctx.arc(px, py, pluto.r, 0, Math.PI * 2)
-      ctx.fill()
-      // 心形
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)'
-      ctx.lineWidth = 1
-      const hs = 6
-      ctx.beginPath()
-      ctx.moveTo(px, py - 2)
-      ctx.bezierCurveTo(px, py - 4, px - hs / 2, py - 4, px - hs / 2, py - 2)
-      ctx.bezierCurveTo(px - hs / 2, py, px, py + 2, px, py + 3)
-      ctx.bezierCurveTo(px, py + 2, px + hs / 2, py, px + hs / 2, py - 2)
-      ctx.bezierCurveTo(px + hs / 2, py - 4, px, py - 4, px, py - 2)
-      ctx.stroke()
-
-      // 卡戎
-      ctx.fillStyle = charon.color
-      ctx.beginPath()
-      ctx.arc(cx_, cy_, charon.r, 0, Math.PI * 2)
-      ctx.fill()
-      // 北极红点
-      ctx.fillStyle = '#C44536'
-      ctx.beginPath()
-      ctx.arc(
-        cx_ + Math.cos(angle + Math.PI) * charon.r * 0.5,
-        cy_ + Math.sin(angle + Math.PI) * charon.r * 0.5,
-        2,
-        0,
-        Math.PI * 2,
-      )
-      ctx.fill()
-
-      animId = requestAnimationFrame(draw)
+      draw()
     }
-    animId = requestAnimationFrame(draw)
 
-    return () => cancelAnimationFrame(animId)
-  }, [])
+    setupCanvas()
+
+    resizeObserver = new ResizeObserver(() => {
+      setupCanvas()
+    })
+    resizeObserver.observe(canvas)
+
+    return () => {
+      cancelAnimationFrame(animId)
+      resizeObserver?.disconnect()
+    }
 
   return (
     <button

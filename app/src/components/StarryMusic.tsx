@@ -43,7 +43,12 @@ export default function StarryMusic() {
 
       window.addEventListener('pointerdown', start, { once: true })
       window.addEventListener('keydown', start, { once: true })
-      return
+
+      // 组件卸载时清理未触发的监听器
+      return () => {
+        window.removeEventListener('pointerdown', start)
+        window.removeEventListener('keydown', start)
+      }
     }
 
     // 同一首歌在星空页之间切换时不重新加载，避免中断
