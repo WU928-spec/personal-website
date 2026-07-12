@@ -140,6 +140,7 @@ export default function PlutoCharonBadge({ onClick }: PlutoCharonBadgeProps) {
       cancelAnimationFrame(animId)
       resizeObserver?.disconnect()
     }
+  }, [])
 
   return (
     <button
