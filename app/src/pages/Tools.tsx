@@ -95,7 +95,7 @@ export default function Tools() {
           </motion.div>
 
           {/* 工具卡片列表 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto items-stretch">
             {TOOLS.map((tool, index) => (
               <motion.div
                 key={tool.id}
@@ -106,12 +106,13 @@ export default function Tools() {
                   delay: 0.2 + index * 0.15,
                   ease: [0.16, 1, 0.3, 1],
                 }}
+                className="h-full"
               >
                 <div
-                  className="group relative cursor-pointer"
+                  className="group relative cursor-pointer h-full"
                   onClick={() => navigate(tool.path)}
                 >
-                  <div className="relative rounded-lg border border-Sand dark:border-white/10 bg-white/50 dark:bg-white/[0.03] p-8 transition-all duration-500 hover:border-Amber/20 dark:hover:border-white/20 hover:shadow-soft">
+                  <div className="relative rounded-lg border border-Sand dark:border-white/10 bg-white/50 dark:bg-white/[0.03] p-8 h-full flex flex-col transition-all duration-500 hover:border-Amber/20 dark:hover:border-white/20 hover:shadow-soft">
                     {/* 状态标签 */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-2">
@@ -131,12 +132,14 @@ export default function Tools() {
                     </div>
 
                     {/* 标题和描述 */}
-                    <h3 className="font-display text-heading text-Ink dark:text-white/90 tracking-wide text-center mb-4">
-                      {t(tool.titleKey)}
-                    </h3>
-                    <p className="text-body text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
-                      {t(tool.descKey)}
-                    </p>
+                    <div className="flex-1 flex flex-col">
+                      <h3 className="font-display text-heading text-Ink dark:text-white/90 tracking-wide text-center mb-4">
+                        {t(tool.titleKey)}
+                      </h3>
+                      <p className="text-body text-Ink/50 dark:text-white/40 font-body leading-[1.8] text-center mb-6">
+                        {t(tool.descKey)}
+                      </p>
+                    </div>
 
                     {/* 底部提示 */}
                     <div className="flex items-center justify-center gap-2 text-label text-Amber/50 dark:text-white/30 font-body tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">
