@@ -25,6 +25,7 @@ const Moments = lazy(() => import('./pages/Moments.tsx'))
 const InternshipDecision = lazy(() => import('./pages/InternshipDecision.tsx'))
 const TextSegmenter = lazy(() => import('./pages/TextSegmenter.tsx'))
 const MovieRecommender = lazy(() => import('./pages/MovieRecommender.tsx'))
+const DevTools = lazy(() => import('./pages/DevTools.tsx'))
 
 function App() {
   const location = useLocation()
@@ -67,6 +68,7 @@ function App() {
               <Route path="/internship" element={<LazyPage component={InternshipDecision} />} />
               <Route path="/text-segmenter" element={<LazyPage component={TextSegmenter} />} />
               <Route path="/movie-recommender" element={<LazyPage component={MovieRecommender} />} />
+              <Route path="/devtools" element={<LazyPage component={DevTools} />} />
               <Route path="/easter-eggs" element={<PageTransition><EasterEggs /></PageTransition>} />
               <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

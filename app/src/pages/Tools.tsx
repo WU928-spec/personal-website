@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote, Film } from 'lucide-react'
+import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote, Film, Terminal } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 
@@ -34,6 +34,16 @@ const TOOLS = [
     path: '/movie-recommender',
     titleKey: 'tools.movieRecommenderTitle',
     descKey: 'tools.movieRecommenderDesc',
+  },
+  {
+    id: 'devtools',
+    title: '开发工具',
+    description: '交互式 Git 分支树可视化与 Conda 虚拟环境管理演示。输入命令，实时查看分支结构和环境状态变化。',
+    status: 'available' as const,
+    icon: <Terminal size={48} />,
+    path: '/devtools',
+    titleKey: 'tools.devtoolsTitle',
+    descKey: 'tools.devtoolsDesc',
   },
 ]
 

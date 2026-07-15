@@ -305,8 +305,19 @@ const translations = {
       textSegmenterDesc: '智能英文文本分段工具，自动将连续英文文本按句子换行、段落空行分隔，方便在 Obsidian 中阅读。',
       movieRecommenderTitle: '每日电影推荐',
       movieRecommenderDesc: '根据心情、偏好或关键词，从精选片库中推荐下一部值得看的电影。支持 AI 智能匹配和每日推荐。',
+      devtoolsTitle: '开发工具',
+      devtoolsDesc: '交互式 Git 分支树可视化与 Conda 虚拟环境管理演示。输入命令，实时查看分支结构和环境状态变化。',
       clickToUse: '点击使用',
       moreTools: '更多工具正在开发中...',
+    },
+    // DevTools
+    devtools: {
+      title: '开发工具',
+      description: '交互式 Git 与 Conda 可视化教学工具。',
+      gitTitle: 'Git 分支可视化',
+      gitDesc: '输入 git 命令，实时查看分支树结构变化。支持 init、add、commit、branch、checkout、merge 等常用命令。',
+      condaTitle: 'Conda 环境管理',
+      condaDesc: '输入 conda 命令，管理虚拟环境。支持 create、activate、install、remove 等环境操作。',
     },
     // Footer (common)
     common: {
@@ -616,8 +627,19 @@ const translations = {
       textSegmenterDesc: 'Smart English text segmentation tool. Automatically splits continuous English text into sentences (one per line) and paragraphs (separated by blank lines), making it easy to read in Obsidian.',
       movieRecommenderTitle: 'Daily Movie Recommender',
       movieRecommenderDesc: 'Discover your next favorite movie based on mood, preferences, or keywords. Features AI smart matching and daily curated picks from a hand-picked library.',
+      devtoolsTitle: 'Dev Tools',
+      devtoolsDesc: 'Interactive Git branch tree visualization and Conda virtual environment management demo. Type commands and watch branch structures and environment states update in real time.',
       clickToUse: 'Click to Use',
       moreTools: 'More tools coming soon...',
+    },
+    // DevTools
+    devtools: {
+      title: 'Dev Tools',
+      description: 'Interactive Git and Conda visualization teaching tools.',
+      gitTitle: 'Git Branch Visualizer',
+      gitDesc: 'Type git commands and watch the branch tree update in real time. Supports init, add, commit, branch, checkout, merge.',
+      condaTitle: 'Conda Environment Manager',
+      condaDesc: 'Type conda commands to manage virtual environments. Supports create, activate, install, remove.',
     },
     // Footer (common)
     common: {
