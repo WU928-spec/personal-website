@@ -1,20 +1,20 @@
-/* ════════ 共享设计 Token ════════ */
+/* ════════ 共享设计 Token — 高对比度亮色主题 ════════ */
 
 :root {
-  /* 色板 */
-  --bg-dark: #0D1117;
-  --bg-card: #161B22;
-  --bg-hover: #1C2128;
-  --border: #30363D;
-  --text-primary: #E6EDF3;
-  --text-secondary: #8B949E;
-  --text-muted: #6E7681;
-  --accent-git: #4ade80;
-  --accent-git-dim: rgba(74, 222, 128, 0.15);
-  --accent-conda: #60a5fa;
-  --accent-conda-dim: rgba(96, 165, 250, 0.15);
-  --accent-warn: #f0883e;
-  --accent-danger: #f85149;
+  /* 色板 — 从深色改为浅色，提高对比度 */
+  --bg-dark: #f5f5f0;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f0ea;
+  --border: #d4d4ce;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #7a7a7a;
+  --accent-git: #16a34a;
+  --accent-git-dim: rgba(22, 163, 74, 0.12);
+  --accent-conda: #2563eb;
+  --accent-conda-dim: rgba(37, 99, 235, 0.12);
+  --accent-warn: #d97706;
+  --accent-danger: #dc2626;
 
   /* 字号 */
   --text-xs: 18px;
@@ -89,7 +89,7 @@ body {
 
 /* 代码块样式 */
 .code-block {
-  background: var(--bg-card);
+  background: #f8f8f5;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px 32px;
@@ -100,9 +100,9 @@ body {
 }
 
 .code-block .comment { color: var(--text-muted); }
-.code-block .keyword { color: #ff7b72; }
-.code-block .string { color: #a5d6ff; }
-.code-block .function { color: #d2a8ff; }
+.code-block .keyword { color: #d73a49; }
+.code-block .string { color: #032f62; }
+.code-block .function { color: #6f42c1; }
 .code-block .prompt { color: var(--accent-git); }
 
 /* 命令标签 */
@@ -119,8 +119,8 @@ body {
   color: var(--text-secondary);
 }
 
-.cmd-tag.git { border-color: rgba(74, 222, 128, 0.3); color: var(--accent-git); }
-.cmd-tag.conda { border-color: rgba(96, 165, 250, 0.3); color: var(--accent-conda); }
+.cmd-tag.git { border-color: rgba(22, 163, 74, 0.3); color: var(--accent-git); }
+.cmd-tag.conda { border-color: rgba(37, 99, 235, 0.3); color: var(--accent-conda); }
 
 /* 章节指示器 */
 .chapter-badge {
@@ -159,11 +159,11 @@ body {
 
 .btn-primary {
   background: var(--accent-git);
-  color: var(--bg-dark);
+  color: #fff;
   border-color: var(--accent-git);
 }
 
-.btn-primary:hover { background: #3ec46e; }
+.btn-primary:hover { background: #15803d; }
 
 .btn-ghost {
   background: transparent;

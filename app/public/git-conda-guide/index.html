@@ -32,7 +32,7 @@
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; font-family: -apple-system, "PingFang SC", sans-serif; background: #0a0a0a; }
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system, "PingFang SC", sans-serif; background: #e8e8e0; }
 
   .overview { position: fixed; inset: 0; }
   body[data-mode="present"] .overview { display: none; }
@@ -40,85 +40,85 @@
   body[data-mode="overview"] #present-ui { display: none; }
   body[data-ov="grid"]    #ov-gallery { display: none; }
   body[data-ov="gallery"] #ov-grid    { display: none; }
-  body[data-ov="gallery"][data-mode="overview"] { background: #0a0805; }
-  body[data-ov="grid"][data-mode="overview"]    { background: #0d1117; }
+  body[data-ov="gallery"][data-mode="overview"] { background: #f0eee8; }
+  body[data-ov="grid"][data-mode="overview"]    { background: #e8e8e0; }
 
   /* 网格概览 */
   #ov-grid { display: flex; justify-content: center; perspective: 2200px; perspective-origin: 50% 42%;
-    background: radial-gradient(120% 90% at 50% 0%, #161b22, #0d1117 75%); }
+    background: radial-gradient(120% 90% at 50% 0%, #f5f5f0, #e8e8e0 75%); }
   body[data-grid="fit"]    #ov-grid { overflow: hidden; align-items: center; }
   body[data-grid="scroll"] #ov-grid { overflow-y: auto; overflow-x: hidden; align-items: flex-start; padding: 74px 0 110px; }
   .wall-wrap { }
   body[data-grid="fit"]    .wall-wrap { transform: translateY(-3vh); }
   .wall { display: grid; gap: 20px; transform-origin: center center; margin: 0 auto; }
   #ov-grid .card {
-    position: relative; aspect-ratio: 16/9; border-radius: 9px; overflow: hidden; background: #161b22; cursor: pointer;
-    box-shadow: 0 16px 34px rgba(0,0,0,0.4), 0 3px 10px rgba(0,0,0,0.3);
+    position: relative; aspect-ratio: 16/9; border-radius: 9px; overflow: hidden; background: #fff; cursor: pointer;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.08);
     transition: transform .28s cubic-bezier(.2,.7,.2,1), box-shadow .28s;
-    border: 1px solid #30363d;
+    border: 1px solid #d4d4ce;
   }
   #ov-grid .card:hover {
     transform: scale(1.18);
-    box-shadow: 0 48px 92px rgba(0,0,0,0.5), 0 14px 30px rgba(0,0,0,0.4); z-index: 20;
-    border-color: #4ade80;
+    box-shadow: 0 48px 92px rgba(0,0,0,0.25), 0 14px 30px rgba(0,0,0,0.15); z-index: 20;
+    border-color: #16a34a;
   }
 
   /* 画廊概览 */
   #ov-gallery { overflow: hidden; perspective: 2200px; perspective-origin: 50% 42%;
-    background: radial-gradient(130% 120% at 50% 38%, #1b1610, #0a0805 82%); }
+    background: radial-gradient(130% 120% at 50% 38%, #f5f3ed, #e8e6e0 82%); }
   .stage3d { --rx: 18; --rz: 9; position: absolute; inset: 0; transform-style: preserve-3d; transform: scale(1.22) rotateX(18deg) rotateZ(-9deg); transform-origin: center center; }
   .breathe { position: absolute; inset: 0; animation: breathe 26s ease-in-out infinite; transform-origin: center center; transform-style: preserve-3d; }
   .drift-layer { position: absolute; top: 0; left: 0; will-change: transform; animation: drift var(--driftSec, 80s) linear infinite; transform-style: preserve-3d; }
   #ov-gallery:hover .drift-layer { animation-play-state: paused; }
   .gallery { display: grid; }
   #ov-gallery .card {
-    position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #161b22; cursor: pointer;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.5), 0 3px 9px rgba(0,0,0,0.4);
+    position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #fff; cursor: pointer;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.18), 0 3px 9px rgba(0,0,0,0.1);
     transition: transform .34s cubic-bezier(.2,.7,.2,1), box-shadow .34s; transform-style: preserve-3d; will-change: transform;
-    border: 1px solid #30363d;
+    border: 1px solid #d4d4ce;
   }
   #ov-gallery .card:hover {
     transform: translateZ(60px) rotateX(calc(var(--rx,18)*-1deg)) rotateZ(calc(var(--rz,9)*1deg)) scale(1.06);
-    box-shadow: 0 30px 64px rgba(0,0,0,0.6), 0 8px 20px rgba(0,0,0,0.5); z-index: 30;
-    border-color: #60a5fa;
+    box-shadow: 0 30px 64px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.15); z-index: 30;
+    border-color: #2563eb;
   }
-  .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 20; box-shadow: inset 0 0 240px 70px rgba(8,6,3,0.7); }
+  .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 20; box-shadow: inset 0 0 240px 70px rgba(230,228,220,0.5); }
   @keyframes drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--dx)*-1), calc(var(--dy)*-1), 0); } }
   @keyframes breathe { 0%,100% { transform: scale(1.0); } 50% { transform: scale(1.045); } }
 
   /* 卡片内容 */
   .card .thumb { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; transform-origin: top left; pointer-events: none; }
-  .card .thumb iframe { width: 1920px; height: 1080px; border: 0; display: block; background: #161b22; pointer-events: none; }
+  .card .thumb iframe { width: 1920px; height: 1080px; border: 0; display: block; background: #f5f5f0; pointer-events: none; }
   .card .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-  .card .num { position: absolute; bottom: 6px; left: 7px; background: rgba(13,17,23,0.85); color: #8b949e; font-size: 11px; line-height: 1; padding: 4px 7px; border-radius: 5px; font-variant-numeric: tabular-nums; letter-spacing: 0.03em; z-index: 3; pointer-events: none; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'JetBrains Mono', monospace; }
+  .card .num { position: absolute; bottom: 6px; left: 7px; background: rgba(245,245,240,0.9); color: #4a4a4a; font-size: 11px; line-height: 1; padding: 4px 7px; border-radius: 5px; font-variant-numeric: tabular-nums; letter-spacing: 0.03em; z-index: 3; pointer-events: none; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'JetBrains Mono', monospace; }
   #ov-gallery .card .num { opacity: 0; transition: opacity .25s; }
   #ov-gallery .card:hover .num { opacity: 1; }
 
   .overview-title { position: fixed; top: 24px; left: 0; right: 0; text-align: center; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; z-index: 40; pointer-events: none; font-family: 'Inter', sans-serif; }
-  body[data-ov="grid"]    .overview-title { color: #8b949e; opacity: 0.66; }
-  body[data-ov="gallery"] .overview-title { color: rgba(139,148,158,0.7); text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+  body[data-ov="grid"]    .overview-title { color: #7a7a7a; opacity: 0.66; }
+  body[data-ov="gallery"] .overview-title { color: rgba(90,90,90,0.7); text-shadow: 0 2px 12px rgba(255,255,255,0.6); }
 
   .start-btn { position: fixed; bottom: 26px; right: 26px; border: 0; padding: 13px 24px; border-radius: 999px; font-size: 15px; font-family: inherit; letter-spacing: 0.04em; cursor: pointer; z-index: 200; transition: transform .18s, box-shadow .18s; }
-  body[data-ov="grid"]    .start-btn { background: #238636; color: #fff; box-shadow: 0 8px 28px rgba(35,134,54,0.3); }
-  body[data-ov="gallery"] .start-btn { background: #58a6ff; color: #0d1117; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  body[data-ov="grid"]    .start-btn { background: #16a34a; color: #fff; box-shadow: 0 8px 28px rgba(22,163,74,0.25); }
+  body[data-ov="gallery"] .start-btn { background: #2563eb; color: #fff; box-shadow: 0 10px 30px rgba(37,99,235,0.25); }
   .start-btn:hover { transform: translateY(-2px); }
 
   /* 演示模式 */
-  #stage { position: fixed; top: 50%; left: 50%; transform-origin: top left; will-change: transform; background: #0d1117; box-shadow: 0 10px 60px rgba(0,0,0,0.6); }
-  #stage iframe { width: 100%; height: 100%; border: 0; display: block; background: #0d1117; }
-  .counter { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.65); color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 13px; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; z-index: 100; opacity: 0.7; font-family: 'JetBrains Mono', monospace; }
+  #stage { position: fixed; top: 50%; left: 50%; transform-origin: top left; will-change: transform; background: #f5f5f0; box-shadow: 0 10px 60px rgba(0,0,0,0.2); }
+  #stage iframe { width: 100%; height: 100%; border: 0; display: block; background: #f5f5f0; }
+  .counter { position: fixed; bottom: 20px; right: 20px; background: rgba(60,60,60,0.65); color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 13px; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; z-index: 100; opacity: 0.7; font-family: 'JetBrains Mono', monospace; }
   .counter .label { color: rgba(255,255,255,0.7); margin-left: 8px; }
-  .overview-btn { position: fixed; top: 20px; left: 20px; background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.85); border: 0; padding: 7px 14px; border-radius: 999px; font-size: 13px; font-family: inherit; cursor: pointer; z-index: 100; opacity: 0.6; }
+  .overview-btn { position: fixed; top: 20px; left: 20px; background: rgba(60,60,60,0.55); color: rgba(255,255,255,0.85); border: 0; padding: 7px 14px; border-radius: 999px; font-size: 13px; font-family: inherit; cursor: pointer; z-index: 100; opacity: 0.6; }
   .overview-btn:hover { opacity: 1; }
   .nav-zone { position: fixed; top: 0; bottom: 0; width: 15%; cursor: pointer; z-index: 50; }
   .nav-zone.left { left: 0; } .nav-zone.right { right: 0; }
-  .nav-hint { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; font-size: 22px; opacity: 0; transition: opacity .2s; }
+  .nav-hint { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 999px; background: rgba(0,0,0,0.08); color: rgba(60,60,60,0.6); display: flex; align-items: center; justify-content: center; font-size: 22px; opacity: 0; transition: opacity .2s; }
   .nav-zone.left .nav-hint { left: 20px; } .nav-zone.right .nav-hint { right: 20px; }
   .nav-zone:hover .nav-hint { opacity: 1; }
 
   @media print {
     @page { size: 1920px 1080px; margin: 0; }
-    html, body { background: #0d1117; overflow: visible; height: auto; }
+    html, body { background: #f5f5f0; overflow: visible; height: auto; }
     body[data-mode] .overview { display: none !important; }
     #stage { position: static; transform: none !important; box-shadow: none; }
     .counter, .nav-zone, .overview-btn, .start-btn { display: none !important; }
