@@ -16,15 +16,15 @@
   --accent-warn: #d97706;
   --accent-danger: #dc2626;
 
-  /* 字号 */
-  --text-xs: 18px;
-  --text-sm: 22px;
-  --text-base: 28px;
-  --text-lg: 36px;
-  --text-xl: 48px;
-  --text-2xl: 64px;
-  --text-3xl: 96px;
-  --text-hero: 140px;
+  /* 字号 — 全局放大 25% */
+  --text-xs: 24px;
+  --text-sm: 28px;
+  --text-base: 36px;
+  --text-lg: 44px;
+  --text-xl: 60px;
+  --text-2xl: 80px;
+  --text-3xl: 120px;
+  --text-hero: 176px;
 
   /* 间距 */
   --space-1: 8px;
@@ -83,7 +83,7 @@ body {
   justify-content: space-between;
   padding: 0 48px;
   border-top: 1px solid var(--border);
-  font-size: 14px;
+  font-size: 18px;
   color: var(--text-muted);
 }
 
@@ -94,7 +94,7 @@ body {
   border-radius: 12px;
   padding: 24px 32px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   line-height: 1.6;
   color: var(--text-primary);
 }
@@ -190,7 +190,7 @@ body {
   align-items: center;
   justify-content: center;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
+  font-size: 22px;
   font-weight: 600;
 }
 
