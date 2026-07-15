@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>13 · 实战场景</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header { margin-bottom: 32px; }
+  h1 { font-size: var(--text-2xl); font-weight: 700; margin: 0; }
+  .subtitle { font-size: var(--text-base); color: var(--text-secondary); margin-top: 8px; }
+
+  .scenarios {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .scenario {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .scenario:hover { border-color: rgba(74, 222, 128, 0.2); }
+
+  .scenario-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-git);
+    flex-shrink: 0;
+  }
+
+  .scenario-content {
+    flex: 1;
+  }
+
+  .scenario-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  .scenario-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .scenario-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .step-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    background: var(--bg-dark);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .step-line .cmd { color: var(--accent-git); }
+  .step-line .conda-cmd { color: var(--accent-conda); }
+  .step-line .comment { color: var(--text-muted); }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>实战场景</h1>
+    <p class="subtitle">实习生日常开发中的典型工作流</p>
+  </div>
+
+  <div class="scenarios">
+    <div class="scenario">
+      <div class="scenario-num">1</div>
+      <div class="scenario-content">
+        <div class="scenario-title">新入职：克隆项目 + 配置环境</div>
+        <div class="scenario-desc">第一天到团队，拿到项目地址，快速搭建开发环境</div>
+        <div class="scenario-steps">
+          <div class="step-line"><span class="cmd">git clone</span> git@github.com:team/project.git <span class="comment"># 克隆代码</span></div>
+          <div class="step-line"><span class="conda-cmd">cd</span> project && <span class="conda-cmd">conda env create -f</span> environment.yml <span class="comment"># 创建环境</span></div>
+          <div class="step-line"><span class="conda-cmd">conda activate</span> project-env <span class="comment"># 激活环境</span></div>
+          <div class="step-line"><span class="cmd">git checkout -b</span> feature/my-first-task <span class="comment"># 创建功能分支</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-num">2</div>
+      <div class="scenario-content">
+        <div class="scenario-title">日常开发：修改代码 → 提交 → 推送</div>
+        <div class="scenario-desc">完成一个功能点后的标准提交流程</div>
+        <div class="scenario-steps">
+          <div class="step-line"><span class="cmd">git add .</span> <span class="comment"># 暂存修改</span></div>
+          <div class="step-line"><span class="cmd">git commit -m</span> "feat: add user login" <span class="comment"># 提交</span></div>
+          <div class="step-line"><span class="cmd">git pull origin main</span> <span class="comment"># 先拉取最新（避免冲突）</span></div>
+          <div class="step-line"><span class="cmd">git push origin</span> feature/my-task <span class="comment"># 推送到远程</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-num">3</div>
+      <div class="scenario-content">
+        <div class="scenario-title">紧急修复：临时切换分支修 Bug</div>
+        <div class="scenario-desc">正在开发功能时，需要紧急修复线上问题</div>
+        <div class="scenario-steps">
+          <div class="step-line"><span class="cmd">git stash</span> <span class="comment"># 保存当前进度</span></div>
+          <div class="step-line"><span class="cmd">git checkout main</span> && <span class="cmd">git pull</span> <span class="comment"># 切换到主分支</span></div>
+          <div class="step-line"><span class="cmd">git checkout -b</span> hotfix/critical-bug <span class="comment"># 创建修复分支</span></div>
+          <div class="step-line"><span class="comment"># 修复代码 → commit → push → PR → merge</span></div>
+          <div class="step-line"><span class="cmd">git checkout</span> feature/my-task && <span class="cmd">git stash pop</span> <span class="comment"># 恢复之前进度</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>实战场景</span>
+    <span>13 / 14</span>
+  </div>
+</body>
+</html>

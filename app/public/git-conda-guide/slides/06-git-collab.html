@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>06 · Git 团队协作</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .chapter-badge.git { color: var(--accent-git); }
+  .chapter-badge.git::before { background: var(--accent-git); }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 12px 0 0 0;
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    flex: 1;
+  }
+
+  .cmd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cmd-card:hover { border-color: rgba(74, 222, 128, 0.3); }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--accent-git);
+  }
+
+  .cmd-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .code-example {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+
+  .code-example .prompt { color: var(--accent-git); }
+  .code-example .comment { color: var(--text-muted); }
+  .code-example .output { color: var(--text-secondary); }
+
+  .tip-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(240, 136, 62, 0.08);
+    border: 1px solid rgba(240, 136, 62, 0.2);
+    border-radius: 8px;
+    font-size: var(--text-xs);
+    color: var(--accent-warn);
+    margin-top: 4px;
+  }
+
+  .tip-box::before {
+    content: '💡';
+    font-size: 16px;
+  }
+
+  .workflow-card {
+    grid-column: 1 / -1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 32px;
+  }
+
+  .workflow-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  .workflow-steps {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+    padding: 16px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .step-num {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .step-arrow {
+    color: var(--text-muted);
+    font-size: 20px;
+  }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="chapter-badge git">Chapter 01 · Git</div>
+    <h1>团队协作</h1>
+    <p class="subtitle">多人协作时的常用命令与最佳实践</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git remote</span>
+      </div>
+      <p class="cmd-desc">管理远程仓库地址</p>
+      <div class="code-example">
+<span class="prompt">$</span> git remote -v <span class="comment"># 查看远程</span><br>
+<span class="prompt">$</span> git remote add origin https://...<br>
+<span class="prompt">$</span> git remote set-url origin git@github.com:... <span class="comment"># 改 SSH</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git fetch</span>
+      </div>
+      <p class="cmd-desc">下载远程分支最新状态，但不合并到本地</p>
+      <div class="code-example">
+<span class="prompt">$</span> git fetch origin<br>
+<span class="prompt">$</span> git fetch --all<br>
+<span class="prompt">$</span> git fetch origin main <span class="comment"># 指定分支</span>
+      </div>
+      <div class="tip-box">fetch 是安全的"查看"操作，不会修改你的工作区</div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git stash</span>
+      </div>
+      <p class="cmd-desc">临时保存未提交的修改，方便切换分支</p>
+      <div class="code-example">
+<span class="prompt">$</span> git stash <span class="comment"># 暂存</span><br>
+<span class="prompt">$</span> git stash pop <span class="comment"># 恢复</span><br>
+<span class="prompt">$</span> git stash list <span class="comment"># 查看列表</span><br>
+<span class="prompt">$</span> git stash drop <span class="comment"># 删除</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git cherry-pick</span>
+      </div>
+      <p class="cmd-desc">将指定提交应用到当前分支</p>
+      <div class="code-example">
+<span class="prompt">$</span> git cherry-pick a1b2c3d<br>
+<span class="prompt">$</span> git cherry-pick -n a1b2c3d <span class="comment"># 不自动提交</span>
+      </div>
+    </div>
+
+    <!-- 协作工作流 -->
+    <div class="workflow-card">
+      <div class="workflow-title">Feature Branch 工作流</div>
+      <div class="workflow-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          git checkout -b feature/x
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <span class="step-num">2</span>
+          开发 + commit
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <span class="step-num">3</span>
+          git push origin feature/x
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <span class="step-num">4</span>
+          创建 Pull Request
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <span class="step-num">5</span>
+          Code Review + Merge
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Git 团队协作</span>
+    <span>06 / 14</span>
+  </div>
+</body>
+</html>

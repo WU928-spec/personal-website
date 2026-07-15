@@ -12,6 +12,7 @@ const StarryMemoir = lazy(() => import('./pages/StarryMemoir.tsx'))
 const StarrySecret = lazy(() => import('./pages/StarrySecret.tsx'))
 const EasterEggs = lazy(() => import('./pages/EasterEggs.tsx'))
 const Tools = lazy(() => import('./pages/Tools.tsx'))
+const GitCondaGuide = lazy(() => import('./pages/GitCondaGuide.tsx'))
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import LazyPage, { PageTransition } from './components/LazyPage.tsx'
 import Preloader from './components/Preloader.tsx'
@@ -69,6 +70,7 @@ function App() {
               <Route path="/text-segmenter" element={<LazyPage component={TextSegmenter} />} />
               <Route path="/movie-recommender" element={<LazyPage component={MovieRecommender} />} />
               <Route path="/devtools" element={<LazyPage component={DevTools} />} />
+              <Route path="/git-conda-guide" element={<LazyPage component={GitCondaGuide} />} />
               <Route path="/easter-eggs" element={<PageTransition><EasterEggs /></PageTransition>} />
               <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

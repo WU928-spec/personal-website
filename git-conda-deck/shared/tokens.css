@@ -1,0 +1,205 @@
+/* ════════ 共享设计 Token ════════ */
+
+:root {
+  /* 色板 */
+  --bg-dark: #0D1117;
+  --bg-card: #161B22;
+  --bg-hover: #1C2128;
+  --border: #30363D;
+  --text-primary: #E6EDF3;
+  --text-secondary: #8B949E;
+  --text-muted: #6E7681;
+  --accent-git: #4ade80;
+  --accent-git-dim: rgba(74, 222, 128, 0.15);
+  --accent-conda: #60a5fa;
+  --accent-conda-dim: rgba(96, 165, 250, 0.15);
+  --accent-warn: #f0883e;
+  --accent-danger: #f85149;
+
+  /* 字号 */
+  --text-xs: 18px;
+  --text-sm: 22px;
+  --text-base: 28px;
+  --text-lg: 36px;
+  --text-xl: 48px;
+  --text-2xl: 64px;
+  --text-3xl: 96px;
+  --text-hero: 140px;
+
+  /* 间距 */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-8: 96px;
+}
+
+/* 画布锁定 */
+body {
+  width: 1920px;
+  height: 1080px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, 'PingFang SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 等宽字体（代码） */
+.code, code, pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+}
+
+/* 页面通用 chrome */
+.page-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.page-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* 代码块样式 */
+.code-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.code-block .comment { color: var(--text-muted); }
+.code-block .keyword { color: #ff7b72; }
+.code-block .string { color: #a5d6ff; }
+.code-block .function { color: #d2a8ff; }
+.code-block .prompt { color: var(--accent-git); }
+
+/* 命令标签 */
+.cmd-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xs);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.cmd-tag.git { border-color: rgba(74, 222, 128, 0.3); color: var(--accent-git); }
+.cmd-tag.conda { border-color: rgba(96, 165, 250, 0.3); color: var(--accent-conda); }
+
+/* 章节指示器 */
+.chapter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.chapter-badge::before {
+  content: '';
+  width: 32px;
+  height: 2px;
+  background: currentColor;
+}
+
+.chapter-badge.git::before { background: var(--accent-git); }
+.chapter-badge.conda::before { background: var(--accent-conda); }
+
+/* 按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--accent-git);
+  color: var(--bg-dark);
+  border-color: var(--accent-git);
+}
+
+.btn-primary:hover { background: #3ec46e; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* 卡片 */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+/* 树状图节点 */
+.tree-node {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tree-node.git { background: var(--accent-git-dim); color: var(--accent-git); border: 2px solid var(--accent-git); }
+.tree-node.conda { background: var(--accent-conda-dim); color: var(--accent-conda); border: 2px solid var(--accent-conda); }
+
+/* 连接线 */
+.tree-line {
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+}

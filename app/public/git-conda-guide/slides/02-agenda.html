@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>02 · 目录</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px;
+    position: relative;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .chapter-badge {
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    flex: 1;
+  }
+
+  .agenda-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .agenda-card:hover { border-color: var(--accent-git); }
+  .agenda-card.conda:hover { border-color: var(--accent-conda); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .card-icon.git {
+    background: var(--accent-git-dim);
+    color: var(--accent-git);
+  }
+
+  .card-icon.conda {
+    background: var(--accent-conda-dim);
+    color: var(--accent-conda);
+  }
+
+  .card-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .card-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .item-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+    width: 28px;
+    text-align: right;
+  }
+
+  .item-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .item:hover .item-line {
+    background: var(--accent-git);
+  }
+
+  .agenda-card.conda .item:hover .item-line {
+    background: var(--accent-conda);
+  }
+
+  .footer-note {
+    position: absolute;
+    bottom: 48px;
+    left: 96px;
+    right: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .footer-note .code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg-card);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="chapter-badge">目录 · Agenda</div>
+    <h1>今天聊什么</h1>
+  </div>
+
+  <div class="agenda-grid">
+    <div class="agenda-card">
+      <div class="card-header">
+        <div class="card-icon git">G</div>
+        <div class="card-title">Git 版本控制</div>
+      </div>
+      <div class="card-items">
+        <div class="item"><span class="item-num">01</span><span class="item-line"></span>基础命令：init / clone / status</div>
+        <div class="item"><span class="item-num">02</span><span class="item-line"></span>工作流：add / commit / push / pull</div>
+        <div class="item"><span class="item-num">03</span><span class="item-line"></span>分支管理：branch / checkout / merge</div>
+        <div class="item"><span class="item-num">04</span><span class="item-line"></span>团队协作：remote / fetch / stash</div>
+      </div>
+    </div>
+
+    <div class="agenda-card conda">
+      <div class="card-header">
+        <div class="card-icon conda">C</div>
+        <div class="card-title">Conda 环境管理</div>
+      </div>
+      <div class="card-items">
+        <div class="item"><span class="item-num">01</span><span class="item-line"></span>基础操作：create / activate / list</div>
+        <div class="item"><span class="item-num">02</span><span class="item-line"></span>包管理：install / remove / update</div>
+        <div class="item"><span class="item-num">03</span><span class="item-line"></span>环境导出：env export / create -f</div>
+        <div class="item"><span class="item-num">04</span><span class="item-line"></span>实战技巧与常见问题</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span>面向互联网实习生团队的开发工具培训</span>
+    <span class="code">⌘ + →  开始</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>04 · Git 工作流</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .chapter-badge.git { color: var(--accent-git); }
+  .chapter-badge.git::before { background: var(--accent-git); }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 12px 0 0 0;
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  /* 工作流可视化 */
+  .workflow-viz {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .flow-box {
+    padding: 16px 28px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-box.work { background: rgba(240, 136, 62, 0.12); color: var(--accent-warn); border: 1px solid rgba(240, 136, 62, 0.3); }
+  .flow-box.stage { background: rgba(74, 222, 128, 0.12); color: var(--accent-git); border: 1px solid rgba(74, 222, 128, 0.3); }
+  .flow-box.repo { background: rgba(96, 165, 250, 0.12); color: var(--accent-conda); border: 1px solid rgba(96, 165, 250, 0.3); }
+
+  .flow-arrow {
+    font-size: 24px;
+    color: var(--text-muted);
+  }
+
+  .flow-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* 命令卡片 */
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    flex: 1;
+  }
+
+  .cmd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cmd-card:hover { border-color: rgba(74, 222, 128, 0.3); }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--accent-git);
+  }
+
+  .cmd-desc {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .code-example {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+
+  .code-example .prompt { color: var(--accent-git); }
+  .code-example .comment { color: var(--text-muted); }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="chapter-badge git">Chapter 01 · Git</div>
+    <h1>日常开发工作流</h1>
+    <p class="subtitle">修改 → 暂存 → 提交 → 推送 —— 循环往复</p>
+  </div>
+
+  <!-- 工作流可视化 -->
+  <div class="workflow-viz">
+    <div class="flow-box work">
+      工作区
+      <div class="flow-label">Working Directory</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box stage">
+      暂存区
+      <div class="flow-label">Staging Area</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box repo">
+      仓库
+      <div class="flow-label">Repository</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box repo">
+      远程
+      <div class="flow-label">Remote</div>
+    </div>
+  </div>
+
+  <div class="cmd-grid">
+    <div class="cmd-card">
+      <div class="cmd-name">git add</div>
+      <p class="cmd-desc">将工作区的修改添加到暂存区，准备提交</p>
+      <div class="code-example">
+<span class="prompt">$</span> git add filename.ts<br>
+<span class="prompt">$</span> git add . <span class="comment"># 全部</span><br>
+<span class="prompt">$</span> git add -p <span class="comment"># 交互式</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-name">git commit</div>
+      <p class="cmd-desc">将暂存区的内容保存到本地仓库，形成一次提交记录</p>
+      <div class="code-example">
+<span class="prompt">$</span> git commit -m "feat: add login"<br>
+<span class="prompt">$</span> git commit -am "fix: typo" <span class="comment"># add+commit</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-name">git push</div>
+      <p class="cmd-desc">将本地提交推送到远程仓库，同步给团队成员</p>
+      <div class="code-example">
+<span class="prompt">$</span> git push origin main<br>
+<span class="prompt">$</span> git push -u origin main <span class="comment"># 首次</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-name">git pull</div>
+      <p class="cmd-desc">从远程拉取最新代码并合并到当前分支</p>
+      <div class="code-example">
+<span class="prompt">$</span> git pull origin main<br>
+<span class="prompt">$</span> git pull --rebase <span class="comment"># 避免merge</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-name">git diff</div>
+      <p class="cmd-desc">查看工作区与暂存区、或暂存区与仓库的差异</p>
+      <div class="code-example">
+<span class="prompt">$</span> git diff<br>
+<span class="prompt">$</span> git diff --staged<br>
+<span class="prompt">$</span> git diff HEAD~1
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-name">git restore</div>
+      <p class="cmd-desc">撤销修改：用仓库版本覆盖工作区或暂存区</p>
+      <div class="code-example">
+<span class="prompt">$</span> git restore file.ts<br>
+<span class="prompt">$</span> git restore --staged file.ts<br>
+<span class="prompt">$</span> git restore . <span class="comment"># 撤销全部</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Git 日常开发工作流</span>
+    <span>04 / 14</span>
+  </div>
+</body>
+</html>

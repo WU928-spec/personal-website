@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>05 · Git 分支管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .chapter-badge.git { color: var(--accent-git); }
+  .chapter-badge.git::before { background: var(--accent-git); }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 12px 0 0 0;
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .main-content {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    flex: 1;
+  }
+
+  /* 左侧：分支树可视化 */
+  .tree-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tree-title {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .tree-svg {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tree-svg svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 右侧：命令列表 */
+  .cmd-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cmd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cmd-card:hover { border-color: rgba(74, 222, 128, 0.3); }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--accent-git);
+  }
+
+  .cmd-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: var(--bg-hover);
+    color: var(--text-muted);
+  }
+
+  .cmd-desc {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .code-example {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+
+  .code-example .prompt { color: var(--accent-git); }
+  .code-example .comment { color: var(--text-muted); }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="chapter-badge git">Chapter 01 · Git</div>
+    <h1>分支管理</h1>
+    <p class="subtitle">并行开发、功能隔离、安全合并</p>
+  </div>
+
+  <div class="main-content">
+    <!-- 左侧：分支树 -->
+    <div class="tree-panel">
+      <div class="tree-title">分支结构示意</div>
+      <div class="tree-svg">
+        <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- 连接线 -->
+          <line x1="80" y1="80" x2="200" y2="80" stroke="#4ade80" stroke-width="2.5" opacity="0.5"/>
+          <line x1="200" y1="80" x2="320" y2="80" stroke="#4ade80" stroke-width="2.5" opacity="0.5"/>
+          <line x1="320" y1="80" x2="440" y2="80" stroke="#4ade80" stroke-width="2.5" opacity="0.5"/>
+          
+          <line x1="200" y1="80" x2="200" y2="180" stroke="#60a5fa" stroke-width="2" opacity="0.4" stroke-dasharray="6,4"/>
+          <line x1="200" y1="180" x2="320" y2="180" stroke="#60a5fa" stroke-width="2.5" opacity="0.5"/>
+          <line x1="320" y1="180" x2="440" y2="180" stroke="#60a5fa" stroke-width="2.5" opacity="0.5"/>
+          
+          <line x1="320" y1="80" x2="320" y2="280" stroke="#f472b6" stroke-width="2" opacity="0.4" stroke-dasharray="6,4"/>
+          <line x1="320" y1="280" x2="440" y2="280" stroke="#f472b6" stroke-width="2.5" opacity="0.5"/>
+          
+          <!-- main 分支节点 -->
+          <circle cx="80" cy="80" r="18" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="2.5"/>
+          <text x="80" y="85" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="600">c0</text>
+          
+          <circle cx="200" cy="80" r="18" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="2.5"/>
+          <text x="200" y="85" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="600">c1</text>
+          
+          <circle cx="320" cy="80" r="22" fill="rgba(74,222,128,0.2)" stroke="#4ade80" stroke-width="3"/>
+          <text x="320" y="86" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="12" font-weight="700">c2</text>
+          <text x="320" y="50" text-anchor="middle" fill="#4ade80" font-family="Inter" font-size="11" font-weight="600">main</text>
+          
+          <circle cx="440" cy="80" r="18" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="2.5"/>
+          <text x="440" y="85" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="600">c3</text>
+          
+          <!-- develop 分支节点 -->
+          <circle cx="200" cy="180" r="18" fill="rgba(96,165,250,0.15)" stroke="#60a5fa" stroke-width="2.5"/>
+          <text x="200" y="185" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="600">d1</text>
+          
+          <circle cx="320" cy="180" r="18" fill="rgba(96,165,250,0.15)" stroke="#60a5fa" stroke-width="2.5"/>
+          <text x="320" y="185" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="600">d2</text>
+          
+          <circle cx="440" cy="180" r="22" fill="rgba(96,165,250,0.2)" stroke="#60a5fa" stroke-width="3"/>
+          <text x="440" y="186" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="12" font-weight="700">d3</text>
+          <text x="440" y="150" text-anchor="middle" fill="#60a5fa" font-family="Inter" font-size="11" font-weight="600">develop</text>
+          
+          <!-- feature 分支节点 -->
+          <circle cx="320" cy="280" r="18" fill="rgba(244,114,182,0.15)" stroke="#f472b6" stroke-width="2.5"/>
+          <text x="320" y="285" text-anchor="middle" fill="#f472b6" font-family="JetBrains Mono" font-size="11" font-weight="600">f1</text>
+          
+          <circle cx="440" cy="280" r="22" fill="rgba(244,114,182,0.2)" stroke="#f472b6" stroke-width="3"/>
+          <text x="440" y="286" text-anchor="middle" fill="#f472b6" font-family="JetBrains Mono" font-size="12" font-weight="700">f2</text>
+          <text x="440" y="310" text-anchor="middle" fill="#f472b6" font-family="Inter" font-size="11" font-weight="600">feature/login</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 右侧：命令 -->
+    <div class="cmd-panel">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="cmd-name">git branch</span>
+          <span class="cmd-tag">查看/创建</span>
+        </div>
+        <p class="cmd-desc">列出所有分支，或创建新分支</p>
+        <div class="code-example">
+<span class="prompt">$</span> git branch <span class="comment"># 列出分支</span><br>
+<span class="prompt">$</span> git branch feature/login <span class="comment"># 创建</span><br>
+<span class="prompt">$</span> git branch -d feature/login <span class="comment"># 删除</span>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="cmd-name">git checkout</span>
+          <span class="cmd-tag">切换</span>
+        </div>
+        <p class="cmd-desc">切换到指定分支或提交</p>
+        <div class="code-example">
+<span class="prompt">$</span> git checkout develop<br>
+<span class="prompt">$</span> git checkout -b feature/new <span class="comment"># 创建并切换</span><br>
+<span class="prompt">$</span> git checkout -- file.ts <span class="comment"># 撤销修改</span>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="cmd-name">git merge</span>
+          <span class="cmd-tag">合并</span>
+        </div>
+        <p class="cmd-desc">将指定分支合并到当前分支</p>
+        <div class="code-example">
+<span class="prompt">$</span> git checkout main<br>
+<span class="prompt">$</span> git merge develop<br>
+<span class="prompt">$</span> git merge --no-ff feature/x <span class="comment"># 保留分支历史</span>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="cmd-name">git rebase</span>
+          <span class="cmd-tag">变基</span>
+        </div>
+        <p class="cmd-desc">将当前分支的提交移到目标分支顶端，保持线性历史</p>
+        <div class="code-example">
+<span class="prompt">$</span> git checkout feature/x<br>
+<span class="prompt">$</span> git rebase main<br>
+<span class="prompt">$</span> git rebase -i HEAD~3 <span class="comment"># 交互式整理</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Git 分支管理</span>
+    <span>05 / 14</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>12 · 快速参考卡</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header { margin-bottom: 32px; }
+  h1 { font-size: var(--text-2xl); font-weight: 700; margin: 0; }
+  .subtitle { font-size: var(--text-base); color: var(--text-secondary); margin-top: 8px; }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    flex: 1;
+  }
+
+  .ref-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ref-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ref-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .ref-icon.git { background: var(--accent-git-dim); color: var(--accent-git); }
+  .ref-icon.conda { background: var(--accent-conda-dim); color: var(--accent-conda); }
+
+  .ref-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .ref-table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ref-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+
+  .ref-row:hover { background: var(--bg-hover); }
+
+  .ref-cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 180px;
+    color: var(--text-primary);
+  }
+
+  .ref-card.git .ref-cmd { color: var(--accent-git); }
+  .ref-card.conda .ref-cmd { color: var(--accent-conda); }
+
+  .ref-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>快速参考卡</h1>
+    <p class="subtitle">最常用的命令一览，建议截图保存</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="ref-card git">
+      <div class="ref-header">
+        <div class="ref-icon git">G</div>
+        <div class="ref-title">Git 速查</div>
+      </div>
+      <div class="ref-table">
+        <div class="ref-row"><span class="ref-cmd">git init</span><span class="ref-desc">初始化仓库</span></div>
+        <div class="ref-row"><span class="ref-cmd">git clone &lt;url&gt;</span><span class="ref-desc">克隆远程仓库</span></div>
+        <div class="ref-row"><span class="ref-cmd">git status</span><span class="ref-desc">查看状态</span></div>
+        <div class="ref-row"><span class="ref-cmd">git add .</span><span class="ref-desc">暂存所有修改</span></div>
+        <div class="ref-row"><span class="ref-cmd">git commit -m "msg"</span><span class="ref-desc">提交更改</span></div>
+        <div class="ref-row"><span class="ref-cmd">git push origin main</span><span class="ref-desc">推送到远程</span></div>
+        <div class="ref-row"><span class="ref-cmd">git pull origin main</span><span class="ref-desc">拉取并合并</span></div>
+        <div class="ref-row"><span class="ref-cmd">git branch -a</span><span class="ref-desc">列出所有分支</span></div>
+        <div class="ref-row"><span class="ref-cmd">git checkout -b feat/x</span><span class="ref-desc">创建并切换分支</span></div>
+        <div class="ref-row"><span class="ref-cmd">git merge develop</span><span class="ref-desc">合并分支</span></div>
+        <div class="ref-row"><span class="ref-cmd">git stash / pop</span><span class="ref-desc">临时保存/恢复</span></div>
+        <div class="ref-row"><span class="ref-cmd">git log --oneline</span><span class="ref-desc">简洁提交历史</span></div>
+      </div>
+    </div>
+
+    <div class="ref-card conda">
+      <div class="ref-header">
+        <div class="ref-icon conda">C</div>
+        <div class="ref-title">Conda 速查</div>
+      </div>
+      <div class="ref-table">
+        <div class="ref-row"><span class="ref-cmd">conda create -n env</span><span class="ref-desc">创建环境</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda activate env</span><span class="ref-desc">激活环境</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda deactivate</span><span class="ref-desc">退出环境</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda env list</span><span class="ref-desc">列出环境</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda install pkg</span><span class="ref-desc">安装包</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda remove pkg</span><span class="ref-desc">卸载包</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda list</span><span class="ref-desc">查看已安装包</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda update --all</span><span class="ref-desc">更新全部包</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda env export > f.yml</span><span class="ref-desc">导出环境</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda env create -f f.yml</span><span class="ref-desc">从文件创建</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda env remove -n env</span><span class="ref-desc">删除环境</span></div>
+        <div class="ref-row"><span class="ref-cmd">conda clean --all</span><span class="ref-desc">清理缓存</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>快速参考卡</span>
+    <span>12 / 14</span>
+  </div>
+</body>
+</html>

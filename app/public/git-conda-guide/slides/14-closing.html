@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>14 · 封底</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 背景 */
+  .bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 30%, rgba(74, 222, 128, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 50% 70%, rgba(96, 165, 250, 0.06) 0%, transparent 50%);
+  }
+
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(48, 54, 61, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(48, 54, 61, 0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.3;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .thanks {
+    font-size: 80px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--accent-git) 0%, var(--accent-conda) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    margin-bottom: 64px;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    margin-bottom: 80px;
+  }
+
+  .link-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .link-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .link-icon.git {
+    background: var(--accent-git-dim);
+    color: var(--accent-git);
+  }
+
+  .link-icon.conda {
+    background: var(--accent-conda-dim);
+    color: var(--accent-conda);
+  }
+
+  .link-label {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .link-url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .footer-line {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-git), var(--accent-conda));
+    border-radius: 3px;
+  }
+
+  .version {
+    position: absolute;
+    bottom: 48px;
+    right: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .author {
+    position: absolute;
+    bottom: 48px;
+    left: 48px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="grid-bg"></div>
+
+  <div class="content">
+    <div class="thanks">Thanks!</div>
+    <p class="subtitle">Git 与 Conda 是团队开发的基石工具，熟练掌握事半功倍</p>
+
+    <div class="links">
+      <div class="link-item">
+        <div class="link-icon git">G</div>
+        <div class="link-label">Git 官方文档</div>
+        <div class="link-url">git-scm.com/doc</div>
+      </div>
+      <div class="link-item">
+        <div class="link-icon conda">C</div>
+        <div class="link-label">Conda 官方文档</div>
+        <div class="link-url">docs.conda.io</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-line"></div>
+  <div class="author">技术分享 · 互联网实习生团队</div>
+  <div class="version">v1.0 · 2026</div>
+</body>
+</html>

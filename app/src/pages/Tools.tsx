@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote, Film, Terminal } from 'lucide-react'
+import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote, Film, Terminal, BookOpen } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
 
@@ -44,6 +44,16 @@ const TOOLS = [
     path: '/devtools',
     titleKey: 'tools.devtoolsTitle',
     descKey: 'tools.devtoolsDesc',
+  },
+  {
+    id: 'git-conda-guide',
+    title: 'Git & Conda 指南',
+    description: '14 页交互式幻灯片，涵盖 Git 版本控制与 Conda 环境管理的完整命令参考。含 SVG 分支树、YAML 预览、速查卡，适合团队技术分享。',
+    status: 'available' as const,
+    icon: <BookOpen size={48} />,
+    path: '/git-conda-guide',
+    titleKey: 'tools.gitCondaGuideTitle',
+    descKey: 'tools.gitCondaGuideDesc',
   },
 ]
 

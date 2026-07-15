@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>07 · Conda 章节封面</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 背景渐变 */
+  .bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(96, 165, 250, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 70% 80%, rgba(96, 165, 250, 0.05) 0%, transparent 50%);
+  }
+
+  /* 网格 */
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(48, 54, 61, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(48, 54, 61, 0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.3;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .chapter-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-xs);
+    color: var(--accent-conda);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: 120px;
+    font-weight: 900;
+    line-height: 1;
+    margin: 0 0 32px 0;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 600px;
+    margin: 0 auto 48px;
+  }
+
+  .topics {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .topic {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .topic-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-conda);
+  }
+
+  .divider {
+    color: var(--border);
+  }
+
+  /* 装饰 */
+  .deco-ring {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    border: 1px solid rgba(96, 165, 250, 0.1);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .deco-ring-2 {
+    position: absolute;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    border: 1px solid rgba(96, 165, 250, 0.06);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .page-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="grid-bg"></div>
+  <div class="deco-ring"></div>
+  <div class="deco-ring-2"></div>
+
+  <div class="content">
+    <div class="chapter-num">Chapter 02</div>
+    <h1>Conda</h1>
+    <p class="subtitle">Python 虚拟环境管理利器<br>隔离依赖、复现环境、团队协作</p>
+    <div class="topics">
+      <div class="topic"><span class="topic-dot"></span>环境创建</div>
+      <span class="divider">·</span>
+      <div class="topic"><span class="topic-dot"></span>包管理</div>
+      <span class="divider">·</span>
+      <div class="topic"><span class="topic-dot"></span>环境导出</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Conda 环境管理</span>
+    <span>07 / 14</span>
+  </div>
+</body>
+</html>

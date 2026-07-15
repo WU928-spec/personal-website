@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>03 · Git 基础命令</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header {
+    margin-bottom: 40px;
+  }
+
+  .chapter-badge.git { color: var(--accent-git); }
+  .chapter-badge.git::before { background: var(--accent-git); }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 12px 0 0 0;
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    flex: 1;
+  }
+
+  .cmd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cmd-card:hover { border-color: rgba(74, 222, 128, 0.3); }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--accent-git);
+  }
+
+  .cmd-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .code-example {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+
+  .code-example .prompt { color: var(--accent-git); }
+  .code-example .comment { color: var(--text-muted); }
+  .code-example .output { color: var(--text-secondary); }
+
+  .tip-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(240, 136, 62, 0.08);
+    border: 1px solid rgba(240, 136, 62, 0.2);
+    border-radius: 8px;
+    font-size: var(--text-xs);
+    color: var(--accent-warn);
+  }
+
+  .tip-box::before {
+    content: '⚡';
+    font-size: 16px;
+  }
+
+  .page-footer {
+    position: relative;
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="chapter-badge git">Chapter 01 · Git</div>
+    <h1>基础命令</h1>
+    <p class="subtitle">初始化仓库、克隆远程、查看状态 —— 一切的开始</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git init</span>
+      </div>
+      <p class="cmd-desc">在当前目录初始化一个新的 Git 仓库，创建 .git 隐藏文件夹</p>
+      <div class="code-example">
+<span class="prompt">$</span> git init<br>
+<span class="output">Initialized empty Git repository in /project/.git/</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git clone</span>
+      </div>
+      <p class="cmd-desc">从远程仓库下载完整副本，包括所有分支和历史记录</p>
+      <div class="code-example">
+<span class="prompt">$</span> git clone https://github.com/user/repo.git<br>
+<span class="prompt">$</span> git clone git@github.com:user/repo.git <span class="comment"># SSH 方式</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git status</span>
+      </div>
+      <p class="cmd-desc">查看当前工作区状态：哪些文件被修改、已暂存或未跟踪</p>
+      <div class="code-example">
+<span class="prompt">$</span> git status<br>
+<span class="output">On branch main</span><br>
+<span class="output">Changes not staged for commit:</span><br>
+<span class="output">  modified:   src/App.tsx</span><br>
+<span class="output">Untracked files:</span><br>
+<span class="output">  new-file.ts</span>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="cmd-name">git log</span>
+      </div>
+      <p class="cmd-desc">查看提交历史，可加 --oneline 简化输出，--graph 显示分支图</p>
+      <div class="code-example">
+<span class="prompt">$</span> git log --oneline --graph<br>
+<span class="output">* a1b2c3d feat: add login page</span><br>
+<span class="output">* e4f5g6h fix: button style</span><br>
+<span class="output">* i7j8k9l init: project setup</span>
+      </div>
+      <div class="tip-box">
+        常用组合：<code>git log --oneline --graph --all --decorate</code> 查看完整分支图
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Git 基础命令</span>
+    <span>03 / 14</span>
+  </div>
+</body>
+</html>
