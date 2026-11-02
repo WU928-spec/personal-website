@@ -18,7 +18,23 @@ collections:
   memoirs:
     output: true
     permalink: /starry/:title/
+defaults:
+  - scope:
+      type: notes
+    values:
+      layout: note
+  - scope:
+      type: moments
+    values:
+      layout: moment
+  - scope:
+      type: memoirs
+    values:
+      layout: note
 exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - package.json
+  - assets/js/*.test.js
+  - assets/media/README.md
