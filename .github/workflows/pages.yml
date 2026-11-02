@@ -26,7 +26,8 @@ jobs:
           working-directory: site
           bundler-cache: true
       - name: Build Jekyll
-        run: bundle exec jekyll build --source site --destination site/_site
+        working-directory: site
+        run: bundle exec jekyll build --source . --destination _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/_site
