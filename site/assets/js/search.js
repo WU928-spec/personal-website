@@ -69,5 +69,8 @@ dialog?.addEventListener('keydown', (event) => {
   } else if (event.key === 'Enter' && filtered[activeIndex]) {
     event.preventDefault()
     window.location.href = filtered[activeIndex].url
+  } else if (event.key === 'Escape') {
+    event.preventDefault()
+    dialog.close()
   }
 })
