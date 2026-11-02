@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
-import { useRef } from 'react'
 import { useClickOutside } from './useClickOutside'
 
 function TestComponent({ handler }: { handler: () => void }) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Star, Play } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -74,17 +74,17 @@ export default function StarrySecret() {
   const isLastPage = page === total - 1
   const hasPrev = page > 0
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     if (isLastPage) {
       navigate('/starry', { state: { playVideo: true } })
     } else {
       setPage((p) => Math.min(total - 1, p + 1))
     }
-  }
+  }, [isLastPage, navigate, total])
 
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     setPage((p) => Math.max(0, p - 1))
-  }
+  }, [])
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -93,7 +93,7 @@ export default function StarrySecret() {
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [isLastPage, total])
+  }, [goNext, goPrev])
 
   if (loading || !verified) {
     return (

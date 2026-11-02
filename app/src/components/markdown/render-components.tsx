@@ -1,213 +1,53 @@
 import type { Components } from 'react-markdown'
 import { Link } from 'react-router-dom'
-import CodeBlock from './CodeBlock'
+import CodeBlock, { CodeBlockContext } from './CodeBlock'
 import Blockquote from './Blockquote'
 import makeHeading from './Heading'
 
-export function buildComponents(
-  existingSlugs: string[],
-  onWikilinkClick?: (slug: string) => void
-): Components {
-  const handleAnchorClick = (e: React.MouseEvent, href: string) => {
-    e.preventDefault()
-    const id = href.slice(1)
-    const element = document.getElementById(id)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      window.history.pushState(null, '', href)
-    }
-  }
+const linkClass = 'text-Amber underline decoration-Amber/30 underline-offset-4 transition-colors hover:decoration-Amber'
 
-  const makeWikilinkSpan = (slug: string, children: React.ReactNode) => (
-    <span
-      onClick={(e) => {
-        e.preventDefault()
-        onWikilinkClick?.(slug)
-      }}
-      className="obsidian-wikilink"
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onWikilinkClick?.(slug)
-        }
-      }}
-    >
-      {children}
-    </span>
-  )
-
+export function buildComponents(): Components {
   return {
-    h1: makeHeading(1) as unknown as Components['h1'],
-    h2: makeHeading(2) as unknown as Components['h2'],
-    h3: makeHeading(3) as unknown as Components['h3'],
-    h4: makeHeading(4) as unknown as Components['h4'],
-
-    p: ({ children }) => (
-      <p className="text-body leading-[1.75] text-primary mb-4">{children}</p>
-    ),
-
-    a: ({ href, children }) => {
-      if (href?.startsWith('#')) {
-        return (
-          <a
-            href={href}
-            onClick={(e) => handleAnchorClick(e, href)}
-            className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200 cursor-pointer"
-          >
-            {children}
-          </a>
-        )
+    h1: makeHeading(1) as Components['h1'],
+    h2: makeHeading(2) as Components['h2'],
+    h3: makeHeading(3) as Components['h3'],
+    h4: makeHeading(4) as Components['h4'],
+    p: ({ children }) => <p className="mb-5 text-[1.0625rem] leading-[1.9] text-Ink/85 dark:text-white/80">{children}</p>,
+    a: ({ href = '', children }) => {
+      if (href.startsWith('/notes')) {
+        return <Link to={href} className={linkClass}>{children}</Link>
       }
-
-      if (href?.startsWith('obsidian-internal://')) {
-        const slug = href.replace('obsidian-internal://', '')
-        return makeWikilinkSpan(slug, children)
+      if (href.endsWith('.md')) {
+        const slug = href.replace(/\.md$/, '')
+        return <Link to={`/notes?note=${encodeURIComponent(slug)}`} className={linkClass}>{children}</Link>
       }
-
-      if (href?.endsWith('.md')) {
-        const slug = href.replace('.md', '')
-        if (onWikilinkClick) {
-          return makeWikilinkSpan(slug, children)
-        }
-        return (
-          <Link
-            to={`/obsidian?note=${slug}`}
-            className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
-          >
-            {children}
-          </Link>
-        )
-      }
-
-      if (href && !href.includes('://') && !href.startsWith('/') && !href.startsWith('#')) {
-        const decodedHref = decodeURIComponent(href)
-        if (onWikilinkClick && existingSlugs.includes(decodedHref)) {
-          return makeWikilinkSpan(decodedHref, children)
-        }
-      }
-
-      if (href?.startsWith('/blog/') || href?.startsWith('/obsidian')) {
-        return (
-          <Link
-            to={href}
-            className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
-          >
-            {children}
-          </Link>
-        )
-      }
-
       return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary border-b border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
-        >
+        <a href={href} target={href.startsWith('#') ? undefined : '_blank'} rel="noopener noreferrer" className={linkClass}>
           {children}
         </a>
       )
     },
-
-    code: CodeBlock as unknown as Components['code'],
-    pre: ({ children }) => <>{children}</>,
+    code: CodeBlock as Components['code'],
+    pre: ({ children }) => <CodeBlockContext.Provider value={true}>{children}</CodeBlockContext.Provider>,
     blockquote: ({ children }) => <Blockquote>{children}</Blockquote>,
-
-    ul: ({ children }) => (
-      <ul className="list-disc pl-6 my-4 marker:text-primary">{children}</ul>
-    ),
-    ol: ({ children }) => (
-      <ol className="list-decimal pl-6 my-4 marker:text-primary">{children}</ol>
-    ),
-    li: ({ children }) => (
-      <li className="mb-2 text-body leading-[1.75] text-primary">{children}</li>
-    ),
-
+    ul: ({ children }) => <ul className="my-5 list-disc space-y-2 pl-6 marker:text-Amber/70">{children}</ul>,
+    ol: ({ children }) => <ol className="my-5 list-decimal space-y-2 pl-6 marker:text-Amber/70">{children}</ol>,
+    li: ({ children }) => <li className="pl-1 text-[1.0625rem] leading-[1.85] text-Ink/85 dark:text-white/80">{children}</li>,
     table: ({ children }) => (
-      <div className="overflow-x-auto my-6">
-        <table className="w-full border-collapse border border-border">{children}</table>
+      <div className="my-8 overflow-x-auto border-y border-Sand/70 dark:border-white/10">
+        <table className="w-full border-collapse text-left">{children}</table>
       </div>
     ),
-    thead: ({ children }) => <thead className="bg-muted font-semibold">{children}</thead>,
-    tbody: ({ children }) => <tbody>{children}</tbody>,
-    tr: ({ children }) => <tr className="even:bg-muted/30">{children}</tr>,
-    th: ({ children }) => (
-      <th className="border border-border px-4 py-2 text-left text-primary text-body">
-        {children}
-      </th>
+    thead: ({ children }) => <thead className="bg-Linen/80 font-semibold dark:bg-white/[0.06]">{children}</thead>,
+    tr: ({ children }) => <tr className="border-b border-Sand/60 last:border-0 dark:border-white/10">{children}</tr>,
+    th: ({ children }) => <th className="px-4 py-3 text-sm text-Ink dark:text-white">{children}</th>,
+    td: ({ children }) => <td className="px-4 py-3 text-sm text-Ink/80 dark:text-white/75">{children}</td>,
+    hr: () => <hr className="my-12 border-0 border-t border-Sand/80 dark:border-white/10" />,
+    img: ({ src, alt }) => (
+      <figure className="my-9">
+        <img src={src} alt={alt || ''} className="aspect-auto w-full object-cover" loading="lazy" />
+        {alt && <figcaption className="mt-3 text-center text-caption text-Slate">{alt}</figcaption>}
+      </figure>
     ),
-    td: ({ children }) => (
-      <td className="border border-border px-4 py-2 text-primary text-body">
-        {children}
-      </td>
-    ),
-
-    hr: () => (
-      <div className="relative my-8 flex items-center justify-center">
-        <hr className="w-full border-t border-border" />
-        <div className="absolute bg-background px-2">
-          <div className="w-2 h-2 rounded rotate-45 bg-primary" />
-        </div>
-      </div>
-    ),
-
-    img: ({ src, alt }) => {
-      if (src?.startsWith('data:')) {
-        return (
-          <img
-            src={src}
-            alt={alt || ''}
-            className="rounded-lg w-full"
-            loading="lazy"
-          />
-        )
-      }
-      const ext = src?.split('.').pop()?.toLowerCase() || ''
-      const audioExts = ['mp3', 'wav', 'm4a', 'ogg', 'webm', 'aac', 'flac']
-      const videoExts = ['mp4', 'mov', 'webm', 'mkv']
-
-      if (audioExts.includes(ext)) {
-        return (
-          <figure className="my-6">
-            <audio controls className="w-full rounded-lg" preload="metadata">
-              <source src={src} type={`audio/${ext === 'm4a' ? 'mp4' : ext}`} />
-            </audio>
-            {alt && (
-              <figcaption className="text-center mt-2 font-ui text-caption font-medium tracking-wider text-muted">
-                {alt}
-              </figcaption>
-            )}
-          </figure>
-        )
-      }
-
-      if (videoExts.includes(ext)) {
-        return (
-          <figure className="my-6">
-            <video controls className="w-full rounded-lg" preload="metadata">
-              <source src={src} />
-            </video>
-            {alt && (
-              <figcaption className="text-center mt-2 font-ui text-caption font-medium tracking-wider text-muted">
-                {alt}
-              </figcaption>
-            )}
-          </figure>
-        )
-      }
-
-      return (
-        <figure className="my-6">
-          <img src={src} alt={alt || ''} className="rounded-lg w-full" loading="lazy" />
-          {alt && (
-            <figcaption className="text-center mt-2 font-ui text-caption font-medium tracking-wider text-muted">
-              {alt}
-            </figcaption>
-          )}
-        </figure>
-      )
-    },
   }
 }

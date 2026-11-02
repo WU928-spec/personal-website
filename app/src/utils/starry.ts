@@ -13,7 +13,7 @@ export function getStarPos(
 
   const n = parseInt(id, 10)
   let xPct = 10 + seededRandom(n * 1.1) * 80
-  let yPct = 10 + seededRandom(n * 2.3) * 80
+  const yPct = 10 + seededRandom(n * 2.3) * 80
   const cx = Math.abs(xPct - 50)
   const cy = Math.abs(yPct - 50)
   if (cx < 12 && cy < 12) {

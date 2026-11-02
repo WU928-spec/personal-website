@@ -1,4 +1,4 @@
-import { formatRelativeTime } from './time'
+import { formatRelativeTime, formatShortDate } from './time'
 
 describe('formatRelativeTime', () => {
   beforeEach(() => {
@@ -55,5 +55,13 @@ describe('formatRelativeTime', () => {
     const now = new Date('2024-03-01T12:00:00Z')
     vi.setSystemTime(now)
     expect(formatRelativeTime('2024-01-01T12:00:00Z')).toBe('2024/1/1')
+  })
+})
+
+describe('formatShortDate', () => {
+  it('uses a neutral fallback for missing and invalid dates', () => {
+    expect(formatShortDate('')).toBe('日期待定')
+    expect(formatShortDate('not-a-date')).toBe('日期待定')
+    expect(formatShortDate('2026-01-02T00:00:00Z')).toBe('2026/1/2')
   })
 })

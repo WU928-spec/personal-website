@@ -1,0 +1,33 @@
+<header class="site-header">
+  <div class="shell nav-inner">
+    <a class="brand" href="{{ '/' | relative_url }}" aria-label="Jasper 首页">
+      <span class="brand-name">Jasper</span>
+      <span class="brand-note" data-i18n="brandNote">记录生活，也记录思考</span>
+    </a>
+    <nav class="desktop-nav" aria-label="主导航">
+      <a href="{{ '/' | relative_url }}"><span data-i18n="home">首页</span></a>
+      <a href="{{ '/moments/' | relative_url }}"><span data-i18n="moments">记忆碎片</span></a>
+      <a href="{{ '/notes/' | relative_url }}"><span data-i18n="notes">笔记</span></a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-button" id="search-open" aria-label="搜索" title="搜索">⌕</button>
+      <button class="text-button" id="language-toggle" aria-label="切换语言">EN</button>
+      <button class="icon-button" id="theme-toggle" aria-label="切换主题">◐</button>
+      <button class="icon-button mobile-toggle" id="menu-toggle" aria-label="打开菜单" aria-expanded="false" aria-controls="mobile-nav">☰</button>
+    </div>
+  </div>
+  <nav class="mobile-nav shell" id="mobile-nav" hidden aria-label="移动导航">
+    <a href="{{ '/' | relative_url }}" data-i18n="home">首页</a>
+    <a href="{{ '/moments/' | relative_url }}" data-i18n="moments">记忆碎片</a>
+    <a href="{{ '/notes/' | relative_url }}" data-i18n="notes">笔记</a>
+    <a href="{{ '/tools/' | relative_url }}" data-i18n="tools">小工具</a>
+  </nav>
+</header>
+<dialog class="search-dialog" id="search-dialog" aria-labelledby="search-title">
+  <div class="search-head">
+    <label id="search-title" for="search-input" data-i18n="searchLabel">搜索笔记和动态</label>
+    <button class="icon-button" id="search-close" aria-label="关闭搜索">×</button>
+  </div>
+  <input id="search-input" type="search" autocomplete="off" placeholder="输入关键词…" data-i18n-placeholder="searchPlaceholder">
+  <div id="search-results" class="search-results" aria-live="polite"></div>
+</dialog>

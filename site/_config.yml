@@ -1,0 +1,24 @@
+title: Jasper
+description: 记录生活，也记录那些慢慢想清楚的事。
+url: "https://www.wuspace.top"
+baseurl: ""
+lang: zh-CN
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  auto_ids: true
+collections:
+  notes:
+    output: true
+    permalink: /notes/:title/
+  moments:
+    output: true
+    permalink: /moments/:title/
+  memoirs:
+    output: true
+    permalink: /starry/:title/
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md

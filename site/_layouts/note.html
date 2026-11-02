@@ -1,0 +1,16 @@
+---
+layout: default
+---
+<article class="article shell-narrow" data-article>
+  <header class="article-header">
+    <p class="eyebrow">{{ page.tags | first | default: '笔记' }}</p>
+    <h1>{{ page.title }}</h1>
+    {% if page.date %}<time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>{% endif %}
+  </header>
+  <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
+  <div class="article-content">{{ content }}</div>
+</article>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/contrib/auto-render.min.js" defer></script>
+<script src="{{ '/assets/js/content.js' | relative_url }}" defer></script>

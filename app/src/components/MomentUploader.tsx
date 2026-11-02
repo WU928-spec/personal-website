@@ -4,7 +4,7 @@ import type { Moment, MomentAttachment } from '@/types/moment'
 import ImagePreviewStrip from './moment-uploader/ImagePreviewStrip'
 import AttachmentList from './moment-uploader/AttachmentList'
 import NotePicker from './moment-uploader/NotePicker'
-import { slugifyNotePath } from '@/services/obsidianClient'
+import type { NoteMeta } from '@/types'
 import { uploadMomentImage, isBase64Image } from '@/services/momentImageUpload'
 import { AMAP_KEY } from '@/lib/amap'
 
@@ -163,11 +163,10 @@ export default function MomentUploader({ onSubmit, userName = 'Jasper', avatarUr
     setAttachments((prev) => prev.filter((_, i) => i !== idx))
   }
 
-  const handleNoteSelect = (item: { name: string; path: string }) => {
-    const noteSlug = slugifyNotePath(item.path)
+  const handleNoteSelect = (note: NoteMeta) => {
     setAttachments((prev) => [
       ...prev,
-      { name: item.name + '.md', type: 'md-link', data: noteSlug },
+      { name: `${note.title}.md`, type: 'md-link', data: note.slug },
     ])
     setShowNotePicker(false)
   }

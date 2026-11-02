@@ -1,50 +1,22 @@
 import { memo } from 'react'
-import { motion } from 'framer-motion'
-import { Star, GitFork, ExternalLink } from 'lucide-react'
+import { ExternalLink, GitFork, Star } from 'lucide-react'
 import type { GitHubRepo } from '@/data/site'
 
-interface RepoCardProps {
-  repo: GitHubRepo
-  index: number
-}
-
-function RepoCard({ repo, index }: RepoCardProps) {
+function RepoCard({ repo }: { repo: GitHubRepo }) {
   return (
-    <motion.a
-      href={`https://github.com/WU928-spec/${repo.name}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: 0.1 * index, ease: [0.16, 1, 0.3, 1] }}
-      className="block bg-Graphite/90 border border-white/[0.08] rounded-lg p-6 hover:border-white/[0.15] hover:shadow-deep hover:-translate-y-[2px] transition-all duration-300"
-    >
-      <div className="flex items-center justify-between">
-        <h3 className="font-mono text-caption leading-[1.6] text-Amber">{repo.name}</h3>
-        <ExternalLink size={14} className="text-white/40" />
+    <a href={`https://github.com/WU928-spec/${repo.name}`} target="_blank" rel="noopener noreferrer" className="group border-t border-Sand/70 py-6 dark:border-white/10">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="font-mono text-body font-medium text-Ink transition-colors group-hover:text-Amber dark:text-white">{repo.name}</h3>
+        <ExternalLink size={15} className="shrink-0 text-Slate/50 transition-colors group-hover:text-Amber" />
       </div>
-      <p className="font-body text-caption leading-[1.65] text-white/70 mt-2 line-clamp-2">
-        {repo.description}
-      </p>
-      <div className="flex items-center gap-4 mt-4">
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-lg" style={{ backgroundColor: repo.languageColor }} />
-          <span className="font-ui text-caption tracking-[0.04em] text-white/60">{repo.language}</span>
-        </span>
-        <span className="flex items-center gap-1 text-white/60">
-          <Star size={14} />
-          <span className="font-ui text-caption tracking-[0.04em]">{repo.stars}</span>
-        </span>
-        <span className="flex items-center gap-1 text-white/60">
-          <GitFork size={14} />
-          <span className="font-ui text-caption tracking-[0.04em]">{repo.forks}</span>
-        </span>
-        <span className="font-ui text-caption tracking-[0.04em] text-white/40 ml-auto">
-          {repo.updated}
-        </span>
+      <p className="mt-3 line-clamp-2 text-caption leading-relaxed text-Slate">{repo.description || '这个仓库还没有添加简介。'}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-label text-Slate">
+        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: repo.languageColor }} />{repo.language}</span>
+        <span className="inline-flex items-center gap-1"><Star size={12} />{repo.stars}</span>
+        <span className="inline-flex items-center gap-1"><GitFork size={12} />{repo.forks}</span>
+        <span className="ml-auto">{repo.updated}</span>
       </div>
-    </motion.a>
+    </a>
   )
 }
 

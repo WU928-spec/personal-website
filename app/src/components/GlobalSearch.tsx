@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X, FileText, Tag } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { fetchObsidianNotes } from '@/services/obsidianClient'
+import { fetchNotes } from '@/services/noteClient'
 import { dbToMoment, isSupabaseReady, supabase } from '@/lib/supabase'
 import type { Moment } from '@/types/moment'
+import { selectVisibleNotes } from '@/utils/noteContent'
 
 interface SearchResult {
   type: 'note' | 'moment'
@@ -93,10 +94,10 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     if (searchResults.length > 0) return
     setSearchLoading(true)
     try {
-      const [notes, moments] = await Promise.all([fetchObsidianNotes(), fetchMomentsForSearch()])
+      const [notes, moments] = await Promise.all([fetchNotes(), fetchMomentsForSearch()])
       const results: SearchResult[] = []
 
-      notes.forEach((n) =>
+      selectVisibleNotes(notes).forEach((n) =>
         results.push({
           type: 'note',
           id: n.slug,
@@ -165,7 +166,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       if (note) {
         onClose()
         if (note.type === 'note') {
-          navigate(`/obsidian?note=${encodeURIComponent(note.id)}`)
+          navigate(`/notes?note=${encodeURIComponent(note.id)}`)
         } else {
           navigate('/moments')
         }
@@ -205,7 +206,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="搜索笔记..."
+              placeholder="搜索笔记和动态..."
               className="flex-1 bg-transparent text-Ink dark:text-white placeholder:text-Slate/60 text-caption focus:outline-none"
             />
             {searchQuery && (
@@ -224,7 +225,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 <div className="w-5 h-5 border-2 border-Amber border-t-transparent rounded-lg animate-spin" />
               </div>
             ) : !searchQuery.trim() ? (
-              <div className="py-6 text-center text-caption text-Slate">输入关键词搜索笔记</div>
+              <div className="py-6 text-center text-caption text-Slate">输入关键词搜索笔记和动态</div>
             ) : filtered.length === 0 ? (
               <div className="py-6 text-center text-caption text-Slate">未找到相关笔记</div>
             ) : (
@@ -235,7 +236,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     onClick={() => {
                       onClose()
                       if (item.type === 'note') {
-                        navigate(`/obsidian?note=${encodeURIComponent(item.id)}`)
+                        navigate(`/notes?note=${encodeURIComponent(item.id)}`)
                       } else {
                         navigate('/moments')
                       }

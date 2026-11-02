@@ -1,0 +1,18 @@
+---
+layout: tool
+title: 实习决策助手
+description: 输入薪资、通勤、体验与前景，用同一套权重比较 Offer。
+permalink: /tools/internship/
+---
+<form class="tool-form" id="offer-form">
+  <label>公司名<input id="offer-company" name="company" required></label>
+  <label>岗位<input id="offer-position" name="position"></label>
+  <label>日薪（元/天）<input id="offer-salary" name="salary" type="number" min="0" max="10000" value="175" required></label>
+  <label>通勤时长（分钟，单程）<input id="offer-commute" name="commute" type="number" min="0" max="1440" value="45" required></label>
+  <label>工作强度（1–10）<input id="offer-intensity" name="intensity" type="number" min="1" max="10" value="5" required></label>
+  <label>团队氛围（1–10）<input id="offer-atmosphere" name="atmosphere" type="number" min="1" max="10" value="5" required></label>
+  <label>发展前景（1–10）<input id="offer-growth" name="growth" type="number" min="1" max="10" value="5" required></label>
+  <button class="tool-button" type="submit">保存并比较</button>
+</form>
+<div id="offer-list" aria-live="polite"></div>
+<script type="module" src="{{ '/assets/js/internship.js' | relative_url }}" defer></script>

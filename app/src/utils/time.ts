@@ -29,3 +29,8 @@ export function formatRelativeTime(iso: string): string {
   if (days < 30) return `${Math.floor(days / 7)}周前`
   return new Date(iso).toLocaleDateString('zh-CN')
 }
+
+export function formatShortDate(iso: string, fallback = '日期待定'): string {
+  if (!iso || !Number.isFinite(Date.parse(iso))) return fallback
+  return new Date(iso).toLocaleDateString('zh-CN')
+}

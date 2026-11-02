@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>10 · Conda 环境导出与复现</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header { margin-bottom: 32px; }
+  .chapter-badge.conda { color: var(--accent-conda); }
+  .chapter-badge.conda::before { background: var(--accent-conda); }
+  h1 { font-size: var(--text-2xl); font-weight: 700; margin: 12px 0 0 0; }
+  .subtitle { font-size: var(--text-base); color: var(--text-secondary); margin-top: 8px; }
+
+  .main-content {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    flex: 1;
+  }
+
+  .left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cmd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cmd-card:hover { border-color: rgba(96, 165, 250, 0.3); }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--accent-conda);
+  }
+  .cmd-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .code-example {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .code-example .prompt { color: var(--accent-conda); }
+  .code-example .comment { color: var(--text-muted); }
+
+  .tip-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(96, 165, 250, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 8px;
+    font-size: var(--text-xs);
+    color: var(--accent-conda);
+  }
+  .tip-box::before { content: '💡'; font-size: 16px; }
+
+  /* 右侧 YAML 预览 */
+  .yaml-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .yaml-title {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .yaml-content {
+    flex: 1;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-primary);
+    overflow: auto;
+  }
+
+  .yaml-key { color: #ff7b72; }
+  .yaml-string { color: #a5d6ff; }
+  .yaml-num { color: #79c0ff; }
+  .yaml-comment { color: var(--text-muted); }
+  .yaml-dash { color: var(--text-secondary); }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="chapter-badge conda">Chapter 02 · Conda</div>
+    <h1>环境导出与复现</h1>
+    <p class="subtitle">让团队协作无缝衔接：导出环境 → 分享 → 一键复现</p>
+  </div>
+
+  <div class="main-content">
+    <div class="left-panel">
+      <div class="cmd-card">
+        <div class="cmd-name">conda env export</div>
+        <p class="cmd-desc">导出当前环境为 YAML 文件，包含所有包和版本</p>
+        <div class="code-example">
+<span class="prompt">$</span> conda env export > environment.yml<br>
+<span class="prompt">$</span> conda env export --no-builds > env.yml <span class="comment"># 去掉 build 号</span><br>
+<span class="prompt">$</span> conda env export --from-history > env.yml <span class="comment"># 只含手动安装的</span>
+        </div>
+        <div class="tip-box">--from-history 最实用，只记录你主动安装的包，体积最小</div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-name">conda env create -f</div>
+        <p class="cmd-desc">从 YAML 文件创建环境，完美复现</p>
+        <div class="code-example">
+<span class="prompt">$</span> conda env create -f environment.yml<br>
+<span class="prompt">$</span> conda env create -f env.yml -n newenv <span class="comment"># 指定新名</span><br>
+<span class="prompt">$</span> conda env update -f environment.yml <span class="comment"># 更新现有</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="yaml-panel">
+      <div class="yaml-title">environment.yml 示例</div>
+      <div class="yaml-content">
+<span class="yaml-key">name</span>: <span class="yaml-string">blog-api</span><br>
+<span class="yaml-key">channels</span>:<br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">conda-forge</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">defaults</span><br>
+<span class="yaml-key">dependencies</span>:<br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">python=3.11</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">fastapi=0.104</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">uvicorn=0.24</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">sqlalchemy=2.0</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">pydantic=2.5</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">pytest=7.4</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">pip</span><br>
+<span class="yaml-dash">  -</span> <span class="yaml-string">pip:</span><br>
+<span class="yaml-dash">    -</span> <span class="yaml-string">httpx==0.25.0</span><br>
+<span class="yaml-comment"># 提交到 Git，队友只需 conda env create -f</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Conda 环境导出与复现</span>
+    <span>10 / 14</span>
+  </div>
+</body>
+</html>

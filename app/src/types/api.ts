@@ -30,41 +30,6 @@ export const GitHubUserSchema = z.object({
 
 export type GitHubAPIUser = z.infer<typeof GitHubUserSchema>
 
-// Obsidian 笔记 API 响应
-export const ObsidianNoteMetaSchema = z.object({
-  slug: z.string(),
-  title: z.string(),
-  excerpt: z.string(),
-  category: z.string(),
-  tags: z.array(z.string()),
-  date: z.string().optional(),
-})
-
-export type ObsidianNoteMetaAPI = z.infer<typeof ObsidianNoteMetaSchema>
-
-export const ObsidianNoteSchema = ObsidianNoteMetaSchema.extend({
-  content: z.string(),
-})
-
-export type ObsidianNoteAPI = z.infer<typeof ObsidianNoteSchema>
-
-// Vault 文件树
-export const VaultFileSchema: z.ZodType<{
-  name: string
-  path: string
-  type: 'file' | 'folder'
-  children?: VaultFileAPI[]
-}> = z.lazy(() =>
-  z.object({
-    name: z.string(),
-    path: z.string(),
-    type: z.enum(['file', 'folder']),
-    children: z.array(VaultFileSchema).optional(),
-  })
-)
-
-export type VaultFileAPI = z.infer<typeof VaultFileSchema>
-
 /**
  * 安全的 API 数据解析
  */

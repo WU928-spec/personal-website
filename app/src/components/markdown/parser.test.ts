@@ -1,4 +1,4 @@
-import { parseFrontmatter, extractToc, preprocessWikilinks } from './parser'
+import { extractToc, parseFrontmatter, preprocessMarkdown, slugifyHeading } from './parser'
 
 describe('parseFrontmatter', () => {
   it('should parse YAML frontmatter', () => {
@@ -16,65 +16,30 @@ Body text`
   })
 
   it('should handle content without frontmatter', () => {
-    const content = 'Just body text'
-    const result = parseFrontmatter(content)
+    const result = parseFrontmatter('Just body text')
     expect(result.frontmatter).toEqual({})
     expect(result.body).toBe('Just body text')
   })
 })
 
-describe('extractToc', () => {
-  it('should extract h2 and h3 headings', () => {
-    const content = `# Title
-## Section 1
-Some text
-### Subsection A
-## Section 2
-### Subsection B with **bold**
-#### Should be ignored`
-    const toc = extractToc(content)
-    expect(toc).toHaveLength(4)
-    expect(toc[0]).toEqual({ level: 2, text: 'Section 1', id: 'section-1' })
-    expect(toc[1]).toEqual({ level: 3, text: 'Subsection A', id: 'subsection-a' })
-    expect(toc[2]).toEqual({ level: 2, text: 'Section 2', id: 'section-2' })
-    expect(toc[3]).toEqual({ level: 3, text: 'Subsection B with bold', id: 'subsection-b-with-bold' })
+describe('standard markdown', () => {
+  it('preserves legal LaTeX blocks without commands and fenced code verbatim', () => {
+    expect(preprocessMarkdown('$$E=mc^2$$')).toBe('$$E=mc^2$$')
+    expect(preprocessMarkdown('$$x^2+y^2=z^2$$')).toBe('$$x^2+y^2=z^2$$')
+    expect(preprocessMarkdown('```text\n$$plain text$$\n```')).toBe('```text\n$$plain text$$\n```')
   })
 
-  it('should return empty array for no headings', () => {
+  it('creates unique Chinese heading anchors and ignores fenced code', () => {
+    const source = '## 春日 记录\n```md\n## 不是标题\n```\n### 阅读 & 思考\n## 春日 记录'
+    expect(slugifyHeading('春日 记录')).toBe('春日-记录')
+    expect(extractToc(source)).toEqual([
+      { level: 2, text: '春日 记录', id: '春日-记录' },
+      { level: 3, text: '阅读 & 思考', id: '阅读--思考' },
+      { level: 2, text: '春日 记录', id: '春日-记录-1' },
+    ])
+  })
+
+  it('returns an empty table of contents without headings', () => {
     expect(extractToc('No headings here')).toEqual([])
-  })
-})
-
-describe('preprocessWikilinks', () => {
-  it('should convert [[Title]] to markdown link', () => {
-    const result = preprocessWikilinks('See [[Hello World]]', ['Hello-World'])
-    expect(result).toBe('See [Hello World](/obsidian?note=Hello-World)')
-  })
-
-  it('should convert [[Title|Display]] to markdown link with display text', () => {
-    const result = preprocessWikilinks('See [[Hello World|HW]]', ['Hello-World'])
-    expect(result).toBe('See [HW](/obsidian?note=Hello-World)')
-  })
-
-  it('should mark unresolved wikilinks', () => {
-    const result = preprocessWikilinks('See [[Missing]]', [])
-    expect(result).toBe(
-      'See <span class="obsidian-wikilink-unresolved" title="Note not yet published">Missing</span>'
-    )
-  })
-
-  it('should handle internal heading links', () => {
-    const result = preprocessWikilinks('Jump to [[#Section Name]]', [])
-    expect(result).toBe('Jump to [Section Name](#section-name)')
-  })
-
-  it('should strip non-Latex $$ wrappers', () => {
-    const result = preprocessWikilinks('$$plain text$$', [])
-    expect(result).toBe('plain text')
-  })
-
-  it('should preserve LaTeX $$ blocks', () => {
-    const result = preprocessWikilinks('$$\\frac{1}{2}$$', [])
-    expect(result).toBe('$$\\frac{1}{2}$$')
   })
 })

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Film, Send, User, Bot, KeyRound, Wand2, Star, Sparkles } from 'lucide-react'
 import BackToTools from '@/components/BackToTools'
@@ -98,7 +98,7 @@ async function chatWithAI(
     const content = data.choices?.[0]?.message?.content || ''
 
     // Try to extract JSON block
-    let parsed: any = null
+    let parsed: { reply?: string; movies?: Array<Record<string, string>> } | null = null
     try {
       // Try code block first: ```json ... ```
       const codeBlock = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
@@ -259,7 +259,7 @@ export default function MovieAgent() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const dailyMovie = getDailyMovie()
+  const dailyMovie = useMemo(() => getDailyMovie(), [])
 
   // Initialize greeting (only if no history)
   useEffect(() => {
@@ -272,7 +272,7 @@ export default function MovieAgent() {
       }
       setMessages([greeting])
     }
-  }, [])
+  }, [messages.length])
 
   // Persist chat history
   useEffect(() => {
@@ -334,61 +334,7 @@ export default function MovieAgent() {
     setTimeout(() => inputRef.current?.focus(), 100)
   }, [])
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || loading) return
-
-    setError(null)
-
-    const userMsg: ChatMessage = {
-      id: 'u-' + Date.now(),
-      role: 'user',
-      content: text.trim(),
-      timestamp: Date.now(),
-    }
-
-    setMessages((prev) => [...prev, userMsg])
-    setInput('')
-    setLoading(true)
-
-    const history = messages
-      .map((m) => ({ role: m.role, content: m.content }))
-    history.push({ role: 'user', content: text.trim() })
-
-    if (apiKey) {
-      const aiResult = await chatWithAI(apiKey, history)
-
-      if (aiResult) {
-        const localMovies: Movie[] = []
-        for (const fm of aiResult.movies) {
-          const local = findLocalMovie(fm.title)
-          if (local) localMovies.push(local)
-        }
-
-        const aiMsg: ChatMessage = {
-          id: 'a-' + Date.now(),
-          role: 'assistant',
-          content: aiResult.reply,
-          movies: localMovies.length > 0 ? localMovies : undefined,
-          freeMovies: aiResult.movies,
-          timestamp: Date.now(),
-        }
-        setMessages((prev) => [...prev, aiMsg])
-      } else {
-        setError('AI 服务暂时不可用，已切换为本地推荐。')
-        fallback(text.trim())
-      }
-    } else {
-      fallback(text.trim())
-    }
-
-    setLoading(false)
-  }, [loading, apiKey, messages])
-
-  const handleSend = useCallback(() => {
-    sendMessage(input)
-  }, [input, sendMessage])
-
-  function fallback(text: string) {
+  const fallback = useCallback((text: string) => {
     const searchWords = text.toLowerCase().split(/[\s,，.。!！?？]+/)
     const matches = MOVIE_LIBRARY.filter((m) =>
       searchWords.some((w) =>
@@ -403,7 +349,6 @@ export default function MovieAgent() {
     )
     const pick = matches.length > 0 ? matches[0] : dailyMovie
 
-    // 兜底：如果片库为空，给出友好提示
     if (!pick) {
       const emptyMsg: ChatMessage = {
         id: 'f-' + Date.now(),
@@ -440,7 +385,60 @@ export default function MovieAgent() {
       timestamp: Date.now(),
     }
     setMessages((prev) => [...prev, fallbackMsg])
-  }
+  }, [dailyMovie])
+
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || loading) return
+
+    setError(null)
+
+    const userMsg: ChatMessage = {
+      id: 'u-' + Date.now(),
+      role: 'user',
+      content: text.trim(),
+      timestamp: Date.now(),
+    }
+
+    setMessages((prev) => [...prev, userMsg])
+    setInput('')
+    setLoading(true)
+
+    const history = messages.map((m) => ({ role: m.role, content: m.content }))
+    history.push({ role: 'user', content: text.trim() })
+
+    if (apiKey) {
+      const aiResult = await chatWithAI(apiKey, history)
+
+      if (aiResult) {
+        const localMovies: Movie[] = []
+        for (const fm of aiResult.movies) {
+          const local = findLocalMovie(fm.title)
+          if (local) localMovies.push(local)
+        }
+
+        const aiMsg: ChatMessage = {
+          id: 'a-' + Date.now(),
+          role: 'assistant',
+          content: aiResult.reply,
+          movies: localMovies.length > 0 ? localMovies : undefined,
+          freeMovies: aiResult.movies,
+          timestamp: Date.now(),
+        }
+        setMessages((prev) => [...prev, aiMsg])
+      } else {
+        setError('AI 服务暂时不可用，已切换为本地推荐。')
+        fallback(text.trim())
+      }
+    } else {
+      fallback(text.trim())
+    }
+
+    setLoading(false)
+  }, [loading, apiKey, messages, fallback])
+
+  const handleSend = useCallback(() => {
+    void sendMessage(input)
+  }, [input, sendMessage])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

@@ -1,0 +1,12 @@
+---
+layout: tool
+title: 英文分段器
+description: 输入连续英文文本，自动按句子和段落整理，方便阅读。
+permalink: /tools/text-segmenter/
+---
+<div class="tool-form">
+  <label for="segmenter-input">原文<textarea id="segmenter-input" placeholder="Paste English text here…"></textarea></label>
+  <button class="tool-button" id="segmenter-run" type="button">整理文本</button>
+  <label for="segmenter-output">结果<textarea id="segmenter-output" readonly></textarea></label>
+</div>
+<script type="module" src="{{ '/assets/js/text-segmenter.js' | relative_url }}" defer></script>

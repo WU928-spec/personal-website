@@ -1,0 +1,15 @@
+---
+layout: default
+---
+<article class="article shell-narrow">
+  <header class="article-header">
+    <p class="eyebrow">记忆碎片</p>
+    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>
+  </header>
+  <div class="article-content">{{ content }}</div>
+  {% if page.images %}
+  <div class="moment-images">
+    {% for image in page.images %}<img src="{{ image | relative_url }}" alt="动态图片" loading="lazy">{% endfor %}
+  </div>
+  {% endif %}
+</article>

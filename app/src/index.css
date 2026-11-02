@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -35,17 +35,18 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --color-parchment: 247, 244, 239;
-    --color-ink: 30, 28, 26;
-    --color-amber: 196, 120, 58;
-    --color-sage: 107, 142, 107;
-    --color-slate: 74, 85, 104;
-    --color-graphite: 45, 42, 38;
-    --color-linen: 237, 232, 224;
-    --color-sand: 212, 197, 181;
-    --color-mist: 232, 226, 216;
-    --color-rose: 184, 105, 90;
-    --color-gold: 201, 168, 76;
+    --color-parchment: 248, 247, 242;
+    --color-ink: 28, 27, 25;
+    /* Amber 变量在当前主题中代表酒红强调色。 */
+    --color-amber: 154, 54, 74;
+    --color-sage: 108, 117, 93;
+    --color-slate: 98, 96, 90;
+    --color-graphite: 31, 31, 34;
+    --color-linen: 239, 237, 230;
+    --color-sand: 218, 214, 204;
+    --color-mist: 235, 232, 224;
+    --color-rose: 174, 76, 91;
+    --color-gold: 177, 144, 75;
   }
 
   .dark {
@@ -77,17 +78,17 @@
     --sidebar-border: 34 8.4% 32.5%;
     --sidebar-ring: 29 75.5% 63.1%;
 
-    --color-parchment: 20, 18, 16;
-    --color-ink: 255, 252, 247;
-    --color-amber: 232, 158, 90;
-    --color-sage: 148, 182, 148;
-    --color-slate: 200, 195, 185;
-    --color-graphite: 28, 26, 24;
-    --color-linen: 48, 44, 38;
-    --color-sand: 90, 84, 76;
-    --color-mist: 42, 38, 34;
-    --color-rose: 218, 138, 122;
-    --color-gold: 232, 208, 122;
+    --color-parchment: 25, 25, 28;
+    --color-ink: 244, 241, 234;
+    --color-amber: 219, 128, 145;
+    --color-sage: 168, 171, 152;
+    --color-slate: 181, 178, 170;
+    --color-graphite: 25, 25, 28;
+    --color-linen: 43, 42, 45;
+    --color-sand: 72, 69, 73;
+    --color-mist: 52, 50, 54;
+    --color-rose: 224, 139, 153;
+    --color-gold: 213, 182, 123;
   }
 
 
@@ -103,6 +104,7 @@
     @apply bg-Parchment text-Ink font-body antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-size-adjust: from-font;
   }
 
   h1, h2, h3 {
@@ -146,7 +148,12 @@
 }
 
 /* ── KaTeX Math ── */
-.katex {
+.markdown-content .katex {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: middle;
   font-size: 1.05em;
 }
 .katex-display {
@@ -169,35 +176,6 @@
 .dark .katex .mathbf,
 .dark .katex .boldsymbol {
   color: #F7F4EF;
-}
-
-/* ── Obsidian Wikilink styles ── */
-.obsidian-wikilink {
-  color: #B58A5F;
-  border-bottom: 1px solid rgba(181, 138, 95, 0.3);
-  cursor: pointer;
-  transition: border-color 0.2s, background-color 0.2s;
-}
-.obsidian-wikilink:hover {
-  border-bottom-color: #B58A5F;
-  background-color: rgba(181, 138, 95, 0.05);
-}
-.dark .obsidian-wikilink {
-  color: #D4A76A;
-  border-bottom-color: rgba(212, 167, 106, 0.3);
-}
-.dark .obsidian-wikilink:hover {
-  border-bottom-color: #D4A76A;
-  background-color: rgba(212, 167, 106, 0.05);
-}
-.obsidian-wikilink-unresolved {
-  color: rgba(181, 138, 95, 0.5);
-  border-bottom: 1px dashed rgba(181, 138, 95, 0.5);
-  cursor: help;
-}
-.dark .obsidian-wikilink-unresolved {
-  color: rgba(212, 167, 106, 0.5);
-  border-bottom-color: rgba(212, 167, 106, 0.5);
 }
 
 /* ── Starry Easter Egg ── */
@@ -345,4 +323,13 @@
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

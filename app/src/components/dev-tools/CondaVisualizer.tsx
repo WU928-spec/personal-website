@@ -42,23 +42,26 @@ export default function CondaVisualizer() {
     const action = parts[0]
 
     switch (action) {
-      case 'create':
+      case 'create': {
         const nameIdx = parts.indexOf('-n') >= 0 ? parts.indexOf('-n') : parts.indexOf('--name')
         const name = nameIdx >= 0 ? parts[nameIdx + 1] : 'new-env'
         const pythonIdx = parts.indexOf('python')
         const python = pythonIdx >= 0 ? parts[pythonIdx + 1] : '3.11'
         return { type: 'create' as const, name, python }
+      }
       case 'activate':
         return { type: 'activate' as const, name: parts[1] || 'base' }
       case 'deactivate':
         return { type: 'deactivate' as const }
-      case 'install':
+      case 'install': {
         const pkgs = parts.slice(1).filter(p => !p.startsWith('-'))
         return { type: 'install' as const, packages: pkgs.length > 0 ? pkgs : ['numpy'] }
+      }
       case 'remove':
-      case 'uninstall':
+      case 'uninstall': {
         const rmPkgs = parts.slice(1).filter(p => !p.startsWith('-'))
         return { type: 'remove' as const, packages: rmPkgs.length > 0 ? rmPkgs : ['numpy'] }
+      }
       case 'env':
         if (parts[1] === 'remove' || parts[1] === 'delete') {
           const envNameIdx = parts.indexOf('-n') >= 0 ? parts.indexOf('-n') : parts.indexOf('--name')

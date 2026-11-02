@@ -1,0 +1,64 @@
+---
+layout: home
+title: 首页
+---
+{% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
+{% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
+<section class="hero shell">
+  <p class="eyebrow">NOTES ON LIFE AND THOUGHTS</p>
+  <h1>记录生活，也记录那些慢慢想清楚的事。</h1>
+  <p class="hero-intro">我动手创造，并记录所学。欢迎来到我的互联网角落。</p>
+</section>
+
+<section class="shell" aria-label="最新笔记">
+  {% if public_notes.size > 0 %}
+    {% assign latest = public_notes | first %}
+    <a class="latest-note" href="{{ latest.url | relative_url }}">
+      <div class="latest-meta"><span>最近写下</span><time>{{ latest.date | date: '%Y-%m-%d' }}</time></div>
+      <div><h2>{{ latest.title }}</h2><p>{{ latest.description | default: latest.excerpt | strip_html | truncate: 130 }}</p></div>
+      <span class="latest-arrow">阅读这篇 ↗</span>
+    </a>
+  {% else %}
+    <a class="text-link" href="{{ '/notes/' | relative_url }}">去读笔记 ↗</a>
+  {% endif %}
+</section>
+
+<section class="about-strip shell">
+  <div><p class="eyebrow">ABOUT ME</p><h2>一个仍在探索中的普通人</h2></div>
+  <p>这里记录我的生活、阅读和随手写下的心得。很高兴你来坐坐。不赶时间的话，可以从最近的生活或一篇笔记开始认识我。</p>
+</section>
+
+<section class="content-section shell">
+  <div class="section-head"><div><p class="eyebrow">RECENT MOMENTS</p><h2>最近的生活</h2><p>一些普通但值得记住的时刻。</p></div><a class="section-link" href="{{ '/moments/' | relative_url }}">查看全部动态 ↗</a></div>
+  <div class="entry-list">
+    {% for moment in public_moments limit: 3 %}
+      <a class="entry" href="{{ moment.url | relative_url }}">
+        <time class="entry-date">{{ moment.date | date: '%Y-%m-%d' }}</time>
+        <div><h3>{{ moment.excerpt | strip_html | truncate: 72 }}</h3>{% if moment.location %}<p>{{ moment.location }}</p>{% endif %}</div>
+        <span class="entry-arrow">↗</span>
+      </a>
+    {% else %}
+      <p class="empty-state">新的故事正在酝酿。</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="content-section shell">
+  <div class="section-head"><div><p class="eyebrow">NOTES & STORIES</p><h2>最近写的东西</h2><p>记录阅读、思考，以及不想忘记的发现。</p></div><a class="section-link" href="{{ '/notes/' | relative_url }}">查看全部笔记 ↗</a></div>
+  <div class="entry-list">
+    {% for note in public_notes limit: 3 %}
+      <a class="entry" href="{{ note.url | relative_url }}">
+        <time class="entry-date">{{ note.date | date: '%Y-%m-%d' }}</time>
+        <div><h3>{{ note.title }}</h3><p>{{ note.description | default: note.excerpt | strip_html | truncate: 130 }}</p></div>
+        <span class="entry-arrow">读下去 ↗</span>
+      </a>
+    {% else %}
+      <p class="empty-state">新的文字正在路上。</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="content-section shell">
+  <div class="section-head"><div><p class="eyebrow">THINGS I MADE</p><h2>我做过的小东西</h2><p>一些公开在 GitHub 上的尝试。</p></div></div>
+  <div class="project-links"><a href="https://github.com/WU928-spec" target="_blank" rel="noopener noreferrer">访问我的 GitHub ↗</a><a href="{{ '/tools/' | relative_url }}">打开小工具 ↗</a></div>
+</section>

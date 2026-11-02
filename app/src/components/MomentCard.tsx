@@ -42,7 +42,7 @@ function MomentCard({
 
   const handleAttachmentClick = (att: MomentAttachment) => {
     if (att.type === 'md-link') {
-      navigate(`/obsidian?note=${encodeURIComponent(att.data)}`)
+      navigate(`/notes?note=${encodeURIComponent(att.data)}`)
     } else {
       const link = document.createElement('a')
       link.href = att.data

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Git & Conda 开发工具指南</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* 背景网格 */
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(48, 54, 61, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(48, 54, 61, 0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.4;
+  }
+
+  /* 发光装饰 */
+  .glow-git {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.15) 0%, transparent 70%);
+    top: 15%;
+    left: 20%;
+    filter: blur(60px);
+  }
+
+  .glow-conda {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.15) 0%, transparent 70%);
+    bottom: 15%;
+    right: 20%;
+    filter: blur(60px);
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-git);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    font-size: var(--text-hero);
+    font-weight: 900;
+    line-height: 1.05;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.02em;
+  }
+
+  h1 .git { color: var(--accent-git); }
+  h1 .conda { color: var(--accent-conda); }
+  h1 .and {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.6em;
+    vertical-align: middle;
+    margin: 0 16px;
+  }
+
+  .subtitle {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 64px;
+    font-weight: 400;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .meta-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .meta-icon.git { background: var(--accent-git-dim); color: var(--accent-git); }
+  .meta-icon.conda { background: var(--accent-conda-dim); color: var(--accent-conda); }
+
+  /* 底部装饰线 */
+  .bottom-line {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-git), var(--accent-conda));
+    border-radius: 3px;
+  }
+
+  /* 版本标记 */
+  .version {
+    position: absolute;
+    bottom: 48px;
+    right: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="glow-git"></div>
+  <div class="glow-conda"></div>
+
+  <div class="content">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      技术分享 · 互联网实习生团队
+    </div>
+
+    <h1>
+      <span class="git">Git</span>
+      <span class="and">&</span>
+      <span class="conda">Conda</span>
+    </h1>
+
+    <p class="subtitle">版本控制与虚拟环境管理 · 从入门到团队实战</p>
+
+    <div class="meta">
+      <div class="meta-item">
+        <div class="meta-icon git">◆</div>
+        <span>分支策略 · 协作流程</span>
+      </div>
+      <div class="meta-item">
+        <div class="meta-icon conda">◇</div>
+        <span>环境隔离 · 依赖管理</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-line"></div>
+  <div class="version">v1.0 · 2026</div>
+</body>
+</html>

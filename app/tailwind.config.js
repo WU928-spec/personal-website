@@ -70,10 +70,10 @@ module.exports = {
         },
       },
       fontFamily: {
-        display: ['"Playfair Display"', 'serif'],
-        body: ['Inter', 'sans-serif'],
+        display: ['"Playfair Display"', '"Noto Serif SC"', 'serif'],
+        body: ['Inter', '"Noto Sans SC"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        ui: ['Inter', 'sans-serif'],
+        ui: ['Inter', '"Noto Sans SC"', 'sans-serif'],
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",

@@ -4,6 +4,8 @@ import { Github, Twitter, Linkedin, Mail, Pencil, Save, X } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLang } from '@/contexts/PreferencesContext'
 import { type FooterData, loadFooter, saveFooter } from '@/data/site'
+import StarryLink from './StarryLink'
+import { filterPublicFooterLinks, filterPublicSocials } from '@/utils/footerContent'
 
 const iconMap: Record<string, React.ElementType> = {
   Github,
@@ -111,7 +113,7 @@ export default function Footer() {
   const display = isEditing ? (lang === 'zh' ? editZh : editEn) : data
 
   return (
-    <footer className="bg-card py-16 md:py-20 relative">
+    <footer className="relative border-t border-Sand/60 bg-Parchment py-14 md:py-16 dark:border-white/10 dark:bg-Graphite">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         {/* Edit controls */}
         {isLoggedIn && isEditMode && (
@@ -146,16 +148,16 @@ export default function Footer() {
             {/* Top Row */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-8">
               {/* Brand */}
-              <div className="flex flex-col gap-4">
-                <img src="/logo.svg" alt="Logo" className="h-7 w-auto" />
-                <p className="font-body text-body text-muted-foreground">
+              <div className="flex flex-col gap-3">
+                <Link to="/" className="font-display text-3xl font-semibold tracking-[-0.04em] text-Ink dark:text-white">Jasper</Link>
+                <p className="max-w-xs font-body text-body text-muted-foreground">
                   {display.brandDesc}
                 </p>
               </div>
 
               {/* Navigation */}
               <div className="flex flex-wrap gap-x-6 gap-y-4">
-                {display.links.map((link) => (
+                {filterPublicFooterLinks(display.links).map((link) => (
                   <Link
                     key={`${link.path}-${link.label}`}
                     to={link.path}
@@ -168,7 +170,7 @@ export default function Footer() {
 
               {/* Social */}
               <div className="flex items-center gap-4">
-                {display.socials.map((social) => {
+                {filterPublicSocials(display.socials).map((social) => {
                   const Icon = iconMap[social.icon] || Github
                   return (
                     <a
@@ -194,9 +196,12 @@ export default function Footer() {
               <p className="font-ui text-label font-medium leading-[1.5] tracking-[0.04em] text-muted-foreground">
                 {display.copyright}
               </p>
-              <p className="font-mono text-label leading-[1.5] text-muted-foreground">
-                {display.tagline}
-              </p>
+              <div className="flex items-center">
+                <p className="font-mono text-label leading-[1.5] text-muted-foreground">
+                  {display.tagline}
+                </p>
+                <StarryLink />
+              </div>
             </div>
           </>
         )}

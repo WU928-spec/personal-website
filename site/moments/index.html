@@ -1,0 +1,21 @@
+---
+layout: default
+title: 记忆碎片
+description: 一些普通但值得记住的时刻。
+permalink: /moments/
+---
+{% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
+<header class="page-header shell"><p class="eyebrow">RECENT MOMENTS</p><h1>一些普通但值得记住的时刻</h1><p>没有点赞和评论，只是认真留下生活。</p></header>
+<div class="content-section shell">
+  <div class="entry-list">
+    {% for moment in public_moments %}
+      <a class="entry" href="{{ moment.url | relative_url }}">
+        <time class="entry-date">{{ moment.date | date: '%Y-%m-%d' }}</time>
+        <div><h3>{{ moment.excerpt | strip_html | truncate: 90 }}</h3>{% if moment.location %}<p>{{ moment.location }}</p>{% endif %}</div>
+        <span class="entry-arrow">↗</span>
+      </a>
+    {% else %}
+      <p class="empty-state">新的故事正在酝酿。</p>
+    {% endfor %}
+  </div>
+</div>

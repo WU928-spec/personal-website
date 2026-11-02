@@ -10,9 +10,9 @@ interface ResultChartsProps {
 
 export default function ResultCharts({ offers }: ResultChartsProps) {
   const { t } = useLang()
-  if (offers.length < 2) return null
-
   const [activeDimension, setActiveDimension] = useState<'total' | 'salary' | 'commute' | 'intensity' | 'atmosphere' | 'growth'>('total')
+
+  if (offers.length < 2) return null
 
   const dimensionConfig = {
     total: { label: t('internship.totalScore'), getValue: (o: Offer) => calcTotalScore(o) },

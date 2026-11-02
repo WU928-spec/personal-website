@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>11 · 实用技巧与常见问题</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 80px 96px 48px;
+    position: relative;
+  }
+
+  .header { margin-bottom: 32px; }
+  h1 { font-size: var(--text-2xl); font-weight: 700; margin: 0; }
+  .subtitle { font-size: var(--text-base); color: var(--text-secondary); margin-top: 8px; }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    flex: 1;
+  }
+
+  .section-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .section-icon.git { background: var(--accent-git-dim); color: var(--accent-git); }
+  .section-icon.conda { background: var(--accent-conda-dim); color: var(--accent-conda); }
+
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .item-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .item-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .item-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-git);
+    background: var(--bg-card);
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  .section-card.conda .item-code { color: var(--accent-conda); }
+
+  .page-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>实用技巧与常见问题</h1>
+    <p class="subtitle">Git 和 Conda 的进阶用法与踩坑指南</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-icon git">◆</div>
+        Git 进阶技巧
+      </div>
+      <div class="items">
+        <div class="item">
+          <div class="item-label">撤销错误提交</div>
+          <div class="item-desc">soft 保留修改，hard 彻底丢弃</div>
+          <span class="item-code">git reset --soft HEAD~1</span>
+        </div>
+        <div class="item">
+          <div class="item-label">修改最后一次提交</div>
+          <div class="item-desc">补充遗漏的文件或修改提交信息</div>
+          <span class="item-code">git commit --amend -m "新信息"</span>
+        </div>
+        <div class="item">
+          <div class="item-label">查看某行代码谁写的</div>
+          <div class="item-desc">快速定位代码责任人</div>
+          <span class="item-code">git blame filename.ts -L 10,20</span>
+        </div>
+        <div class="item">
+          <div class="item-label">忽略文件不提交</div>
+          <div class="item-desc">.gitignore 模板：node_modules/ .env __pycache__/</div>
+          <span class="item-code">git checkout -- .gitignore</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card conda">
+      <div class="section-title">
+        <div class="section-icon conda">◇</div>
+        Conda 踩坑指南
+      </div>
+      <div class="items">
+        <div class="item">
+          <div class="item-label">conda 和 pip 混用</div>
+          <div class="item-desc">先用 conda 安装，conda 找不到再用 pip，避免依赖冲突</div>
+          <span class="item-code">conda install numpy && pip install pkg</span>
+        </div>
+        <div class="item">
+          <div class="item-label">环境激活不生效</div>
+          <div class="item-desc">初始化 shell：conda init bash/zsh，然后重启终端</div>
+          <span class="item-code">conda init bash && exec bash</span>
+        </div>
+        <div class="item">
+          <div class="item-label">解决环境冲突</div>
+          <div class="item-desc">创建干净环境测试，逐步添加包定位冲突源</div>
+          <span class="item-code">conda create -n test python=3.11</span>
+        </div>
+        <div class="item">
+          <div class="item-label">清理缓存释放空间</div>
+          <div class="item-desc">定期清理未使用的包和缓存</div>
+          <span class="item-code">conda clean --all</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>实用技巧与常见问题</span>
+    <span>11 / 14</span>
+  </div>
+</body>
+</html>

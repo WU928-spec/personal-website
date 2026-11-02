@@ -217,7 +217,7 @@ export default function TextSegmenter() {
                 英文分段器
               </h1>
               <p className="text-caption text-Slate dark:text-white/40">
-                输入连续英文文本，自动按句子换行、段落空行分隔，方便在 Obsidian 中阅读
+                输入连续英文文本，自动按句子换行、段落空行分隔，方便阅读与整理
               </p>
             </div>
           </div>

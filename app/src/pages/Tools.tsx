@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Wrench, Briefcase, ArrowRight, Star, Heart, TextQuote, Film, Terminal, BookOpen } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import PageSEO from '@/components/PageSEO'
@@ -18,7 +18,7 @@ const TOOLS = [
   {
     id: 'text-segmenter',
     title: '英文分段器',
-    description: '智能英文文本分段工具，自动将连续英文文本按句子换行、段落空行分隔，方便在 Obsidian 中阅读。',
+    description: '智能英文文本分段工具，自动将连续英文文本按句子换行、段落空行分隔，方便阅读与整理。',
     status: 'available' as const,
     icon: <TextQuote size={48} />,
     path: '/text-segmenter',
@@ -60,6 +60,7 @@ const TOOLS = [
 export default function Tools() {
   const navigate = useNavigate()
   const { t } = useLang()
+  const reduceMotion = useReducedMotion()
 
   return (
     <>
@@ -73,9 +74,9 @@ export default function Tools() {
         <div className="max-w-5xl mx-auto">
           {/* 标题区域 */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: reduceMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-20"
           >
             <div className="flex items-center justify-center gap-4 mb-6">
@@ -91,9 +92,9 @@ export default function Tools() {
             <div className="mt-4 mx-auto w-16 h-0.5 bg-gradient-to-r from-transparent via-Amber/60 to-transparent rounded-lg" />
 
             <motion.p
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
+              transition={{ delay: reduceMotion ? 0 : 0.4, duration: reduceMotion ? 0 : 0.8 }}
               className="mt-6 max-w-md mx-auto text-body text-Ink/50 dark:text-white/40 font-body leading-relaxed tracking-wide"
             >
               {t('tools.description')}
@@ -102,9 +103,9 @@ export default function Tools() {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
+              transition={{ delay: reduceMotion ? 0 : 0.8, duration: reduceMotion ? 0 : 0.6 }}
               className="mt-4 flex items-center justify-center gap-2 text-caption text-Amber/60 dark:text-white/30 font-body tracking-widest"
             >
               <Heart size={12} className="text-Amber/40" />
@@ -119,11 +120,11 @@ export default function Tools() {
             {TOOLS.map((tool, index) => (
               <motion.div
                 key={tool.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 0.6,
-                  delay: 0.2 + index * 0.15,
+                  duration: reduceMotion ? 0 : 0.6,
+                  delay: reduceMotion ? 0 : 0.2 + index * 0.15,
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 className="h-full"
@@ -172,22 +173,6 @@ export default function Tools() {
             ))}
           </div>
 
-          {/* 底部占位提示 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="mt-20 text-center"
-          >
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <div className="w-12 h-px bg-gradient-to-r from-transparent to-Amber/20 dark:to-white/20" />
-              <Wrench size={14} className="text-Amber/30 dark:text-white/20" />
-              <div className="w-12 h-px bg-gradient-to-l from-transparent to-Amber/20 dark:to-white/20" />
-            </div>
-            <p className="text-label text-Ink/30 dark:text-white/20 font-body tracking-widest">
-              {t('tools.moreTools')}
-            </p>
-          </motion.div>
         </div>
       </section>
     </>

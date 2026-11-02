@@ -1,79 +1,67 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import { useLang } from '@/contexts/PreferencesContext'
 import { loadHero, type HeroData } from '@/data/site'
-import { useTypingEffect } from '@/hooks/useTypingEffect'
-import PlutoCharonBadge from '@/components/PlutoCharonBadge'
+import { fetchNotes } from '@/services/noteClient'
+import { selectLatestNotes } from '@/utils/noteContent'
+import type { NoteMeta } from '@/types'
 
 export default function HeroSection() {
   const { t, lang } = useLang()
-  const headline = t('home.heroTitle')
-  const { displayed, showCursor, done } = useTypingEffect(headline, 80, 600)
+  const reduceMotion = useReducedMotion()
   const [hero, setHero] = useState<HeroData>(() => loadHero(lang))
+  const [latestNote, setLatestNote] = useState<NoteMeta | null>(null)
 
   useEffect(() => { setHero(loadHero(lang)) }, [lang])
 
+  useEffect(() => {
+    let active = true
+    const loadLatest = async () => {
+      try {
+        const notes = await fetchNotes()
+        if (active) setLatestNote(selectLatestNotes(notes, 1)[0] || null)
+      } catch {
+        if (active) setLatestNote(null)
+      }
+    }
+    void loadLatest()
+    return () => { active = false }
+  }, [])
+
   return (
-    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-Parchment dark:bg-Graphite">
-      <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
-        <PlutoCharonBadge />
-        <h1 className="font-display text-display font-semibold text-Ink dark:text-white">
-          {displayed}
-          {showCursor && <span className="text-Amber animate-blink ml-0.5">|</span>}
-        </h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={done ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="font-body text-subhead text-Ink/85 mt-6 dark:text-white/85"
-        >
-          {hero.subtitle}
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={done ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="font-body text-body text-Ink/60 max-w-xl mx-auto mt-4 dark:text-white/60"
-        >
-          {hero.tagline}
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={done ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center justify-center gap-4 mt-10"
-        >
-          <Link
-            to="/moments"
-            className="inline-flex items-center bg-Amber text-Parchment font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-2 rounded-md hover:bg-primary hover:-translate-y-px transition-all duration-300"
-          >
-            记忆碎片
-          </Link>
-          <Link
-            to="/projects"
-            className="inline-flex items-center border-[1.5px] border-Ink/80 text-Ink font-ui text-label font-semibold uppercase tracking-[0.05em] px-7 py-2 rounded-md hover:bg-Ink/5 hover:-translate-y-px transition-all duration-300 dark:border-white/40 dark:text-white dark:hover:bg-white/5"
-          >
-            {t('home.viewProjects')}
-          </Link>
-        </motion.div>
-      </div>
-
+    <section className="border-b border-Sand/70 dark:border-white/10">
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        transition={{ duration: reduceMotion ? 0 : 0.2 }}
+        className="mx-auto max-w-6xl px-6 py-20 md:px-12 md:py-28"
       >
-        <div className="flex flex-col items-center gap-2">
-          <span className="font-ui text-caption font-medium tracking-[0.04em] text-Ink/40 uppercase dark:text-white/40">
-            {t('home.scroll')}
-          </span>
-          <ChevronDown size={20} className="text-Ink/40 dark:text-white/40" />
+        <p className="font-ui text-label uppercase tracking-[0.16em] text-Amber">{t('homeExtra.brandNote')}</p>
+        <h1 className="mt-6 max-w-5xl font-display text-[clamp(2.75rem,6.2vw,5.5rem)] font-medium leading-[1.13] tracking-[-0.035em] text-Ink dark:text-white">
+          {t('homeExtra.blogHeroTitle')}
+        </h1>
+        <p className="mt-7 max-w-xl text-body leading-[1.85] text-Slate">{hero.tagline}</p>
+
+        <div className="mt-16 border-t border-Sand/80 pt-7 dark:border-white/10 md:mt-20">
+          {latestNote ? (
+            <Link to={`/notes?note=${encodeURIComponent(latestNote.slug)}`} className="group grid gap-5 md:grid-cols-[10rem_1fr_auto] md:items-start">
+              <div className="font-ui text-caption text-Slate">
+                <span className="block text-Amber">{t('homeExtra.latestLabel')}</span>
+                <time className="mt-2 block">{latestNote.date}</time>
+              </div>
+              <div>
+                <h2 className="font-display text-3xl leading-snug text-Ink transition-colors group-hover:text-Amber dark:text-white md:text-4xl">{latestNote.title}</h2>
+                <p className="mt-3 max-w-2xl text-body leading-relaxed text-Slate">{latestNote.excerpt}</p>
+              </div>
+              <span className="inline-flex items-center gap-2 font-ui text-caption text-Amber md:pt-2">{t('homeExtra.readLatest')}<ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></span>
+            </Link>
+          ) : (
+            <Link to="/notes" className="group inline-flex items-center gap-2 border-b border-Amber/40 pb-1 font-ui text-body text-Amber">
+              {t('homeExtra.readNotes')}<ArrowUpRight size={17} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
+          )}
         </div>
       </motion.div>
     </section>
