@@ -31,6 +31,8 @@ function renderMath() {
   window.renderMathInElement(article, {
     delimiters: [
       { left: '$$', right: '$$', display: true },
+      { left: '\\[', right: '\\]', display: true },
+      { left: '\\(', right: '\\)', display: false },
       { left: '$', right: '$', display: false },
     ],
     ignoredTags: ['script', 'style', 'textarea', 'pre', 'code'],
