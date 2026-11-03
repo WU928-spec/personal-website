@@ -13,7 +13,7 @@ title: 首页
 <section class="shell" aria-label="最新笔记">
   {% if public_notes.size > 0 %}
     {% assign latest = public_notes | first %}
-    <a class="latest-note" href="{{ latest.url | relative_url }}">
+    <a class="latest-note" href="{{ latest.url | relative_url }}" data-math>
       <div class="latest-meta"><span>最近写下</span><time>{{ latest.date | date: '%Y-%m-%d' }}</time></div>
       <div><h2>{{ latest.title }}</h2><p>{{ latest.description | default: latest.excerpt | strip_html | truncate: 130 }}</p></div>
       <span class="latest-arrow">阅读这篇 ↗</span>
@@ -32,7 +32,7 @@ title: 首页
   <div class="section-head"><div><p class="eyebrow">RECENT MOMENTS</p><h2>最近的生活</h2><p>一些普通但值得记住的时刻。</p></div><a class="section-link" href="{{ '/moments/' | relative_url }}">查看全部动态 ↗</a></div>
   <div class="entry-list">
     {% for moment in public_moments limit: 3 %}
-      <a class="entry" href="{{ moment.url | relative_url }}">
+      <a class="entry" href="{{ moment.url | relative_url }}" data-math>
         <time class="entry-date">{{ moment.date | date: '%Y-%m-%d' }}</time>
         <div><h3>{{ moment.excerpt | strip_html | truncate: 72 }}</h3>{% if moment.location %}<p>{{ moment.location }}</p>{% endif %}</div>
         <span class="entry-arrow">↗</span>
@@ -47,7 +47,7 @@ title: 首页
   <div class="section-head"><div><p class="eyebrow">NOTES & STORIES</p><h2>最近写的东西</h2><p>记录阅读、思考，以及不想忘记的发现。</p></div><a class="section-link" href="{{ '/notes/' | relative_url }}">查看全部笔记 ↗</a></div>
   <div class="entry-list">
     {% for note in public_notes limit: 3 %}
-      <a class="entry" href="{{ note.url | relative_url }}">
+      <a class="entry" href="{{ note.url | relative_url }}" data-math>
         <time class="entry-date">{{ note.date | date: '%Y-%m-%d' }}</time>
         <div><h3>{{ note.title }}</h3><p>{{ note.description | default: note.excerpt | strip_html | truncate: 130 }}</p></div>
         <span class="entry-arrow">读下去 ↗</span>

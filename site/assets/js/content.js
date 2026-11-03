@@ -26,16 +26,17 @@ function buildTableOfContents() {
 }
 
 function renderMath() {
-  const article = document.querySelector('[data-article]')
-  if (!article || typeof window.renderMathInElement !== 'function') return
-  window.renderMathInElement(article, {
-    delimiters: [
-      { left: '$$', right: '$$', display: true },
-      { left: '\\[', right: '\\]', display: true },
-      { left: '\\(', right: '\\)', display: false },
-      { left: '$', right: '$', display: false },
-    ],
-    ignoredTags: ['script', 'style', 'textarea', 'pre', 'code'],
+  if (typeof window.renderMathInElement !== 'function') return
+  document.querySelectorAll('[data-article], [data-math]').forEach((element) => {
+    window.renderMathInElement(element, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '$', right: '$', display: false },
+      ],
+      ignoredTags: ['script', 'style', 'textarea', 'pre', 'code'],
+    })
   })
 }
 

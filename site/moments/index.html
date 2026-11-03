@@ -9,7 +9,7 @@ permalink: /moments/
 <div class="content-section shell">
   <div class="entry-list">
     {% for moment in public_moments %}
-      <a class="entry" href="{{ moment.url | relative_url }}">
+      <a class="entry" href="{{ moment.url | relative_url }}" data-math>
         <time class="entry-date">{{ moment.date | date: '%Y-%m-%d' }}</time>
         <div><h3>{{ moment.excerpt | strip_html | truncate: 90 }}</h3>{% if moment.location %}<p>{{ moment.location }}</p>{% endif %}</div>
         <span class="entry-arrow">↗</span>

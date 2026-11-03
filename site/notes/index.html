@@ -9,7 +9,7 @@ permalink: /notes/
 <div class="content-section shell">
   <div class="entry-list">
     {% for note in public_notes %}
-      <a class="entry" href="{{ note.url | relative_url }}">
+      <a class="entry" href="{{ note.url | relative_url }}" data-math>
         <time class="entry-date">{{ note.date | date: '%Y-%m-%d' }}</time>
         <div><h3>{{ note.title }}</h3><p>{{ note.description | default: note.excerpt | strip_html | truncate: 150 }}</p>{% if note.tags %}<div class="entry-tags">{% for tag in note.tags %}<span>#{{ tag }}</span>{% endfor %}</div>{% endif %}</div>
         <span class="entry-arrow">↗</span>
