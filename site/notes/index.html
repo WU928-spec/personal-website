@@ -5,7 +5,7 @@ description: 记录生活、阅读与思考的文章。
 permalink: /notes/
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
-<header class="page-header shell"><p class="eyebrow">NOTES & STORIES</p><h1>一些文字，一些思考</h1><p>记录生活、阅读，以及那些值得慢慢想清楚的事情。</p></header>
+<header class="page-header shell"><p class="eyebrow">NOTES</p><h1>文章</h1><p>生活、阅读和学习记录。</p></header>
 <div class="content-section shell">
   <div class="entry-list">
     {% for note in public_notes %}

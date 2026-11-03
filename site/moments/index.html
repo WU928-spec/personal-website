@@ -5,7 +5,7 @@ description: 一些普通但值得记住的时刻。
 permalink: /moments/
 ---
 {% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
-<header class="page-header shell"><p class="eyebrow">RECENT MOMENTS</p><h1>一些普通但值得记住的时刻</h1><p>没有点赞和评论，只是认真留下生活。</p></header>
+<header class="page-header shell"><p class="eyebrow">MOMENTS</p><h1>动态</h1><p>一些日常记录。</p></header>
 <div class="content-section shell">
   <div class="entry-list">
     {% for moment in public_moments %}

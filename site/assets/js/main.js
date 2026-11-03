@@ -1,12 +1,12 @@
 const translations = {
   zh: {
-    brandNote: '记录生活，也记录思考', home: '首页', moments: '记忆碎片', notes: '笔记', tools: '小工具',
-    footerNote: '一个记录生活与思考的小角落。', signature: '用好奇心和咖啡构建',
+    brandNote: '个人小站', home: '首页', moments: '动态', notes: '文章', tools: '小工具',
+    footerNote: 'Jasper 的个人小站。', signature: '记录生活和学习',
     searchLabel: '搜索笔记和动态', searchPlaceholder: '输入关键词…',
   },
   en: {
-    brandNote: 'Notes on life and thoughts', home: 'Home', moments: 'Moments', notes: 'Notes', tools: 'Tools',
-    footerNote: 'A small corner for life and notes.', signature: 'Built with curiosity and coffee',
+    brandNote: 'Personal site', home: 'Home', moments: 'Moments', notes: 'Notes', tools: 'Tools',
+    footerNote: "Jasper's personal site.", signature: 'Life and learning',
     searchLabel: 'Search notes and moments', searchPlaceholder: 'Type a keyword…',
   },
 }
