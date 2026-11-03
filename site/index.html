@@ -4,13 +4,15 @@ title: 首页
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
 {% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
-<section class="hero shell">
-  <img class="hero-avatar" src="{{ '/assets/media/avatar.jpg' | relative_url }}" alt="Jasper 的头像" width="384" height="384" fetchpriority="high" decoding="async">
-  <p class="eyebrow">PERSONAL SITE</p>
-  <h1>Jasper 的个人小站</h1>
-  <p class="hero-intro">在这里记录生活、学习和一些随手写下的东西。</p>
-  <a class="hero-link" href="#recent-notes">看看文章 <span aria-hidden="true">↓</span></a>
-</section>
+<div class="hero-backdrop">
+  <section class="hero shell">
+    <img class="hero-avatar" src="{{ '/assets/media/avatar.jpg' | relative_url }}" alt="Jasper 的头像" width="384" height="384" fetchpriority="high" decoding="async">
+    <p class="eyebrow">PERSONAL SITE</p>
+    <h1>Jasper 的个人小站</h1>
+    <p class="hero-intro">在这里记录生活、学习和一些随手写下的东西。</p>
+    <a class="hero-link" href="#recent-notes">看看文章 <span aria-hidden="true">↓</span></a>
+  </section>
+</div>
 
 <section class="content-section shell" id="recent-notes">
   <div class="section-head"><div><h2>最近文章</h2><p>生活、阅读和学习记录。</p></div><a class="section-link" href="{{ '/notes/' | relative_url }}">全部文章 ↗</a></div>
