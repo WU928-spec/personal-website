@@ -1,5 +1,6 @@
 ---
 title: "What is luxury？"
+written_date: "2026-04-10"
 date: 2026-04-10
 category: "散文"
 tags: ["散文"]

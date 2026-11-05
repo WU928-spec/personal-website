@@ -5,7 +5,7 @@ layout: default
   <header class="article-header">
     <p class="eyebrow">{{ page.tags | first | default: '笔记' }}</p>
     <h1>{{ page.title }}</h1>
-    {% if page.date %}<time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>{% else %}<span>日期待定</span>{% endif %}
+    <span class="article-date">{{ page.written_date | default: '日期待定' }}</span>
   </header>
   <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
   <div class="article-content">{{ content }}</div>
