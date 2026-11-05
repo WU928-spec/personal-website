@@ -202,6 +202,7 @@ p { text-wrap: pretty; }
 .article-toc a { display: block; padding-top: 8px; font-size: 14px; }
 .article-content { overflow-wrap: anywhere; }
 .article-content p, .article-content li { font-size: 17px; line-height: 1.95; }
+.poem .article-content p { white-space: pre-line; }
 .article-content h1 { margin: 48px 0 20px; font-size: 36px; }
 .article-content h2 { margin: 44px 0 18px; font-size: 30px; scroll-margin-top: 110px; }
 .article-content h3 { margin: 34px 0 14px; font-size: 24px; scroll-margin-top: 110px; }

@@ -1,11 +1,11 @@
 ---
 layout: default
 ---
-<article class="article shell-narrow" data-article>
+<article class="article shell-narrow{% if page.category == '诗' %} poem{% endif %}" data-article>
   <header class="article-header">
     <p class="eyebrow">{{ page.tags | first | default: '笔记' }}</p>
     <h1>{{ page.title }}</h1>
-    {% if page.date %}<time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>{% endif %}
+    {% if page.date %}<time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>{% else %}<span>日期待定</span>{% endif %}
   </header>
   <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
   <div class="article-content">{{ content }}</div>
