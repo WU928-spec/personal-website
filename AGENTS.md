@@ -12,7 +12,7 @@
 
 ## 内容模型
 
-- `_notes/`：文章笔记，支持 `title/date/tags/description/slug/published`。
+- `_notes/`：文章笔记，支持 `title/date/written_date/category/tags/description/slug/published`。栏目包括诗歌、散文、随笔、小说、数学、计算机&金融、日记；缺失或未知分类进入未归档。
 - `_moments/`：生活动态，支持 `date/images/location/published`。
 - `_memoirs/`：星空短文，支持 `title/date/published`。
 - `published: false` 是草稿，不得生成页面或进入列表、搜索。

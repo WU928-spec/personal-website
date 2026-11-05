@@ -6,10 +6,17 @@ permalink: /notes/
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
 <header class="page-header shell"><p class="eyebrow">NOTES</p><h1>文章</h1><p>生活、阅读和学习记录。</p></header>
-<div class="content-section shell">
+<nav class="category-nav shell" aria-label="文章栏目">
+  {% assign categories = '全部,诗歌,散文,随笔,小说,数学,计算机&金融,日记,未归档' | split: ',' %}
+  {% for category in categories %}
+    <a href="{{ '/notes/' | relative_url }}{% unless category == '全部' %}?category={{ category | url_encode }}{% endunless %}" data-category-link="{{ category }}">{{ category }}</a>
+  {% endfor %}
+</nav>
+<div class="content-section shell category-content">
+  <p class="empty-state" id="category-empty" hidden>这个栏目还没有文章。</p>
   <div class="entry-list">
     {% for note in public_notes %}
-      <a class="entry" href="{{ note.url | relative_url }}" data-math>
+      <a class="entry" href="{{ note.url | relative_url }}" data-category="{{ note.category | default: '未归档' }}" data-math>
         <span class="entry-date">{{ note.written_date | default: '日期待定' }}</span>
         <div><h3>{{ note.title }}</h3><p>{{ note.description | default: note.excerpt | strip_html | truncate: 150 }}</p>{% if note.tags %}<div class="entry-tags">{% for tag in note.tags %}<span>#{{ tag }}</span>{% endfor %}</div>{% endif %}</div>
         <span class="entry-arrow">↗</span>
@@ -19,3 +26,4 @@ permalink: /notes/
     {% endfor %}
   </div>
 </div>
+<script type="module" src="{{ '/assets/js/categories.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

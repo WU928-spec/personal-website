@@ -11,6 +11,7 @@
 title: 今天值得记住的一件事
 date: 2026-11-02 10:00:00 +08:00
 tags: [生活]
+category: 散文
 published: true
 ---
 
@@ -20,6 +21,7 @@ published: true
 - `title`：公开标题。
 - `date`：用于排序和展示。
 - `tags`：可选标签。
+- `category`：可选栏目，支持诗歌、散文、随笔、小说、数学、计算机&金融、日记；留空或未知分类会进入“未归档”。
 - `description`：可选的列表摘要。
 - `published: false`：草稿，不生成公开页面，也不进入列表或搜索。
 - `slug`：可选，覆盖默认 URL 标识。

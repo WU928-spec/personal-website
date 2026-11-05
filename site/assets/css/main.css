@@ -176,6 +176,12 @@ p { text-wrap: pretty; }
 .section-head h2 { margin: 0; font-size: clamp(30px, 4vw, 42px); }
 .section-head p { margin: 8px 0 0; color: var(--muted); }
 .section-link { color: var(--accent); font-size: 13px; white-space: nowrap; }
+.category-nav { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 24px; border-bottom: 1px solid var(--line); }
+.category-nav a { padding: 5px 13px; border: 1px solid transparent; border-radius: 999px; color: var(--muted); font-size: 13px; }
+.category-nav a:hover { color: var(--accent); }
+.category-nav a.is-active { border-color: var(--accent); color: var(--accent); }
+.category-content { padding-top: 32px; }
+.entry[hidden] { display: none; }
 .entry-list { display: flex; flex-direction: column; }
 .entry { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto; gap: 24px; padding-block: 26px; border-top: 1px solid var(--line); }
 .entry:last-child { border-bottom: 1px solid var(--line); }
