@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<article class="article shell-narrow{% if page.category == '诗' %} poem{% endif %}" data-article>
+<article class="article shell-narrow{% if page.category == '诗' or page.category == '诗歌' %} poem{% endif %}" data-article>
   <header class="article-header">
     <p class="eyebrow">{{ page.tags | first | default: '笔记' }}</p>
     <h1>{{ page.title }}</h1>
