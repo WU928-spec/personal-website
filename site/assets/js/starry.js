@@ -1,7 +1,8 @@
 export function brightProgress(memoirs, clickedIds) {
   const clicked = new Set(clickedIds)
-  const remaining = memoirs.filter((memoir) => memoir.brightness >= 1 && !clicked.has(memoir.id)).map((memoir) => memoir.id)
-  return { remaining, complete: remaining.length === 0 }
+  const bright = memoirs.filter((memoir) => memoir.brightness >= 1)
+  const remaining = bright.filter((memoir) => !clicked.has(memoir.id)).map((memoir) => memoir.id)
+  return { remaining, complete: bright.length > 0 && remaining.length === 0 }
 }
 
 export function nextLetterPage(page, total) {
