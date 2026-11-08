@@ -11,7 +11,7 @@ permalink: /starry/
     {% for memoir in public_memoirs %}
       <a class="memory-star{% if memoir.brightness >= 1 %} is-bright{% endif %}" href="{{ memoir.url | relative_url }}" data-memoir-id="{{ memoir.slug }}"{% if memoir.x and memoir.y %} style="--star-x: {{ memoir.x }}%; --star-y: {{ memoir.y }}%"{% endif %} aria-label="阅读{{ memoir.title }}">
         <span class="star-core" style="--brightness: {{ memoir.brightness }}" aria-hidden="true"></span>
-        <span class="star-tooltip">{{ memoir.title }}<small>{{ memoir.date }}</small></span>
+        <span class="star-tooltip">{{ memoir.title }}<small>{{ memoir.date | date: '%Y-%m-%d' }}</small></span>
       </a>
     {% endfor %}
   </div>
