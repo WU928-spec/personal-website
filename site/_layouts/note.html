@@ -5,7 +5,7 @@ layout: default
   <header class="article-header">
     <p class="eyebrow">{{ page.tags | first | default: '笔记' }}</p>
     <h1>{{ page.title }}</h1>
-    <span class="article-date">{{ page.written_date | default: '日期待定' }}</span>
+    {% if page.written_date and page.written_date != '日期待定' %}<span class="article-date">{{ page.written_date }}</span>{% endif %}
   </header>
   <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
   <div class="article-content">{{ content }}</div>

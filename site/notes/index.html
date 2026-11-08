@@ -17,7 +17,7 @@ permalink: /notes/
   <div class="entry-list">
     {% for note in public_notes %}
       <a class="entry" href="{{ note.url | relative_url }}" data-category="{{ note.category | default: '未归档' }}" data-math>
-        <span class="entry-date">{{ note.written_date | default: '日期待定' }}</span>
+        {% if note.written_date and note.written_date != '日期待定' %}<span class="entry-date">{{ note.written_date }}</span>{% endif %}
         <div><h3>{{ note.title }}</h3><p>{{ note.description | default: note.excerpt | strip_html | truncate: 150 }}</p>{% if note.tags %}<div class="entry-tags">{% for tag in note.tags %}<span>#{{ tag }}</span>{% endfor %}</div>{% endif %}</div>
         <span class="entry-arrow">↗</span>
       </a>
