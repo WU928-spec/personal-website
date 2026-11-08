@@ -251,6 +251,12 @@ if (typeof document !== 'undefined') {
     if (audio.paused) audio.play().catch(() => {})
     else audio.pause()
   })
+  const startMusic = (event) => {
+    if (!audio || !audio.paused || event.target.closest?.('#music-toggle')) return
+    audio.play().catch(() => {})
+  }
+  window.addEventListener('pointerdown', startMusic, { once: true })
+  window.addEventListener('keydown', startMusic, { once: true })
   audio?.addEventListener('play', () => {
     musicToggle?.setAttribute('aria-pressed', 'true')
     musicToggle?.setAttribute('aria-label', '暂停音乐')

@@ -26,7 +26,7 @@ test('reading a bright memory preserves progress and reveals the unlocked letter
     getElementById(id) { return id === 'secret-entry' ? secretLink : null },
     querySelectorAll(selector) { return selector === '.memory-star' ? [star] : [] },
   }
-  globalThis.window = { location: { search: '', href: '' } }
+  globalThis.window = { location: { search: '', href: '' }, addEventListener() {} }
   globalThis.localStorage = {
     getItem(key) { return stored.get(key) ?? null },
     setItem(key, value) { stored.set(key, value) },

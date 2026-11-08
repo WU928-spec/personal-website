@@ -170,6 +170,9 @@ p { text-wrap: pretty; }
   font-size: 14px;
 }
 .hero-link:hover { background: var(--accent); color: var(--paper); }
+.pluto-entry { display: block; width: 320px; height: 140px; margin-top: 28px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; opacity: .9; }
+.pluto-entry:hover { opacity: 1; }
+.pluto-entry canvas { display: block; width: 100%; height: 100%; }
 #recent-notes { scroll-margin-top: 80px; }
 .content-section { padding-block: 64px; border-bottom: 1px solid var(--line); }
 .section-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }

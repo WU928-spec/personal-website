@@ -11,6 +11,7 @@ title: 首页
     <h1>Jasper 的个人小站</h1>
     <p class="hero-intro">在这里记录生活、学习和一些随手写下的东西。</p>
     <a class="hero-link" href="#recent-notes">看看文章 <span aria-hidden="true">↓</span></a>
+    <a class="pluto-entry" href="{{ '/starry/' | relative_url }}" aria-label="进入星空彩蛋"><canvas id="pluto-charon" width="640" height="280" aria-hidden="true"></canvas></a>
   </section>
 </div>
 
@@ -48,3 +49,4 @@ title: 首页
   <div class="section-head"><div><h2>其他链接</h2></div></div>
   <div class="project-links"><a href="https://github.com/WU928-spec" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="{{ '/tools/' | relative_url }}">小工具 ↗</a></div>
 </section>
+<script type="module" src="{{ '/assets/js/pluto.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
