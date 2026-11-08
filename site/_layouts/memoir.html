@@ -1,0 +1,33 @@
+---
+layout: starry
+---
+<canvas class="nebula-field" id="nebula-field" aria-hidden="true"></canvas>
+<main class="memoir-shell">
+  <a class="starry-back" href="{{ '/starry/' | relative_url }}">← 返回星空</a>
+  <article class="memoir-article">
+    <header class="memoir-header">
+      <time>{{ page.date }}</time>
+      <h1>{{ page.title }}</h1>
+    </header>
+    {% if page.images and page.images.size > 0 %}
+      <div class="memoir-photos">
+        {% for image in page.images %}
+          <figure class="polaroid"><img src="{{ image | relative_url }}" alt="{{ page.title }}" loading="lazy"></figure>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="memoir-copy">{{ content }}</div>
+    {% if page.title == '2月26日 凌晨 冬雨' %}
+      <button class="memoir-next" id="memoir-next" type="button">下一页 →</button>
+    {% endif %}
+  </article>
+  {% if page.title == '老夏' %}
+    <img class="golden-glasses" id="golden-glasses" src="{{ '/assets/starry/golden-glasses.png' | relative_url }}" alt="可拖动、可缩放的金丝眼镜" tabindex="0">
+  {% endif %}
+</main>
+{% if page.title == '2月26日 凌晨 冬雨' %}
+  <div class="video-overlay" id="memoir-video-overlay" hidden>
+    <video id="memoir-video" src="{{ '/assets/starry/next-video.mp4' | relative_url }}" playsinline controls></video>
+    <button class="starry-back" id="memoir-video-close" type="button">← 返回</button>
+  </div>
+{% endif %}

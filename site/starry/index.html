@@ -1,19 +1,30 @@
 ---
-layout: default
+layout: starry
 title: 星空
-description: 一些被藏起来的记忆。
+starry_page: home
 permalink: /starry/
 ---
-{% assign public_memoirs = site.memoirs | where_exp: "memoir", "memoir.published != false" | sort: "date" %}
-<section class="starry-page shell">
-  <p class="eyebrow">A QUIET LITTLE SKY</p>
-  <h1>有些记忆，藏在星星里。</h1>
-  <p>点击星星，读一段光年之外的记忆。</p>
-  <div class="star-map" aria-label="星空记忆列表">
+<main class="starfield">
+  <h1 class="sr-only">星空记忆</h1>
+  <div class="starfield-stars" aria-label="记忆星星">
+    {% assign public_memoirs = site.memoirs | where_exp: "memoir", "memoir.published != false" %}
     {% for memoir in public_memoirs %}
-      <a class="star-point" href="{{ memoir.url | relative_url }}" style="--star-x: 48%; --star-y: 46%" aria-label="阅读{{ memoir.title }}">✦<span>{{ memoir.title }}</span></a>
+      <a class="memory-star{% if memoir.brightness >= 1 %} is-bright{% endif %}" href="{{ memoir.url | relative_url }}" data-memoir-id="{{ memoir.slug }}"{% if memoir.x and memoir.y %} style="--star-x: {{ memoir.x }}%; --star-y: {{ memoir.y }}%"{% endif %} aria-label="阅读{{ memoir.title }}">
+        <span class="star-core" style="--brightness: {{ memoir.brightness }}" aria-hidden="true"></span>
+        <span class="star-tooltip">{{ memoir.title }}<small>{{ memoir.date }}</small></span>
+      </a>
     {% endfor %}
   </div>
-  <div class="starry-links"><a href="{{ '/starry/epilogue/' | relative_url }}">读一封尾声</a><a id="secret-link" href="{{ '/starry/secret/' | relative_url }}" hidden>打开隐藏的信</a></div>
-</section>
-<script src="{{ '/assets/js/starry.js' | relative_url }}" defer></script>
+  <a class="starry-back" href="{{ '/' | relative_url }}">← 返回</a>
+  <p class="starfield-instruction">点击星星，阅读一段光年之外的记忆</p>
+  <p class="starfield-quote">在距离太阳 59 亿公里的地方，有一颗心永远朝向它的伴星</p>
+  <p class="starfield-progress" id="starfield-progress" aria-live="polite"></p>
+  <div class="starfield-actions">
+    <a class="secret-entry" id="secret-entry" href="{{ '/starry/secret/' | relative_url }}" hidden>进入信件</a>
+    <button id="play-star-trail" type="button">观看星轨</button>
+  </div>
+  <div class="video-overlay" id="star-trail-overlay" hidden>
+    <video id="star-trail-video" src="{{ '/assets/starry/starry-video.mp4' | relative_url }}" muted playsinline controls></video>
+    <button class="starry-back" id="star-trail-close" type="button">← 返回星空</button>
+  </div>
+</main>

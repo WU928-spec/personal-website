@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title | default: '星空' }} — Jasper</title>
+  <meta name="description" content="一些藏在星空里的记忆。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/starry.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+</head>
+<body class="starry-body" data-starry-page="{{ page.starry_page | default: 'memoir' }}">
+  {{ content }}
+  {% assign music_src = '/assets/starry/bg-music.mp3' %}
+  {% if page.starry_page == 'secret' %}{% assign music_src = '/assets/starry/secret-music.mp3' %}{% elsif page.starry_page == 'epilogue' %}{% assign music_src = '/assets/starry/epilogue-music.m4a' %}{% endif %}
+  <button class="music-toggle" id="music-toggle" type="button" aria-label="播放音乐" aria-pressed="false">♪</button>
+  <audio id="starry-audio" src="{{ music_src | relative_url }}" loop preload="none"></audio>
+  <script type="module" src="{{ '/assets/js/starry.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
+</body>
+</html>

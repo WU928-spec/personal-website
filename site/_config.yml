@@ -30,7 +30,8 @@ defaults:
   - scope:
       type: memoirs
     values:
-      layout: note
+      layout: memoir
+      starry_page: memoir
 exclude:
   - Gemfile
   - Gemfile.lock

@@ -1,0 +1,103 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { font-family: "Noto Sans SC", system-ui, sans-serif; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid #fff; outline-offset: 5px; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.starry-body { background: #050508; color: #fff; }
+.starry-body button { color: inherit; cursor: pointer; }
+.starry-back { display: inline-flex; width: fit-content; align-items: center; border: 1px solid #ffffff18; border-radius: 999px; padding: 10px 18px; background: #ffffff0a; color: #ffffffb0; font-size: 13px; backdrop-filter: blur(10px); }
+.starry-back:hover { background: #ffffff16; color: #fff; }
+.music-toggle { position: fixed; right: 20px; top: 20px; z-index: 100; width: 40px; height: 40px; border: 1px solid #ffffff18; border-radius: 50%; background: #05050880; color: #ffffff90; backdrop-filter: blur(10px); }
+.music-toggle[aria-pressed="true"] { color: #fff; box-shadow: 0 0 20px #ffffff20; }
+
+.starfield { position: relative; min-height: 100dvh; overflow: hidden; background: #050508 url("/assets/starry/starry-bg.jpg") center / cover; }
+.starfield-stars { position: absolute; inset: 0; }
+.memory-star { position: absolute; left: var(--star-x, 50%); top: var(--star-y, 50%); z-index: 3; padding: 22px; transform: translate(-50%, -50%); }
+.star-core { display: block; width: 8px; height: 8px; border-radius: 50%; background: #fff; opacity: calc(.18 + var(--brightness) * .82); box-shadow: 0 0 calc(8px + var(--brightness) * 20px) #fff, 0 0 calc(16px + var(--brightness) * 35px) #a9b8ff; animation: star-pulse 3.6s ease-in-out infinite; }
+.memory-star.is-bright .star-core { width: 11px; height: 11px; }
+.star-tooltip { position: absolute; left: 50%; bottom: calc(100% - 4px); width: max-content; max-width: 220px; padding: 8px 12px; border: 1px solid #ffffff14; border-radius: 8px; background: #050508d9; color: #ffffffc0; font-size: 12px; opacity: 0; pointer-events: none; transform: translate(-50%, 6px); transition: opacity .2s, transform .2s; }
+.star-tooltip small { display: block; margin-top: 3px; color: #ffffff60; }
+.memory-star:hover .star-tooltip, .memory-star:focus-visible .star-tooltip { opacity: 1; transform: translate(-50%, 0); }
+.starfield > .starry-back { position: absolute; top: 24px; left: 24px; z-index: 10; }
+.starfield-instruction { position: absolute; top: 30px; left: 50%; width: min(80vw, 500px); margin: 0; color: #ffffff50; font-size: 11px; letter-spacing: .16em; text-align: center; transform: translateX(-50%); pointer-events: none; }
+.starfield-quote { position: absolute; bottom: 28px; left: 50%; width: min(85vw, 460px); margin: 0; color: #ffffff40; font-size: 13px; line-height: 1.8; text-align: center; transform: translateX(-50%); pointer-events: none; }
+.starfield-progress { position: absolute; bottom: 116px; left: 50%; margin: 0; color: #ffffff60; font-size: 11px; letter-spacing: .12em; transform: translateX(-50%); white-space: nowrap; }
+.starfield-actions { position: absolute; bottom: 72px; left: 50%; display: flex; gap: 12px; transform: translateX(-50%); }
+.starfield-actions button, .starfield-actions a { padding: 8px 14px; border: 1px solid #ffffff18; border-radius: 999px; background: #ffffff08; color: #ffffff80; font-size: 12px; }
+.starfield-actions button:hover, .starfield-actions a:hover { color: #fff; background: #ffffff12; }
+.video-overlay { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; background: #000; }
+.video-overlay video { width: 100%; height: 100%; object-fit: contain; }
+.video-overlay .starry-back { position: absolute; left: 24px; bottom: 24px; z-index: 2; }
+
+.memoir-shell { position: relative; min-height: 100dvh; overflow: hidden; }
+.nebula-field { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.memoir-shell > .starry-back { position: absolute; top: 24px; left: 24px; z-index: 10; }
+.memoir-article { position: relative; z-index: 2; width: min(calc(100% - 48px), 760px); margin: 0 auto; padding-block: 128px 96px; }
+.memoir-header { padding-left: 20px; border-left: 1px solid #ffffff35; }
+.memoir-header time { color: #ffffff45; font-size: 11px; letter-spacing: .18em; }
+.memoir-header h1 { margin: 16px 0 0; font-family: "Noto Serif SC", serif; font-size: clamp(30px, 5vw, 44px); font-weight: 500; line-height: 1.3; }
+.memoir-photos { display: flex; flex-wrap: wrap; gap: 24px; margin: 36px 0; }
+.polaroid { width: 170px; margin: 0; padding: 10px 10px 28px; background: #e9e6df; box-shadow: 0 12px 35px #0008; transform: rotate(-3deg); }
+.polaroid:nth-child(even) { transform: rotate(2deg); }
+.polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.memoir-copy { margin-top: 32px; color: #ffffffa0; font-size: 16px; line-height: 2.05; white-space: pre-line; }
+.memoir-copy p { margin: 0 0 16px; }
+.memoir-copy > p:first-child::first-letter { float: left; margin: 8px 10px 0 0; color: #ffffffe0; font-family: "Noto Serif SC", serif; font-size: 48px; line-height: .8; }
+.memoir-next { display: block; margin: 48px 0 0 auto; padding: 12px 0; border: 0; background: transparent; color: #ffffff70; letter-spacing: .12em; }
+.memoir-next:hover { color: #fff; }
+.golden-glasses { position: fixed; top: 100px; left: 62%; z-index: 20; width: 100px; opacity: .75; cursor: grab; touch-action: none; user-select: none; transform-origin: center; }
+.golden-glasses:active { cursor: grabbing; }
+
+.letter-shell { min-height: 100dvh; padding: 8vh 6vw; background: #2a2320 url("/assets/starry/letter-bg.jpg") center / cover; }
+.letter-content { width: min(90vw, 430px); padding: 24px 0; color: #fff; text-shadow: 0 2px 12px #000; }
+.letter-page h1 { margin: 0 0 24px; font-size: 16px; font-weight: 500; letter-spacing: .25em; }
+.letter-page p { margin: 0; font-size: 14px; line-height: 1.9; white-space: pre-line; }
+.letter-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; color: #ffffffb0; font-size: 12px; }
+.letter-controls button { width: 40px; height: 40px; border: 0; background: transparent; color: #fff; font-size: 24px; }
+.letter-controls button:disabled { color: #ffffff35; cursor: default; }
+
+.epilogue-shell { position: relative; min-height: 100dvh; overflow: hidden; padding: 10vh 24px 160px; background: #050508; }
+.epilogue-shell::before { content: ""; position: fixed; inset: 0; background: url("/assets/starry/starry-bg.jpg") center / cover; opacity: .65; }
+.epilogue-shell::after { content: ""; position: fixed; inset: 0; pointer-events: none; background-image: radial-gradient(circle at 15% 25%, #ffffff70 0 1px, transparent 2px), radial-gradient(circle at 80% 60%, #ffffff50 0 1px, transparent 2px); background-size: 230px 260px, 310px 330px; animation: particle-drift 12s ease-in-out infinite alternate; }
+.epilogue-progress { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 2px; background: #ffffffc0; transform: scaleX(0); transform-origin: left; }
+.epilogue-header { position: relative; z-index: 2; margin-bottom: 48px; text-align: center; }
+.epilogue-header span { color: #ffffff60; }
+.epilogue-header h1 { margin: 18px 0 8px; font-size: 28px; font-weight: 500; letter-spacing: .35em; }
+.epilogue-header p { color: #ffffff50; font-size: 11px; letter-spacing: .25em; }
+.epilogue-card { position: relative; z-index: 2; width: min(100%, 680px); margin: 0 auto; padding: 32px; border: 1px solid #ffffff0a; border-radius: 18px; background: #00000035; backdrop-filter: blur(8px); }
+.epilogue-section { color: #ffffffa0; font-size: 14px; line-height: 2.2; }
+.epilogue-section p { margin: 0 0 20px; }
+.epilogue-heading { display: flex; align-items: center; gap: 16px; padding-top: 36px; }
+.epilogue-heading span { color: #ffffff30; font-size: 11px; }
+.epilogue-heading h2 { margin: 0; color: #ffffffd0; font-size: 17px; font-weight: 500; letter-spacing: .16em; }
+.epilogue-quote { margin-block: 36px; padding: 20px 24px; border-left: 1px solid #ffffff30; background: #ffffff05; font-style: italic; }
+.epilogue-list li { margin-bottom: 18px; }
+.epilogue-closing { margin-top: 56px; text-align: center; }
+.starry-bottom-nav { position: fixed; bottom: 24px; left: 50%; z-index: 30; display: flex; gap: 8px; transform: translateX(-50%); }
+.starry-bottom-nav a { padding: 10px 16px; border: 1px solid #ffffff12; border-radius: 999px; background: #050508a0; color: #ffffff70; font-size: 12px; backdrop-filter: blur(10px); white-space: nowrap; }
+.starry-bottom-nav a:hover { color: #fff; }
+[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .8s, transform .8s; }
+[data-reveal].is-visible { opacity: 1; transform: none; }
+
+@keyframes star-pulse { 0%, 100% { transform: scale(.9); } 50% { transform: scale(1.25); } }
+@keyframes particle-drift { from { transform: translateY(0); } to { transform: translateY(24px); } }
+@media (max-width: 700px) {
+  .starfield-instruction { top: 82px; }
+  .starfield-quote { bottom: 22px; font-size: 11px; }
+  .starfield-progress { bottom: 128px; }
+  .starfield-actions { bottom: 76px; }
+  .letter-shell { padding: 90px 24px 48px; }
+  .letter-content { width: 100%; }
+  .epilogue-card { padding: 24px 20px; }
+  .starry-bottom-nav { width: calc(100% - 24px); justify-content: center; gap: 4px; }
+  .starry-bottom-nav a { padding: 9px 11px; font-size: 11px; }
+  .golden-glasses { left: 70%; width: 78px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+  [data-reveal] { opacity: 1; transform: none; }
+}
