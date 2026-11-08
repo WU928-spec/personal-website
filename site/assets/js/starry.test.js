@@ -41,7 +41,8 @@ test('reading a bright memory preserves progress and reveals the unlocked letter
   assert.equal(secretLink.hidden, true)
   star.click()
   assert.equal(stored.get('starry-bright-clicked'), '["1"]')
-  assert.equal(stored.get('starry-completed'), null)
+  assert.equal(stored.get('starry-completed') ?? null, null)
+  assert.equal(stored.get('wuspace-starry-complete') ?? null, null)
 
   stored.set('starry-completed', 'true')
   await import('./starry.js?read')
