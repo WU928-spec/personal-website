@@ -11,6 +11,15 @@
   <link rel="stylesheet" href="{{ '/assets/css/starry.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 </head>
 <body class="starry-body" data-starry-page="{{ page.starry_page | default: 'memoir' }}">
+  <div class="starry-preloader" id="starry-preloader" role="status" aria-live="polite">
+    <div class="preload-content">
+      <h1>正在装载星光</h1>
+      <p id="preload-percent">0%</p>
+      <div class="preload-track"><div class="preload-bar" id="preload-bar"></div></div>
+      <p class="preload-note">请稍候，所有记忆即将呈现</p>
+    </div>
+  </div>
+  <noscript><style>#starry-preloader { display: none; }</style></noscript>
   {{ content }}
   {% assign music_src = '/assets/starry/bg-music.mp3' %}
   {% if page.starry_page == 'secret' %}{% assign music_src = '/assets/starry/secret-music.mp3' %}{% elsif page.starry_page == 'epilogue' %}{% assign music_src = '/assets/starry/epilogue-music.m4a' %}{% endif %}

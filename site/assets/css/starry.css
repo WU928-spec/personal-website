@@ -8,6 +8,14 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px s
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 .starry-body { background: #050508; color: #fff; }
+.starry-preloader { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: #050508; transition: opacity .5s; }
+.starry-preloader.is-done { opacity: 0; pointer-events: none; }
+.preload-content { width: min(85vw, 420px); text-align: center; }
+.preload-content h1 { margin: 0 0 20px; font-size: 22px; font-weight: 500; letter-spacing: .3em; }
+#preload-percent { color: #ffffff60; font-size: 12px; letter-spacing: .15em; }
+.preload-track { height: 3px; margin: 20px 0; overflow: hidden; border-radius: 999px; background: #ffffff12; }
+.preload-bar { width: 0; height: 100%; border-radius: inherit; background: #ffffffc0; transition: width .3s; }
+.preload-note { color: #ffffff40; font-size: 11px; letter-spacing: .12em; }
 .starry-body button { color: inherit; cursor: pointer; }
 .starry-back { display: inline-flex; width: fit-content; align-items: center; border: 1px solid #ffffff18; border-radius: 999px; padding: 10px 18px; background: #ffffff0a; color: #ffffffb0; font-size: 13px; backdrop-filter: blur(10px); }
 .starry-back:hover { background: #ffffff16; color: #fff; }

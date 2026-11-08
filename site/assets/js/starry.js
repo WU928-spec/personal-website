@@ -1,3 +1,73 @@
+export const PRELOAD_ASSETS = [
+  'bg-music.mp3',
+  'epilogue-music.m4a',
+  'secret-music.mp3',
+  'starry-bg.jpg',
+  'starry-images/1-0.jpg',
+  'starry-images/1-1.jpg',
+  'starry-video.mp4',
+  'letter-bg.jpg',
+  'golden-glasses.png',
+  'next-video.mp4',
+]
+
+export function withTimeout(promise, milliseconds) {
+  return Promise.race([promise, new Promise((resolve) => setTimeout(resolve, milliseconds))])
+}
+
+function loadAsset(path) {
+  return new Promise((resolve) => {
+    const url = `/assets/starry/${path}`
+    const extension = path.split('.').pop()?.toLowerCase()
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(extension || '')) {
+      const image = new Image()
+      const finish = () => resolve(image)
+      image.onload = () => {
+        if (typeof image.decode === 'function') image.decode().then(finish).catch(finish)
+        else finish()
+      }
+      image.onerror = finish
+      image.src = url
+      return
+    }
+    const isAudio = ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'].includes(extension || '')
+    const media = isAudio ? new Audio() : document.createElement('video')
+    media.preload = 'auto'
+    media.muted = true
+    media.src = url
+    const finish = () => resolve(media)
+    media.oncanplaythrough = finish
+    media.onloadedmetadata = finish
+    media.onerror = finish
+    media.onstalled = finish
+    media.load()
+  })
+}
+
+async function prepareStarry() {
+  const overlay = document.getElementById('starry-preloader')
+  if (!overlay) return
+  const percent = document.getElementById('preload-percent')
+  const bar = document.getElementById('preload-bar')
+  let loaded = 0
+  const update = () => {
+    loaded += 1
+    const value = Math.min(100, Math.round(loaded / PRELOAD_ASSETS.length * 100))
+    if (percent) percent.textContent = `${value}%`
+    if (bar) bar.style.width = `${value}%`
+  }
+  const load = (path) => withTimeout(loadAsset(path), 15000).catch(() => {}).then(update)
+  const critical = PRELOAD_ASSETS.filter((path) => !/\.(mp3|m4a|wav|ogg|aac|flac)$/.test(path))
+  const optional = PRELOAD_ASSETS.filter((path) => !critical.includes(path))
+  Promise.all(optional.map(load))
+  await Promise.all([
+    Promise.all(critical.map(load)),
+    new Promise((resolve) => setTimeout(resolve, 800)),
+  ])
+  overlay.classList.add('is-done')
+  setTimeout(() => overlay.remove(), 500)
+}
+
 export function brightProgress(memoirs, clickedIds) {
   const clicked = new Set(clickedIds)
   const bright = memoirs.filter((memoir) => memoir.brightness >= 1)
@@ -237,7 +307,7 @@ function initializeEpilogue() {
   sections.forEach((section) => observer.observe(section))
 }
 
-if (typeof document !== 'undefined') {
+function initializeStarryPage() {
   const page = document.body?.dataset.starryPage || 'home'
   if (page === 'home') initializeStars()
   if (page === 'secret') initializeLetter()
@@ -265,4 +335,12 @@ if (typeof document !== 'undefined') {
     musicToggle?.setAttribute('aria-pressed', 'false')
     musicToggle?.setAttribute('aria-label', '播放音乐')
   })
+}
+
+if (typeof document !== 'undefined') {
+  if (document.getElementById('starry-preloader')) {
+    prepareStarry().then(initializeStarryPage).catch(initializeStarryPage)
+  } else {
+    initializeStarryPage()
+  }
 }
