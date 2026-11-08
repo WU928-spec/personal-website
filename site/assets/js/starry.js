@@ -43,7 +43,6 @@ function initializeStars() {
     star.addEventListener('click', () => {
       clicked.add(star.dataset.memoirId)
       writeStorage('starry-bright-clicked', JSON.stringify([...clicked]))
-      writeStorage('wuspace-starry-complete', 'true')
     })
   }
 
