@@ -8,6 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    try {
+      if (sessionStorage.getItem('starry-preloaded') === 'true') document.documentElement.classList.add('starry-skip-preload')
+    } catch {}
+  </script>
   <link rel="stylesheet" href="{{ '/assets/css/starry.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 </head>
 <body class="starry-body" data-starry-page="{{ page.starry_page | default: 'memoir' }}">

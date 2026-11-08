@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { brightProgress, nextLetterPage, PRELOAD_ASSETS, withTimeout } from './starry.js'
+import { brightProgress, nextLetterPage, PRELOAD_ASSETS, shouldPreload, withTimeout } from './starry.js'
 
 test('tracks only bright memories and completes when all are read', () => {
   const memoirs = [
@@ -27,4 +27,9 @@ test('preloads every critical starry resource and resolves stalled media safely'
     assert.ok(PRELOAD_ASSETS.some((asset) => asset.endsWith(path)), path)
   }
   assert.equal(await withTimeout(new Promise(() => {}), 5), undefined)
+})
+
+test('shows the preloader only before the first successful load in a session', () => {
+  assert.equal(shouldPreload(null), true)
+  assert.equal(shouldPreload('true'), false)
 })

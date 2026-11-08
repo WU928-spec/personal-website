@@ -15,6 +15,10 @@ export function withTimeout(promise, milliseconds) {
   return Promise.race([promise, new Promise((resolve) => setTimeout(resolve, milliseconds))])
 }
 
+export function shouldPreload(value) {
+  return value !== 'true'
+}
+
 function loadAsset(path) {
   return new Promise((resolve) => {
     const url = `/assets/starry/${path}`
@@ -47,6 +51,12 @@ function loadAsset(path) {
 async function prepareStarry() {
   const overlay = document.getElementById('starry-preloader')
   if (!overlay) return
+  let preloaded = null
+  try { preloaded = sessionStorage.getItem('starry-preloaded') } catch {}
+  if (!shouldPreload(preloaded)) {
+    overlay.remove()
+    return
+  }
   const percent = document.getElementById('preload-percent')
   const bar = document.getElementById('preload-bar')
   let loaded = 0
@@ -64,6 +74,7 @@ async function prepareStarry() {
     Promise.all(critical.map(load)),
     new Promise((resolve) => setTimeout(resolve, 800)),
   ])
+  try { sessionStorage.setItem('starry-preloaded', 'true') } catch {}
   overlay.classList.add('is-done')
   setTimeout(() => overlay.remove(), 500)
 }
