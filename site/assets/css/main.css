@@ -187,7 +187,6 @@ p { text-wrap: pretty; }
 .entry[hidden] { display: none; }
 .entry-list { display: flex; flex-direction: column; }
 .entry { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto; gap: 24px; padding-block: 26px; border-top: 1px solid var(--line); }
-.entry:not(:has(.entry-date)) { grid-template-columns: minmax(0, 1fr) auto; }
 .entry:last-child { border-bottom: 1px solid var(--line); }
 .entry-date { color: var(--muted); font-family: ui-monospace, monospace; font-size: 12px; }
 .entry h3 { margin: 0; font-size: clamp(23px, 2.6vw, 30px); }
