@@ -10,5 +10,5 @@ permalink: /tools/devtools/
 </div>
 <pre class="tool-output" id="dev-output" aria-live="polite">当前分支：main
 当前 Conda 环境：base</pre>
-<p class="muted">支持 git init/add/commit/branch/checkout/merge/status/log，以及 conda create/activate/deactivate/install/remove/env list。未知命令不会执行。</p>
-<script type="module" src="{{ '/assets/js/devtools.js' | relative_url }}" defer></script>
+<p class="muted">支持 git init/add/commit/branch/checkout/switch/merge/status/log，以及 conda create/activate/deactivate/install/remove/list/env list/env remove。所有操作只在浏览器中模拟。</p>
+<script type="module" src="{{ '/assets/js/devtools.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

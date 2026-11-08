@@ -36,3 +36,10 @@ test('requires an environment or package argument for Conda actions', () => {
   assert.deepEqual(parseCondaCommand('conda deactivate'), { action: 'deactivate' })
   assert.deepEqual(parseCondaCommand('conda create -n notes'), { action: 'create', name: 'notes' })
 })
+
+test('supports common Conda listing, package and environment operations', () => {
+  assert.deepEqual(parseCondaCommand('conda list'), { action: 'list' })
+  assert.deepEqual(parseCondaCommand('conda create -n ml python=3.11'), { action: 'create', name: 'ml', packages: ['python=3.11'] })
+  assert.deepEqual(parseCondaCommand('conda install numpy pandas'), { action: 'install', packages: ['numpy', 'pandas'] })
+  assert.deepEqual(parseCondaCommand('conda env remove -n ml'), { action: 'delete', name: 'ml' })
+})

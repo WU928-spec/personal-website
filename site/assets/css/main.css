@@ -264,6 +264,7 @@ p { text-wrap: pretty; }
 .tool-form input, .tool-form textarea, .tool-form select { width: 100%; border: 1px solid var(--line); padding: 12px; background: var(--paper); color: var(--ink); }
 .tool-form textarea { min-height: 220px; resize: vertical; }
 .tool-button { width: fit-content; border: 1px solid var(--accent); padding: 10px 18px; background: var(--accent); color: var(--paper); cursor: pointer; }
+.tool-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .tool-output { min-height: 80px; padding: 20px; border-block: 1px solid var(--line); white-space: pre-wrap; }
 
 @media (max-width: 800px) {

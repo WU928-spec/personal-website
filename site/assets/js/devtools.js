@@ -14,10 +14,27 @@ export function parseCondaCommand(input) {
   const parts = input.trim().split(/\s+/)
   if (parts[0] !== 'conda') return null
   const action = parts[1]
+  if (action === 'list') return { action: 'list' }
   if (action === 'env' && parts[2] === 'list') return { action: 'list' }
-  if (['create', 'activate', 'install', 'remove', 'uninstall'].includes(action)) {
-    const name = parts.at(-1)
-    return parts.length > 2 && !name.startsWith('-') ? { action, name } : null
+  if (action === 'env' && ['remove', 'delete'].includes(parts[2])) {
+    const nameIndex = Math.max(parts.indexOf('-n'), parts.indexOf('--name'))
+    const name = nameIndex >= 0 ? parts[nameIndex + 1] : parts[3]
+    return name && !name.startsWith('-') ? { action: 'delete', name } : null
+  }
+  if (action === 'create') {
+    const nameIndex = Math.max(parts.indexOf('-n'), parts.indexOf('--name'))
+    const name = nameIndex >= 0 ? parts[nameIndex + 1] : parts[2]
+    if (!name || name.startsWith('-')) return null
+    const packages = parts.slice(nameIndex >= 0 ? nameIndex + 2 : 3).filter((part) => !part.startsWith('-'))
+    return packages.length > 0 ? { action, name, packages } : { action, name }
+  }
+  if (action === 'activate') {
+    const name = parts[2]
+    return name && !name.startsWith('-') ? { action, name } : null
+  }
+  if (['install', 'remove', 'uninstall'].includes(action)) {
+    const packages = parts.slice(2).filter((part) => !part.startsWith('-'))
+    return packages.length > 0 ? { action, packages } : null
   }
   if (action === 'deactivate') return { action }
   return null
@@ -28,6 +45,7 @@ if (typeof document !== 'undefined') {
   const output = document.getElementById('dev-output')
   let branch = 'main'
   let environment = 'base'
+  const environments = new Map([['base', ['numpy', 'pandas', 'matplotlib']]])
   const commits = ['Initial commit']
   document.getElementById('dev-run')?.addEventListener('click', () => {
     const value = input?.value || ''
@@ -43,9 +61,42 @@ if (typeof document !== 'undefined') {
       else if (git.action === 'merge') message = `已将 ${git.name} 合并到 ${branch}。`
       else message = `当前分支：${branch}\n${commits.join('\n')}`
     } else if (conda) {
-      if (conda.action === 'create' || conda.action === 'activate') environment = conda.name
-      else if (conda.action === 'deactivate') environment = 'base'
-      message = `当前 Conda 环境：${environment}\n模拟操作：${conda.action} ${conda.name || ''}`
+      if (conda.action === 'create') {
+        if (environments.has(conda.name)) message = `环境 ${conda.name} 已存在。`
+        else {
+          environments.set(conda.name, conda.packages || [])
+          message = `已创建环境 ${conda.name}。`
+        }
+      } else if (conda.action === 'activate') {
+        if (!environments.has(conda.name)) message = `环境 ${conda.name} 不存在。`
+        else {
+          environment = conda.name
+          message = `已激活环境 ${environment}。`
+        }
+      } else if (conda.action === 'deactivate') {
+        environment = 'base'
+        message = '已退出到 base 环境。'
+      } else if (conda.action === 'install') {
+        const packages = environments.get(environment)
+        environments.set(environment, [...new Set([...packages, ...conda.packages])])
+        message = `已在 ${environment} 中安装：${conda.packages.join('、')}。`
+      } else if (conda.action === 'remove' || conda.action === 'uninstall') {
+        const remaining = environments.get(environment).filter((item) => !conda.packages.includes(item))
+        environments.set(environment, remaining)
+        message = `已从 ${environment} 中移除：${conda.packages.join('、')}。`
+      } else if (conda.action === 'delete') {
+        if (conda.name === 'base') message = '不能删除 base 环境。'
+        else if (!environments.has(conda.name)) message = `环境 ${conda.name} 不存在。`
+        else {
+          environments.delete(conda.name)
+          if (environment === conda.name) environment = 'base'
+          message = `已删除环境 ${conda.name}。`
+        }
+      } else if (conda.action === 'list') {
+        const envList = [...environments.keys()].map((name) => `${name === environment ? '*' : ' '} ${name}`).join('\n')
+        const packages = environments.get(environment).join('、') || '无'
+        message = `环境列表：\n${envList}\n\n${environment} 中的包：${packages}`
+      }
     }
     if (output) output.textContent = message
   })
