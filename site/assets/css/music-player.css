@@ -6,7 +6,7 @@
 .music-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .12em; }
 .music-close { display: grid; width: 30px; height: 30px; padding: 0; place-items: center; border: 0; border-radius: 50%; background: #1c1b190a; color: var(--muted); font-size: 21px; line-height: 1; cursor: pointer; }
 .music-close:hover { background: #1c1b1914; color: var(--ink); }
-.music-cover { display: block; width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; box-shadow: 0 18px 42px #0003; }
+.music-cover { display: block; width: 100%; height: clamp(180px, 32dvh, 320px); border-radius: 20px; object-fit: cover; box-shadow: 0 18px 42px #0003; }
 .music-meta { margin-top: 22px; text-align: center; }
 .music-meta h2 { margin: 0; font-family: Inter, "Noto Sans SC", sans-serif; font-size: 25px; font-weight: 600; letter-spacing: -.03em; }
 .music-meta p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
