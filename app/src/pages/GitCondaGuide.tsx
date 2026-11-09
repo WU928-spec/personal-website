@@ -11,7 +11,7 @@ export default function GitCondaGuide() {
 
   useEffect(() => {
     // 自动跳转到幻灯片页面
-    window.location.href = '/git-conda-guide/index.html'
+    window.location.href = '/assets/git-conda-deck/index.html'
   }, [])
 
   // 如果跳转失败，显示备用界面
@@ -43,7 +43,7 @@ export default function GitCondaGuide() {
                 返回工具箱
               </button>
               <a
-                href="/git-conda-guide/index.html"
+                href="/assets/git-conda-deck/index.html"
                 className="flex items-center gap-2 px-6 py-3 rounded-lg bg-Amber/20 text-Amber/80 hover:bg-Amber/30 transition-colors border border-Amber/20"
               >
                 <ExternalLink size={16} />

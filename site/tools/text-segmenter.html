@@ -1,13 +1,6 @@
 ---
-layout: tool
+layout: legacy-tool
 title: 英文分段器
-description: 输入连续英文文本，自动按句子和段落整理，方便阅读。
+description: 自动将连续英文文本按句子换行、段落空行分隔。
 permalink: /tools/text-segmenter/
 ---
-<div class="tool-form">
-  <label for="segmenter-input">原文<textarea id="segmenter-input" placeholder="Paste English text here…"></textarea></label>
-  <div class="tool-actions"><button class="tool-button" id="segmenter-run" type="button">整理文本</button><button class="tool-button" id="segmenter-paste" type="button">粘贴并整理</button><button class="tool-button" id="segmenter-clear" type="button">清空</button></div>
-  <label for="segmenter-output">结果<textarea id="segmenter-output" readonly></textarea></label>
-  <button class="tool-button" id="segmenter-copy" type="button">复制结果</button>
-</div>
-<script type="module" src="{{ '/assets/js/text-segmenter.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

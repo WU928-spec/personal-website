@@ -1,14 +1,6 @@
 ---
-layout: tool
+layout: legacy-tool
 title: 开发工具
-description: 输入白名单 Git 或 Conda 命令，查看模拟分支和环境变化。
+description: 交互式 Git 分支树可视化与 Conda 虚拟环境管理演示。
 permalink: /tools/devtools/
 ---
-<div class="tool-form">
-  <label for="dev-command">命令<textarea id="dev-command" spellcheck="false">git init</textarea></label>
-  <button class="tool-button" id="dev-run" type="button">模拟执行</button>
-</div>
-<pre class="tool-output" id="dev-output" aria-live="polite">当前分支：main
-当前 Conda 环境：base</pre>
-<p class="muted">支持 git init/add/commit/branch/checkout/switch/merge/status/log，以及 conda create/activate/deactivate/install/remove/list/env list/env remove。所有操作只在浏览器中模拟。</p>
-<script type="module" src="{{ '/assets/js/devtools.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

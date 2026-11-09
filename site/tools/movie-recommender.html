@@ -1,14 +1,6 @@
 ---
-layout: tool
+layout: legacy-tool
 title: 每日电影推荐
-description: 根据心情、偏好或关键词，从片库中推荐下一部电影。
+description: 根据心情、偏好或关键词推荐下一部值得看的电影。
 permalink: /tools/movie-recommender/
 ---
-<div class="tool-form">
-  <label for="movie-query">现在的心情或偏好<textarea id="movie-query" placeholder="比如：周末想放松，或者看一点科幻"></textarea></label>
-  <button class="tool-button" id="movie-recommend" type="button">本地推荐</button>
-  <label for="movie-key">可选：自己的 AI Key（仅本次页面使用，不保存）<input id="movie-key" type="password" autocomplete="off"></label>
-  <button class="tool-button" id="movie-ai" type="button">尝试 AI 推荐（失败自动回退）</button>
-</div>
-<section class="tool-output" id="movie-result" aria-live="polite"><p>点击“本地推荐”，不需要任何密钥。</p></section>
-<script type="module" src="{{ '/assets/js/movies.js' | relative_url }}" defer></script>

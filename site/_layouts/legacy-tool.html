@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/legacy-tools/legacy-tools.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+</head>
+<body>
+  {% include header.html %}
+  <main id="main-content"><div id="legacy-tools-root"></div></main>
+  {% include footer.html %}
+  <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
+  <script src="{{ '/assets/js/search.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
+  <script type="module" src="{{ '/assets/legacy-tools/legacy-tools.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+</body>
+</html>

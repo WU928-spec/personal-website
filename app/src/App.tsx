@@ -64,6 +64,11 @@ function App() {
             <Route path="/movie-recommender" element={<LazyPage component={MovieRecommender} />} />
             <Route path="/devtools" element={<LazyPage component={DevTools} />} />
             <Route path="/git-conda-guide" element={<LazyPage component={GitCondaGuide} />} />
+            <Route path="/tools/internship" element={<LazyPage component={InternshipDecision} />} />
+            <Route path="/tools/text-segmenter" element={<LazyPage component={TextSegmenter} />} />
+            <Route path="/tools/movie-recommender" element={<LazyPage component={MovieRecommender} />} />
+            <Route path="/tools/devtools" element={<LazyPage component={DevTools} />} />
+            <Route path="/tools/git-conda-guide" element={<LazyPage component={GitCondaGuide} />} />
             <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />

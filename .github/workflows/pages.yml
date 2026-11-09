@@ -20,6 +20,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Build legacy tools
+        working-directory: app
+        run: |
+          npm ci
+          npm run build:tools
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
