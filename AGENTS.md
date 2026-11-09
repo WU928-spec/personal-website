@@ -22,7 +22,11 @@
 ## 构建与测试
 
 ```bash
-cd site
+cd app
+npm ci
+npm run build:tools
+
+cd ../site
 bundle install
 bundle exec jekyll build --source . --destination _site
 bundle exec jekyll serve --source . --destination _site
@@ -35,8 +39,8 @@ Jekyll 使用 4.4 系列；本地与 Actions 均使用 Ruby 3.3。生成目录�
 
 ## 代码约定
 
-- 页面使用 Liquid 模板、语义 HTML 和共享 CSS；交互使用无框架浏览器 JavaScript。
-- 不引入 Supabase、React、Vite、数据库或在线后台到主站。
+- 内容页面使用 Liquid 模板、语义 HTML 和共享 CSS；交互使用无框架浏览器 JavaScript。
+- 五个旧版小工具复用 `app/src/` 中的 React 组件，经 `app/vite.tools.config.ts` 构建为纯静态资源；不得接入 Supabase、数据库或在线后台。
 - Markdown 使用 kramdown/GFM，Rouge 构建时高亮，KaTeX 前端渲染。
 - 目录必须读取最终标题 id，不另写一套不兼容的 slug 规则。
 - 工具纯函数使用 Node 内置测试，浏览器 DOM 绑定必须在 Node 中可安全导入。
@@ -45,14 +49,14 @@ Jekyll 使用 4.4 系列；本地与 Actions 均使用 Ruby 3.3。生成目录�
 
 ## 部署边界
 
-- `.github/workflows/pages.yml` 使用官方 Pages actions 构建 `site/_site`。
+- `.github/workflows/pages.yml` 先用 Node 22 构建旧版小工具，再使用官方 Pages actions 构建 `site/_site`。
 - `site/CNAME` 固定为 `www.wuspace.top`。
 - 不自动创建仓库、推送、部署、修改 DNS 或执行其他远程写操作。
 - 远程启用需要用户确认仓库、Pages 来源、自定义域名、DNS 和 HTTPS。
 
 ## 旧应用与数据
 
-当前 `app/` 保留作历史与回退参照，不参与新站构建。不要删除或重置它。
+`app/` 主要保留作历史与回退参照，仅旧版小工具的独立入口参与新站构建。不要删除或重置它。
 
 旧 Supabase、localStorage 和云端数据不读取、不迁移、不删除。历史 React 设计文档描述的是迁移前架构，不代表当前主站。
 
@@ -63,4 +67,4 @@ Jekyll 使用 4.4 系列；本地与 Actions 均使用 Ruby 3.3。生成目录�
 - `site/README.md` — Obsidian 写作与发布流程
 - `DEVELOPMENT.md` — 历史开发日志
 
-*最后更新：2026-11-02*
+*最后更新：2026-11-09*
