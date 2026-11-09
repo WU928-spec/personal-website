@@ -16,6 +16,13 @@ async function loadSearchItems() {
   }
 }
 
+function updateActiveResult() {
+  if (!results) return
+  results.querySelectorAll('.search-result').forEach((result, index) => {
+    result.classList.toggle('is-active', index === activeIndex)
+  })
+}
+
 function renderResults() {
   if (!results || !input) return
   const query = input.value.trim().toLowerCase()
@@ -42,7 +49,7 @@ function renderResults() {
     const excerpt = document.createElement('span')
     excerpt.textContent = item.excerpt
     link.append(title, excerpt)
-    link.addEventListener('mouseenter', () => { activeIndex = index; renderResults() })
+    link.addEventListener('mouseenter', () => { activeIndex = index; updateActiveResult() })
     return link
   }))
 }
