@@ -10,6 +10,8 @@
 
 核心页面：首页、笔记、Markdown 动态、五个静态工具、搜索和隐藏星空。点赞、评论、在线编辑器与网站后台不再存在。
 
+首页、动态、文章和小工具通过 `site/assets/js/navigation.js` 无刷新替换正文，音乐播放器在这些跳转中保持存活；星空与静态资源仍整页打开。播放器默认静音且不自动播放。
+
 ## 内容模型
 
 - `_notes/`：文章笔记，支持 `title/date/written_date/category/tags/description/slug/published`。栏目包括诗歌、散文、随笔、小说、数学、计算机&金融、日记；缺失或未知分类进入未归档。
