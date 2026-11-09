@@ -12,6 +12,7 @@
   <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
   <script src="{{ '/assets/js/search.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
   <script type="module" src="{{ '/assets/js/music-player.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+  <script type="module" src="{{ '/assets/js/navigation.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
   {% if page.layout == 'home' or page.layout == 'note' or page.layout == 'moment' or page.url == '/notes/' or page.url == '/moments/' %}{% include math.html %}{% endif %}
 </body>
 </html>

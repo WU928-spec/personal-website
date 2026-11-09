@@ -15,10 +15,12 @@ export function categoryFromSearch(search) {
   return CATEGORIES.includes(category) ? category : ALL_CATEGORY
 }
 
-if (typeof document !== 'undefined') {
+export function initializeCategories() {
+  window.categoriesCleanup?.()
   const links = Array.from(document.querySelectorAll('[data-category-link]'))
   const entries = Array.from(document.querySelectorAll('[data-category]'))
   const empty = document.getElementById('category-empty')
+  const listeners = []
 
   function showCategory(category, updateHistory = false) {
     let visible = 0
@@ -45,12 +47,24 @@ if (typeof document !== 'undefined') {
   }
 
   for (const link of links) {
-    link.addEventListener('click', (event) => {
+    const listener = (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       event.preventDefault()
       showCategory(link.dataset.categoryLink, true)
-    })
+    }
+    link.addEventListener('click', listener)
+    listeners.push([link, listener])
   }
-  window.addEventListener('popstate', () => showCategory(categoryFromSearch(window.location.search)))
+  const onPopState = () => showCategory(categoryFromSearch(window.location.search))
+  window.addEventListener('popstate', onPopState)
   showCategory(categoryFromSearch(window.location.search))
+
+  const cleanup = () => {
+    window.removeEventListener('popstate', onPopState)
+    for (const [link, listener] of listeners) link.removeEventListener('click', listener)
+  }
+  window.categoriesCleanup = cleanup
+  return cleanup
 }
+
+if (typeof document !== 'undefined') initializeCategories()
