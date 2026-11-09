@@ -77,9 +77,9 @@ if (typeof document !== 'undefined') {
       }
     }
 
-    const loadTrack = (index, autoplay = true) => {
+    const loadTrack = (index, autoplay = true, startTime = 0) => {
       state.track = index
-      restoreTime = 0
+      restoreTime = startTime
       const track = TRACKS[index]
       audio.src = track.src
       audio.load()
@@ -114,7 +114,7 @@ if (typeof document !== 'undefined') {
     audio.volume = state.volume
     audio.muted = state.volume === 0
     if (volume) volume.value = String(state.volume)
-    loadTrack(state.track, false)
+    loadTrack(state.track, false, state.time)
     state.playing = resumeWanted
 
     audio.addEventListener('loadedmetadata', () => {
