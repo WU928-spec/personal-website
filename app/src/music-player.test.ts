@@ -42,3 +42,26 @@ it('opens the music dialog and controls the playlist and volume', async () => {
   volume.dispatchEvent(new Event('input'))
   expect(audio.volume).toBe(0.2)
 })
+
+
+it('restores the saved track position before playing', async () => {
+  document.body.innerHTML = `
+    <button id="music-open">♪</button><audio id="music-audio"></audio>
+    <dialog id="music-dialog"><h2 id="music-title"></h2><p id="music-artist"></p><img id="music-cover" alt="">
+      <button id="music-play">▶</button><button id="music-previous">←</button><button id="music-next">→</button>
+      <input id="music-progress" type="range"><input id="music-volume" type="range">
+      <span id="music-current"></span><span id="music-duration"></span><ol id="music-playlist"></ol>
+    </dialog>
+  `
+  const audio = document.getElementById('music-audio') as HTMLAudioElement
+  vi.spyOn(audio, 'load').mockImplementation(() => {})
+  vi.spyOn(audio, 'play').mockResolvedValue()
+  vi.spyOn(audio, 'pause').mockImplementation(() => {})
+  Object.defineProperty(audio, 'duration', { configurable: true, value: 273.28 })
+  vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify({ track: 1, time: 71, volume: 0, playing: false }))
+
+  await import('../../site/assets/js/music-player.js?restore-time')
+  audio.dispatchEvent(new Event('loadedmetadata'))
+
+  expect(audio.currentTime).toBe(71)
+})
