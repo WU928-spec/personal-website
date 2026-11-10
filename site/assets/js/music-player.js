@@ -5,17 +5,29 @@ const TRACKS = [
 ]
 
 const STORAGE_KEY = 'wuspace-music-state'
+const PLAY_MODES = ['sequential', 'repeat', 'shuffle']
 
 export function normalizeMusicState(value, trackCount) {
   const state = value && typeof value === 'object' ? value : {}
   const track = Number.isInteger(state.track) && state.track >= 0 && state.track < trackCount ? state.track : 0
   const time = Number.isFinite(state.time) && state.time >= 0 ? state.time : 0
   const volume = Number.isFinite(state.volume) ? Math.min(1, Math.max(0, state.volume)) : 0
-  return { track, time, volume, playing: state.playing === true }
+  const mode = PLAY_MODES.includes(state.mode) ? state.mode : 'sequential'
+  return { track, time, volume, playing: state.playing === true, mode }
 }
 
-export function nextTrackIndex(current, trackCount) {
-  return trackCount > 0 ? (current + 1) % trackCount : 0
+export function nextPlayMode(mode) {
+  return PLAY_MODES[(PLAY_MODES.indexOf(mode) + 1) % PLAY_MODES.length]
+}
+
+export function nextTrackIndex(current, trackCount, mode = 'sequential', random = Math.random) {
+  if (trackCount <= 0) return 0
+  if (mode === 'repeat') return current
+  if (mode === 'shuffle' && trackCount > 1) {
+    const candidate = Math.min(trackCount - 1, Math.floor(random() * trackCount))
+    return candidate === current ? (current + 1) % trackCount : candidate
+  }
+  return (current + 1) % trackCount
 }
 
 export function formatTime(seconds) {
@@ -35,6 +47,7 @@ if (typeof document !== 'undefined') {
     const progress = document.getElementById('music-progress')
     const volume = document.getElementById('music-volume')
     const playlist = document.getElementById('music-playlist')
+    const modeButton = document.getElementById('music-mode')
     let stored = null
     try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') } catch {}
     const state = normalizeMusicState(stored, TRACKS.length)
@@ -65,6 +78,19 @@ if (typeof document !== 'undefined') {
         button.classList.toggle('is-active', index === state.track)
         button.setAttribute('aria-current', index === state.track ? 'true' : 'false')
       })
+    }
+
+    const updateMode = () => {
+      const details = {
+        sequential: { label: '顺序播放', icon: '↻' },
+        repeat: { label: '单曲循环', icon: '↻¹' },
+        shuffle: { label: '随机播放', icon: '⤨' },
+      }[state.mode]
+      const label = document.getElementById('music-mode-label')
+      const icon = document.getElementById('music-mode-icon')
+      if (label) label.textContent = details.label
+      if (icon) icon.textContent = details.icon
+      modeButton?.setAttribute('aria-label', `${details.label}，点击切换播放模式`)
     }
 
     const play = async () => {
@@ -135,9 +161,10 @@ if (typeof document !== 'undefined') {
         save()
       }
     })
+    updateMode()
     audio.addEventListener('play', updatePlayState)
     audio.addEventListener('pause', updatePlayState)
-    audio.addEventListener('ended', () => loadTrack(nextTrackIndex(state.track, TRACKS.length)))
+    audio.addEventListener('ended', () => loadTrack(nextTrackIndex(state.track, TRACKS.length, state.mode)))
     audio.addEventListener('error', () => {
       state.playing = false
       updatePlayState()
@@ -152,7 +179,7 @@ if (typeof document !== 'undefined') {
       loadTrack((state.track - 1 + TRACKS.length) % TRACKS.length)
     })
     document.getElementById('music-next')?.addEventListener('click', () => {
-      loadTrack(nextTrackIndex(state.track, TRACKS.length))
+      loadTrack(nextTrackIndex(state.track, TRACKS.length, state.mode))
     })
     progress?.addEventListener('input', () => {
       if (!Number.isFinite(audio.duration)) return
@@ -163,6 +190,11 @@ if (typeof document !== 'undefined') {
       state.volume = Number(volume.value)
       audio.volume = state.volume
       audio.muted = state.volume === 0
+      save()
+    })
+    modeButton?.addEventListener('click', () => {
+      state.mode = nextPlayMode(state.mode)
+      updateMode()
       save()
     })
 

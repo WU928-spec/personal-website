@@ -5,7 +5,7 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-it('opens the music dialog and controls the playlist and volume', async () => {
+it('opens the music dialog and controls the playlist, volume and playback mode', async () => {
   document.body.innerHTML = `
     <button id="music-open">♪</button>
     <audio id="music-audio"></audio>
@@ -13,6 +13,7 @@ it('opens the music dialog and controls the playlist and volume', async () => {
       <h2 id="music-title"></h2><p id="music-artist"></p><img id="music-cover" alt="">
       <button id="music-play">▶</button><button id="music-previous">←</button><button id="music-next">→</button>
       <input id="music-progress" type="range"><input id="music-volume" type="range">
+      <button id="music-mode"><span id="music-mode-icon"></span><span id="music-mode-label"></span></button>
       <span id="music-current"></span><span id="music-duration"></span><ol id="music-playlist"></ol>
     </dialog>
   `
@@ -41,6 +42,16 @@ it('opens the music dialog and controls the playlist and volume', async () => {
   volume.value = '0.2'
   volume.dispatchEvent(new Event('input'))
   expect(audio.volume).toBe(0.2)
+
+  const mode = document.getElementById('music-mode') as HTMLButtonElement
+  mode.click()
+  expect(mode).toHaveTextContent('单曲循环')
+  audio.dispatchEvent(new Event('ended'))
+  expect(document.getElementById('music-title')).toHaveTextContent('信件')
+  mode.click()
+  expect(mode).toHaveTextContent('随机播放')
+  const lastSave = vi.mocked(localStorage.setItem).mock.calls.at(-1)
+  expect(JSON.parse(String(lastSave?.[1])).mode).toBe('shuffle')
 })
 
 

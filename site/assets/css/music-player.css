@@ -20,7 +20,10 @@
 .music-controls .music-play { width: 56px; height: 56px; background: var(--accent); color: #fff; font-size: 22px; box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 30%, transparent); }
 .music-controls .music-play:hover { background: var(--accent); }
 .music-volume-wrap { display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 12px; margin-top: 18px; color: var(--muted); font-size: 11px; }
-.music-playlist { display: grid; gap: 4px; margin: 22px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); list-style: none; }
+.music-mode { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 14px auto 0; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
+.music-mode:hover { border-color: var(--accent); color: var(--accent); }
+#music-mode-icon { font-size: 15px; line-height: 1; }
+.music-playlist { display: grid; gap: 4px; margin: 14px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); list-style: none; }
 .music-playlist button { display: grid; grid-template-columns: 28px 1fr 20px; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); text-align: left; cursor: pointer; }
 .music-playlist button:hover { background: #1c1b1908; color: var(--ink); }
 .music-playlist button.is-active { background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
