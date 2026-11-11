@@ -1,15 +1,27 @@
-# VibeCoding Garden · 个人数字花园
+# Jasper · 个人生活小站
 
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000?logo=vercel&logoColor=white)](https://vibecoding-garden.vercel.app)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Supabase](https://img.shields.io/badge/Supabase-2.1-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![GitHub Pages](https://img.shields.io/badge/Deployed%20on-GitHub%20Pages-222?logo=githubpages&logoColor=white)](https://www.wuspace.top)
+[![Jekyll](https://img.shields.io/badge/Jekyll-4.4-CC0000?logo=jekyll&logoColor=white)](https://jekyllrb.com)
+[![Ruby](https://img.shields.io/badge/Ruby-3.3-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org)
+[![Obsidian](https://img.shields.io/badge/Content-Obsidian-7C3AED?logo=obsidian&logoColor=white)](https://obsidian.md)
 
-> 一个作为个人数字名片使用的全栈博客作品集网站。
+> 以 Obsidian 维护内容、由 Jekyll 生成的静态个人网站，记录生活、学习和一些随手写下的东西。
 >
-> 在线地址：https://vibecoding-garden.vercel.app
+> 在线地址：https://www.wuspace.top
+
+---
+
+## 🏗️ 当前架构
+
+主站已从 React/Vite/Supabase 迁移为 **Jekyll + Obsidian + GitHub Pages**。文章、动态和星空短文都是仓库内的 Markdown 文件，构建结果为纯静态页面，不再依赖数据库、网站后台或在线编辑器。
+
+| 部分 | 当前实现 |
+|------|----------|
+| 主站 | `site/` 下的 Jekyll 4.4 静态网站，使用 Liquid、语义 HTML、共享 CSS 和原生 JavaScript |
+| 内容 | 通过 Obsidian 维护 `_notes/`、`_moments/` 和 `_memoirs/` 中的 Markdown |
+| 小工具 | 五个旧版工具的独立入口仍使用 React + TypeScript，经 Vite 构建为纯静态资源 |
+| 构建与部署 | GitHub Actions 使用 Node 22 构建工具、Ruby 3.3 构建 Jekyll，并发布到 GitHub Pages |
+| 自定义域名 | `site/CNAME` 固定为 `www.wuspace.top` |
 
 ---
 
@@ -17,109 +29,124 @@
 
 | 模块 | 描述 |
 |------|------|
-| 🏠 **个人名片主页** | 打字机效果标题、个人简介、技能标签云、GitHub 贡献图与仓库展示 |
-| 📚 **Obsidian 知识库** | 浏览 900+ 篇 Markdown 笔记，支持 Wikilink `[[标题]]` 双链跳转、标题折叠、文档内锚点、Callout、KaTeX 数学公式、Shiki 代码高亮 |
-| 💭 **记忆碎片 Moments** | 类朋友圈动态发布、图片九宫格、点赞评论，数据存储于 Supabase |
-| 🗓️ **日历与待办** | 日历视图、每日待办计时、项目工时自动统计 |
-| 📊 **项目追踪** | 项目阶段管理、子任务、柱状图工时可视化 |
-| 🔍 **全局搜索 Cmd+K** | 同时搜索 Obsidian 笔记与记忆碎片，按相关度排序 |
-| 🌌 **星空彩蛋** | 独立路由的交互式星空页面，可拖拽星星，每颗星对应一段记忆 |
+| 🏠 **个人主页** | 圆形头像、最新笔记与动态，以及 GitHub 和小工具入口 |
+| 📚 **Markdown 笔记** | 支持栏目、标签、摘要、目录与标题锚点；使用 kramdown/GFM、Rouge 代码高亮和 KaTeX 数学公式 |
+| 💭 **记忆碎片** | 使用 Markdown 记录文字、图片、日期和地点，不再有在线发布、点赞或评论 |
+| 🛠️ **五个静态工具** | 实习决策助手、英文分段器、每日电影推荐、开发工具、Git & Conda 指南 |
+| 🔍 **站内搜索** | 通过 Jekyll 生成的静态 JSON 索引搜索笔记和动态，草稿不会进入索引 |
+| 🎵 **连续浏览体验** | 首页、文章、动态和工具之间无刷新切换，音乐播放器跨页面保持；默认静音且不自动播放 |
+| 🌌 **隐藏星空** | 由 `_memoirs/` 驱动的星空短文与隐藏彩蛋页面 |
+| 🌗 **主题与语言** | 深浅主题、中英文界面控件，以及键盘导航和减少动态效果支持 |
 
 ---
 
 ## 🛠️ 技术栈
 
-**前端**
+**主站**
 
-- [React 19](https://react.dev) + [TypeScript 5.9](https://www.typescriptlang.org)（严格模式）
-- [Vite 7.2](https://vitejs.dev) + [SWC](https://swc.rs)
-- [Tailwind CSS 3.4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)
-- [React Router v7](https://reactrouter.com)（HashRouter）
-- [Framer Motion](https://www.framer.com/motion) 动画
-- [react-markdown](https://github.com/remarkjs/react-markdown) + [KaTeX](https://katex.org) + [Shiki](https://shiki.style)
+- [Jekyll 4.4](https://jekyllrb.com) + Ruby 3.3
+- Liquid 模板、语义 HTML、共享 CSS、无框架浏览器 JavaScript
+- kramdown（GFM 输入）+ Rouge + KaTeX
+- 静态 JSON 搜索索引
 
-**后端**
+**旧版工具构建**
 
-- [Supabase](https://supabase.com)（PostgreSQL + Storage）
-- 静态文件托管（Obsidian 笔记 900+ 篇 Markdown）
+- React 19 + TypeScript 5.9
+- Vite 7.2，配置位于 `app/vite.tools.config.ts`
+- 仅独立工具入口参与新站构建，不作为主站运行时
 
-**质量保障**
+**发布**
 
-- TypeScript `strict` 模式 + `noUnusedLocals`/`noUnusedParameters`
-- [Zod](https://zod.dev) 运行时类型验证
-- [Vitest](https://vitest.dev) + `@testing-library/react` 单元测试
-- 错误边界 + 懒加载 + React.memo 性能优化
+- GitHub Actions + GitHub Pages
+- Obsidian + Obsidian Git 可用于自动提交和推送内容
+
+---
+
+## 📁 目录结构
+
+```text
+personal-website/
+├── site/                         # 当前主站，也是 Obsidian 公开内容库
+│   ├── _notes/                   # 文章笔记
+│   ├── _moments/                 # 生活动态
+│   ├── _memoirs/                 # 星空短文
+│   ├── _layouts/                 # Jekyll 页面布局
+│   ├── _includes/                # 共享模板
+│   ├── assets/
+│   │   ├── css/                  # 共享样式
+│   │   ├── js/                   # 浏览器交互与测试
+│   │   ├── media/                # 图片等公开媒体
+│   │   └── legacy-tools/         # 旧版工具的构建产物
+│   ├── notes/                    # 笔记列表
+│   ├── moments/                  # 动态列表
+│   ├── tools/                    # 五个静态工具
+│   ├── starry/                   # 星空彩蛋
+│   ├── _config.yml               # Jekyll 配置
+│   ├── CNAME                     # 自定义域名
+│   └── README.md                 # Obsidian 写作与发布说明
+├── app/                          # 旧应用；仅旧版工具入口参与新站构建
+├── docs/superpowers/             # 当前迁移设计与计划
+└── .github/workflows/pages.yml   # 构建与部署工作流
+```
 
 ---
 
 ## 🚀 本地开发
+
+需要 **Ruby 3.3 + Bundler**；构建五个静态工具还需要 **Node 22**。
 
 ```bash
 # 克隆仓库
 git clone https://github.com/WU928-spec/personal-website.git
 cd personal-website/app
 
-# 安装依赖
-npm install
+# 构建旧版工具的静态资源
+npm ci
+npm run build:tools
 
-# 启动开发服务器
-npm run dev        # http://localhost:3000
-
-# 运行测试
-npm test
-
-# 构建生产版本
-npm run build      # 输出到 dist/
+# 安装 Jekyll 依赖并启动本地预览
+cd ../site
+bundle install
+bundle exec jekyll serve --source . --destination _site
 ```
 
-**环境变量**（`app/.env.local`）
+打开终端输出的本地地址即可预览。生产构建和工具纯函数测试：
 
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+```bash
+cd site
+bundle exec jekyll build --source . --destination _site
+node --test assets/js/text-segmenter.test.js assets/js/tools.test.js
 ```
+
+生成目录和项目内依赖已被 `.gitignore` 排除。
 
 ---
 
-## 📁 目录结构
+## ✍️ 写作与发布
 
-```
-app/
-├── src/
-│   ├── components/      # UI 组件
-│   │   ├── ui/          # shadcn/ui 基础组件
-│   │   ├── calendar/    # 日历相关
-│   │   ├── home/        # 首页分区（Hero/Intro/Skill/GitHub）
-│   │   ├── markdown/    # Markdown 渲染子模块
-│   │   ├── project/     # 项目追踪组件
-│   │   └── starry/      # 星空彩蛋组件
-│   ├── pages/           # 路由页面
-│   ├── hooks/           # 自定义 Hooks（含测试）
-│   ├── contexts/        # React Context
-│   ├── utils/           # 工具函数（含测试）
-│   ├── types/           # TypeScript 类型 + Zod Schemas
-│   ├── data/            # 静态配置数据
-│   ├── i18n/            # 国际化
-│   └── lib/             # 第三方库配置（Supabase）
-├── public/              # 静态资源（含 Obsidian 笔记）
-└── package.json
-```
+1. 在 Obsidian 中打开 `site/` 或其内容目录。
+2. 在对应集合中新建 Markdown，并填写 front matter：
+
+| 目录 | 内容 | 主要字段 |
+|------|------|----------|
+| `site/_notes/` | 文章笔记 | `title`、`date`、`written_date`、`category`、`tags`、`description`、`slug`、`published` |
+| `site/_moments/` | 生活动态 | `date`、`images`、`location`、`published` |
+| `site/_memoirs/` | 星空短文 | `title`、`date`、`published` |
+
+3. 将公开图片放入 `site/assets/media/`，使用仓库相对路径引用。
+4. 将 `published: false` 用作草稿；草稿不会生成公开页面，也不会进入列表或搜索。
+5. 提交并推送到 `main` 后，GitHub Actions 会构建并发布网站。
+
+完整示例和 Obsidian Git 配置见 [`site/README.md`](site/README.md)。不要提交 `.env`、密钥、私人笔记或不愿公开的图片。
 
 ---
 
-## 🧠 数据架构
+## 🔄 旧应用与历史数据
 
-采用 **localStorage 优先 + Supabase 后台同步** 的双写策略：
+`app/` 主要保留作历史与回退参照，只有五个旧版小工具的独立入口参与当前构建，请勿将其误认为主站。旧 Supabase、localStorage 和云端数据不由新站读取、迁移或删除；历史 React 设计文档描述的是迁移前架构。
 
-| 数据 | 存储位置 | 同步策略 |
-|------|---------|---------|
-| Obsidian 笔记 | Supabase `notes` 表 | 纯云端 |
-| 记忆碎片 | localStorage + Supabase `moments` | 先显本地，后台静默同步 |
-| 日历任务 | localStorage + Supabase `calendar_entries` | 先显本地，后台同步 |
-| 项目列表 | localStorage + Supabase `projects` | 先显本地，后台同步 |
+当前迁移文档：
 
----
-
-## 📄 License
-
-[MIT](LICENSE)
+- [Jekyll + Obsidian 迁移设计](docs/superpowers/specs/2026-11-02-jekyll-obsidian-migration-design.md)
+- [迁移实施计划](docs/superpowers/plans/2026-11-02-jekyll-obsidian-migration.md)
+- [Obsidian 写作与发布流程](site/README.md)
