@@ -24,9 +24,10 @@ test('includes maintenance updates in the homepage feed using the same post card
   assert.match(homePage, /include moment-card\.html moment=moment/)
 })
 
-test('keeps writing times in China Standard Time and loads feed avatars directly', () => {
-  const config = readFileSync(new URL('../../_config.yml', import.meta.url), 'utf8')
+test('preserves explicit local time labels and loads feed avatars directly', () => {
   const card = readFileSync(new URL('../../_includes/moment-card.html', import.meta.url), 'utf8')
-  assert.match(config, /timezone: Asia\/Shanghai/)
+  const log = readFileSync(new URL('../../_moments/2026-11-11-moments-feed.md', import.meta.url), 'utf8')
+  assert.match(card, /include\.moment\.display_time/)
+  assert.match(log, /display_time: "2026-11-11 13:32"/)
   assert.doesNotMatch(card, /moment-avatar[^>]*loading="lazy"/)
 })

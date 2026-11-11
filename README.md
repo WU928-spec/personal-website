@@ -133,10 +133,10 @@ node --test assets/js/*.test.js
 | 目录 | 内容 | 主要字段 |
 |------|------|----------|
 | `site/_notes/` | 文章笔记 | `title`、`date`、`written_date`、`category`、`tags`、`description`、`slug`、`published` |
-| `site/_moments/` | 生活动态与网站维护日志 | `title`、`date`、`images`、`location`、`tags`、`published` |
+| `site/_moments/` | 生活动态与网站维护日志 | `title`、`date`、`display_time`、`images`、`location`、`tags`、`published` |
 | `site/_memoirs/` | 星空短文 | `title`、`date`、`published` |
 
-3. 网站维护更新每条单独发布，使用 `tags: [网站维护日志]`，与普通动态按时间统一排列，时间精确到分钟。
+3. 网站维护更新每条单独发布，使用 `tags: [网站维护日志]`；所有动态按 `date` 排序，以精确到分钟的 `display_time` 显示本地时间。
 4. 将公开图片放入 `site/assets/media/`，使用仓库相对路径引用。
 5. 将 `published: false` 用作草稿；草稿不会生成公开页面，也不会进入列表或搜索。
 6. 提交并推送到 `main` 后，GitHub Actions 会刷新贡献数据、运行测试、构建并发布网站。

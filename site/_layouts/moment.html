@@ -5,7 +5,7 @@ layout: default
   <header class="article-header">
     <p class="eyebrow">记忆碎片</p>
     {% if page.title %}<h1>{{ page.title }}</h1>{% endif %}
-    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d %H:%M' }}</time>
+    <time datetime="{{ page.date | date_to_xmlschema }}">{% if page.display_time %}{{ page.display_time }}{% else %}{{ page.date | date: '%Y-%m-%d %H:%M' }}{% endif %}</time>
   </header>
   <div class="article-content">{{ content }}</div>
   {% if page.images %}

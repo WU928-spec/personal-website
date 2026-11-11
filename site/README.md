@@ -33,6 +33,7 @@ published: true
 ```md
 ---
 date: 2026-11-02 18:00:00 +08:00
+display_time: "2026-11-02 18:00"
 images:
   - /assets/media/my-photo.jpg
 location: 可选地点
@@ -41,6 +42,8 @@ published: true
 
 今天的一段生活记录。
 ```
+
+`date` 用于排序和机器可读时间；`display_time` 是页面上显示的本地时间文本，精确到分钟，不受构建服务器时区影响。
 
 图片先复制到 `assets/media/`。不要提交私人图片、密钥、`.env` 或不愿公开的笔记。
 
@@ -51,6 +54,7 @@ published: true
 ```md
 ---
 date: 2026-11-11 13:32:00 +08:00
+display_time: "2026-11-11 13:32"
 tags: [网站维护日志]
 published: true
 ---
