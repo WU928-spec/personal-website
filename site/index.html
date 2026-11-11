@@ -18,10 +18,10 @@ title: 首页
   <div class="section-head"><div><h2>最近文章</h2><p>生活、阅读和学习记录。</p></div><a class="section-link" href="{{ '/notes/' | relative_url }}">全部文章 ↗</a></div>
   <div class="entry-list">
     {% for note in public_notes limit: 3 %}
-      <a class="entry home-note" href="{{ note.url | relative_url }}" data-math>
-        <div class="home-note-heading"><h3>{{ note.title }}</h3><span class="entry-arrow">读下去 ↗</span></div>
+      <a class="entry compact-note" href="{{ note.url | relative_url }}" data-math>
+        <div class="compact-note-heading"><h3>{{ note.title }}</h3><span class="entry-arrow">读下去 ↗</span></div>
         <p>{{ note.description | default: note.excerpt | strip_html | truncate: 110 }}</p>
-        {% if note.written_date and note.written_date != '日期待定' %}<span class="home-note-date">{{ note.written_date }}</span>{% endif %}
+        {% if note.written_date and note.written_date != '日期待定' %}<span class="compact-note-date">{{ note.written_date }}</span>{% endif %}
       </a>
     {% else %}
       <p class="empty-state">还没有文章。</p>

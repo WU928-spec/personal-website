@@ -5,21 +5,22 @@ description: 记录生活、阅读与思考的文章。
 permalink: /notes/
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
-<header class="page-header shell"><p class="eyebrow">NOTES</p><h1>文章</h1><p>Sharpen your thinking</p></header>
-<nav class="category-nav shell" aria-label="文章栏目">
+<header class="page-header page-shell"><p class="eyebrow">NOTES</p><h1>文章</h1><p>Sharpen your thinking</p></header>
+<nav class="category-nav page-shell" aria-label="文章栏目">
   {% assign categories = '全部,诗歌,散文,随笔,小说,数学,计算机&金融,日记,未归档' | split: ',' %}
   {% for category in categories %}
     <a href="{{ '/notes/' | relative_url }}{% unless category == '全部' %}?category={{ category | url_encode }}{% endunless %}" data-category-link="{{ category }}">{{ category }}</a>
   {% endfor %}
 </nav>
-<div class="content-section shell category-content">
+<div class="content-section page-shell category-content">
   <p class="empty-state" id="category-empty" hidden>这个栏目还没有文章。</p>
   <div class="entry-list">
     {% for note in public_notes %}
-      <a class="entry" href="{{ note.url | relative_url }}" data-category="{{ note.category | default: '未归档' }}" data-math>
-        <span class="entry-date">{% if note.written_date and note.written_date != '日期待定' %}{{ note.written_date }}{% endif %}</span>
-        <div><h3>{{ note.title }}</h3><p>{{ note.description | default: note.excerpt | strip_html | truncate: 150 }}</p>{% if note.tags %}<div class="entry-tags">{% for tag in note.tags %}<span>#{{ tag }}</span>{% endfor %}</div>{% endif %}</div>
-        <span class="entry-arrow">↗</span>
+      <a class="entry compact-note" href="{{ note.url | relative_url }}" data-category="{{ note.category | default: '未归档' }}" data-math>
+        <div class="compact-note-heading"><h3>{{ note.title }}</h3><span class="entry-arrow">↗</span></div>
+        <p>{{ note.description | default: note.excerpt | strip_html | truncate: 130 }}</p>
+        {% if note.tags %}<div class="entry-tags">{% for tag in note.tags %}<span>#{{ tag }}</span>{% endfor %}</div>{% endif %}
+        {% if note.written_date and note.written_date != '日期待定' %}<span class="compact-note-date">{{ note.written_date }}</span>{% endif %}
       </a>
     {% else %}
       <p class="empty-state">还没有笔记，第一篇文字正在路上。</p>

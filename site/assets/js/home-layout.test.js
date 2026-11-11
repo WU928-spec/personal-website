@@ -14,7 +14,7 @@ test('uses one narrow reading measure and a compact desktop hero', () => {
 })
 
 test('keeps homepage entries compact without empty date columns or duplicate links', () => {
-  assert.match(home, /class="entry home-note"/)
+  assert.match(home, /class="entry compact-note"/)
   assert.match(home, /public_moments limit: 2/)
   assert.doesNotMatch(home, /<h2>其他链接<\/h2>/)
 })
