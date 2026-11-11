@@ -201,7 +201,9 @@ p { text-wrap: pretty; }
 .contribution-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .contribution-meta p { margin: 0; font-size: 14px; }
 .contribution-meta > span { color: var(--muted); font-size: 12px; }
-.contribution-scroll { max-width: 100%; overflow-x: auto; padding: 4px 2px 12px; }
+.github-contributions, [data-contribution-chart] { width: 100%; min-width: 0; }
+[data-contribution-chart] { overflow: hidden; }
+.contribution-scroll { display: block; width: 100%; max-width: 100%; overflow-x: auto; padding: 4px 2px 12px; }
 .contribution-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .contribution-table { width: max-content; border-collapse: separate; border-spacing: 4px; }
 .contribution-table th, .contribution-table td { padding: 0; }
