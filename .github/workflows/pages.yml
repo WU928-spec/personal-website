@@ -30,6 +30,12 @@ jobs:
         run: |
           npm ci
           npm run build:tools
+      - name: Refresh GitHub contributions
+        working-directory: site
+        run: node scripts/update-github-contributions.mjs
+      - name: Test site scripts
+        working-directory: site
+        run: node --test assets/js/*.test.js
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'

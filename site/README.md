@@ -44,14 +44,33 @@ published: true
 
 图片先复制到 `assets/media/`。不要提交私人图片、密钥、`.env` 或不愿公开的笔记。
 
+## 写网站维护日志
+
+仍在 `_moments/` 新建 Markdown，一天一篇，使用固定栏目名和当天日期：
+
+```md
+---
+title: 首页功能与文案更新
+date: 2026-11-11 11:51:00 +08:00
+category: 网站维护日志
+published: true
+---
+
+- 记录当天完成的更新。
+- 可以列出页面调整、功能变化和问题修复。
+```
+
+维护日志显示在动态页的独立栏目，不进入首页“最近动态”。日常动态无需填写 `category`。
+
 星空短文放在 `_memoirs/`，同样支持 `published` 开关。
 
 ## 本地预览
 
-需要可用的 Ruby 和项目内依赖：
+需要可用的 Ruby 和项目内依赖。构建前可用 Node 刷新真实 GitHub 贡献数据；网络不可用时保留仓库内已有的静态数据：
 
 ```bash
 cd site
+node scripts/update-github-contributions.mjs
 bundle install
 bundle exec jekyll serve --source . --destination _site
 ```
@@ -60,6 +79,7 @@ bundle exec jekyll serve --source . --destination _site
 
 ```bash
 bundle exec jekyll build --source . --destination _site
+node --test assets/js/*.test.js
 ```
 
 ## 自动发布

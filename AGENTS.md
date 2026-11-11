@@ -8,14 +8,14 @@
 
 视觉方向是简洁的个人生活小站：暖纸白、墨黑、酒红、中文衬线标题和真实文章流。首页首屏使用圆形头像，文案直接，不使用过度修饰的介绍。
 
-核心页面：首页、笔记、Markdown 动态、五个静态工具、搜索和隐藏星空。点赞、评论、在线编辑器与网站后台不再存在。
+核心页面：首页（含真实 GitHub 贡献热力图）、笔记、Markdown 动态（含网站维护日志）、五个静态工具、搜索和隐藏星空。点赞、评论、在线编辑器与网站后台不再存在。
 
 首页、动态、文章和小工具通过 `site/assets/js/navigation.js` 无刷新替换正文，音乐播放器在这些跳转中保持存活；星空与静态资源仍整页打开。播放器默认静音且不自动播放。
 
 ## 内容模型
 
 - `_notes/`：文章笔记，支持 `title/date/written_date/category/tags/description/slug/published`。栏目包括诗歌、散文、随笔、小说、数学、计算机&金融、日记；缺失或未知分类进入未归档。
-- `_moments/`：生活动态，支持 `date/images/location/published`。
+- `_moments/`：生活动态与网站维护日志，支持 `title/date/images/location/category/published`。`category: 网站维护日志` 进入动态页独立栏目，不进入首页日常动态；其余分类或留空均为日常动态。
 - `_memoirs/`：星空短文，支持 `title/date/published`。
 - `published: false` 是草稿，不得生成页面或进入列表、搜索。
 - 图片放在 `site/assets/media/`，使用仓库相对路径。
@@ -29,10 +29,11 @@ npm ci
 npm run build:tools
 
 cd ../site
+node scripts/update-github-contributions.mjs
 bundle install
 bundle exec jekyll build --source . --destination _site
 bundle exec jekyll serve --source . --destination _site
-node --test assets/js/text-segmenter.test.js assets/js/tools.test.js
+node --test assets/js/*.test.js
 ```
 
 Jekyll 使用 4.4 系列；本地与 Actions 均使用 Ruby 3.3。生成目录和项目内依赖已被 `.gitignore` 排除。
@@ -51,7 +52,7 @@ Jekyll 使用 4.4 系列；本地与 Actions 均使用 Ruby 3.3。生成目录�
 
 ## 部署边界
 
-- `.github/workflows/pages.yml` 先用 Node 22 构建旧版小工具，再使用官方 Pages actions 构建 `site/_site`。
+- `.github/workflows/pages.yml` 先用 Node 22 构建旧版小工具、刷新真实 GitHub 贡献数据并运行站点脚本测试，再使用官方 Pages actions 构建 `site/_site`。
 - `site/CNAME` 固定为 `www.wuspace.top`。
 - 不自动创建仓库、推送、部署、修改 DNS 或执行其他远程写操作。
 - 远程启用需要用户确认仓库、Pages 来源、自定义域名、DNS 和 HTTPS。

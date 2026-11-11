@@ -3,7 +3,7 @@ layout: home
 title: 首页
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
-{% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
+{% assign public_moments = site.moments | where_exp: "moment", "moment.published != false and moment.category != '网站维护日志'" | sort: "date" | reverse %}
 <div class="hero-backdrop">
   <section class="hero shell">
     <img class="hero-avatar" src="{{ '/assets/media/avatar.jpg' | relative_url }}" alt="Jasper 的头像" width="384" height="384" fetchpriority="high" decoding="async">
@@ -45,8 +45,21 @@ title: 首页
   </div>
 </section>
 
+<section class="content-section shell" id="github-activity">
+  <div class="section-head">
+    <div><p class="eyebrow">OPEN SOURCE</p><h2>GitHub 足迹</h2><p>过去一年的真实贡献记录。</p></div>
+    <a class="section-link" href="https://github.com/WU928-spec" target="_blank" rel="noopener noreferrer">查看 GitHub ↗</a>
+  </div>
+  <div class="github-contributions" data-github-contributions>
+    <div class="contribution-meta"><p data-contribution-summary aria-live="polite">正在加载 GitHub 贡献记录…</p><span data-contribution-updated></span></div>
+    <div data-contribution-chart></div>
+  </div>
+  <noscript><p class="empty-state">启用 JavaScript 后可查看 GitHub 贡献热力图。</p></noscript>
+</section>
+
 <section class="content-section shell">
   <div class="section-head"><div><h2>其他链接</h2></div></div>
   <div class="project-links"><a href="https://github.com/WU928-spec" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="{{ '/tools/' | relative_url }}">小工具 ↗</a></div>
 </section>
 <script type="module" src="{{ '/assets/js/pluto.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
+<script type="module" src="{{ '/assets/js/github-contributions.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
