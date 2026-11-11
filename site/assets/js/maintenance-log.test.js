@@ -23,3 +23,10 @@ test('includes maintenance updates in the homepage feed using the same post card
   assert.doesNotMatch(homePage, /moment\.category/)
   assert.match(homePage, /include moment-card\.html moment=moment/)
 })
+
+test('keeps writing times in China Standard Time and loads feed avatars directly', () => {
+  const config = readFileSync(new URL('../../_config.yml', import.meta.url), 'utf8')
+  const card = readFileSync(new URL('../../_includes/moment-card.html', import.meta.url), 'utf8')
+  assert.match(config, /timezone: Asia\/Shanghai/)
+  assert.doesNotMatch(card, /moment-avatar[^>]*loading="lazy"/)
+})

@@ -3,6 +3,7 @@ description: Jasper 的个人小站，记录生活和学习。
 url: "https://www.wuspace.top"
 baseurl: ""
 lang: zh-CN
+timezone: Asia/Shanghai
 markdown: kramdown
 highlighter: rouge
 kramdown:
