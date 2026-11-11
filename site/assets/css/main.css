@@ -198,6 +198,7 @@ p { text-wrap: pretty; }
 .moment-image { width: 180px; aspect-ratio: 4 / 3; object-fit: cover; }
 .project-links { display: flex; flex-wrap: wrap; gap: 12px 28px; }
 .project-links a { color: var(--accent); border-bottom: 1px solid var(--line); }
+.home-page { overflow-x: hidden; }
 .contribution-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .contribution-meta p { margin: 0; font-size: 14px; }
 .contribution-meta > span { color: var(--muted); font-size: 12px; }
