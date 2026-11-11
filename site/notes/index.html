@@ -5,7 +5,7 @@ description: 记录生活、阅读与思考的文章。
 permalink: /notes/
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
-<header class="page-header shell"><p class="eyebrow">NOTES</p><h1>文章</h1><p>生活、阅读和学习记录。</p></header>
+<header class="page-header shell"><p class="eyebrow">NOTES</p><h1>文章</h1><p>Sharpen your thinking</p></header>
 <nav class="category-nav shell" aria-label="文章栏目">
   {% assign categories = '全部,诗歌,散文,随笔,小说,数学,计算机&金融,日记,未归档' | split: ',' %}
   {% for category in categories %}
