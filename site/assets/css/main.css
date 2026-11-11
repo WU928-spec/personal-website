@@ -102,7 +102,7 @@ p { text-wrap: pretty; }
   background-image: radial-gradient(color-mix(in srgb, var(--muted) 14%, transparent) .65px, transparent .75px);
   background-size: 24px 24px;
   background-position: center top;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0;
 }
 .hero {
   min-height: 480px;
@@ -111,6 +111,7 @@ p { text-wrap: pretty; }
   align-items: flex-start;
   justify-content: center;
   padding-block: 48px;
+  border-bottom: 1px solid var(--line);
 }
 .hero-avatar {
   width: 88px;

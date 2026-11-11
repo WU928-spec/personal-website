@@ -32,3 +32,8 @@ test('uses a coordinated paper background and links the hero button to the artic
   assert.match(home, /class="hero-link" href="{{ '\/notes\/' \| relative_url }}"/)
   assert.match(css, /\.hero-link:active/)
 })
+
+test('aligns the hero divider with the content column instead of the full viewport', () => {
+  assert.match(css, /\.hero\s*\{[^}]*border-bottom: 1px solid var\(--line\)/s)
+  assert.match(css, /\.hero-backdrop\s*\{[^}]*border-bottom: 0/s)
+})
