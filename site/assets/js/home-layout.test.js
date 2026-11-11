@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs'
 
 const home = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
 const css = readFileSync(new URL('../css/main.css', import.meta.url), 'utf8')
+const navigation = readFileSync(new URL('./navigation.js', import.meta.url), 'utf8')
+const footer = readFileSync(new URL('../../_includes/footer.html', import.meta.url), 'utf8')
 
 test('uses one narrow reading measure and a shorter homepage hero', () => {
   assert.match(css, /--home-max: 840px/)
@@ -14,6 +16,12 @@ test('uses one narrow reading measure and a shorter homepage hero', () => {
 test('keeps homepage entries compact without empty date columns or duplicate links', () => {
   assert.match(home, /class="entry home-note"/)
   assert.match(home, /public_moments limit: 2/)
-  assert.match(home, /pluto-entry-label/)
   assert.doesNotMatch(home, /<h2>其他链接<\/h2>/)
+})
+
+test('removes the hero planet module and keeps the footer star entrance', () => {
+  assert.doesNotMatch(home, /pluto-entry|pluto-charon|assets\/js\/pluto\.js/)
+  assert.doesNotMatch(css, /\.pluto-entry/)
+  assert.doesNotMatch(navigation, /initializePluto|pluto\.js|plutoCleanup/)
+  assert.match(footer, /class="starry-link"[^>]*aria-label="进入星空"/)
 })

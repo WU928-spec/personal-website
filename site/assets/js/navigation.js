@@ -40,9 +40,7 @@ async function initializeContent() {
 
 async function initializePage(url) {
   if (url.pathname === '/') {
-    const { initializePluto } = await import(/* @vite-ignore */ `/assets/js/pluto.js${VERSION}`)
     const { initializeContributions } = await import(/* @vite-ignore */ `/assets/js/github-contributions.js${VERSION}`)
-    initializePluto()
     initializeContributions()
   } else if (url.pathname === '/notes/' || url.pathname === '/notes') {
     const { initializeCategories } = await import(/* @vite-ignore */ `/assets/js/categories.js${VERSION}`)
@@ -81,7 +79,6 @@ async function navigate(url, { push = true } = {}) {
     if (sequence !== navigationSequence) return
 
     window.legacyToolsUnmount?.()
-    window.plutoCleanup?.()
     window.categoriesCleanup?.()
     window.contributionsCleanup?.()
     main.replaceWith(nextMain)
