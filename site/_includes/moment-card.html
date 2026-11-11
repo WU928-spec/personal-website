@@ -1,0 +1,19 @@
+<article class="moment-post">
+  <img class="moment-avatar" src="{{ '/assets/media/avatar.jpg' | relative_url }}" alt="" width="40" height="40" loading="lazy">
+  <div class="moment-post-body">
+    <div class="moment-author">Jasper</div>
+    <div class="moment-post-content" data-math>{{ include.moment.content }}</div>
+    {% if include.moment.images %}
+    <div class="moment-images">
+      {% for image in include.moment.images %}<img src="{{ image | relative_url }}" alt="动态图片" loading="lazy">{% endfor %}
+    </div>
+    {% endif %}
+    {% if include.moment.tags %}
+    <div class="moment-tags">{% for tag in include.moment.tags %}<span class="moment-tag">#{{ tag }}</span>{% endfor %}</div>
+    {% endif %}
+    <footer class="moment-post-footer">
+      <a class="moment-time" href="{{ include.moment.url | relative_url }}"><time datetime="{{ include.moment.date | date_to_xmlschema }}">{{ include.moment.date | date: '%Y-%m-%d %H:%M' }}</time></a>
+      {% if include.moment.location %}<span class="moment-location">{{ include.moment.location }}</span>{% endif %}
+    </footer>
+  </div>
+</article>

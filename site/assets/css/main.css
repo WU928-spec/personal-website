@@ -252,6 +252,22 @@ p { text-wrap: pretty; }
 .katex { max-width: 100%; }
 .moment-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 32px; }
 .moment-images img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.moment-feed { max-width: var(--reading); padding-block: 24px 48px; }
+.moment-post { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; padding-block: 24px; border-bottom: 1px solid var(--line); }
+.moment-post:first-child { border-top: 1px solid var(--line); }
+.moment-avatar { width: 40px; height: 40px; border-radius: 50%; outline: 1px solid var(--line); object-fit: cover; }
+.moment-post-body { min-width: 0; }
+.moment-author { margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+.moment-post-content { overflow-wrap: anywhere; }
+.moment-post-content p { margin: 0 0 10px; }
+.moment-post-content > :last-child { margin-bottom: 0; }
+.moment-post-content a { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.moment-post .moment-images { margin-top: 12px; }
+.moment-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.moment-tag { color: var(--accent); font-size: 13px; }
+.moment-post-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+.moment-time { color: var(--muted); font-family: ui-monospace, monospace; }
+.moment-time:hover { color: var(--accent); }
 
 .site-footer { padding-block: 52px 28px; }
 .footer-grid { display: grid; grid-template-columns: 1fr auto auto; align-items: start; gap: 48px; }

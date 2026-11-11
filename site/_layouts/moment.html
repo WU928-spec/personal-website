@@ -3,14 +3,17 @@ layout: default
 ---
 <article class="article shell-narrow">
   <header class="article-header">
-    <p class="eyebrow">{{ page.category | default: '记忆碎片' }}</p>
+    <p class="eyebrow">记忆碎片</p>
     {% if page.title %}<h1>{{ page.title }}</h1>{% endif %}
-    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }}</time>
+    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d %H:%M' }}</time>
   </header>
   <div class="article-content">{{ content }}</div>
   {% if page.images %}
   <div class="moment-images">
     {% for image in page.images %}<img src="{{ image | relative_url }}" alt="动态图片" loading="lazy">{% endfor %}
   </div>
+  {% endif %}
+  {% if page.tags %}
+  <div class="moment-tags">{% for tag in page.tags %}<span class="moment-tag">#{{ tag }}</span>{% endfor %}</div>
   {% endif %}
 </article>

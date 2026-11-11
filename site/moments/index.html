@@ -5,34 +5,11 @@ description: 一些普通但值得记住的时刻。
 permalink: /moments/
 ---
 {% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
-{% assign maintenance_logs = public_moments | where: "category", "网站维护日志" %}
-{% assign daily_moments = public_moments | where_exp: "moment", "moment.category != '网站维护日志'" %}
 <header class="page-header shell"><p class="eyebrow">MOMENTS</p><h1>动态</h1><p>一些日常记录。</p></header>
-<section class="content-section shell" id="maintenance-log">
-  <div class="section-head"><div><p class="eyebrow">SITE NOTES</p><h2>网站维护日志</h2><p>记录这个网站每天的更新与调整。</p></div></div>
-  <div class="entry-list">
-    {% for log in maintenance_logs %}
-      <a class="entry" href="{{ log.url | relative_url }}">
-        <time class="entry-date" datetime="{{ log.date | date_to_xmlschema }}">{{ log.date | date: '%Y-%m-%d' }}</time>
-        <div><h3>{{ log.title | default: '网站更新' }}</h3><p>{{ log.excerpt | strip_html | truncate: 110 }}</p></div>
-        <span class="entry-arrow">↗</span>
-      </a>
-    {% else %}
-      <p class="empty-state">还没有维护记录。</p>
-    {% endfor %}
-  </div>
-</section>
-<section class="content-section shell">
-  <div class="section-head"><div><h2>日常动态</h2><p>一些普通但值得记住的时刻。</p></div></div>
-  <div class="entry-list">
-    {% for moment in daily_moments %}
-      <a class="entry" href="{{ moment.url | relative_url }}" data-math>
-        <time class="entry-date">{{ moment.date | date: '%Y-%m-%d' }}</time>
-        <div><h3>{{ moment.excerpt | strip_html | truncate: 90 }}</h3>{% if moment.location %}<p>{{ moment.location }}</p>{% endif %}</div>
-        <span class="entry-arrow">↗</span>
-      </a>
-    {% else %}
-      <p class="empty-state">新的故事正在酝酿。</p>
-    {% endfor %}
-  </div>
+<section class="moment-feed shell-narrow" aria-label="动态列表">
+  {% for moment in public_moments %}
+    {% include moment-card.html moment=moment %}
+  {% else %}
+    <p class="empty-state">新的故事正在酝酿。</p>
+  {% endfor %}
 </section>

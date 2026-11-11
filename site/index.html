@@ -3,7 +3,7 @@ layout: home
 title: 首页
 ---
 {% assign public_notes = site.notes | where_exp: "note", "note.published != false" | sort: "date" | reverse %}
-{% assign public_moments = site.moments | where_exp: "moment", "moment.published != false and moment.category != '网站维护日志'" | sort: "date" | reverse %}
+{% assign public_moments = site.moments | where_exp: "moment", "moment.published != false" | sort: "date" | reverse %}
 <div class="hero-backdrop">
   <section class="hero shell">
     <img class="hero-avatar" src="{{ '/assets/media/avatar.jpg' | relative_url }}" alt="Jasper 的头像" width="384" height="384" fetchpriority="high" decoding="async">
@@ -32,13 +32,9 @@ title: 首页
 
 <section class="content-section shell">
   <div class="section-head"><div><h2>最近动态</h2><p>一些日常记录。</p></div><a class="section-link" href="{{ '/moments/' | relative_url }}">全部动态 ↗</a></div>
-  <div class="entry-list">
+  <div class="moment-feed">
     {% for moment in public_moments limit: 3 %}
-      <a class="entry" href="{{ moment.url | relative_url }}" data-math>
-        <time class="entry-date">{{ moment.date | date: '%Y-%m-%d' }}</time>
-        <div><h3>{{ moment.excerpt | strip_html | truncate: 72 }}</h3>{% if moment.location %}<p>{{ moment.location }}</p>{% endif %}</div>
-        <span class="entry-arrow">↗</span>
-      </a>
+      {% include moment-card.html moment=moment %}
     {% else %}
       <p class="empty-state">还没有动态。</p>
     {% endfor %}

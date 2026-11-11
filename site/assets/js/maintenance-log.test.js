@@ -5,12 +5,21 @@ import { readFileSync } from 'node:fs'
 const momentsPage = readFileSync(new URL('../../moments/index.html', import.meta.url), 'utf8')
 const homePage = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
 
-test('separates website maintenance logs from everyday moments', () => {
-  assert.match(momentsPage, /where: "category", "网站维护日志"/)
-  assert.match(momentsPage, /id="maintenance-log"/)
-  assert.match(momentsPage, /moment\.category != '网站维护日志'/)
+test('renders every moment in one social feed without a maintenance-only section', () => {
+  assert.match(momentsPage, /class="moment-feed shell-narrow"/)
+  assert.match(momentsPage, /include moment-card\.html moment=moment/)
+  assert.doesNotMatch(momentsPage, /maintenance_logs|daily_moments|maintenance-log/)
 })
 
-test('keeps maintenance entries out of the homepage daily moments feed', () => {
-  assert.match(homePage, /moment\.published != false and moment\.category != '网站维护日志'/)
+test('renders maintenance updates as tagged posts with minute timestamps', () => {
+  const card = readFileSync(new URL('../../_includes/moment-card.html', import.meta.url), 'utf8')
+  assert.match(card, /#{{ tag }}/)
+  assert.match(card, /%Y-%m-%d %H:%M/)
+  assert.match(card, /moment-post-content/)
+})
+
+test('includes maintenance updates in the homepage feed using the same post card', () => {
+  assert.match(homePage, /moment\.published != false"/)
+  assert.doesNotMatch(homePage, /moment\.category/)
+  assert.match(homePage, /include moment-card\.html moment=moment/)
 })

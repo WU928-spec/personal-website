@@ -29,9 +29,9 @@
 
 | 模块 | 描述 |
 |------|------|
-| 🏠 **个人主页** | 圆形头像、最新笔记与日常动态，以及使用真实数据的 GitHub 贡献热力图 |
+| 🏠 **个人主页** | 圆形头像、最新笔记与动态，以及使用真实数据的 GitHub 贡献热力图 |
 | 📚 **Markdown 笔记** | 支持栏目、标签、摘要、目录与标题锚点；使用 kramdown/GFM、Rouge 代码高亮和 KaTeX 数学公式 |
-| 💭 **记忆碎片** | 日常动态与“网站维护日志”分栏展示，均通过 Markdown 维护 |
+| 💭 **记忆碎片** | 微博式单条信息流，时间精确到分钟；网站维护更新使用 `#网站维护日志` 标签 |
 | 🛠️ **五个静态工具** | 实习决策助手、英文分段器、每日电影推荐、开发工具、Git & Conda 指南 |
 | 🔍 **站内搜索** | 通过 Jekyll 生成的静态 JSON 索引搜索笔记和动态，草稿不会进入索引 |
 | 🎵 **连续浏览体验** | 首页、文章、动态和工具之间无刷新切换，音乐播放器跨页面保持；默认静音且不自动播放 |
@@ -133,10 +133,10 @@ node --test assets/js/*.test.js
 | 目录 | 内容 | 主要字段 |
 |------|------|----------|
 | `site/_notes/` | 文章笔记 | `title`、`date`、`written_date`、`category`、`tags`、`description`、`slug`、`published` |
-| `site/_moments/` | 生活动态与网站维护日志 | `title`、`date`、`images`、`location`、`category`、`published` |
+| `site/_moments/` | 生活动态与网站维护日志 | `title`、`date`、`images`、`location`、`tags`、`published` |
 | `site/_memoirs/` | 星空短文 | `title`、`date`、`published` |
 
-3. 网站维护日志使用 `category: 网站维护日志`，一天一篇，显示在动态页独立栏目。
+3. 网站维护更新每条单独发布，使用 `tags: [网站维护日志]`，与普通动态按时间统一排列，时间精确到分钟。
 4. 将公开图片放入 `site/assets/media/`，使用仓库相对路径引用。
 5. 将 `published: false` 用作草稿；草稿不会生成公开页面，也不会进入列表或搜索。
 6. 提交并推送到 `main` 后，GitHub Actions 会刷新贡献数据、运行测试、构建并发布网站。
