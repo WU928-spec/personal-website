@@ -1,0 +1,13 @@
+---
+layout: default
+---
+<header class="page-header shell now-header">
+  <p class="eyebrow">NOW</p>
+  <h1>现在</h1>
+  <p>这是我此刻正在关注的事。</p>
+  {% if page.updated %}<time class="now-updated" datetime="{{ page.updated }}">最近更新于 {{ page.updated }}</time>{% endif %}
+</header>
+<div class="now-page shell">
+  <div class="article-content now-content">{{ content }}</div>
+  <p class="now-note">这是一个 <a href="https://nownownow.com/about" target="_blank" rel="noopener noreferrer">Now 页面</a>：记录我目前的生活重心，而不是即时动态或任务清单。</p>
+</div>

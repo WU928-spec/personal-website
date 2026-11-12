@@ -236,6 +236,17 @@ p { text-wrap: pretty; }
 .table-wrap { max-width: 100%; overflow-x: auto; }
 .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding-block: 10px; }
 .katex { max-width: 100%; }
+.now-page { max-width: 860px; padding-block: 48px 80px; }
+.now-updated { display: inline-block; margin-top: 24px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 12px; }
+.now-content h2 { margin: 52px 0 20px; padding-top: 28px; border-top: 1px solid var(--line); }
+.now-content h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.now-content h3 { margin-top: 30px; font-size: 22px; }
+.now-content strong { color: var(--accent); font-weight: 500; }
+.now-content ul { display: grid; gap: 8px; padding-left: 0; list-style: none; }
+.now-content li { padding-left: 18px; position: relative; }
+.now-content li::before { content: ''; position: absolute; left: 0; top: 1.35em; width: 6px; height: 1px; background: var(--accent); }
+.now-note { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.now-note a { color: var(--accent); text-underline-offset: 4px; }
 .moment-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 32px; }
 .moment-images img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .moment-feed { max-width: var(--reading); padding-block: 24px 48px; }

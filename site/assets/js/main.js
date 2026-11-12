@@ -1,11 +1,11 @@
 const translations = {
   zh: {
-    brandNote: '个人小站', home: '首页', moments: '动态', notes: '文章', tools: '小工具',
+    brandNote: '个人小站', home: '首页', now: '现在', moments: '动态', notes: '文章', tools: '小工具',
     footerNote: 'Jasper 的个人小站。', signature: '记录生活和学习',
     searchLabel: '搜索笔记和动态', searchPlaceholder: '输入关键词…',
   },
   en: {
-    brandNote: 'Personal site', home: 'Home', moments: 'Moments', notes: 'Notes', tools: 'Tools',
+    brandNote: 'Personal site', home: 'Home', now: 'Now', moments: 'Moments', notes: 'Notes', tools: 'Tools',
     footerNote: "Jasper's personal site.", signature: 'Life and learning',
     searchLabel: 'Search notes and moments', searchPlaceholder: 'Type a keyword…',
   },
