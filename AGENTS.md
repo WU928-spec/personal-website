@@ -17,7 +17,7 @@
 - `_notes/`：文章笔记，支持 `title/date/written_date/category/tags/description/slug/published`。栏目包括诗歌、散文、随笔、小说、数学、计算机&金融、日记；缺失或未知分类进入未归档。
 - `_moments/`：生活动态与网站维护日志，支持 `title/date/display_time/images/location/tags/published`。所有动态按 `date` 倒序统一显示；`display_time` 使用精确到分钟的本地时间文本，避免构建时区改变显示。维护更新每条单独发布，使用 `tags: [网站维护日志]`，标签显示在正文下方，不另设栏目。
 - `_memoirs/`：星空短文，支持 `title/date/published`。
-- `now.md`：单页当前状态、进行中项目与近期计划，正文用 Markdown 维护；`updated` 是页面上手动更新的日期。
+- `now.md`：单页当前状态、进行中项目与近期计划，正文用 Markdown 维护；`_plugins/now_updated.rb` 在构建时读取最近一次 Git 提交时间，`updated` 仅作回退。
 - `published: false` 是草稿，不得生成页面或进入列表、搜索。
 - 图片放在 `site/assets/media/`，使用仓库相对路径。
 - 不提交 `.env`、密钥、私人笔记或不愿公开的图片。

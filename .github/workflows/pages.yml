@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/configure-pages@v5
       - uses: actions/setup-node@v4
         with:
@@ -43,7 +45,9 @@ jobs:
           bundler-cache: true
       - name: Test wikilinks
         working-directory: site
-        run: bundle exec ruby test/wikilinks_test.rb
+        run: |
+          bundle exec ruby test/wikilinks_test.rb
+          bundle exec ruby test/now_updated_test.rb
       - name: Build Jekyll
         working-directory: site
         run: bundle exec jekyll build --source . --destination _site
