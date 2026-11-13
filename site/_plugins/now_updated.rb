@@ -31,7 +31,10 @@ end
 if defined?(Jekyll::Generator)
   class NowUpdatedGenerator < Jekyll::Generator
     def generate(site)
+      page = site.pages.find { |candidate| File.basename(candidate.path.to_s) == 'now.md' }
+      Jekyll.logger.info('Now timestamp:', "page=#{page&.path || 'missing'}")
       NowUpdated.apply_to_site(site)
+      Jekyll.logger.info('Now timestamp:', "value=#{page&.data&.dig('updated') || 'missing'}")
     end
   end
 end
