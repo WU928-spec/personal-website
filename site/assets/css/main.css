@@ -236,6 +236,13 @@ p { text-wrap: pretty; }
 .table-wrap { max-width: 100%; overflow-x: auto; }
 .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding-block: 10px; }
 .katex { max-width: 100%; }
+.wikilink { color: var(--accent); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 4px; }
+.wikilink.unresolved { color: var(--muted); text-decoration: none; cursor: default; }
+.backlinks { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); }
+.backlinks h2 { margin: 0 0 8px; font-size: 22px; }
+.backlinks p { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+.backlinks ul { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0; padding: 0; list-style: none; }
+.backlinks a { color: var(--accent); text-underline-offset: 4px; }
 .now-page { max-width: 860px; padding-block: 48px 80px; }
 .now-updated { display: inline-block; margin-top: 24px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 12px; }
 .now-content h2 { margin: 52px 0 20px; padding-top: 28px; border-top: 1px solid var(--line); }

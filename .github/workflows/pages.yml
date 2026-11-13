@@ -41,6 +41,9 @@ jobs:
           ruby-version: '3.3'
           working-directory: site
           bundler-cache: true
+      - name: Test wikilinks
+        working-directory: site
+        run: bundle exec ruby test/wikilinks_test.rb
       - name: Build Jekyll
         working-directory: site
         run: bundle exec jekyll build --source . --destination _site

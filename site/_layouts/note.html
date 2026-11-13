@@ -9,4 +9,13 @@ layout: default
   </header>
   <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
   <div class="article-content">{{ content }}</div>
+  {% if page.backlinks and page.backlinks.size > 0 %}
+  <section class="backlinks" aria-labelledby="backlinks-title">
+    <h2 id="backlinks-title">反向链接</h2>
+    <p>这些文章也提到了这里：</p>
+    <ul>
+      {% for link in page.backlinks %}<li><a href="{{ link.url | relative_url }}">{{ link.title }}</a></li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
 </article>

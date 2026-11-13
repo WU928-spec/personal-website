@@ -45,7 +45,7 @@ Jekyll 使用 4.4 系列；本地与 Actions 均使用 Ruby 3.3。生成目录�
 
 - 内容页面使用 Liquid 模板、语义 HTML 和共享 CSS；交互使用无框架浏览器 JavaScript。
 - 五个旧版小工具复用 `app/src/` 中的 React 组件，经 `app/vite.tools.config.ts` 构建为纯静态资源；不得接入 Supabase、数据库或在线后台。
-- Markdown 使用 kramdown/GFM，Rouge 构建时高亮，KaTeX 前端渲染。
+- Markdown 使用 kramdown/GFM，Rouge 构建时高亮，KaTeX 前端渲染；`_plugins/wikilinks.rb` 在构建时处理 `[[双链]]` 与公开文章反向链接，代码区域不转换。
 - 目录必须读取最终标题 id，不另写一套不兼容的 slug 规则。
 - 工具纯函数使用 Node 内置测试，浏览器 DOM 绑定必须在 Node 中可安全导入。
 - 图片保留 alt 和固定画幅；主题、语言和交互支持键盘与减少动态效果。
