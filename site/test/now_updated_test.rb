@@ -20,4 +20,9 @@ without_slash = Struct.new(:url, :path, :data).new('/now', '/repo/site/now.md', 
 NowUpdated.apply(without_slash, git: ->(_path) { "2026-11-13T10:20:24+08:00\n" })
 assert_equal '2026-11-13 10:20', without_slash.data['updated']
 
-puts '4 Now timestamp tests passed'
+site = Struct.new(:pages).new([other, without_slash])
+NowUpdated.apply_to_site(site, git: ->(_path) { "2026-11-13T10:20:24+08:00\n" })
+assert_equal '2026-11-13 10:20', without_slash.data['updated']
+assert_equal 'unchanged', other.data['updated']
+
+puts '5 Now timestamp tests passed'

@@ -21,10 +21,17 @@ module NowUpdated
     timestamp = display_time(page.path, git: git)
     page.data['updated'] = timestamp if timestamp
   end
+
+  def self.apply_to_site(site, git: nil)
+    page = site.pages.find { |candidate| File.basename(candidate.path.to_s) == 'now.md' }
+    apply(page, git: git) if page
+  end
 end
 
-if defined?(Jekyll::Hooks)
-  Jekyll::Hooks.register :pages, :pre_render do |page, _payload|
-    NowUpdated.apply(page)
+if defined?(Jekyll::Generator)
+  class NowUpdatedGenerator < Jekyll::Generator
+    def generate(site)
+      NowUpdated.apply_to_site(site)
+    end
   end
 end
