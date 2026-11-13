@@ -17,7 +17,7 @@ module NowUpdated
   end
 
   def self.apply(page, git: nil)
-    return unless page.url == '/now/'
+    return unless File.basename(page.path.to_s) == 'now.md'
     timestamp = display_time(page.path, git: git)
     page.data['updated'] = timestamp if timestamp
   end
