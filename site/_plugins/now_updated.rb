@@ -16,25 +16,23 @@ module NowUpdated
     nil
   end
 
-  def self.apply(page, git: nil)
+  def self.apply(page, git: nil, source: nil)
     return unless File.basename(page.path.to_s) == 'now.md'
-    timestamp = display_time(page.path, git: git)
+    path = source ? File.expand_path(page.path.to_s, source) : page.path
+    timestamp = display_time(path, git: git)
     page.data['updated'] = timestamp if timestamp
   end
 
   def self.apply_to_site(site, git: nil)
     page = site.pages.find { |candidate| File.basename(candidate.path.to_s) == 'now.md' }
-    apply(page, git: git) if page
+    apply(page, git: git, source: site.source) if page
   end
 end
 
 if defined?(Jekyll::Generator)
   class NowUpdatedGenerator < Jekyll::Generator
     def generate(site)
-      page = site.pages.find { |candidate| File.basename(candidate.path.to_s) == 'now.md' }
-      Jekyll.logger.info('Now timestamp:', "page=#{page&.path || 'missing'}")
       NowUpdated.apply_to_site(site)
-      Jekyll.logger.info('Now timestamp:', "value=#{page&.data&.dig('updated') || 'missing'}")
     end
   end
 end
