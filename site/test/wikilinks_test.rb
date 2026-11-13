@@ -52,11 +52,26 @@ def test_builds_backlinks_from_public_notes
   end
 end
 
+def test_processes_pages_and_includes_them_in_backlinks
+  target = FakeDocument.new({ 'title' => '调度问题' }, '/notes/调度问题/', '调度问题.md', '正文')
+  now = FakeDocument.new({ 'title' => '现在' }, '/now/', 'now.md', '一个[[调度问题]]')
+  site = Struct.new(:collections, :pages).new(
+    { 'notes' => Struct.new(:docs).new([target]) },
+    [now],
+  )
+
+  Wikilinks.process_page(now, site)
+
+  assert_includes now.content, '<a class="wikilink" href="/notes/调度问题/">调度问题</a>'
+  assert_equal [{ 'title' => '现在', 'url' => '/now/' }], target.data['backlinks']
+end
+
 [
   :test_links_titles_aliases_and_headings,
   :test_supports_file_names_and_local_headings,
   :test_unresolved_links_and_code_are_preserved,
   :test_builds_backlinks_from_public_notes,
+  :test_processes_pages_and_includes_them_in_backlinks,
 ].each { |test| send(test) }
 
-puts '4 wikilink tests passed'
+puts '5 wikilink tests passed'

@@ -28,7 +28,7 @@ published: true
 
 ## 双链与反向链接
 
-文章中可以直接使用 Obsidian 风格链接：
+文章和 Now 等独立页面中可以直接使用 Obsidian 风格链接：
 
 ```md
 [[读者]]

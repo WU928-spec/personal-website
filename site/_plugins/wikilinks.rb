@@ -71,13 +71,21 @@ module Wikilinks
     end
   end
 
+  def self.process_page(document, site)
+    prepare(site)
+    index = site.instance_variable_get(:@wikilinks_index)
+    document.content = transform(document.content, index, document)
+  end
+
   def self.prepare(site)
     return if site.instance_variable_get(:@wikilinks_prepared)
-    notes = site.collections['notes'].docs.select { |document| document.data['published'] != false }
-    index = build_index(notes)
+    notes = site.collections['notes'].docs
+    pages = site.respond_to?(:pages) ? site.pages : []
+    sources = (notes + pages).select { |document| document.data['published'] != false }
+    index = build_index(sources)
     backlinks = Hash.new { |hash, key| hash[key] = [] }
 
-    notes.each do |source|
+    sources.each do |source|
       extract_targets(source.content).each do |target|
         document = index[normalize_key(target)]
         next unless document
@@ -86,8 +94,10 @@ module Wikilinks
       end
     end
 
-    notes.each do |document|
-      document.data['backlinks'] = backlinks[document].map { |source| { 'title' => source.data['title'], 'url' => source.url } }
+    sources.each do |document|
+      document.data['backlinks'] = backlinks[document].map do |source|
+        { 'title' => source.data['title'] || source.basename, 'url' => source.url }
+      end
     end
     site.instance_variable_set(:@wikilinks_index, index)
     site.instance_variable_set(:@wikilinks_prepared, true)
@@ -97,8 +107,10 @@ end
 if defined?(Jekyll::Hooks)
   Jekyll::Hooks.register :documents, :pre_render do |document, _payload|
     next unless document.collection.label == 'notes'
-    Wikilinks.prepare(document.site)
-    index = document.site.instance_variable_get(:@wikilinks_index)
-    document.content = Wikilinks.transform(document.content, index, document)
+    Wikilinks.process_page(document, document.site)
+  end
+
+  Jekyll::Hooks.register :pages, :pre_render do |page, _payload|
+    Wikilinks.process_page(page, page.site)
   end
 end
